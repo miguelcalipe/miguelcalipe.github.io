@@ -1,0 +1,490 @@
+/* =====================================
+   MC Mundo Tech - Estilo de Artículos
+   ===================================== */
+
+:root {
+    --primary-color: #1e3a8a;
+    --secondary-color: #3b82f6;
+    --text-color: #1f2937;
+    --bg-color: #0c39ef29;
+    --card-bg: #ffffff;
+    --border-color: #e2e8f0;
+    --code-bg: #f1f5f9;
+}
+
+
+body.articulo {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color:var(--bg-color);
+    margin: 0;
+    padding: 0;
+}
+
+.article-header {
+    background: linear-gradient(
+        135deg,
+        var(--primary-color),
+        var(--secondary-color)
+    );
+    color: white;
+    padding: 2.5rem 1.5rem;
+    text-align: left;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.2rem;
+    font-weight: 700;
+}
+
+header p {
+    margin: 0 auto;
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+.articulo main {
+   width: 100%;
+   max-width: 1080px;
+   margin: 2rem auto;
+   padding: 0 1rem;
+}
+
+/*
+section {
+    background-color:var(--card-bg);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+}
+*/
+section {
+    background: #ffffff;
+    border: 2px solid #abadb0;
+    border-radius: 10px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.386);
+    overflow: hidden;
+    /*border: 3px solid red;
+    box-shadow: 0 0 0 5px lime;*/
+}
+
+
+h2 {
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--secondary-color);
+    padding-bottom: 0.5rem;
+    margin-top: 0;
+    font-size: 1.5rem;
+}
+
+h3 {
+    color: var(--secondary-color);
+    font-size: 1.2rem;
+    margin-top: 1.5rem;
+}
+
+p {
+    margin: 0.8rem 0;
+    text-align: justify;
+}
+
+ul,
+ol {
+    padding-left: 1.5rem;
+}
+
+li {
+    margin-bottom: 0.5rem;
+}
+
+.table-container {
+    overflow-x: auto;
+    margin: 2rem 0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+}
+
+th,
+td {
+    border: 1px solid var(--border-color);
+    padding: 0.75rem;
+    text-align: left;
+}
+
+th {
+    background-color: var(--bg-color);
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+tr:nth-child(even) {
+    background-color: #fafafa;
+}
+/* ===========================
+   FÓRMULAS
+   =========================== */
+.formula-box {
+    background-color: var(--bg-color);
+    border-left: 4px solid var(--secondary-color);
+    padding: 1rem;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+    border-radius: 0 4px 4px 0;
+}
+
+.alert-box {
+    background-color: #fff7ed;
+    border-left: 4px solid #ea580c;
+    color: #7c2d12;
+    padding: 1rem;
+    margin: 1.5rem 0;
+    border-radius: 0 4px 4px 0;
+}
+
+/* ===========================
+   BLOQUES DE CÓDIGO
+   =========================== */
+
+pre {
+    background: #1f2937;
+    color: #f8fafc;
+    padding: 18px;
+    margin: 25px 0;
+    border-left: 5px solid #2563EB;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,.15);
+
+
+     /* Tipografía */
+    font-family: Consolas, "Courier New", monospace;
+    font-size: .95rem;
+    line-height: 1.6;
+
+    /* Permite desplazamiento horizontal si el código es muy largo */
+    overflow-x: auto;
+
+    /* Evita que el código se parta en varias líneas */
+    white-space: pre;
+
+    /* Suaviza el desplazamiento en iPhone/iPad */
+    -webkit-overflow-scrolling: touch;
+
+    /* Sombra */
+    box-shadow: 0 3px 10px rgba(0,0,0,.15);
+}
+
+pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    font: inherit;
+    display: block;
+}
+
+/* ===========================
+   CÓDIGO DENTRO DE UN PÁRRAFO
+   =========================== */
+:not(pre) > code {
+    background: #eef4ff;
+    color: #1e3a8a;
+    padding: 2px 6px;
+    border: 1px solid #c7d2fe;
+    border-radius: 4px;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 0.95em;
+}
+
+.dos-columnas {
+    column-count: 2;
+    column-gap: 2rem;
+}
+
+@media (max-width: 768px) {
+    .dos-columnas {
+        column-count: 1;
+    }
+}
+
+
+.image-placeholder {
+    background-color: var(--code-bg);
+    border: 2px dashed #cbd5e1;
+    padding: 3rem 1rem;
+    text-align: center;
+    color: #64748b;
+    margin: 1.5rem 0;
+    border-radius: 6px;
+    font-style: italic;
+}
+
+.articulo-nav{
+
+display:flex;
+justify-content:space-between;
+margin-top:60px;
+padding-top:25px;
+border-top:1px solid #ccc;
+
+}
+
+.articulo-nav a{
+text-decoration:none;
+font-weight:bold;
+}
+
+.volver-arriba{
+    display:inline-block;
+    margin-top:30px;
+    padding:10px 18px;
+    background:#2563EB;
+    color:#fff;
+    text-decoration:none;
+    border-radius:6px;
+    font-weight:bold;
+    transition:.3s;
+}
+
+.volver-arriba:hover{
+    background:#1D4ED8;
+}
+
+.galeria {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.galeria figure {
+    flex: 0 1 320px;
+    max-width: 320px;
+    text-align: center;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.galeria img {
+    max-width: 100%;
+    height: 200px;
+    display: block;
+    margin: 0 auto;
+    object-fit: contain;
+}
+.galeria figcaption {
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+.imagen-derecha {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.imagen-derecha .texto {
+    flex: 1;
+}
+
+.imagen-derecha img {
+    max-width: 300px;
+    height: auto;
+}
+
+@media (max-width: 768px) {
+    .imagen-derecha {
+        flex-direction: column;
+    }
+}
+
+/*==========================================================
+    ÍNDICE
+==========================================================*/
+
+#indice{
+
+    background:#f8f9fa;
+
+    border:1px solid #d9d9d9;
+
+    border-radius:8px;
+
+    padding:18px;
+
+    margin-bottom:30px;
+
+}
+
+#indice h2{
+
+    margin-top:0;
+
+    margin-bottom:10px;
+
+}
+
+.lista-indice{
+
+    list-style:none;
+
+    padding-left:0;
+
+    margin-top:15px;
+
+}
+
+.lista-indice li{
+
+    margin:8px 0;
+
+}
+
+.lista-indice li.subnivel{
+
+    margin-left:20px;
+
+}
+
+.lista-indice a{
+
+    text-decoration:none;
+
+    color:#0f4fa8;
+
+}
+
+.lista-indice a:hover{
+
+    text-decoration:underline;
+
+}
+
+.boton-indice{
+
+    padding:6px 12px;
+
+    cursor:pointer;
+
+}
+
+/* ===========================
+   FOOTER
+=========================== */
+
+.site-footer{
+    background:#1b1f24;
+    color:#d7dce2;
+    margin-top:60px;
+    border-top:4px solid #2c7be5;
+    font-size:0.95rem;
+}
+
+.footer-container{
+    max-width:1200px;
+    margin:auto;
+    padding:45px 25px;
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:space-between;
+    gap:40px;
+}
+
+.footer-block{
+    flex:1;
+    min-width:230px;
+}
+
+.footer-block h3,
+.footer-block h4{
+    color:#ffffff;
+    margin-bottom:18px;
+    font-weight:600;
+}
+
+.footer-block p{
+    color:#c5ccd3;
+    line-height:1.8;
+    text-align:justify;
+}
+
+.footer-block ul{
+    list-style:none;
+    margin:0;
+    padding:0;
+}
+
+.footer-block li{
+    margin-bottom:12px;
+}
+
+.footer-block a{
+    color:#b9d8ff;
+    text-decoration:none;
+    transition:color .25s ease;
+}
+
+.footer-block a:hover{
+    color:#ffffff;
+}
+
+.footer-bottom{
+    border-top:1px solid rgba(255,255,255,.12);
+    text-align:center;
+    padding:18px 20px;
+    background:#171a1e;
+}
+
+.footer-bottom p{
+    margin:0;
+    color:#aeb6bf;
+    font-size:.9rem;
+}
+
+
+/*
+.galeria {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+}
+
+.galeria figure {
+    flex: 0 1 320px;
+    max-width: 350px;
+    text-align: center;
+    margin: 0;
+}
+
+.galeria img {
+    width: 100%;
+    max-height: 250px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    border-radius: 8px;
+}
+
+.galeria figcaption {
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+*/

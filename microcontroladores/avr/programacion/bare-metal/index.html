@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Nombre articulo | MC Mundo Tech</title>
+    <link rel="stylesheet" href="/mi-web-electronica/assets/css/principal.css">
+    <link rel="stylesheet" href="/mi-web-electronica/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>
+        
+        <article>
+            <header class="article-header">
+            <h1>PROGRAMACIÓN BARE-METAL DE MICROCONTROLADORES AVR</h1>
+            <p style="text-align:center">Dominando la Toolchain GNU desde la línea de comandos></p>
+            </header>
+            
+            <aside id="indice"></aside>    
+            
+            <section> 
+            <h2>1. ¿QUÉ ES UNA TOOLCHAIN?</h2>
+            <p>
+                Una <strong>toolchain</strong> (cadena de herramientas) es un conjunto de programas independientes que trabajan de forma secuencial para transformar el código fuente escrito por el desarrollador en un archivo de firmware ejecutable por la unidad de procesamiento del microcontrolador.</p>
+            <p>
+                Cada herramienta realiza una tarea muy concreta y entrega su resultado como entrada a la siguiente herramienta de la cadena. En una toolchain, los programas están diseñados para complementarse y automatizar por completo el proceso de construcción del software (<em>build</em>).
+            </p>
+        
+                <h3>Toolchain vs. Toolkit</h3>
+                <p>Aunque ambos términos suelen confundirse, no significan lo mismo:</p>
+                <ul>
+                    <li><strong>Toolchain (cadena de herramientas):</strong> Es el conjunto específico de programas que intervienen directamente en la fabricación del binario final. Existe un flujo de trabajo estrictamente definido donde no se puede alterar el orden de los pasos ni omitir una etapa sin romper el proceso de construcción.</li>
+                    <li><strong>Toolkit (kit de herramientas):</strong> Es una colección más amplia de utilidades que ayudan al desarrollo pero que no forman una cadena secuencial obligatoria (por ejemplo: analizadores de consumo, herramientas de configuración gráfica de pines o generadores de código).</li>
+                </ul>
+                
+                <p>
+                    Por ejemplo, un fabricante puede distribuir un toolkit de desarrollo que incluya de forma modular:</p>
+                <ul>
+                    <li>Un editor de código o IDE.</li>
+                    <li>Un simulador de circuitos.</li>
+                    <li>Un analizador lógico.</li>
+                    <li>Un software de grabación de firmware (como AVRDUDE).</li>
+                    <li>Un monitor serie para telemetría.</li>
+                    <li>Un depurador en tiempo real.</li>
+                </ul>
+                <p>
+                    Todas estas aplicaciones pertenecen al mismo kit de desarrollo, pero no forman parte de la cadena secuencial de procesamiento del código fuente.<
+                    /p>
+            
+                <h3>El flujo esencial de una Toolchain</h3>
+                <p>Sin importar la arquitectura del chip, el flujo sigue siempre este orden:</p>
+                
+                <div style="overflow-wrap: break-word" class="flowchart">
+                    Código Fuente &rarr; Preprocesado &rarr; Compilación &rarr; Ensamblado &rarr; Enlazado &rarr; Imagen de Firmware &rarr; Programación/Flasheo del &#956;C
+                </div>
+
+                <ol>
+                    <li><strong>Código fuente:</strong> Archivos escritos en lenguajes de alto o medio nivel (como C, C++ o Rust) y ensamblador.</li>
+                    <li><strong>Preprocesador:</strong> Modifica el código fuente procesando directivas (como inclusiones de archivos <code>#include</code> o macros).</li>
+                    <li><strong>Compilador:</strong> Traduce el código de alto nivel a código ensamblador específico de la arquitectura destino.</li>
+                    <li><strong>Ensamblador:</strong> Convierte el código ensamblador en código de máquina (archivos objeto en código binario no reubicable).</li>
+                    <li><strong>Enlazador (Linker):</strong> Combina los archivos objeto con las librerías y, guiado por un script de enlazado (<em>linker script</em>), organiza el mapa de memoria específico del microcontrolador (definiendo dónde van la Flash y la RAM).</li>
+                    <li><strong>Imagen de Firmware:</strong> El resultado final optimizado en el formato que requiera el programador (formatos comunes: <code>.hex</code>, <code>.bin</code>, <code>.elf</code>, <code>.srec</code>).</li>
+                    <li><strong>Programación/Flasheo:</strong> Herramienta que transfiere esa imagen binaria a la memoria no volátil del microcontrolador mediante una interfaz de depuración (como JTAG, SWD, ICSP o por un <em>bootloader</em>).</li>
+                </ol>
+            </section>
+
+            <section>
+            <h2>2. LA TOOLCHAIN PARA AVR EN ENTORNO LINUX (RASPBERRY PI 5)</h2>
+            <p>
+                Para programar microcontroladores AVR desde la línea de comandos utilizaremos la <strong>GNU AVR Toolchain</strong>, una colección de herramientas y librerías usadas para crear programas para  microcontroladores AVR.
+            </p>
+
+                <p>
+                    La gran mayoría de sus herramientas son adaptaciones de las herramientas clásicas del software libre desarrolladas por el proyecto GNU (<a href="https://www.gnu.org" target="_blank">www.gnu.org</a>) patrocinado por la Free Software Foundation, y que han sido modificadas específicamente para entender la arquitectura AVR e incluyen los siguientes paquetes:
+                </p>
+
+                    <h3>AVR-GCC</h3>
+                    <p>Es un Compilador de C y C++ para microcontroladores AVR.</p>
+                    <ul>
+                        <li>Traduce el código fuente a código objeto.</li>
+                        <li>Es una versión del famoso <strong>GNU Compiler Collection</strong> (<code>GCC</code>).</li>
+                        <li>El motor del compilador es 100% de GNU.</li>
+                    </ul>
+
+                    <h3>Binutils para AVR</h3>
+                    <p>Todas sus herramientas pertenecen al proyecto GNU Binutils. Son las utilidades esenciales para manipular código binario, e incluyen:</p>
+                    <ul>
+                        <li><code>avr-as</code> (ensamblador)</li>
+                        <li><code>avr-ld</code> (enlazador)</li>
+                        <li><code>avr-ar</code> (bibliotecas)</li>
+                        <li><code>avr-objcopy</code> (genera archivos <code>HEX</code>)</li>
+                        <li><code>avr-objdump</code> (desensamblado)</li>
+                        <li><code>avr-size</code> (tamaño del programa)</li>
+                        <li><code>avr-nm</code>, entre otras.</li>
+                    </ul>
+
+                    <h3>avr-libc</h3>
+                    <p>Biblioteca estándar del lenguaje C para AVR.</p>
+                    <ul>
+                        <li>Proporciona funciones, macros y archivos de cabecera específicos del hardware, como <code>&lt;avr/io.h&gt;</code> y <code>&lt;util/delay.h&gt;</code>.</li>
+                        <li>Fue desarrollada y sigue siendo mantenida por un grupo independiente de desarrolladores voluntarios de la comunidad de software libre, actualmente en plataformas como GitHub, para llenar el vacío de las funciones básicas de C en estos micros.</li>
+                    </ul>
+
+                    <h3>AVR-GDB</h3>
+                    <p>Depurador de aplicaciones.</p>
+                    <ul>
+                        <li>Permite ejecutar el programa paso a paso, inspeccionar registros, memoria y variables cuando se dispone de un depurador de hardware compatible.</li>
+                        <li>Se basa en <code>GDB</code> (GNU Debugger), el depurador estándar del proyecto GNU.</li>
+                    </ul>
+
+                    <p>La programación o grabado del firmware en el chip completa el flujo de trabajo del desarrollador en la línea de comandos. En la cadena de herramientas GNU AVR, esta tarea se delega a utilidades externas de despliegue como <code>AVRDUDE</code>, las cuales son independientes de la toolchain de compilación GNU.</p>
+
+                    <h3>AVRDUDE</h3>
+                    <p>Programa el microcontrolador.</p>
+                    <ul>
+                        <li>Graba el archivo <code>.hex</code> en la memoria Flash y verifica que la programación se haya realizado correctamente.</li>
+                        <li>El nombre significa <em>AVR Downloader/Uploader</em>. Es un proyecto completamente independiente y de código abierto. Hoy en día es mantenido por una comunidad global de entusiastas y desarrolladores de sistemas embebidos.</li>
+                    </ul>
+
+                    <h3>Make (opcional, pero muy recomendable)</h3>
+                    <ul>
+                        <li>Es <strong>GNU Make</strong>, la herramienta por excelencia para automatizar la compilación mediante archivos <code>Makefile</code>.</li>
+                        <li>Evita ejecutar manualmente cada comando de la toolchain.</li>
+                    </ul>
+                    <div class="imagen">
+                        <img src="img/FLUJOavr.jpg"
+                        alt="Flujo de la GNU AVR + DUDE Toolchain para AVR">
+                    </div>
+            </section>
+            <section>
+            <h2>3. INSTALACIÓN DE LA TOOLCHAIN PARA AVR Y AVRDUDE EN ENTORNO LINUX (RASPBERRY PI 5)</h2>
+
+            <p>Para desarrollar firmware desde una Raspberry Pi 5, destinado a microcontroladores AVR, como los  Atmega y los Attyni, es fundamental comprender la diferencia entre el entorno nativo y el entorno de compilación cruzada (<em>cross-compilation</em>).</p>
+
+            <p>En sistemas Linux, <code>gcc</code> (GNU Compiler Collection) es el compilador estándar y nativo principal. Este se encarga de compilar programas que se ejecutan directamente en la arquitectura de la Raspberry Pi 5 (ARM64). Sin embargo, este comando nativo no puede generar código binario ejecutable para un microcontrolador AVR, ya que este último utiliza una arquitectura RISC totalmente distinta. Para ello, necesitamos instalar una <strong>toolchain de compilación cruzada</strong> específica llamada <code>avr-gcc</code>, junto con las utilidades GNU contenidades en <code>binutils-avr</code>,  la librería de soporte <code>avr-libc</code> y el paquete de transferencia de firmware hacia el microcontrolador, <code>avrdude</code>.</p>
+
+            <h3>3.1. Actualización de los índices de paquetes del sistema</h3>
+            <p>Antes de instalar cualquier paquete, es obligatorio actualizar las listas de los repositorios para asegurar que el gestor de paquetes de Debian/Raspberry Pi OS descargue las versiones compatibles más recientes de la Toolchain.</p>
+
+            <pre><code class="bash">sudo apt update && sudo apt upgrade -y</code></pre>
+
+            <p>Para comprobar que el proceso de actualización finalizó correctamente sin errores en segundo plano, puede evaluar la variable de estado de salida del shell con el siguiente comando inmediatamente después de que termine la ejecución:</p>
+
+            <pre><code class="bash">echo $?</code></pre>
+
+            <p>Si la terminal devuelve un valor de <code>0</code>, significa que el sistema se ha actualizado correctamente. Cualquier valor distinto de cero indica un fallo o interrupción en el gestor de paquetes.</p>
+
+            <h3>3.2. Verificación y preparación del entorno nativo (Build-Essential)</h3>
+            <p>Aunque <code>gcc</code> nativo no compila para AVR, la instalación de las herramientas de compilación de la Raspberry Pi proporciona utilidades de enlazado, cabeceras del sistema y herramientas de gestión de binarios necesarias como base.</p>
+
+            <p>Para verificar si el compilador nativo básico se encuentra en el sistema, ejecute:</p>
+
+            <pre><code class="bash">gcc --version</code></pre>
+
+            <p>Si el sistema tiene el compilador instalado, se imprimirá un mensaje parecido al siguiente:</p>
+
+            <pre><code>gcc (Debian 12.2.0-14) 12.2.0;
+Copyright (C) 2022 Free Software Foundation, Inc.</code></pre>
+
+            <p>Si el sistema operativo responde con un error del tipo "command not found", el paquete no está presente. </p>
+                
+            <p>
+                Para conocer la ruta exacta donde se aloja este binario ejecutable, emplee el comando <code>which</code>:</p>
+
+            <pre><code class="bash">which gcc</code></pre>
+
+            <p>Por regla general, la salida estándar devolverá la ruta absoluta: <code>/usr/bin/gcc</code>.</p>
+
+            <p><strong>Método recomendado: Verificación del metapaquete build-essential</strong></p>
+            <p>En entornos de desarrollo basados en Debian, no se recomienda instalar el compilador de forma aislada. Lo óptimo es validar la presencia del metapaquete <code>build-essential</code>, el cual agrupa de forma automática el compilador de C (<code>gcc</code>), el de C++ (<code>g++</code>), el gestor de automatización <code>make</code> y las librerías de desarrollo nativas fundamentales (<code>libc6-dev</code>).</p>
+
+            <p>Ejecute la herramienta de consultas de Debian filtrando por el paquete requerido:</p>
+
+            <pre><code class="bash">dpkg -l | grep build-essential</code></pre>
+
+            <p>Si el paquete ya está instalado en la Raspberry Pi 5, la terminal mostrará un registro con el estado <code>ii</code> (installs ok, installed):</p>
+
+            <pre><code>ii  build-essential   12.9   arm64   Informational list of build-essential packages</code></pre>
+
+            <p>En caso de que el comando no devuelva ninguna línea de texto, el entorno de compilación base está ausente. Debe instalarlo inmediatamente ejecutando:</p>
+
+            <pre><code class="bash">sudo apt update && sudo apt install build-essential -y</code></pre>
+
+            <h3>3.3. Instalación de la Toolchain AVR y el software de programación</h3>
+            <p>Una vez garantizado el entorno base, se procede con la instalación de las cuatro herramientas clave para el desarrollo embebido AVR:</p>
+            <ul>
+                <li><code>gcc-avr</code>: El compilador cruzado que traduce código fuente C/C++ a instrucciones entendibles por el procesador AVR.</li>
+                <li><code>avr-libc</code>: La librería estándar de C modificada específicamente para microcontroladores AVR (provee funciones críticas como el manejo de registros de E/S, interrupciones y retardos de tiempo).</li>
+                <li><code>binutils-avr</code>: Conjunto de herramientas utilitarias encargadas de tareas como el ensamblado (<code>avr-as</code>), el enlazado de objetos (<code>avr-ld</code>) y la conversión de formatos binarios a archivos legibles por programadores como el formato Intel HEX (<code>avr-objcopy</code>).</li>
+                <li><code>avrdude</code>: El software encargado de interactuar mediante protocolos serie o USB con los programadores físicos (como USBAsp, ArduinoISP o AVRISP mkII) para descargar el archivo comprimido .hex dentro de la memoria Flash del microcontrolador.</li>
+            </ul>
+
+            <p>En los repositorios oficiales de Debian, el paquete del compilador se invoca formalmente como <code>gcc-avr</code>. Instale toda la suite con el siguiente comando unificado:</p>
+
+            <pre><code class="bash">sudo apt install gcc-avr avr-libc binutils-avr avrdude -y</code></pre>
+
+            <h3>3.4. Comprobación y auditoría técnica de los componentes instalados</h3>
+            <p>Una vez completada la descarga e instalación, es crucial verificar de manera analítica que cada binario y las librerías se hayan posicionado correctamente en las rutas del sistema y respondan de manera adecuada.</p>
+
+            <h4>3.4.1. Verificación del compilador cruzado (avr-gcc)</h4>
+            <p>Para comprobar que el compilador cruzado está operativo y reconocer su versión de compilación, ejecute:</p>
+
+            <pre><code class="bash">avr-gcc --version</code></pre>
+
+            <p>Determine la localización exacta del binario ejecutable para certificar que se encuentra mapeado dentro de las variables de entorno del sistema (<code>$PATH</code>):</p>
+
+            <pre><code class="bash">which avr-gcc</code></pre>
+
+            <p>La salida estándar esperada en sistemas operativos limpios debe apuntar a la ruta: <code>/usr/bin/avr-gcc</code>.</p>
+
+            <h4>3.4.2. Verificación de la estructura de librerías y cabeceras (avr-libc)</h4>
+            <p>A diferencia de los programas normales, las cabeceras de <code>avr-libc</code> deben estar ubicadas en un directorio aislado para que el compilador cruzado las localice durante la fase de preprocesamiento. Utilice el comando <code>ls</code> para auditar el directorio raíz de inclusión de AVR:</p>
+
+            <pre><code class="bash">ls /usr/lib/avr/include</code></pre>
+
+            <p>El sistema debe listar carpetas troncales como <code>avr/</code> y <code>util/</code>, así como archivos de cabecera estándar indispensables, por ejemplo, <code>stdio.h</code>.</p>
+
+            <p>Para verificar las librerías de temporización e instrucciones de retardo de hardware, que son críticas en sistemas embebidos, se debe constatar la existencia del archivo de cabecera <code>delay.h</code> dentro de la subcarpeta de utilidades mediante el siguiente comando:</p>
+
+            <pre><code class="bash">ls /usr/lib/avr/include/util</code></pre>
+
+            <div class="imagen">
+                <img src="" alt="Estructura de directorios de cabeceras avr-libc y utilidades dentro del sistema de archivos de la Raspberry Pi 5">
+            </div>
+
+            <h4>3.4.3. Verificación de las utilidades de binarios (GNU Binutils para AVR)</h4>
+            <p>Para asegurar que las herramientas de bajo nivel para manipulación de binarios (como el extractor de símbolos o el conversor de objetos) se instalaron correctamente, audite el estado del paquete mediante el gestor de bajo nivel:</p>
+
+            <pre><code class="bash">dpkg -l binutils-avr</code></pre>
+
+            <p>Para un control de calidad exhaustivo y automatizado de la Toolchain, se puede comprobar si cada una de las herramientas individuales empaquetadas dentro de <code>binutils-avr</code> en la ruta de ejecutables responde correctamente al llamado del sistema operativo. Ejecute el siguiente bucle en Bash:</p>
+
+            <pre><code class="bash">for cmd in $(dpkg -L binutils-avr | grep '^/usr/bin/'); do $cmd --version | head -n 1; done</code></pre>
+
+            <p>Este comando iterará sobre cada binario instalado (como <code>avr-objcopy</code>, <code>avr-size</code>, <code>avr-nm</code>), imprimiendo únicamente la primera línea de su respuesta técnica para validar que no existan librerías dinámicas rotas.</p>
+
+            <h4>3.4.4. Verificación del software de transferencia (avrdude)</h4>
+            <p>Finalmente, compruebe que la herramienta de flasheo esté operativa y cargue de forma correcta sus archivos de configuración de hardware predeterminados (<code>avrdude.conf</code>):</p>
+
+            <pre><code class="bash">avrdude -v</code></pre>
+
+            <p>Este comando detallado mostrará en la terminal la versión de software activa y un listado exhaustivo de todos los programadores e interfaces de comunicación soportados de manera nativa, confirmando la compatibilidad con dispositivos de desarrollo populares como <code>usbasp</code>, clones directos USBasp, y configuraciones de depuración embebida como <code>arduinoisp</code>.</p>
+
+            <p>Valide la ruta de instalación del binario con:</p>
+
+            <pre><code class="bash">which avrdude</code></pre>
+
+            <p>El sistema devolverá la ruta estandarizada de operación: <code>/usr/bin/avrdude</code>.</p>
+            
+            </section>
+
+            <section>
+            <h2>4. FLUJO DE TRABAJO PARA CREAR Y CARGAR UN FIRMWARE EN UN &#956;C AVR</h2>    
+            </section>
+
+        
+<!--
+<div style="overflow-wrap: break-word" class="formula-box"> 
+    $\text{Código Fuente} \longrightarrow \text{Preprocesado} \longrightarrow \text{Compilación} \longrightarrow \text{Ensamblado} \longrightarrow \text{Enlazado} \longrightarrow \text{Imagen de Firmware} \longrightarrow \text{Programación/Flasheo del } \mu\text{C}$
+</div>            
+            <p> En términos más generales, existe <b>efecto de carga</b> cuando un circuito conectado a la salida de otro absorbe corriente y modifica el voltaje o la corriente que el circuito original produciría sin esa conexión. Por eso también se habla de cargar una fuente, cargar un sensor, cargar un divisor. </p>
+            
+            </section>
+-->        
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+
+<script src="/mi-web-electronica/assets/js/componentes.js"></script>
+
+<script src="/mi-web-electronica/assets/js/menu-direction.js"></script>
+
+<script src="/mi-web-electronica/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>

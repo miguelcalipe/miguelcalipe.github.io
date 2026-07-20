@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Nombre articulo | MC Mundo Tech</title>
+    <link rel="stylesheet" href="/mi-web-electronica/assets/css/principal.css">
+    <link rel="stylesheet" href="/mi-web-electronica/assets/css/articulo.css">
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>
+        <aside id="indice"></aside>
+        <article>
+            <section>
+                <header class="article-header">
+                    <h1>QUE ES UNA FUENTE CONMUTADA</h1>
+                </header>
+            </section>
+
+            <section>
+                <p>
+                    Una fuente conmutada (también conocida como SMPS por sus siglas en inglés, Switched-Mode Power
+                    Supply, o fuente switching) es un dispositivo electrónico de conversión de energía que transforma la
+                    energía eléctrica de un nivel de tensión y corriente a otro mediante el uso de elementos
+                    semiconductores de potencia que conmutan rápidamente entre los estados de corte (abierto) y
+                    saturación (cerrado).
+                </p>
+
+                <p>
+                    A diferencia de las fuentes de alimentación lineales convencionales, que regulan la tensión
+                    disipando el exceso de energía en forma de calor a través de un transistor operando en su zona
+                    activa, una fuente conmutada transfiere energía en "paquetes" discretos a alta frecuencia. Esto se
+                    logra controlando el tiempo durante el cual el interruptor principal permanece encendido en relación
+                    con el tiempo total del ciclo (concepto conocido como ciclo de trabajo o duty cycle).
+                </p>
+
+                <p>
+                    Las fuentes conmutadas son ampliamente utilizadas en aplicaciones donde se requiere eficiencia
+                    energética, tamaño compacto y capacidad de manejar una amplia gama de tensiones de entrada. Son
+                    comunes en computadoras, televisores, cargadores de dispositivos móviles, sistemas de iluminación
+                    LED y muchos otros equipos electrónicos modernos.
+                </p>
+            </section>
+
+            <section>
+                <h2>PRINCIPIO FUNDAMENTAL DE OPERACIÓN</h2>
+                <p>
+                    El funcionamiento de una fuente conmutada se basa en la conmutación de un transistor (generalmente
+                    un MOSFET de potencia o un IGBT) a frecuencias muy elevadas, típicamente desde los 20 kHz hasta
+                    varios megahertz (MHz).
+                </p>
+
+                <p>
+                    Cuando el transistor está saturado (cerrado), la caída de tensión a través de él es prácticamente
+                    nula, aunque circule una gran corriente. Cuando está en corte (abierto), la corriente es cero,
+                    aunque soporte toda la tensión de la línea. Como la potencia disipada por el interruptor es el
+                    producto de la tensión por la corriente ($P = V.I$), en ambos estados ideales la pérdida de potencia
+                    es cero. Las únicas pérdidas reales ocurren durante los breves periodos de transición (conmutación)
+                    y por las resistencias internas de los componentes, lo que dota a estas fuentes de una eficiencia
+                    energética sumamente alta (típicamente entre el 70% y el 90% o más).
+                </p>
+
+                <p>
+                    Para mantener la tensión de salida estable frente a variaciones de la carga o de la tensión de
+                    entrada, un circuito de control mide continuamente la salida y ajusta el ancho de los pulsos que
+                    activan el transistor (modulación por ancho de pulsos o PWM).
+                </p>
+            </section>
+
+            <section>
+                <h2>CLASIFICACIÓN DE TOPOLOGÍAS COMUNES</h2>
+                Las fuentes conmutadas se dividen principalmente en dos grandes categorías según requieran o no
+                aislamiento galvánico:
+
+                <h3>A. Topologías No Aisladas (Convertidores DC/DC directos)</h3>
+                <ul>
+                    <li><b>Reductor (Buck)</b>: La tensión de salida es siempre menor que la de entrada.</li>
+                    <li><b>Elevador (Boost)</b>: La tensión de salida es siempre mayor que la de entrada.</li>
+                    <li><b>Reductor-Elevador (Buck-Boost)</b> : Puede entregar una tensión de salida menor o mayor que
+                        la de entrada, habitualmente con polaridad invertida.</li>
+                </ul>
+
+                <h3>B. Topologías Aisladas (Uso de transformador)</h3>
+                <ul>
+                    <li><b>Flyback (Transferencia indirecta)</b>: Durante el tiempo de conducción del transistor, la
+                        energía se almacena en el entrehierro del transformador (que actúa como inductor acoplado) y se
+                        transfiere a la salida cuando el transistor se apaga. Muy común en potencias bajas (menores a
+                        150W), como cargadores de teléfonos y monitores.</li>
+
+                    <li><b>Forward (Transferencia directa)</b>: La energía se transfiere directamente al secundario
+                        durante el tiempo de conducción del transistor. Requiere un diodo de libre circulación e
+                        inductores adicionales. Apta para potencias medias.</li>
+
+                    <li><b>Push-Pull, Medio Puente (Half-Bridge) y Puente Completo (Full-Bridge)</b>: Utilizan
+                        configuraciones de dos o cuatro transistores operando de forma alternada para aprovechar al
+                        máximo el núcleo magnético. Son las estructuras elegidas para altas potencias (fuentes de PC,
+                        inversores industriales, soldadoras electrónicas).</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>VENTAJAS FRENTE A LAS FUENTES LINEALES</h2>
+                <ul>
+                    <li><b>Alta eficiencia</b>: Al disipar muy poca energía en forma de calor, consumen menos
+                        electricidad y requieren disipadores térmicos mucho más pequeños.</li>
+
+                    <li><b>Tamaño y peso reducido</b>: La alta frecuencia de operación permite que los componentes
+                        magnéticos (transformadores e inductores) y los filtros capacitivos sean compactos y livianos.
+                    </li>
+
+                    <li><b>Amplio rango de entrada</b>: Pueden operar de manera estable con tensiones de entrada muy
+                        variables (por ejemplo, fuentes universales que aceptan desde 90V hasta 240VAC de forma
+                        automática).</li>
+
+                    <li><b>Flexibilidad de salidas</b>: Permiten obtener con facilidad múltiples voltajes de salida
+                        (positivos y negativos) a partir de un único diseño.</li>
+            </section>
+
+            <section>
+                <h2>DESVENTAJAS Y LIMITACIONES</h2>
+                <ul>
+                    <li><b>Complejidad de diseño</b>: Requieren de circuitos de control más sofisticados, un diseño
+                        cuidadoso de las pistas del circuito impreso (PCB) y consideraciones críticas sobre la
+                        estabilidad del lazo de control.</li>
+
+                    <li><b>Ruido e Interferencia Electromagnética (EMI)</b>: La conmutación abrupta de corrientes y
+                        voltajes genera una gran cantidad de armónicos de alta frecuencia que pueden interferir con
+                        equipos de radio o audio cercanos si no se filtran y apantallan correctamente.</li>
+
+                    <li><b>Rizado de salida (Ripple)</b>: La tensión continua de salida siempre presenta un pequeño
+                        componente alterno residual a la frecuencia de conmutación.</li>
+
+                    <li><b>Costo de componentes específicos</b>: Requieren semiconductores rápidos, capacitores de baja
+                        resistencia serie equivalente (Low ESR) y núcleos de ferrita específicos que pueden encarecer el
+                        prototipado inicial.</li>
+            </section>
+
+        </article>
+        
+    </main>
+
+    <div id="articulo-nav"> </div>
+
+    <div id="footer"></div>
+
+    <script src="/mi-web-electronica/assets/js/componentes.js"></script>
+    <script src="/mi-web-electronica/assets/js/menu-direction.js"></script>
+    <script src="/mi-web-electronica/assets/js/indice.js"></script>
+
+   
+
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "/mi-web-electronica/reparaciones/fuente-alimentacion/fuente-lineal";
+    document.getElementById("articulo-anterior").textContent = "← La Fuente Lineal ";
+
+    document.getElementById("articulo-siguiente").href = "/mi-web-electronica/reparaciones/fuente-alimentacion/fuente-conmutada/etapas-fc";
+    document.getElementById("articulo-siguiente").textContent = "Etapas de una Fuente Conmutada →";
+
+});
+</script>
+
+
+</body>
+
+</html>

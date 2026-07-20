@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Nombre articulo | MC Mundo Tech</title>
+    <link rel="stylesheet" href="/mi-web-electronica/assets/css/principal.css">
+    <link rel="stylesheet" href="/mi-web-electronica/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>
+        
+        <article>
+            <section>
+            <header class="article-header">
+            <h1>ANCHO DE PALABRA DEL PROCESADOR</h1>
+            <p style="text-align:center">El ancho de palabra es el concepto que distingue a las arquitecturas de 8, 16 y 32 bits.</p>
+            </header>
+            </section>
+            
+            <aside id="indice"></aside>    
+            
+            <section> 
+            <h2>¿QUE SIGNIFICA QUE UN MICROCONTROLADOR SEA DE  8, 16 O 32 BITS?</h2>
+            <p> 
+                Cuando se afirma que un microcontrolador es de 8, 16 o 32 bits, no se está indicando la cantidad de memoria que posee, sino el ancho de palabra (word size) de su arquitectura. Este ancho representa la cantidad de bits que la CPU está diseñada para procesar de forma natural en una sola operación.
+            </p>
+            
+            <p>            
+                En términos generales, el ancho de palabra influye directamente en varios elementos fundamentales del procesador:
+            </p>
+                <ul>
+                    <li>El tamaño de los registros de propósito general.</li>
+                    <li>La cantidad de bits que puede procesar la Unidad Aritmético-Lógica (ALU) en una operación.</li>
+                    <li> El ancho del camino de datos (datapath) utilizado para transportar información dentro del núcleo.</li>
+                    <li>El tamaño de muchos operandos y direcciones manejados por el conjunto de instrucciones de la arquitectura.</li>
+                </ul>
+            <p>
+                Por ejemplo, en un microcontrolador AVR de 8 bits, la mayoría de los registros de propósito general tienen un ancho de 8 bits y la ALU realiza operaciones sobre datos de ese tamaño. En cambio, en un microcontrolador basado en ARM Cortex-M3, los registros generales tienen 32 bits y la ALU procesa operandos de 32 bits de forma natural.
+            </p>
+            <p> Esto significa que una suma como la siguiente:</p>
+
+<pre><code class="language-c"> uint8_t a, b, c;c = a + b;</code></pre>
+            <p>            
+                puede realizarse mediante una única operación de 8 bits en un AVR.
+            </p>
+            <p>
+                De manera similar, en un Cortex-M3, una operación como:
+            </p>
+<pre><code class="language-c">uint32_t a, b, c;
+c = a + b;</code></pre>
+            <p> 
+                también puede ejecutarse mediante una única operación, pero esta vez sobre datos de 32 bits.
+            </p>
+            <p> 
+                Cuando el programa necesita operar con datos mayores que el ancho de palabra de la CPU, el compilador debe generar varias instrucciones para completar la operación. Por ejemplo, sumar dos valores de 32 bits en un microcontrolador de 8 bits requiere varias sumas parciales con propagación del acarreo (carry) entre los distintos bytes.</p>    
+
+            <p>
+                Es importante destacar que el ancho de palabra no determina por sí solo el rendimiento del microcontrolador. La velocidad de ejecución también depende de numerosos factores, como la frecuencia de reloj, la arquitectura del conjunto de instrucciones (ISA), la organización interna del procesador, el número de etapas del pipeline, el sistema de buses, la memoria caché (cuando existe) y otros mecanismos de optimización.
+            </p>
+            <p>
+                Tampoco debe confundirse el ancho de palabra con la capacidad de memoria del dispositivo. Un microcontrolador de 8 bits puede disponer de una gran cantidad de memoria Flash o RAM, mientras que uno de 32 bits puede tener menos memoria dependiendo del modelo. Del mismo modo, muchos periféricos utilizan registros de 8, 16 o incluso 64 bits independientemente del ancho de palabra del núcleo de la CPU.
+            </p>
+            </section>
+
+            <section>
+            <h2>COMPARACIÓPN ENTRE ARQUITECTURAS DE 8 Y 32 BITS</h2>
+            <p>
+                Decir que un microcontrolador es de 32 bits no significa que todos sus registros tengan 32 bits. El ancho de palabra se refiere principalmente a la arquitectura del núcleo de la CPU y a sus registros de propósito general. Los registros de los periféricos pueden tener tamaños diferentes según la función que desempeñan.
+            </p>
+            <p>
+                El ancho de palabra también suele influir en el tamaño de los buses internos y en la forma en que la CPU accede a la memoria. Sin embargo, estas características dependen de cada arquitectura y no siempre coinciden exactamente con el ancho de palabra del procesador.
+            </p>
+                <h3>Compatibilidad de IDEs con Raspberry Pi 5</h3>
+                <table>
+                    <thead> 
+                        <tr> 
+                            <th>Característica</th>
+                            <th>MCU de 8 bits</th>
+                            <th>MCU de 32 bits </th>
+                        </tr>
+                    </thead>
+                    <tbody> 
+                        <tr> 
+                            <td>Tamaño natural de los registros</td>
+                            <td>8 bits</td>
+                            <td>32 bits</td>
+                        </tr>
+                        <tr>
+                            <td>Operación natural de la ALU</td>
+                            <td>8 bits</td>
+                            <td>32 bits</td>
+                        </tr>
+                        <tr>
+                            <td>Suma de un entero de 32 bits</td>
+                            <td>Requiere varias instrucciones</td>
+                            <td>Generalmente una instrucción</td>
+                        </tr>
+                        <tr>
+                            <td>Tamaño de la palabra</td>
+                            <td>8 bits</td>
+                            <td>32 bits</td>
+                        </tr>        
+                </table>
+            </section>
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+
+<script src="/mi-web-electronica/assets/js/componentes.js"></script>
+
+<script src="/mi-web-electronica/assets/js/menu-direction.js"></script>
+
+<script src="/mi-web-electronica/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>

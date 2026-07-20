@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Nombre articulo | MC Mundo Tech</title>
+    <link rel="stylesheet" href="/mi-web-electronica/assets/css/principal.css">
+    <link rel="stylesheet" href="/mi-web-electronica/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>
+        <aside id="indice"></aside>
+        <article>
+            <section>  
+            <header class="article-header">
+            <h1>ETAPAS DE LA FUENTE CONMUTADA </h1>
+            </header>
+            </section>
+
+                <section>
+                <p>
+                Una fuente de alimentación es un sistema complejo diseñado para convertir la corriente alterna (CA) de entrada en los voltajes de corriente directa (CD) específicos que necesita el equipo  para funcionar. Una fuente de alimentaciónb conmutada tiene más complejidad que las fuentes lineales, ya que utiliza técnicas de conmutación para lograr una mayor eficiencia. Esto se logra controlando el tiempo durante el cual el interruptor principal permanece encendido en relación  con el tiempo total del ciclo (concepto conocido como ciclo de trabajo o duty cycle)
+                </p>
+
+                <p> 
+                Entender la estructura de la fuente por secciones, modo de operación y la función de cada circuito es crucial para un diagnóstico preciso, ya que permite al técnico identificar rápidamente dónde se encuentra la falla (en el bus principal de corriente continua positiva, en el arranque del oscilador, en la etapa de regulación o tal vez en algún circuito conversor específico) 
+                </p>
+                </section>  
+
+                <section> 
+                <h2>1. SECCIONES DE LA FUENNTE CONMUTADA</h2>
+                <p> 
+                Una fuente de alimentación se divide conceptualmente en dos secciones principales: <b> la sección caliente (hot)</b> y la <b>sección fría (cold)</b>, separadas por una línea divisoria en la placa, lo cual es clave para identificar los conversores y sus conexiones. Además, existe una etapa crítica de <b> retroalimentación</b> que las interconecta.
+                </p>
+                <p>
+                la división entre la <b>sección caliente (Hot)</b> y la <b>sección fría (Cold)</b> es la frontera entre una descarga eléctrica peligrosa (o un cortocircuito destructivo) y una zona segura de baja tensión    
+                </p>
+                <p>
+                A continuación, se detallan los componentes principales y su función en una fuente de alimentación; sin embargo este es un recuento rápido. En artículos posteriores detallaremos cada uno de los bloques funcioanles de una fuente de alimentación conmutada, los componentes que lo integran y como operan en el sistema electrónico
+                </p>
+                </section>
+
+                <section>
+                <h2>2. LA SECCIÓN CALIENTE (HOT): EL ORIGEN DE LA POTENCIA </h2>                             
+                <p>
+                El voltaje de CA proveniente de la red pública ingresa a la fuente por la sección caliente  y es ahí donde se realiza la primera conversión a CD. 
+                </p>
+
+                <p>
+                Esta zona está conectada directamente a la red eléctrica comercial y no está aislada y contiene los componentes de alta tensión, como el rectificador, el filtro y el interruptor de potencia. Aquí se manejan voltajes letales (desde 110V/220V AC -dependiendo del país donde estemos- hasta más de 300V-400V DC tras la rectificación y el circuito PFC) y es ahí donde se realiza la primera conversión a CD.
+                </p>
+                <p> Los componentes clave incluyen:
+                <ul>
+                    <li>
+                        <b>Entrada de Voltaje Alterno (AC)</b>: La fuente recibe un voltaje de CA, que puede ser de 110/120V o 220V, dependiendo de la región. 
+                    </li>
+
+                    <li>
+                        <b>Componentes de seguridad </b>: El voltaje de entrada pasa primero por un fusible y un filtro de interferencias electromagnéticas o radiofrecuencias (compuesto por una bobina y un capacitor) para protección y acondicionamiento de la señal. Aquí también se ubican componentes de seguridad como condensadores tipo X y tipo Y. A veces se agregan thermistores para limitar la corriente de arranque y varistores para proteger contra picos de voltaje.
+                    </li>
+
+                    <li>
+                        <b>Puente Rectificador</b>: Compuesto por cuatro diodos discretos o un componente rectificador integrado, convierte el voltaje de CA en pulsos de corriente directa (CD).
+                    </li>
+
+                    <li>
+                        <b>Capacitor de B+ (B+ Capacitor)</b>: Es un capacitor grande, generalmente de 400V o 450V, que se encarga de filtrar y almacenar los pulsos de CD provenientes del puente rectificador, estableciendo el primer voltaje de CD (B+) de la fuente. 
+                    </li>
+
+                    <li>
+                        <b>MOSFETs (Conmutadores)</b>: Son transistores de efecto de campo de óxido metálico semiconductor (Metal-Oxide-Semiconductor Field-Effect Transistors) que actúan como interruptores de alta frecuencia, realiza la conmutación de alta frecuencia trabajando en conjunto con los transformadores. Se encargan de encender y apagar rápidamente el flujo de la corriente del B+ a través de los transformadores o bobinas, generando así un voltaje de CA de alta frecuencia. Suelen estar montados en disipadores de calor.
+                    </li>
+                    <li>
+                        <b>Circuitos Integrados Osciladores (Osciladores)</b>: Son los encargados de generar los pulsos de alta frecuencia (desde 30 kHz hasta 1000 kHz o 1 MHz) que controlan a los MOSFETs. Cada conversor tiene un oscilador, que es un chip que genera los pulsos de alta frecuencia para los MOSFETs. No son compatibles entre sí, y si se dañan, a menudo se usa un módulo de reemplazo en lugar del propio integrado. Para operar, necesitan un voltaje de arranque (startup) y un voltaje BCC (VCC), que los alimenta continuamente.
+                    </li> 
+                    <li>
+                        <b>Transformadores y Bobinas</b>: Son componentes esenciales para la conversión de voltaje. Dependiendo del tipo de conversor (Flyback, Boost, Forward), tendrán diferentes configuraciones y funciones específicas. Los transformadores de Flyback y Forward están divididos por la línea de tierra, mientras que las bobinas de Boost están completamente del lado caliente.
+                    </li>
+                    <li>
+                        <b>Circuito Snubber</b>: Consiste en un diodo en serie con una resistencia y un capacitor en paralelo, conectado al bobinado primario del transformador de un conversor Flyback. Su función es proteger el conmutador MOSFET de picos de voltaje generados durante la conmutación.
+                    </li>
+                    <li>
+                        <b> Relés</b>: Algunas fuentes pueden incluir relés (de 5V o 12V) para activar ciertas partes de potencia.
+                    </li>
+                </ul>
+                </p>
+                </section>
+
+                <section>
+                <h2>3. LA RETROALIMENTACIÓN O FEEDBACK</h2>
+                <p>
+                Esta etapa es crucial y se encuentra entre la sección caliente y la sección fría de la fuente, actúa como un "puente" de comunicación entre las secciones Hot (caliente) y Cold (fría) de la fuente de alimentación. ; monitorea los voltajes de salida y ajustar la oscilación en el lado primario para mantener la estabilidad del sistema.
+                </p>
+                
+                <p>
+                La retroalimentación es un circuito que monitorea el voltaje de salida de la fuente y envía información a la sección caliente para ajustar el ciclo de trabajo de los MOSFETs. Su función principal es mantener estables los voltajes de salida estables, dentro de los límites deseados, a pesar de las variaciones en la carga o en el voltaje de entrada
+                </p>
+
+                <p>
+                La retroalimentación puede ser óptica (usando un optoacoplador) o eléctrica (usando un transformador de señal). La retroalimentación es crucial para la regulación de la fuente, ya que permite que la sección caliente responda a cambios en la carga y mantenga el voltaje de salida constante. 
+                </p>
+                </section>
+
+                <section>
+                <h2>4. LA SECCIÓN FRÍA (COLD): EL LADO SEGURO DE LA FUENTE</h2>
+                <p>
+                La sección fría es la parte de la fuente que está aislada de la red eléctrica y contiene los componentes de baja tensión, como el regulador, el controlador y los circuitos de protección. Esta sección es responsable de recibir la señal de retroalimentación de la sección caliente y ajustar el voltaje de salida según sea necesario.
+                </p>    
+                
+                <p>
+                Es en la sección fría es donde se generan los voltajes de salida para alimentar las diferentes etapas del equipo. Los componentes típicos son:
+                    <ul> 
+                        <li>
+                            <b> Diodos Rectificadores de Salida</b>: Rectifican la CA de alta frecuencia proveniente del secundario de los transformadores, nuevamente a CD. Pueden ser individuales o duales.
+                        </li>
+                        <li> 
+                            <b> Capacitores Electrolíticos de Salida</b>: Filtran y suavizan el voltaje de CD rectificado en la sección fría , proporcionando los voltajes de salida estables requeridos por el equipo.
+                        </li>
+
+                        <li> 
+                            <b>Circuitos Integrados Reguladores</b>: Su función es regular y estabilizar los voltajes de salida.
+                        </li>
+                        
+                        <li> 
+                            <b>MOSFETs Switch de Voltaje</b>: Algunos MOSFETs en el lado frío actúan como simples interruptores de voltaje (pasa o no pasa), no como conmutadores de alta frecuencia.
+                        </li>
+                                                
+                        <li> 
+                            <b>Circuito Integrado Oscilador (Excepcional)</b>: En casos raros, el oscilador de un conversor Forward puede estar en el lado frío, pero requerirá un transformador de acoplamiento para pasar la oscilación a los MOSFETs del lado caliente.
+                        </li>
+                    </ul>
+                </p>
+                </section>      
+                
+                <section>
+                En resumen, la fuente de alimentación conmutada toma la CA de entrada, la rectifica a CD (bus positivo de CD), utiliza circuitos conversores (compuestos por MOSFETs, osciladores y transformadores/bobinas) para convertir esa CD en CA de alta frecuencia y luego la vuelve a rectificar y filtrar a CD para generar los voltajes de salida específicos para el equipo. La regulación y los componentes de seguridad aseguran que este proceso sea eficiente, estable y libre de interferencias.
+                </section>
+
+        </article>
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+
+<script src="/mi-web-electronica/assets/js/componentes.js"></script>
+<script src="/mi-web-electronica/assets/js/menu-direction.js"></script>
+<script src="/mi-web-electronica/assets/js/indice.js"></script>
+
+
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "/mi-web-electronica/reparaciones/fuente-alimentacion/fuente-conmutada/que-es-una-fc/";
+    document.getElementById("articulo-anterior").textContent = "← LA FUENTE CONMUTADA";
+
+    document.getElementById("articulo-siguiente").href = "/mi-web-electronica/reparaciones/fuente-alimentacion/fuente-conmutada/partes-de-una-fuente-conmutada/";
+    document.getElementById("articulo-siguiente").textContent = "PARTES DE UNA FUENTE CONMUTADA →";
+
+});
+</script>
+
+</body>
+</html>

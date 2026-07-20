@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Nombre articulo | MC Mundo Tech</title>
+    <link rel="stylesheet" href="/mi-web-electronica/assets/css/principal.css">
+    <link rel="stylesheet" href="/mi-web-electronica/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>
+        
+        <article>
+            <section>
+            <header class="article-header">
+            <h1>CARACTERÍSTICAS DE LA FAMILIA AVR</h1>
+            </header>
+            </section>
+            
+            <aside id="indice"></aside>    
+            
+            <section> 
+            <h2>1. ARQUITECTURA Y RENDIMIENTO DEL NÚCLEO AVR</h2>
+            <p style="text-align:center"> 
+                Los microcontroladores AVR de Microchip (originalmente Atmel) implementan una arquitectura de tipo Harvard modificada, caracterizada por la separación física de las vías de datos y de instrucciones, lo que permite accesos simultáneos y optimiza el ancho de banda del bus.
+            </p>
+
+            <ul>
+                <li><b>Filosofía RISC de Ejecución Rápida</b>: El núcleo incorpora un juego de instrucciones reducido (RISC) altamente optimizado. Posee un banco de 32 registros de propósito general de 8 bits conectados directamente a la Unidad Aritmético Lógica (ALU). Esto permite que dos registros independientes se direccionen en una sola instrucción ejecutada en un único ciclo de reloj. Operando con cristales de cuarzo externos, estos chips alcanzan frecuencias de hasta 20 MHz, entregando un rendimiento cercano a 1 MIPS por MHz (millones de instrucciones por segundo). </li>
+                <li><b>Aritmética y Limitaciones de Punto Flotante</b>: Al ser CPUs nativas de 8 bits, las operaciones matemáticas se procesan eficientemente en bloques de 8 o 16 bits. El chip carece por completo de una FPU (Unidad de Punto Flotante) por hardware. Aunque el compilador de C soporta tipos float, las operaciones de punto flotante se emulan mediante librerías de software (firmware), lo que penaliza severamente el tiempo de ejecución de la CPU y consume una porción drástica de la memoria de programa.</li>
+                <li><b>Eficiencia Energética y Variantes</b> : Las revisiones modernas añaden sufijos como "P" (Picopower) o "PA", los cuales denotan tecnologías de fabricación destinadas a minimizar drásticamente el consumo de corriente en modos de reposo (sleep modes), optimizando los umbrales de voltaje y permitiendo un control granular de los relojes de los periféricos internos.</li>
+            
+                
+            </section>
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+
+<script src="/mi-web-electronica/assets/js/componentes.js"></script>
+
+<script src="/mi-web-electronica/assets/js/menu-direction.js"></script>
+
+<script src="/mi-web-electronica/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Nombre articulo | MC Mundo Tech</title>
+    <link rel="stylesheet" href="/mi-web-electronica/assets/css/principal.css">
+    <link rel="stylesheet" href="/mi-web-electronica/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>
+        
+        <article>
+            <header class="article-header">
+            <h1>Título del artículo</h1>
+            <p>Subtítulo, autor o fecha</p>
+            </header>
+            
+            <aside id="indice"></aside>    
+            <!-- 
+            CONTENIDO DEL ARTÍCULO 
+            <section> 
+            <h2>2. EL EFECTO DE CARGA</h2>
+            <p> 
+            Se denomina <b>efecto de carga</b> al fenómeno por el cual un circuito que originalmente suministraba un determinado voltaje o corriente modifica su comportamiento al conectarse a otro circuito que extrae corriente de él. 
+            </p>
+            <p> En este contexto, la palabra <b>carga</b> no se refiere a carga eléctrica almacenada, sino al concepto de <i>load</i>, es decir, un elemento o circuito consumidor. </p>
+
+            <p> En términos más generales, existe <b>efecto de carga</b> cuando un circuito conectado a la salida de otro absorbe corriente y modifica el voltaje o la corriente que el circuito original produciría sin esa conexión. Por eso también se habla de cargar una fuente, cargar un sensor, cargar un divisor. </p>
+            
+            </section>
+            -->
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+
+<script src="/mi-web-electronica/assets/js/componentes.js"></script>
+
+<script src="/mi-web-electronica/assets/js/menu-direction.js"></script>
+
+<script src="/mi-web-electronica/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>

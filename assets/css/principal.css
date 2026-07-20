@@ -1,0 +1,258 @@
+/* ==========================================
+   MODELO DE CAJA
+   ========================================== */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+/* ===========================
+   ESTILO BASE
+   =========================== */
+
+body.principal {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f5;
+    border: 2px solid rgb(16, 12, 80);
+    margin: 0;
+    padding: 10px;
+}
+
+/* ===========================
+   HEADER
+   =========================== */
+
+#site-header {
+    background-color: #2563EB;
+    padding: 0;
+    text-align: center;
+}
+
+#site-header img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* ===========================
+   TIPOGRAFÍA
+   =========================== */
+
+h1 {
+    color: #0b2665;
+    text-align: center;
+}
+
+h2 {
+    color: #2563EB;
+}
+
+p {
+    margin: 20px;
+    color: #1f2937;
+}
+
+/* ===========================
+   NAV PRINCIPAL
+   =========================== */
+
+nav {
+    background-color: #2563EB;
+    margin-bottom: 10px;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    display: block;
+    padding: 10px 18px;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+nav a:hover {
+    background-color: #1e40af;
+    color: #fff700;
+}
+
+/* ===========================
+   NIVEL PRINCIPAL (HORIZONTAL)
+   =========================== */
+
+nav > ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+nav > ul > li {
+    position: relative;
+}
+/* ==========================================================
+   SUBMENÚS
+   ========================================================== */
+
+/* Todos los submenús */
+nav ul ul {
+
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    position: absolute;
+
+    top: 100%;
+    left: 0;
+
+    min-width: 220px;
+
+    background: #1f4f99;
+
+    display: none;
+
+    z-index: 1000;
+}
+
+
+/* Mostrar submenú */
+
+nav li.open > ul {
+    display: block;
+}
+
+
+/* ==========================================================
+   SUBMENÚS LATERALES
+   ========================================================== */
+
+nav ul ul ul {
+
+    top: 0;
+    left: 100%;
+}
+
+
+/* Abrir automáticamente hacia la izquierda */
+
+nav li.submenu-left > ul {
+
+    left: auto;
+    right: 100%;
+}
+
+
+/* Forzar apertura hacia la derecha */
+
+nav li.submenu-right > ul {
+
+    left: 100%;
+    right: auto;
+}
+
+
+/* ==========================================================
+   ITEMS DEL SUBMENÚ
+   ========================================================== */
+
+nav ul ul li {
+
+    position: relative;
+}
+
+
+nav ul ul a {
+
+    display: block;
+
+    padding: 10px 15px;
+
+    white-space: nowrap;
+}
+
+
+
+/* Hover en submenús */
+
+nav ul ul a:hover {
+
+    background: #2b6cb0;
+}
+
+
+
+/* ===========================
+   FOOTER
+=========================== */
+
+.site-footer{
+    background:#1b1f24;
+    color:#d7dce2;
+    margin-top:60px;
+    border-top:4px solid #2c7be5;
+    font-size:0.95rem;
+}
+
+.footer-container{
+    max-width:1200px;
+    margin:auto;
+    padding:45px 25px;
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:space-between;
+    gap:40px;
+}
+
+.footer-block{
+    flex:1;
+    min-width:230px;
+}
+
+.footer-block h3,
+.footer-block h4{
+    color:#ffffff;
+    margin-bottom:18px;
+    font-weight:600;
+}
+
+.footer-block p{
+    color:#c5ccd3;
+    line-height:1.8;
+    text-align:justify;
+}
+
+.footer-block ul{
+    list-style:none;
+    margin:0;
+    padding:0;
+}
+
+.footer-block li{
+    margin-bottom:12px;
+}
+
+.footer-block a{
+    color:#b9d8ff;
+    text-decoration:none;
+    transition:color .25s ease;
+}
+
+.footer-block a:hover{
+    color:#ffffff;
+}
+
+.footer-bottom{
+    border-top:1px solid rgba(255,255,255,.12);
+    text-align:center;
+    padding:18px 20px;
+    background:#171a1e;
+}
+
+.footer-bottom p{
+    margin:0;
+    color:#aeb6bf;
+    font-size:.9rem;
+}

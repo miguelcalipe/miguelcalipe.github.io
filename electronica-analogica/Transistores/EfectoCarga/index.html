@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Nombre articulo | MC Mundo Tech</title>
+    <link rel="stylesheet" href="/mi-web-electronica/assets/css/principal.css">
+    <link rel="stylesheet" href="/mi-web-electronica/assets/css/articulo.css">
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"> </nav>
+    <div id="migas-pan"> </div>
+
+    <main>
+        
+        <article>
+            <section>
+            <header class="article-header">
+            <h1>EL EFECTO DE CARGA EN LOS TRANSISTORES</h1>
+            <p style="text-align:center">Cómo la corriente de base modifica el comportamiento ideal de un divisor
+            de voltaje</p>
+            </header>
+            </section>
+
+            <aside id="indice"></aside>
+
+            <section>
+                <h2>1. INTRODUCCIÓN</h2>
+                <p>
+                En un circuito de polarización por divisor de voltaje, la base del transistor no constituye una carga idealmente abierta, ya que absorbe una corriente de base $I_B$. Como consecuencia, el divisor formado por $R_1$ y $R_2$ se ve afectado por la presencia del transistor, fenómeno conocido como efecto de carga.
+                <br>
+                El divisor de voltaje formado por las resistencias $R_1$ y $R_2$ ayuda a establecer el punto de operación de corriente continua.  
+                </p>
+
+                <div class="galeria">
+
+                    <figure>
+                        <img src="img/divisor-solo.png"
+                            alt="Schematic of a simple voltage divider: two resistors R1 and R2 stacked between supply VCC and ground, with the midpoint labeled Vout; a downward arrow at the left labeled ID indicates the divider current. Text in the diagram: VCC, R1, R2, GND, Vout, ID. The drawing is a black line circuit diagram on a white background, technical and neutral in tone">
+                        <figcaption>
+                        <p> En un divisor de voltaje, sin transistor conectado, el divisor está solo. El voltaje de base ideal es: 
+                            <b>  $V_{BB}=V_{CC}\frac{R_2}{R_1+R_2} $ 
+                            </b> <br>
+                        La corriente del divisor es:  
+                            <b> $I_{D}=\frac{V_{CC}}{R_1+R_2} $ 
+                            </b> <br>
+                        Y nadie le extrae corriente al nodo. En estas condiciones, toda la corriente del divisor circula únicamente por <b> $R_1$ y $R_2$ </b>. 
+                        </p>
+                        </figcaption>
+                    </figure>
+
+                    <figure>
+                        <img src="img/divisorcontransistor.png"
+                            alt="Schematic showing the same voltage divider with a transistor base connected at the midpoint: two resistors R1 and R2 between VCC and ground, midpoint labeled Vout connected to a horizontal line representing the transistor base; diagram conveys that base current draws from the divider. No emotive content, technical explanatory illustration">
+                        <figcaption>
+                        Al conectarse la base del transistor:
+                        <br>
+                        La base absorbe una corriente $I_B$, aparece una corriente de base
+                        <br>
+                        Entonces el divisor ya no está solo.
+                        <br>
+                        Parte de la corriente que antes circulaba únicamente por $R_2$, ahora se desvía hacia la base, por lo que el divisor deja de comportarse como un circuito aislado.
+                        </figcaption>
+                    </figure>
+
+                </div>
+
+                <p>La consecuencia es que, en el divisor de tensión:</p>
+                <ul>
+                    <li>La corriente de base $I_B$ extrae corriente del divisor.</li>
+                    <li>El voltaje de base disminuye respecto del valor ideal.</li>
+                    <li>Cambia la distribución de corriente en el divisor de tensión.</li>  
+                    <li>Cambia la caída de tensión </li>
+                    <li>El voltaje suministrado por el divisor disminuye respecto del valor ideal.</li>
+                </ul>
+                <p> 
+                    Por ello se dice que la base del transistor carga el divisor de voltaje. El nombre proviene de que la base del transistor actúa como una carga conectada al divisor de voltaje.
+                </p>    
+                </section>
+
+                <section> 
+                <h2>2. EL EFECTO DE CARGA</h2>
+                <p> 
+                Se denomina <b>efecto de carga</b> al fenómeno por el cual un circuito que originalmente suministraba un determinado voltaje o corriente modifica su comportamiento al conectarse a otro circuito que extrae corriente de él. 
+                </p>
+                <p> En este contexto, la palabra <b>carga</b> no se refiere a carga eléctrica almacenada, sino al concepto de <i>load</i>, es decir, un elemento o circuito consumidor. </p>
+
+                <p> En términos más generales, existe <b>efecto de carga</b> cuando un circuito conectado a la salida de otro absorbe corriente y modifica el voltaje o la corriente que el circuito original produciría sin esa conexión. Por eso también se habla de cargar una fuente, cargar un sensor, cargar un divisor. </p>
+
+                <p> El transistor no genera el efecto de carga por sí mismo; simplemente actúa como carga del divisor al demandar corriente de base. </p>
+                </section>
+
+                <section>
+                <h2>3. RESISTENCIA DE THEVENIN Y EFECTO DE CARGA EN EL DIVISOR </h2>
+
+                <p> Hasta aquí hemos visto que la base del transistor absorbe una corriente $I_B$, lo que altera el comportamiento ideal del divisor de voltaje. </p>
+
+                <div class="imagen-derecha">
+                    <div class="texto">
+                        <p> Para analizar cuantitativamente esta modificación conviene reemplazar el divisor $R_1$  - $R_2$ por su equivalente de Thevenin. </p>
+                        
+                        <p>El divisor de voltaje puede representarse mediante: </p>
+                        <ul>
+                            <li>Una fuente equivalente de tensión: 
+                                <div class="formula-box">$V_{BB}=V_{TH} = V_{CC}\frac{R_2}{R_1+R_2}$
+                                </div>
+                            </li>
+                            <li>Y una resistencia equivalente en serie denominada resistencia de Thevenin: 
+                                <div class="formula-box">$R_{TH}=R_1 \parallel R_2$, donde: </div> 
+                                <div class="formula-box">$R_1 \parallel R_2 = \frac{R_1 R_2}{R_1 + R_2}$</div> 
+                            </li>
+                        </ul>
+                        
+                    </div>
+
+                    <img src="img/efecto-carga.jpeg"
+                        alt="Esquema del efecto de carga">
+                </div>
+
+                <p>Entonces el divisor puede modelarse por:</p>
+                        <ul> 
+                            <li>Una fuente ideal $V_{BB}=V_{TH}$ </li>
+                            <li>Una resistencia interna $R_{TH}$. </li>
+                        </ul> 
+                
+                <p>Debido a esta resistencia interna, la tensión entregada por el divisor no permanece ideal cuando la base absorbe corriente. </p>       
+
+                <p>La base "ve" esa fuente a través de $R_{TH}$. La expresión “la base "ve" esa fuente a través de $R_{TH}$  es una forma abreviada de referirse a la fuente presentada a la entrada de la base del transistor. No implica que la base “vea” algo; se trata de una interpretación desde el nodo de base.</p>
+                <p>La resistencia de Thevenin no constituye un nuevo componente físico del circuito. Representa la <b>resistencia interna equivalente del divisor de voltaje </b> observada desde el nodo de base hacia el propio divisor.</p>
+
+                <div class="imagen-derecha">
+                    <img src="img/efecto-carga2.png"
+                        alt="Esquema del efecto de carga">
+                
+                    <div class="texto">
+                        <p>Cuando la base del transistor se conecta al divisor, aparece la corriente $I_B$. Esta corriente circula a través de $R_{TH}$ ,  produciendo una caída de tensión:<br>
+                        $\mathbf{V_{R_{TH}}} = {I_B}R_{TH}$ . </p>
+                        <p>Esta caída de tensión sobre la resistencia interna del divisor, también es llamada caída de tensión por efecto de carga, ya que solo aparece cuando la base carga el divisor. </p>
+                        <p> Como consecuencia, el voltaje real que llega a la base del transistor ya no coincide exactamente con el valor ideal $V_{TH}$ o también mencionado como $V_{BB}$, sino que resulta:<br>
+                        $\mathbf{V_B}  = V_{TH} - I_B R_{TH}$  
+                        </p>
+                        <p> Esta ecuación muestra con claridad el origen del efecto de carga: <b>la corriente de base produce una caída de tensión sobre la resistencia interna del divisor </b>.</p>
+                    </div>
+                
+                </div>
+                <p>En  otras palabras, el divisor de voltaje no actúa como una fuente ideal de tensión, sino como una fuente real con resistencia interna RTH. Cuanto mayor sea dicha resistencia, más sensible será el divisor a la corriente absorbida por la base.</p>
+
+                <p> Sin embargo, si la caída ${I_B}R_{TH}$ es despreciable (divisor rígido), entonces $V_B = V_{TH}$. En ese caso, el efecto de carga es tan pequeño que puede ignorarse, y el divisor se comporta prácticamente como una fuente ideal de tensión. </p>
+                </section>
+
+                <section>  
+                <h2>4. RIGIDEZ DEL DIVISOR DE VOLTAJE Y CRITERIOS PARA DESPRECIAR EL EFECTO DE CARGA. DIVISOR DE VOLTAJE RÍGIDO
+                </h2> 
+                    
+                <p>
+                    En un circuito de polarización mediante divisor de voltaje, el divisor formado por por R1 y R2se diseña para establecer una tensión de base aproximadamente constante. Sin embargo, al conectarse la base del transistor, aparece una corriente de base IB. que extrae corriente del divisor y modifica su comportamiento ideal.
+                </p>
+
+                <p>El grado en que el transistor altera la tensión suministrada por el divisor se denomina efecto de carga. </p>
+
+                <p> 
+                    Se dice que un <b>divisor de voltaje es rígido —también llamado divisor constante o stiff voltage divider</b> en la literatura anglosajona— cuando la corriente absorbida por la base produce una variación despreciable del voltaje de polarización.
+                </p>
+                
+                <div class="dos-columnas">   
+                    <p>En un divisor rígido: 
+                        <div class="formula-box"> 
+                        $\mathbf{V_B = V_{BB}}$, donde:
+                        </div>
+                        <div class="formula-box"> 
+                        $\mathbf{V_{BB} = V_{CC} \frac{R_2}{R_1 + R_2}}$, representa el voltaje ideal del divisor sin considerar carga. </div> 
+                    En estas condiciones, el divisor puede tratarse como una fuente de tensión prácticamente independiente del transistor. <br>
+                    En el análisis de polarización por divisor usando Thévenin se obtiene: 
+                        <div class="formula-box">   
+                        $\mathbf{V_{TH} = I_B R_{TH} + V_{BE} + I_E R_E}$ 
+                        </div>
+                    
+                    Reemplazamos $\mathbf{I_B=\frac{I_E}{\beta_{DC}+1}}$, entonces: 
+                        <div class="formula-box">
+                        $\mathbf{V_{TH}={\frac{R_{TH}}{\beta_{DC}+1}I_E+V_{BE}+I_E R_E}}$
+                        </div>
+                        <div class="formula-box">
+                        Factorizando: $\mathbf{V_{TH}-V_{BE}= I_E(\frac{R_{TH}}{\beta_{DC}+1}+R_E)}$
+                        </div>
+
+                    La corriente del emisor establecida en el transistor por el circuito de polarización es, por lo tanto:
+                        <div class="formula-box">    
+                        $\mathbf{I_E = {\frac{V_{TH}-V_{BE}}{R_E + {\frac{R_{TH}}{\beta_{DC}+1}}}}}$
+                        </div>
+                    </p> 
+                    </div>
+                    
+                        <h3>Interpretación física</h3>
+                        <p> 
+                        <div class="dos-columnas"> 
+                        La ecuación muestra algo muy importante: $\mathbf{R_E + {\frac{R_{TH}}{\beta_{DC}+1}}}$ , es la resistencia total que limita la corriente de emisor. <br>
+                        Observa que $R_{TH}$​​, aparece dividido entre $(\beta+1)$. <br>
+                        Como normalmente: $β≫1$, el término ${\frac{R_{TH}}{\beta_{DC}+1}}$, suele ser pequeño comparado con $R_E$. <br>
+                        Por eso, la corriente de emisor depende principalmente de $R_E$ y muy poco de $\beta$. <br>   
+                        Por ejemplo, si: 
+                        </p>
+                        <ul>    
+                            <li>$R_{TH+}​​= {2K\Omega}​$</li>
+                            <li>$\beta_{DC}=100$ </li> 
+                        </ul>
+                        
+                        Entonces:  $\frac{R_{TH}​​}{\beta_{DC}+1}=\frac{2000}{101}=19.8\Omega$ <br>
+                        Si $R_E=1K\Omega$, la resistencia efectiva es: $ {1000\Omega + 19.8\Omega} \approx {1020 \Omega}$ <br>
+                        Por eso la corriente de emisor depende principalmente de $R_E$ y muy poco de $\beta$.
+                        </p>
+                        </div>
+                        
+                        <h3> Relación con la "inmunidad al $\beta$"</h3>
+                        <p>Esta ecuación demuestra precisamente por qué la polarización por divisor de tensión es relativamente insensible a las variaciones de $\beta$:
+                        </p>                        
+                            <ul>
+                                <li>Si $\beta$ aumenta,$\mathbf{\frac{R_{TH}​​}{\beta_{DC}+1}}$ disminuye.</li>
+                                <li>Si $\beta$ disminuye,$\mathbf{\frac{R_{TH}​​}{\beta_{DC}+1}}$, aumenta.</li>            
+                                <li> Pero ese término suele ser mucho menor que $R_E$, por lo que $I_E$   cambia poco. </li>               
+                            </ul>
+                        <p>
+                            En el caso ideal de un divisor completamente rígido: $\frac{R_{TH}​​}{\beta_{DC}+1}$ , <br>
+                            y la ecuación se aproxima a: $\mathbf{{{I_E}}\approx{\frac{V_{TH}-V_{BE}}{R_E}}}$, que ya no contiene $\beta$.
+                        </p>
+                        <p><b>Esa es la demostración matemática de que la corriente la fija esencialmente $R_E$ cuando el divisor es suficientemente rígido</b>.
+                        </p>
+                        <p>Para obtener una corriente de polarización $I_E$ que sea insensible a las variaciones de temperatura y del factor $\beta$ del transistor, deben cumplirse las siguientes condiciones:
+                        </p>
+                        <div class="dos-columnas"> 
+                        <div class="formula-box">
+                        En: $\mathbf{V_{TH}={\frac{R_{TH}}{\beta_{DC}+1}I_E+V_{BE}+I_E R_E}}$
+                        </div> 
+                        Si $\frac{R_{TH}​​}{\beta_{DC}+1}$ es pequeño, la caída sobre $R_{TH}$ es despreciable <br>
+                        y entonces: $V_{TH} \approx V_B$;<br>
+                        es decir, solo bajo esa condición el voltaje del divisor coincide con el voltaje real de base 
+                        <div class="formula-box">
+                        $V_B=V_{BE}+I_E R_E$
+                        </div>
+                        </div>                    
+                </section>
+
+                <section>
+                <h2>5. ¿CUANDO PUEDE IGNORARSE EL EFECTO DE CARGA?</h2>
+                <p> 
+                    El efecto de carga puede despreciarse cuando la corriente de base provoca una caída pequeña sobre la resistencia equivalente del divisor, $R_{TH}$. 
+                </p>
+                
+                <p>En tales condiciones: $\mathbf{V_{R_{TH}} = I_B R_{TH}\approx 0}$ 
+                </p>
+
+                <p> 
+                Por lo que el voltaje aplicado a la base prácticamente coincide con el voltaje de Thévenin: $V_B \approx V_{TH}$<br>
+                Como consecuencia, el divisor de tensión se comporta como una fuente de voltaje prácticamente constante o divisor rígido.
+                </p>
+
+                <p>Esta aproximación permite utilizar el <b>análisis aproximado de polarización</b>, también conocido como <b> método del divisor rígido o aproximación de divisor constante</b>, en el cual se asume que el voltaje de base permanece prácticamente invariable.
+                </p>
+
+                <p>En la práctica, esta condición se cumple cuando la corriente que circula por el divisor es mucho mayor que la corriente de base, de modo que la carga ejercida por el transistor resulta despreciable. Si esta condición no se cumple, el efecto de carga debe incluirse en el análisis mediante el circuito equivalente de Thévenin.
+                </p>
+                </section>
+
+                <section>
+                <h2>6. ¿CUÁNDO NO DEBE IGNORARSE EL EFECTO DE CARGA?</h2>
+                    <p> El efecto de carga no puede despreciarse cuando la corriente de base modifica apreciablemente el voltaje suministrado por el divisor.</p>
+
+                    <p> En estas circunstancias:  $\mathbf{V_B < V_{BB}}$
+                    y el análisis ideal deja de ser válido. 
+                    <div class="formula-box">
+                        Debe entonces utilizarse el equivalente de Thevenin del divisor: $\boldsymbol{R_{TH} = R_1 \parallel R_2}$
+                    </div>
+                    <div class="formula-box">
+                    y el análisis preciso: 
+                    $\boldsymbol{I_E = \frac{V_{BB} - V_{BE}}{R_E + \frac {R_{TH}}{\beta_{DC}+1}}}$
+                    </div>
+
+                    Este método incorpora explícitamente el efecto de carga producido por la corriente de base.
+                    </p>
+                    </section>
+
+                <section>
+                <h2>7. RESISTENCIA EQUIVALENTE PRESENTADA POR EL EMISOR</h2>
+                    <p> Cuando el transistor opera en la región activa, la corriente de emisor es:
+                        <div class="formula-box">    
+                        $\boldsymbol{I_E \approx (\beta_{DC}+1)I_B}$ ; (si se desprecia r′e  y otros efectos).
+                        </div>
+                        <div class="formula-box">
+                        y, para $\beta$ grande, suele aproximarse por $\boldsymbol{I_E \approx \beta_{DC} I_B}$
+                        </div>
+
+                    Debido a esta relación de ganancia de corriente, el resistor de emisor $R_E$ presenta, observado desde la base, una resistencia equivalente mayor que su valor físico. 
+                    </p>
+                    <p>
+                    La expresión “$R_E$ visto desde la base” es una forma abreviada de referirse a la resistencia equivalente presentada entre la base y tierra por el transistor y el resistor de emisor; se trata de una interpretación desde un par de terminales.
+                    </p>
+                    <p>
+                    Para comprender el resultado, recordemos que:  $V_E=I_ER_E$ 
+                    </p>
+                    <p>Sustituyendo $I_E \approx \beta_{DC} I_B$, tenemos:  $\boldsymbol{V_E=(\beta_{DC} I_B)R_E}$  
+                    </p>
+                    <p> 
+                    Sin embargo, desde la base la corriente disponible es únicamente $I_B$. Por definición de resistencia:  $R=\frac{V}{I}$
+                    </p>
+                    <p>
+                    Por tanto, la resistencia equivalente presentada entre la base y tierra es:
+                    $\boldsymbol{R_{ENTRADA(base)}=\frac{V_E}{I_B}}$ <br>
+                    Sustituyendo: $\boldsymbol{R_{ENTRADA(base)}=\frac{(\beta_{DC} I_B)R_E}{I_B}}$ 
+                        <div class="formula-box">
+                        Finalmente: $\boldsymbol{R_{ENTRADA(base)}=\beta_{DC}R_E}$
+                        </div>
+                    Este resultado indica que el resistor de emisor conduce la corriente relativamente grande del emisor, mientras que la base suministra únicamente la pequeña corriente $I_B$. Por ello, para la corriente de base, el incremento de voltaje en el emisor parece corresponder a una resistencia mucho mayor.
+                    </p>
+                        <div class="dos-columnas">
+                        <h3>Ejemplo:</h3>
+                    <p>Si: </p>
+                            <ul>
+                            <li>$R_E = 1k\Omega$ y </li>
+                            <li> $\beta_{DC}=100$ </li>
+                            </ul>
+                    <p>Y la base entrega: $I_B=10\mu A$,</p>
+                        <p > 
+                        Entonces, reemplazando $\beta_{DC}$ e $I_B$ en: $\boldsymbol{I_E \approx \beta_{DC} I_B}$ 
+                        </p>
+                            <div class="formula-box"> 
+                            $I_E \approx (100)(10\mu A) \approx 1 mA$ <br>
+                            y la caída en $R_E$  es: $V_E=(1 mA)(1 kΩ)=1V$ 
+                            </div>
+                        <p> 
+                        Desde la base: $R_{ENTRADA(base)}=\frac{1V}{10\mu A}=100KΩ$ 
+                        </p>
+                        <p>O lo que es lo mismo <br>
+                        $\boldsymbol{R_{ENTRADA(base)}=\beta_{DC}R_E = (100)(1k\Omega) = 100K\Omega}$    
+
+                        </p>
+                        <p>
+                        Aunque físicamente solo exista un resistor de 1 kΩ, el circuito presenta desde la base una resistencia equivalente cercana a 100 kΩ.
+                        </p>
+                        </div>
+                </section>
+
+                <section>
+                <h2>8. CRITERIOS PARA DETERMINAR SI UN DIVISOR ES RÍGIDO</h2>
+                    La bibliografía técnica emplea dos criterios principales —y un tercero derivado— para decidir si un divisor de voltaje puede considerarse rígido.
+                    
+                    <h3>1. CRITERIO BASADO EN $R_{TH}$ Y $R_{{ENTRADA}(base)}$</h3>
+                        <p>
+                        Es el criterio físicamente más general.
+                            <div class="formula-box">
+                            El divisor se reemplaza por su equivalente de Thevenin: $\boldsymbol{R_{TH}=R_1 \parallel R_2}$ <br>
+                            Y se compara con la resistencia equivalente presentada por el transistor: $\boldsymbol{R_{ENTRADA(base)}}$
+                            </div>
+                        Para polarización de continua: $\boldsymbol{R_{ENTRADA(base)} \approx \beta_{DC}R_E}$ 
+                            <div class="formula-box">
+                            Si: $\boldsymbol{R_{TH}≤0.01R_{ENTRADA(base)}}$, el divisor es rígido o constante.
+                            </div>
+                        Esta relación constituye la regla <b>100:1</b>. Esto implica un error aproximado de 1%.
+                        </p>
+                        
+                        <p>Es un diseño muy rígido, muy estable, pero consume más corriente en el divisor.
+                        </p>
+                        <p> Algunos diseños aceptan: $\boldsymbol{R_{TH}≤0.1R_{ENTRADA(base)}}$ conocida como regla 10:1 o divisor casi constante. <br>
+                        En este caso el efecto de carga no desaparece, pero permanece moderado.
+                        </p>
+                        <p> La regla 100:1 mide la relación entre la resistencia interna total del divisor y la carga aplicada por la base. Es más general y más exacto
+                        </p>
+                    <h3>2. CRITERIO BASADO EN $R_2$ Y $R_{ENTRADA(base)}$</h3>
+                        <p>Muchos textos introductorios utilizan un criterio simplificado.</p>
+                        
+                        <p> Dado que la carga del transistor aparece conectada en paralelo con $R_2$, puede estimarse la influencia del transistor comparando  $R_{ENTRADA(base)}$ con $R_2$.</p>
+                        
+                        <p>Esta resistencia equivalente ($R_{ENT(base)} \approx \beta_{DC}R_E$) presentada por la base aparece en paralelo con el resistor R2 del divisor de voltaje y constituye la carga efectiva aplicada al divisor. </p>   
+                        
+                        <p> Por ello, el efecto de carga puede estimarse comparando $R_{ENTRADA(base)}$ con $R_2$.</p>
+
+                            <ul>
+                                <li>Si: $\beta_{DC}R_E$ ≥ 10R_2$  el efecto de carga es pequeño (del orden del 10% o menor), y el divisor de voltaje puede considerarse rígido o prácticamente independiente de las variaciones del transistor.</li>
+                                <li>En cambio, si $\beta_{DC}R_E < 10R_2$, el efecto de carga ya no puede despreciarse. En tal caso, debe calcularse la resistencia equivalente: $R_2 \parallel \beta_{DC}R_E$ ya que la corriente de base modifica apreciablemente el voltaje suministrado por el divisor.</li>
+                            </ul>
+                        <p>
+                            En consecuencia, mientras mayor sea la relación entre $R_{ENTRADA(base)}$ y $R_2$, menor será la influencia del transistor sobre la tensión de polarización de base y más estable será el punto de operación del circuito. 
+                        </p>
+                        
+                        <p>La lógica es sencilla, si $R_{ENTRADA(base)}$  es mucho mayor que $R_2$, el paralelo: $R_2 \parallel R_{ENTRADA(base)}$ queda muy próximo a $R_2$ y el divisor casi no cambia. </p>
+                        
+                        <p>Este método es sencillo y útil como estimación rápida, mide directamente: cuánto altera la base al resistor inferior del divisor. Es un criterio local y muy intuitivo. </p>
+                        
+                        <p> Sin embargo, constituye una aproximación, ya que no considera explícitamente la resistencia total del divisor sino únicamente la rama inferior.
+                        </p>
+
+                    <h3>3. CRITERIO BASADO EN LAS CORRIENTES DEL DIVISOR</h3>
+                        <p>Algunas referencias expresan la rigidez del divisor comparando la corriente del divisor con la corriente de base.
+                        </p>  
+                        <p>La corriente que atraviesa $R_2$ es: $\boldsymbol{I_{R_2} = \frac {V_B}{R_2}}$    </p>
+                        
+                        <div class="formula-box"> 
+                        El divisor se considera rígido cuando: $\boldsymbol{I_{R_2}<< I_B}$
+                        </div>
+                        <p>Usualmente se adopta: $\boldsymbol{I_{R_2} ≥ 10I_B}$</p>
+                        
+                        <p>Este criterio es equivalente al anterior, ya que ambos expresan la misma idea física: la corriente absorbida por la base debe ser pequeña comparada con la corriente propia del divisor.
+                        </p>
+                </section>
+                
+                <section>        
+                <h2>SÍNTESIS OPERATIVA </h2>
+                En la práctica:   
+                    <table> 
+                        <thead> 
+                            <tr> 
+                                <th>Situación </th>
+                                <th>Tratamiento  </th>
+                            </tr>
+                        </thead>    
+                            
+                        <tbody> 
+                            <tr> 
+                                <td>$\boldsymbol{R_{TH} << R_{ENT(base)}}$</td>
+                                <td>Divisor rígido; puede ignorarse el efecto de carga </td>
+                            </tr>
+                                
+                            <tr> 
+                                <td>$\boldsymbol{R_{ENT(base)} ≥ 10R_2}$ </td>
+                                <td>Estimación rápida de divisor rígido </td>
+                            </tr>
+                                
+                            <tr> 
+                                <td>$\boldsymbol{I_R{_2}≥10I_B}$ </td>
+                                <td>Verificación mediante corrientes </td>
+                            </tr>
+                                
+                            <tr> 
+                                <td>Resistencias comparables </td>
+                                <td>El efecto de carga debe incluirse mediante &R_{TH}$ </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                En consecuencia, ignorar el efecto de carga no significa que éste no exista, sino que su influencia es suficientemente pequeña para no alterar significativamente la polarización del transistor.    
+                </section>
+
+                
+
+        </article>
+
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+
+<script src="/mi-web-electronica/assets/js/menu-direction.js"></script>
+<script src="/mi-web-electronica/assets/js/componentes.js"></script>
+<script src="/mi-web-electronica/assets/js/indice.js"></script>
+
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Nombre articulo | MC Mundo Tech</title>
+    <link rel="stylesheet" href="/mi-web-electronica/assets/css/principal.css">
+    <link rel="stylesheet" href="/mi-web-electronica/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>
+       
+        <article>
+            <section>
+            <header class="article-header">
+            <h1>LOS REGISTROS DEL MICROCONTROLADOR</h1>
+            <p style="text-align:center">
+                En este artículo se estudian los diferentes tipos de registros presentes en un microcontrolador, su papel dentro de la arquitectura del sistema y la forma en que permiten al software interactuar con el hardware.
+            </p>
+            </header>
+            </section>
+            
+            <aside id="indice"></aside>
+
+            <section> 
+            <h2>1. INTRODUCCION</h2>
+            <p> 
+                Los microcontroladores están presentes en una enorme variedad de dispositivos electrónicos, desde electrodomésticos y equipos industriales hasta sistemas de automatización, instrumentación y productos de consumo. Su función consiste en ejecutar un programa que supervise entradas, procese información y controle diferentes periféricos para realizar una tarea específica.
+            </p>
+
+            <p>
+                Aunque existen numerosas familias de microcontroladores —como AVR, PIC, MSP430, STM32, ESP32 o RP2040—, todas comparten un mismo principio fundamental de funcionamiento: el software controla el hardware mediante la lectura y escritura de registros internos.
+            </p>
+            <p> 
+                Comprender qué son los registros, cómo están organizados y cuál es su función constituye uno de los conocimientos más importantes para cualquier programador de sistemas embebidos. Independientemente del fabricante o de la arquitectura utilizada, la mayor parte del firmware se desarrolla configurando y supervisando estos registros.
+            </p>
+            
+            </section>
+
+            <section>
+            <h2>2. PROGRAMACIÓN DE UN MICROCONTROLADOR Y LA GESTIÓN DE SUS REGISTROS</h2>
+            <p>
+                Programar un microcontrolador consiste en desarrollar el firmware que ejecutará su CPU para controlar el funcionamiento del dispositivo electrónico en el que se encuentra integrado.
+            </p>
+            <p> 
+                Desde el punto de vista del programador, esto implica configurar los periféricos internos, supervisar su estado y coordinar su funcionamiento para realizar una determinada aplicación. Para lograrlo, el firmware utiliza un mecanismo común a prácticamente todas las arquitecturas de microcontroladores: la lectura y escritura de registros internos.
+            </p>
+            <p> 
+                La CPU, por sí sola, no puede encender un LED, iniciar una conversión analógico-digital, transmitir datos por un puerto serie o generar una señal PWM. Su capacidad se limita a ejecutar instrucciones que leen y escriben datos en memoria. Cuando esas operaciones se realizan sobre registros especiales conectados al hardware del microcontrolador, producen cambios en el comportamiento de sus periféricos.
+            </p>
+            <p> 
+                Por esta razón, puede afirmarse que, en gran medida, programar un microcontrolador consiste en gestionar sus registros internos. A través de ellos el firmware configura los módulos de hardware, controla el funcionamiento del procesador y obtiene información sobre el estado del sistema.
+            </p>
+            <p> 
+                Aunque los nombres de los registros, sus direcciones y sus funciones específicas varían entre fabricantes, el modelo de programación es esencialmente el mismo en todas las familias de microcontroladores.
+            </p>
+            </section>
+
+            <section>
+            <h2>3. TIPOS DE REGISTROS DE UN MICROCONTROLADOR</h2>
+            <p>
+                Todos los registros de un microcontrolador son pequeñas unidades de almacenamiento accesibles por la CPU. Sin embargo, no todos cumplen la misma función. Cada grupo participa en un aspecto diferente del funcionamiento del sistema y está diseñado para una finalidad específica.
+            </p>
+            <p>
+                De forma general, los registros de un microcontrolador pueden clasificarse en tres grandes grupos:
+                <ul>               
+                    <li>Registros de propósito general.</li> 
+                    <li>Registros de estado y control de la CPU.</li>
+                    <li>Registros de hardware o de periféricos.</li> 
+                </ul> 
+                Aunque todos son indispensables para el funcionamiento del microcontrolador, cada uno interviene en una etapa diferente de la ejecución del programa.   
+            </p>
+
+                <h3>3.1. Registros de propósito general</h3>
+                <p>
+                    Los registros de propósito general son los registros de trabajo de la CPU. Se utilizan para almacenar temporalmente datos, operandos y resultados mientras el procesador ejecuta las instrucciones del programa.
+                </p>
+                <p>
+                    Estos registros están conectados directamente a la Unidad Aritmético-Lógica (ALU), lo que permite realizar operaciones aritméticas y lógicas con gran rapidez, generalmente en un único ciclo de reloj.                    
+                </p>
+                <p>
+                    Durante la ejecución del firmware, el compilador utiliza estos registros para mantener variables temporales, realizar cálculos, manipular punteros y transferir información entre diferentes partes del programa. Debido a su velocidad de acceso, constituyen uno de los recursos más valiosos de la arquitectura del procesador.                    
+                </p>    
+                <p>
+                    La cantidad, organización y tamaño de estos registros dependen de la arquitectura del microcontrolador. Por ejemplo, los microcontroladores AVR disponen de 32 registros de propósito general de 8 bits, mientras que muchas arquitecturas de 32 bits como STM32 utilizan un número menor de registros, pero con un ancho de palabra mayor.
+                </p>
+                
+                <h3>3.2 Registros de estado y control de la CPU</h3>
+                <p>                    
+                    Los registros de estado y control contienen información sobre el funcionamiento interno del procesador y permiten coordinar la ejecución de las instrucciones.
+                </p>
+                <p> 
+                    Entre ellos destaca el registro de estado, que almacena indicadores (flags) generados por la ALU después de cada operación aritmética o lógica. Estos indicadores informan, por ejemplo, si el resultado fue cero, si se produjo un acarreo, un desbordamiento o si el resultado es negativo.
+                 </p>
+                 <p> 
+                    El programa puede utilizar estos indicadores para tomar decisiones mediante instrucciones condicionales, implementar comparaciones, realizar operaciones de precisión múltiple y controlar el flujo de ejecución.
+                </p> 
+                <p> 
+                    Además del registro de estado, muchas arquitecturas incorporan otros registros relacionados con el funcionamiento de la CPU, como el contador de programa (Program Counter), el puntero de pila (Stack Pointer) y diversos registros de control utilizados para gestionar interrupciones, modos de operación y otras funciones internas del procesador.
+                </p>
+
+                <h3>3.3 Registros de hardware o de periféricos</h3>
+                <p> 
+                    Los registros de hardware constituyen la interfaz entre el software y los circuitos internos del microcontrolador. A través de ellos, el firmware configura, controla y supervisa el funcionamiento de los diferentes periféricos integrados en el dispositivo.  
+                </p>
+                <p>     
+                    Cada periférico dispone de un conjunto de registros específicos que permiten controlar sus distintas funciones. Entre ellos se encuentran los puertos de entrada/salida (GPIO), temporizadores, convertidores analógico-digitales (ADC), convertidores digital-analógico (DAC), interfaces de comunicación como UART, SPI e I$^2$C, módulos PWM y muchos otros.
+                </p>
+                <p> 
+                    A diferencia de los registros de propósito general, estos registros están conectados directamente a la lógica de los periféricos. Por ello, escribir un determinado valor en uno de ellos puede producir un cambio inmediato en el comportamiento físico del microcontrolador, como modificar el estado de un pin, iniciar una conversión analógica, habilitar una interrupción o poner en funcionamiento un temporizador.
+                </p>
+                <p> 
+                    Del mismo modo, la lectura de algunos registros permite conocer el estado del hardware, comprobar si una transmisión ha finalizado, verificar si existe un dato disponible o detectar la ocurrencia de un evento determinado.
+                </p>
+                <p> 
+                    Aunque los tres grupos de registros participan en la ejecución del firmware, el programador interactúa principalmente con los registros de hardware, ya que constituyen el mecanismo mediante el cual el software controla los recursos físicos del microcontrolador.
+                </p>
+            </section>
+
+            <section>
+            <h2>4. ¿QUE ES UN REGISTRO?</h2>
+                <h3>Definición</h3>
+                <p>
+                    Un registro es una pequeña unidad de almacenamiento ubicada dentro del propio microcontrolador, diseñada para guardar información temporal que la CPU necesita durante la ejecución de un programa. A diferencia de la memoria RAM, los registros están físicamente integrados en el núcleo del procesador o en los periféricos y pueden accederse en muy pocos ciclos de reloj.
+                </p>
+                <p>
+                    Dependiendo de su función, un registro puede almacenar datos, direcciones de memoria, resultados de operaciones aritméticas, indicadores de estado o parámetros para controlar los distintos módulos de hardware del microcontrolador.
+                </p>
+                <p> 
+                    Desde el punto de vista del programador, un registro puede entenderse como una variable especial cuyo contenido tiene un significado definido por la arquitectura del microcontrolador.
+                </p>
+
+                <h3>Construcción física (flip-flops)</h3>
+                <p> 
+                    Electrónicamente, un registro no es más que un conjunto de flip-flops.            
+                </p>
+                <p>
+                Un flip-flop es un circuito digital capaz de almacenar un único bit de información (0 o 1). Al combinar varios flip-flops se obtiene un registro de varios bits.
+                </p>
+                
+                <p>Por ejemplo:
+                    <ul>
+                        <li>Un registro de 8 bits está formado por 8 flip-flops;</li>
+                        <li>Un registro de 16 bits contiene 16 flip-flops;</li>
+                        <li>Un registro de 32 bits contiene 32 flip-flops.</li>
+                    </ul>
+                </p>
+                <p>
+                Cada flip-flop mantiene su estado hasta que un pulso de reloj y una señal de control permiten modificarlo.
+                </p>
+                <p>                
+                De esta manera, un registro de 8 bits puede almacenar cualquier número comprendido entre:<br>
+                <div class="formula-box"> 
+                    $00000000_2 = 0$ <br>
+                    $11111111_2 = 255$
+                </div>
+                </p>
+                    
+                <p>
+                Mientras exista alimentación eléctrica, los flip-flops conservan el valor almacenado hasta que la CPU u otro circuito escriba un nuevo dato.    
+                </p>    
+
+                <h3>Acceso por la CPU</h3> 
+                <p> 
+                    La CPU utiliza los registros como su espacio de trabajo inmediato. Antes de realizar cualquier operación, los datos deben encontrarse en alguno de los registros internos del núcleo, ya que la Unidad Aritmético-Lógica (ALU) no opera directamente sobre la memoria Flash ni sobre la memoria RAM. Por ello, cada vez que un programa ejecuta una instrucción, la CPU lee información desde los registros, realiza el procesamiento correspondiente y almacena nuevamente el resultado en otro registro o en la memoria.
+                </p>
+                <p>                    
+                    Durante la ejecución de un programa, la CPU realiza continuamente operaciones como las siguientes:                   
+                    
+                    <ul>                   
+                        <li><b>Lectura y escritura</b>: leer el contenido de un registro o almacenar en él el resultado de una operación.</li>
+                        <li><b>Operaciones aritméticas y lógicas</b>: sumar, restar, comparar valores y ejecutar operaciones binarias como <code>AND, OR, XOR</code> o desplazamientos de bits (shift).</li>
+                        <li><b>Transferencia de datos</b>: copiar información entre registros o mover datos entre los registros y la memoria.;</li>
+                    </ul>                    
+                    En la arquitectura AVR, la mayoría de las instrucciones operan directamente sobre los registros de propósito general, reduciendo la necesidad de acceder continuamente a la memoria durante la ejecución del programa. Este diseño forma parte de la arquitectura RISC utilizada por AVR. Otras arquitecturas de microcontroladores, como ARM Cortex-M y RISC-V, también ejecutan las operaciones de la ALU utilizando registros internos del núcleo. Aunque difieren en el número de registros, su tamaño, el conjunto de instrucciones y la organización interna del procesador, todas comparten el mismo principio fundamental: la CPU realiza las operaciones sobre los registros y no directamente sobre la memoria.
+                </p>
+                <p>
+                    Además de utilizar los registros internos del núcleo, la CPU también accede a los registros de hardware cuando necesita controlar los periféricos del microcontrolador, como los puertos de entrada/salida, los temporizadores, el convertidor analógico-digital (ADC), los módulos de comunicación serie o cualquier otro dispositivo integrado en el chip. A diferencia de los registros del núcleo, estos registros no almacenan datos temporales para la ALU, sino que permiten configurar y controlar el funcionamiento del hardware.
+                </p>
+                <p> 
+                    La forma en que la CPU accede a estos registros de hardware depende de la arquitectura del microcontrolador, aunque el principio fundamental es siempre el mismo: el software controla el hardware mediante operaciones de lectura y escritura sobre registros específicos.            
+                </p>
+
+                <h3>Acceso desde C </h3>
+                <p>
+                    Aunque el programador escribe el firmware en lenguaje C, el objetivo final sigue siendo leer y escribir los registros del microcontrolador. Para facilitar esta tarea, los fabricantes proporcionan archivos de cabecera (como<code>< avr/io.h ></code>en AVR) que asignan un nombre a cada registro de hardware.
+                </p>    
+                <p>
+                    Por ejemplo, al escribir:
+
+<pre><code class="language-c">PORTB = 0x01;</code></pre>
+                    
+                    parece que simplemente se está asignando un valor a una variable. Sin embargo, <code>PORTB</code> no es una variable almacenada en la RAM, sino el nombre simbólico de un registro de hardware. El compilador traduce esta instrucción en código máquina que escribe el valor <code>0x01</code> en la dirección de memoria correspondiente al registro <code>PORTB</code>, provocando que el hardware actualice el estado de los pines del puerto B.
+                </p>
+                <p>
+                    Del mismo modo, la instrucción:
+
+<pre><code class="language-c">if (PINB & (1 << PB0))</code></pre>
+
+                    lee el contenido del registro <code>PINB</code>, el cual refleja el estado lógico presente en los pines del puerto B. A partir de esa lectura, la CPU puede determinar si el pin <code>PB0</code> se encuentra en nivel alto o bajo.
+                </p>
+                <p>
+                    Otro ejemplo es:
+
+<pre><code class="language-c">DDRB |= (1 << PB3);</code></pre>
+
+                    En este caso, el compilador genera las instrucciones necesarias para leer el registro <code>DDRB</code>, modificar únicamente el bit correspondiente a <code>PB3</code> y escribir nuevamente el resultado en el mismo registro, configurando ese pin como salida sin alterar la configuración de los demás pines.
+                </p>
+                <p>
+                    En consecuencia, aunque el lenguaje C proporciona una forma más legible y cómoda de programar, el firmware continúa controlando el microcontrolador mediante operaciones de lectura y escritura sobre los registros de hardware.
+                </p>            
+            </section>
+
+            <section>
+            <h2> 5. DIFERENCIAS ENTRE LOS REGISTROS Y LA MEMORIA RAM</h2>  
+            Aunque ambos almacenan información, los registros y la memoria RAM cumplen funciones muy diferentes.
+            <table> 
+                <thead> 
+                    <tr> 
+                        <th>Registros</th>
+                        <th>Memoria RAM</th>
+                    </tr>
+                </thead>    
+                            
+                <tbody> 
+                    <tr> 
+                        <td>Están dentro de la CPU o de los periféricos.</td>
+                        <td>Es una memoria independiente destinada al almacenamiento temporal de datos.</td>
+                    </tr>
+                    <tr> 
+                        <td>Son muy pocos.</td>
+                        <td>Existe en mucha mayor cantidad.</td>
+                    </tr>
+                    <tr> 
+                        <td>Su acceso es extremadamente rápido.</td>
+                        <td>Su acceso requiere más ciclos de reloj.</td>
+                    </tr>
+                    <tr>
+                        <td>Muchos poseen funciones específicas.</td>
+                        <td>Su contenido es completamente libre. </td>
+                    </tr>
+
+                    <tr>
+                        <td>Algunos controlan directamente el hardware.</td>
+                        <td>No controla directamente ningún periférico.</td>
+                    </tr>
+                </tbody>
+            </table>
+                <p>Por ejemplo:</p>
+<pre><code>uint8_t contador = 10;</code></pre>
+            <p>La variable normalmente se almacena en RAM.</p>
+            <p>En cambio:</p>
+<pre><code>PORTB = 0x01;</code></pre>
+            <p>
+                No escribe en RAM, sino en un registro de hardware cuyo contenido controla físicamente los pines del puerto B.
+            </p>
+            <p>
+                Esta diferencia es fundamental para comprender la programación de microcontroladores.
+            </p>
+            </section>
+
+            <section>
+            <h2>6. LOS REGISTROS DE HARDWARE COMO INTERFAZ ENTRE SOFTWARE Y HARDWARE </h2>
+            <p>
+                Hasta este punto hemos visto que la CPU utiliza registros internos para ejecutar las instrucciones y realizar operaciones aritméticas y lógicas. Sin embargo, un microcontrolador no solo debe procesar datos; también debe interactuar con el mundo físico a través de sus periféricos.
+            </p>
+            <p>            
+                Para ello, el microcontrolador incorpora un conjunto de registros de hardware, cada uno asociado a un circuito electrónico específico. Estos registros constituyen el mecanismo mediante el cual el software puede configurar, controlar y supervisar el funcionamiento de los distintos periféricos integrados en el chip.
+            </p>
+            <p>
+                Cada periférico dispone de uno o varios registros que permiten realizar diferentes funciones, por ejemplo:
+            </p>
+                <ul>
+                    <li>Configurar el modo de funcionamiento de un puerto de entrada/salida.</li>
+                    <li>Iniciar o detener un temporizador.</li>
+                    <li>Seleccionar el canal de un convertidor analógico-digital (ADC).</li>
+                    <li>Transmitir y recibir datos mediante una interfaz UART, SPI o I²C.</li>
+                    <li>Consultar el estado de una interrupción.</li>
+                    <li>Leer el resultado de una conversión analógica.</li>
+                </ul>
+            <p>
+                A diferencia de los registros internos del núcleo de la CPU, cuya función es almacenar temporalmente operandos y resultados, los registros de hardware están conectados directamente a los circuitos electrónicos de cada periférico. Por esta razón, escribir un valor en uno de estos registros no solo modifica un dato almacenado, sino que también puede provocar un cambio físico dentro del microcontrolador.
+            </p>    
+            <p>
+                Por ejemplo, al escribir un 1 en un determinado bit del registro <code>PORTB</code>, el circuito de salida asociado a ese pin cambia su estado eléctrico. Del mismo modo, al configurar un bit del registro <code>TCCR0B</code>, el temporizador correspondiente puede comenzar a contar pulsos; o al escribir un bit de control en un registro del ADC, se inicia una conversión analógica.
+            </p>
+            <p>
+                En otras palabras, los registros de hardware representan el punto de unión entre el software y el hardware. El programa nunca controla directamente los transistores, multiplexores, temporizadores o convertidores internos del microcontrolador. En su lugar, la CPU únicamente realiza operaciones de lectura y escritura sobre estos registros, y es el propio hardware quien interpreta esas operaciones y ejecuta la acción correspondiente.
+            </p>    
+            <p>
+                Este mecanismo ofrece una enorme ventaja: desde el punto de vista del programador, controlar un complejo circuito electrónico resulta tan sencillo como leer o escribir el contenido de un registro.
+            </p>
+                <h3>Del firmware al software</h3>
+                <p>
+                    El siguiente ejemplo ilustra el recorrido que sigue una instrucción escrita en lenguaje C:
+                </p>
+
+<pre><code class="language-c">PORTB |= (1 << PB5); </code></pre>
+                <p>El proceso ocurre de la siguiente manera:</p>                
+                <ol>
+                    <li>El compilador traduce la instrucción C a código máquina.</li>
+                    <li>La CPU ejecuta las instrucciones generadas.</li>
+                    <li>La CPU escribe un nuevo valor en el registro <code>PORTB</code>.</li>
+                    <li>El circuito del puerto B detecta el cambio en ese registro.</li>
+                    <li>El latch de salida actualiza su contenido.</li>
+                    <li>El transistor de salida cambia de estado.</li>
+                    <li>El nivel lógico del pin físico <code>PB5</code> pasa a nivel alto.</li>
+                </ol>
+                <p>
+                Todo este proceso ocurre en unos pocos ciclos de reloj y constituye el mecanismo básico mediante el cual el software controla el hardware del microcontrolador.
+                </p>                
+            </section>
+        
+        </article>       
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+
+<script src="/mi-web-electronica/assets/js/componentes.js"></script>
+
+<script src="/mi-web-electronica/assets/js/menu-direction.js"></script>
+
+<script src="/mi-web-electronica/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>

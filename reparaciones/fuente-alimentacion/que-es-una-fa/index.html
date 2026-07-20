@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Nombre articulo | MC Mundo Tech</title>
+    <link rel="stylesheet" href="/mi-web-electronica/assets/css/principal.css">
+    <link rel="stylesheet" href="/mi-web-electronica/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>
+        <aside id="indice"></aside>
+        <article>
+            <section> 
+            <header class="article-header">
+            <h1>LA FUENTE DE ALIMENTACIÓN </h1>
+            </header>
+            </section>
+            
+            <section>
+            <p>
+            Todo equipo electrónico que se conecta a la red pública de energía electrica debe usar una fuente de alimentación.<br>
+            Entender la estructura de la fuente por secciones, modo de operación y la función de cada circuito es crucial para un diagnóstico preciso, ya que permite al técnico identificar rápidamente dónde se encuentra la falla (en el bus principal de corriente continua positiva, en el arranque del oscilador, en la etapa de regulación o tal vez en algún circuito conversor específico) 
+            </p>
+            </section>
+
+            <section>
+            <h2>1. QUE ES UNA FUENTE DE ALIMENTACIÓN</h2>
+            <p>
+            Una fuente de alimentación es un dispositivo o sistema electrónico complejo de conversión de energía cuya misión principal es adaptar la electricidad disponible en una fuente (como la red eléctrica) a los requerimientos específicos de una carga o equipo electrónico
+            </p>
+            <p>Técnicamente, se define como un circuito "buffer" que se posiciona entre una fuente de energía incompatible y una carga para hacerlas compatibles entre sí. Su función es tomar la tensión alterna ($CA$) de la red domiciliaria y transformarla en una tensión continua ($CC$) regulada, que es el tipo de energía que necesitan los componentes internos de dispositivos como computadoras, televisores y celulares
+            </p>
+                <h3>Funciones críticas de una fuente de alimentación</h3>
+                <p>
+                Para realizar esta conversión de manera segura y eficiente, una fuente debe cumplir con varios procesos:
+                    <ul>
+                        <li><b>Transformación:</b> Modifica los niveles de voltaje (elevándolos o reduciéndolos) según sea necesario</li>
+                        <li><b>Rectificación:</b> Convierte la corriente alterna en corriente continua pulsante</li>   
+                        <li><b>Filtrado:</b> Elimina las ondulaciones y el ruido eléctrico (ripple) para suavizar la señal mediante el uso de condensadores</li>
+                        <li><b>Regulación:</b> Mantiene el voltaje de salida constante independientemente de las variaciones en la tensión de la red o del consumo de la carga</li>
+                        <li><b>Aislamiento:</b> Separa eléctricamente la entrada de la salida para proteger al usuario de descargas eléctricas al tocar el equipo</li>
+                        <li><b>Protección:</b> Evita daños ante cortocircuitos, sobrecargas o picos de tensión en la entrada</li>
+                    </ul>
+                </p>    
+            </section>
+
+            <section>
+            <h2>2. TIPOS PRINCIPALES DE FUENTES DE ALIMENTACIÓN</h2>
+            <p>Las fuentes se clasifican generalmente en dos tecnologías:
+                <ul>
+                    <li><b>Fuentes lineales:</b> Son más simples y robustas, pero menos eficientes y más grandes debido a la disipación de calor en los reguladores lineales. Su eficiencia es baja (típicamente entre el 30% y el 40%) porque regulan el voltaje disipando el exceso de energía en forma de calor</li>
+                    <li><b>Fuentes conmutadas (SMPS):</b>Son las más utilizadas hoy en día por ser ligeras, pequeñas y altamente eficientes (del 80% al 90%). Funcionan mediante la conmutación de alta velocidad de transistores que actúan como interruptores, procesando la energía en "paquetes" a través de transformadores de alta frecuencia (kHz)</li>
+                </ul>
+            </section>
+            
+            <section> 
+            <b>En resumen</b>, la fuente de alimentación es el "corazón" energético de cualquier aparato electrónico, garantizando que reciba la potencia estable y precisa que necesita para operar sin quemarse. <br>          
+            Una fuente de alimentación es un sistema complejo diseñado para convertir la corriente alterna (CA) de entrada en los voltajes de corriente directa (CD) específicos que necesita el equipo  para funcionar. 
+                      
+            </section>
+            
+
+        </article>
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+
+<script src="/mi-web-electronica/assets/js/componentes.js"></script>
+<script src="/mi-web-electronica/assets/js/menu-direction.js"></script>
+<script src="/mi-web-electronica/assets/js/indice.js"></script>
+
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-siguiente").href = "/mi-web-electronica/reparaciones/fuente-alimentacion/fuente-buffer/";
+    document.getElementById("articulo-siguiente").textContent = "LA FUENTE COMO BUFFER →";
+
+});
+</script>
+
+
+</body>
+
+</html>

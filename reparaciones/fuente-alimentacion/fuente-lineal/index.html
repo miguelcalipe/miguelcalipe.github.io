@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Nombre articulo | MC Mundo Tech</title>
+    <link rel="stylesheet" href="/mi-web-electronica/assets/css/principal.css">
+    <link rel="stylesheet" href="/mi-web-electronica/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>
+        <aside id="indice"></aside>
+        <article>
+
+            <section>
+            <header class="article-header">
+            <h1>LA FUENTE DE ALIMENTACIÓN LINEAL</h1>
+            </header>
+            <p>
+            Una <b>fuente de alimentación lineal</b> es el sistema tradicional y más sencillo para convertir la energía eléctrica de la red (corriente alterna) en una tensión continua y estable para alimentar dispositivos electrónicos.<br>
+            Se fundamenta técnicamente en un proceso de <b>disipación de la tensión sobrante en forma de calor</b> para lograr la regulación deseada en su salida
+            </p>
+            </section>
+
+            <section> 
+            <h2>1. BLOQUES FUNDAMENTALES DE UNA FUENTE LINEAL</h2>
+            <p> 
+            Una fuente de alimentación lineal se compone de varios bloques funcionales que trabajan en conjunto para convertir la corriente alterna (CA) de la red eléctrica en corriente continua (CC) regulada y estable. 
+            </p>    
+
+            <p>
+            Para realizar la conversión de energía, estas fuentes se dividen tradicionalmente en cuatro etapas críticas:
+
+                <ul>
+                    <li> <b>Transformador de entrada</b>: Es un componente voluminoso con núcleo de hierro laminado que trabaja a baja frecuencia (50/60 Hz). Su función es reducir el voltaje de la red (220V o 110V) a un nivel de CA más bajo y adecuado, además de proporcionar aislamiento galvánico de seguridad entre la red y la carga. En algunos casos </li>
+                    <li> <b>Rectificador</b>: Convierte la tensión alterna reducida en una tensión continua pulsante utilizando diodos (ya sea un solo diodo o un puente de Graetz)</li>
+                    <li> <b>Filtro</b>: Compuesto generalmente por condensadores electrolíticos de gran capacidad, se encarga de aplanar la señal pulsante y eliminar el rizado (ripple), almacenando energía para entregarla cuando la tensión del rectificador desciende</li>
+                    <li> <b>Regulador</b>: Es el elemento activo (transistor o circuito integrado) que mantiene el voltaje de salida en un valor exacto y constante, independientemente de las variaciones en la línea de entrada o en el consumo de la carga</li>
+                </ul>
+            </p>
+            </section>
+
+            <section> 
+            <h2>2. PRINCIPIO DE REGULACIÓN Y FUNCIONAMIENTO </h2>
+            <p>
+            El principio de funcionamiento de una fuente lineal se basa en la regulación de la tensión de salida mediante la disipación de la energía excedente en forma de calor. El componente central es el regulador lineal, el cual se comporta como una resistencia variable de ajuste automático situada entre la entrada y la salida. El regulador ajusta continuamente la cantidad de corriente que pasa a través de él para mantener un voltaje constante en la salida, compensando las variaciones de carga y de la tensión de entrada. 
+            
+                <ul>
+                <li><b>Mecanismo de control</b>: El regulador utiliza un amplificador de error que compara una muestra de la tensión de salida con una tensión de referencia fija (generalmente un diodo Zener) </li>
+                <li> <b>Ajuste dinámico</b>: Si la tensión de salida tiende a aumentar, el regulador incrementa su resistencia interna para que caiga más voltaje en él; si la tensión baja, disminuye su resistencia para compensar, manteniendo así la salida estable</li>
+                <li> <b></b>Tipos de reguladores</b>: Existen los reguladores en serie (el elemento de control está en serie con la carga, siendo los más comunes como la serie 78XX) y los reguladores en paralelo o shunt (donde el regulador absorbe el exceso de corriente, siendo menos eficientes pero resistentes a cortocircuitos)</li>
+                </ul>
+            </p>
+            </section>
+            
+            <section>
+            <h2>3.LA GRAN LIMITACIÓN: LA EFICIENCIA TÉRMICA</h2>
+            <p>El mayor inconveniente de esta tecnología es que la regulación se basa exclusivamente en la disipación de potencia en forma de calor
+
+                <ul>
+                    <li> <b>Cálculo de pérdida</b>: La potencia disipada ($P_d$) se calcula multiplicando la diferencia de tensión entre la entrada y la salida por la corriente de carga: $P_d = (V_{in} -V_{out})⋅I_{out}$</li>
+                    <li> <b>Bajo rendimiento</b>: Debido a esta pérdida de energía, las fuentes lineales tienen una eficiencia muy baja, típicamente del 30% al 60% (frente al 80-90% de las conmutadas). Por ejemplo, en una fuente lineal LM7805 alimentada con 12V para entregar 5V a 1A, el rendimiento es de apenas el 41.66%, desperdiciando el resto en calor</li>
+                    <li> <b>Disipación de calor</b>: Requieren obligatoriamente de grandes disipadores de calor y, en potencias elevadas, ventilación forzada para evitar que los semiconductores se destruyan por sobrecalentamiento</li>
+                </ul>
+            </p>
+            </section>
+            
+            <section>
+            <h2> 4. VENTAJAS Y DESVENTAJAS </h2>
+            <p> A pesar de sus limitaciones de eficiencia, siguen siendo valoradas en ciertas aplicaciones:
+            
+            <h3>Ventajas:</h3>
+                <ul>
+                    <li> <b>Simplicidad de diseño</b>: Son mucho más fáciles de construir y reparar que las fuentes conmutadas </b> </li>
+                    <li> <b>Bajo ruido</b>: Producen niveles mínimos de interferencia electromagnética (EMI) y radiofrecuencia (RFI), lo que las hace ideales para equipos de audio de alta fidelidad o instrumentación sensible</li>
+                    <li> <b>Excelente regulación</b>: Ofrecen una respuesta muy rápida a cambios bruscos de carga y un rizado de salida extremadamente reducido</li>
+                </ul>
+
+            <h3>Desventajas:</h3>
+                <ul>
+                    <li> <b>Peso y volumen elevados</b>: Debido al transformador de 50/60 Hz y a los grandes disipadores, son pesadas y ocupan mucho espacio</li>
+                    <li> <b>Calor excesivo</b>: Operan a altas temperaturas, lo que reduce la vida útil de los componentes cercanos</li>
+                    <li> <b>Rango de entrada limitado</b>: Son muy sensibles a las variaciones de la tensión de red; si el voltaje de entrada cae demasiado, el regulador deja de funcionar</li>
+                </ul>
+            </p>
+            </section>
+
+            <section>
+            <h2>EN RESUMEN</h2>
+            <p> La fuente lineal es la tecnología más antigua y simple para convertir energía eléctrica, ofreciendo una salida limpia y estable a costa de eficiencia y portabilidad. Su diseño robusto y bajo ruido la hace ideal para aplicaciones críticas, aunque su uso ha disminuido frente a las fuentes conmutadas más eficientes y compactas. 
+            <br> La fuente lineal actúa como un amortiguador o "buffer" disipativo que garantiza una energía de salida limpia y precisa a costa de sacrificar eficiencia energética y portabilidad
+            </p>
+            </section>
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+
+<script src="/mi-web-electronica/assets/js/componentes.js"></script>
+<script src="/mi-web-electronica/assets/js/menu-direction.js"></script>
+<script src="/mi-web-electronica/assets/js/indice.js"></script>
+
+
+
+
+ 
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "/mi-web-electronica/reparaciones/fuente-alimentacion/fuente-buffer/";
+    document.getElementById("articulo-anterior").textContent = "← LA FUENTE COMO BUFFER";
+
+    document.getElementById("articulo-siguiente").href = "/mi-web-electronica/reparaciones/fuente-alimentacion/fuente-conmutada/que-es-una-fc";
+    document.getElementById("articulo-siguiente").textContent = "LA FUENTE CONMUTADA →";
+
+});
+</script>
+
+</body>
+
+</html>
