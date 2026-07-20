@@ -1,12 +1,12 @@
 document.addEventListener("DOMContentLoaded", async () => {
 
-    await cargar("site-header", "/mi-web-electronica/componentes/comunes/header.html");
-    await cargar("menu", "/mi-web-electronica/componentes/comunes/menu.html");
-    await cargar("footer", "/mi-web-electronica/componentes/comunes/footer.html");
+    await cargar("site-header", "/componentes/comunes/header.html");
+    await cargar("menu", "/componentes/comunes/menu.html");
+    await cargar("footer", "/componentes/comunes/footer.html");
 
     await cargar("migas-pan", "componentes/articulos/migas-pan.html");
     await cargar("indice", "componentes/articulos/indice.html");
-    await cargar("articulo-nav", "/mi-web-electronica/componentes/articulos/articulo-nav.html");
+    await cargar("articulo-nav", "/componentes/articulos/articulo-nav.html");
 
 });
 
