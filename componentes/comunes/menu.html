@@ -1,112 +1,103 @@
 
 <nav>
-    <ul>
-        <li><a href="/"> 🏠 Inicio </a> </li>
-        <li>
-            <a>Electrónica Analógica</a> 
-            <ul> 
-                <li><a href="#">Diodos</a> </li>
-                <li><a href="#">Transistores</a> 
-                    <ul>
-                        <li> <a href="#"> </a></li>
-                        <li> <a href="/electronica-analogica/Transistores/EfectoCarga/">Efecto de Carga </a> </li>
-                        <li> <a href="#"> </a></li>
-                    </ul>
-                </li>    
-            </ul>
-        </li>
-        <li>
-            <a>Electrónica Digital</a>
-            <ul> 
-                <li><a href="#">Compuertas Lógicas</a>  
-                    <ul>
-                        <li><a href="#">Compuerta NOT </a> </li>
-                        <li><a href="#">Compuerta AND </a> </li>
-                        <li><a href="#">Compuerta OR </a> </li>
-                        <li><a href="#">Compuerta NOR </a> </li>
-                        <li><a href="#">Compuerta NAND </a> </li>
-                        <li><a href="#">Compuerta XOR </a> </li>
-                    </ul>
-                </li>
-                
-                <li><a href="#">Compuertas aplicadas a AVR </a> </li>
-            </ul>
-        </li>
-        <li>
-            <a>Microcontroladores</a>
-            <ul>
-                <li><a>Fundamentos</a>
-                    <ul> 
-                        <li><a href="/microcontroladores/fundamentos/registros/">Que son los Registros de un <i>u</i>C</a></li>
-                        <li><a href="/microcontroladores/fundamentos/ancho-palabra/">Ancho de Palabra del Procesaador </a></li>               
-                    </ul>
-                </li>
+    <button id="menu-toggle" class="menu-toggle" aria-label="Abrir menú">
+    ☰
+    </button>
 
-                <li><a>AVR</a>
-                    <ul>
-                        <li><a>Características</a></li>
-                        <li><a>Programación</a>
-                            <ul>
-                                <li><a href="/microcontroladores/avr/programacion/entorno-toolchains">Entornos y Toolchains </a></li>
-                                <li><a href="/microcontroladores/avr/programacion/bare-metal">Programación Bare-Metal </a></li>
-                            </ul>
-                        </li>
-
-
+<ul id="menu-principal">
+    <li><a href="/"> 🏠 Inicio </a> </li>
+    <li class="has-submenu"><a>Electrónica Analógica<span class="submenu-arrow">▾</span></a> 
+        <ul> 
+            <li><a href="#">Diodos</a> </li>
+            <li class="has-submenu"><a href="#">Transistores<span class="submenu-arrow">▾</span></a> 
+                <ul>
+                    <li> <a href="#"> </a></li>
+                    <li> <a href="/electronica-analogica/Transistores/EfectoCarga/">Efecto de Carga </a> </li>
+                    <li> <a href="#"> </a></li>
+                </ul>
+            </li>    
+        </ul>
+    </li>
+    <li class="has-submenu"><a>Electrónica Digital<span class="submenu-arrow">▾</span></a>
+        <ul> 
+            <li class="has-submenu"><a href="#">Compuertas Lógicas<span class="submenu-arrow">▾</span></a>  
+                <ul>
+                    <li><a href="#">Compuerta NOT </a> </li>
+                    <li><a href="#">Compuerta AND </a> </li>
+                    <li><a href="#">Compuerta OR </a> </li>
+                    <li><a href="#">Compuerta NOR </a> </li>
+                    <li><a href="#">Compuerta NAND </a> </li>
+                    <li><a href="#">Compuerta XOR </a> </li>
+                </ul>
+            </li>    
+            <li><a href="#">Compuertas aplicadas a AVR </a> </li>
+        </ul>
+    </li>        
+    <li class="has-submenu"><a>Microcontroladores<span class="submenu-arrow">▾</span></a> 
+        <ul>
+            <li class="has-submenu"><a>Fundamentos<span class="submenu-arrow">▾</span></a>
+                <ul> 
+                    <li><a href="/microcontroladores/fundamentos/registros/">Que son los Registros de un <i>u</i>C</a></li>
+                    <li><a href="/microcontroladores/fundamentos/ancho-palabra/">Ancho de Palabra del Procesaador </a></li>               
                     </ul>
                 </li>
-                <li><a href="#">ARM</a> 
-                    <ul>
-                        <li><a href="stm32/">STM32</a>
 
-                        </li>
-                        <li><a>ESP32</a> </li>
-                    </ul>    
-                </li>
+            <li class="has-submenu"><a>AVR<span class="submenu-arrow">▾</span></a>
+                <ul>
+                    <li><a>Características</a></li>
+                    <li class="has-submenu"><a>Programación<span class="submenu-arrow">▾</span></a>
+                        <ul>
+                            <li><a href="/microcontroladores/avr/programacion/entorno-toolchains">Entornos y Toolchains </a></li>
+                            <li><a href="/microcontroladores/avr/programacion/bare-metal">Programación Bare-Metal </a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li class="has-submenu"><a href="#">ARM<span class="submenu-arrow">▾</span></a> 
+                <ul>
+                    <li><a href="stm32/">STM32</a></li>
+                    <li><a>ESP32</a> </li>
+                </ul>    
+            </li>
+        </ul>    
+    </li>    
+    <li class="has-submenu"><a href="#/">Computadoras<span class="submenu-arrow">▾</span></a>
+        <ul>
+            <li><a href="raspberry-pi/">Raspberry Pi 5 </a> </li>
+            <li><a href="#"> Linux para Pi5</a> </li>
+        </ul>
+    </li> 
 
-            </ul>    
-        </li>    
-             
-        <li> 
-            <a href="#/">Computadoras</a>
-            <ul>
-                <li><a href="raspberry-pi/">Raspberry Pi 5 </a> </li>
-                <li><a href="#"> Linux para Pi5</a> </li>
-            </ul>
-        </li> 
-
-        <li><a href="#">Reparaciones </a>
-            <ul>
-                <li><a href="#"> Fuentes de Alimentación</a> 
-                    <ul>
-                        <li><a href="#">La Fuente de Alimentación</a> 
-                            <ul> 
-                                <li> <a href="/reparaciones/fuente-alimentacion/que-es-una-fa/">Que es una Fuente de Alimentación</a> </li>
-                                <li> <a href="/reparaciones/fuente-alimentacion/fuente-buffer/">La Fuente como Buffer</a> </li>
-                            </ul>
-                        </li>   
-                        <li> <a href="/reparaciones/fuente-alimentacion/fuente-lineal/">La Fuente Lineal</a> </li>
-                        <li> <a href="/reparaciones/fuente-alimentacion/fuente-conmutada/">La Fuente Conmutada</a> 
-                            <ul> 
-                                <li> <a href="/reparaciones/fuente-alimentacion/fuente-conmutada/que-es-una-fc/">Que es una Fuente Conmutada</a> </li>
-                                <li> <a href="/reparaciones/fuente-alimentacion/fuente-conmutada/etapas-fc/">Etapas de una Fuente Conmutada</a> 
-                                </li>
-                            </ul>    
-                        </li>                       
-                    </ul>
+    <li class="has-submenu"><a href="#">Reparaciones<span class="submenu-arrow">▾</span> </a>
+        <ul>
+            <li class="has-submenu"><a href="#"> Fuentes de Alimentación <span class="submenu-arrow">▾</span> </a> 
+                <ul>
+                    <li class="has-submenu"><a href="#">La Fuente de Alimentación</a> 
+                        <ul> 
+                            <li> <a href="/reparaciones/fuente-alimentacion/que-es-una-fa/">Que es una Fuente de Alimentación</a> </li>
+                            <li> <a href="/reparaciones/fuente-alimentacion/fuente-buffer/">La Fuente como Buffer</a> </li>
+                        </ul>
+                    </li>   
+                    <li> <a href="/reparaciones/fuente-alimentacion/fuente-lineal/">La Fuente Lineal</a> </li>
+                    <li class="has-submenu"><a href="/reparaciones/fuente-alimentacion/fuente-conmutada/">La Fuente Conmutada<span class="submenu-arrow">▾</span></a> 
+                        <ul> 
+                            <li> <a href="/reparaciones/fuente-alimentacion/fuente-conmutada/que-es-una-fc/">Que es una Fuente Conmutada</a> </li>
+                            <li> <a href="/reparaciones/fuente-alimentacion/fuente-conmutada/etapas-fc/">Etapas de una Fuente Conmutada</a> 
+                            </li>
+                        </ul>    
+                    </li>                       
+                </ul>
                      
                 <li> <a href="#"> Reparacion de Tv</a> </li>             
                 
-            </ul>
-        </li>
+        </ul>
+    </li>
         
-        <li>
-            <a href="#">Programación</a>
-            <ul>
-                <li><a href="#">Python</a> </li>
-            </ul>
-        </li>
+    <li class="has-submenu"><a href="#"> Programaciónclass="has-submenu" <span class="submenu-arrow">▾</span></a>
+        <ul>
+            <li><a href="#">Python</a> </li>
+        </ul>
+    </li>    
     
-    </ul>
-   
+</ul>
 </nav>

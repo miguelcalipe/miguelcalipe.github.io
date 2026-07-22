@@ -34,7 +34,6 @@ document.addEventListener("DOMContentLoaded", () => {
     //==========================================================
     // Crear el botón Mostrar/Ocultar
     //==========================================================
-
     const boton = document.createElement("button");
 
     boton.textContent = "Ocultar índice";
