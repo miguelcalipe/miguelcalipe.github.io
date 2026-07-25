@@ -2,17 +2,6 @@
    MC Mundo Tech - Estilo de Artículos
    ===================================== */
 
-:root {
-    --primary-color: #1e3a8a;
-    --secondary-color: #3b82f6;
-    --text-color: #1f2937;
-    --bg-color: #0c39ef29;
-    --card-bg: #ffffff;
-    --border-color: #e2e8f0;
-    --code-bg: #f1f5f9;
-}
-
-
 body.articulo {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
@@ -33,13 +22,13 @@ body.articulo {
     text-align: left;
 }
 
-header h1 {
+.article-header h1 {
     margin: 0;
     font-size: 2.2rem;
     font-weight: 700;
 }
 
-header p {
+.article-header p {
     margin: 0 auto;
     font-size: 1.1rem;
     opacity: 0.9;
@@ -64,15 +53,13 @@ section {
 }
 */
 section {
-    background: #ffffff;
-    border: 2px solid #abadb0;
+    background-color:var(--card-bg);
+    border: 2px solid var(--border-color);
     border-radius: 10px;
     padding: 2rem;
     margin-bottom: 2rem;
     box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.386);
     overflow: hidden;
-    /*border: 3px solid red;
-    box-shadow: 0 0 0 5px lime;*/
 }
 
 
@@ -272,7 +259,6 @@ font-weight:bold;
     flex: 0 1 320px;
     max-width: 320px;
     text-align: center;
-    
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -319,140 +305,43 @@ font-weight:bold;
 #indice{
 
     background:#f8f9fa;
-
     border:1px solid #d9d9d9;
-
     border-radius:8px;
-
     padding:18px;
-
     margin-bottom:30px;
-
 }
 
 #indice h2{
-
     margin-top:0;
-
     margin-bottom:10px;
-
 }
 
 .lista-indice{
-
     list-style:none;
-
     padding-left:0;
-
     margin-top:15px;
-
 }
 
 .lista-indice li{
-
     margin:8px 0;
-
 }
 
 .lista-indice li.subnivel{
-
     margin-left:20px;
-
 }
 
 .lista-indice a{
-
     text-decoration:none;
-
     color:#0f4fa8;
-
 }
 
 .lista-indice a:hover{
-
     text-decoration:underline;
-
 }
 
 .boton-indice{
-
     padding:6px 12px;
-
     cursor:pointer;
-
-}
-
-/* ===========================
-   FOOTER
-=========================== */
-
-.site-footer{
-    background:#1b1f24;
-    color:#d7dce2;
-    margin-top:60px;
-    border-top:4px solid #2c7be5;
-    font-size:0.95rem;
-}
-
-.footer-container{
-    max-width:1200px;
-    margin:auto;
-    padding:45px 25px;
-    display:flex;
-    flex-wrap:wrap;
-    justify-content:space-between;
-    gap:40px;
-}
-
-.footer-block{
-    flex:1;
-    min-width:230px;
-}
-
-.footer-block h3,
-.footer-block h4{
-    color:#ffffff;
-    margin-bottom:18px;
-    font-weight:600;
-}
-
-.footer-block p{
-    color:#c5ccd3;
-    line-height:1.8;
-    text-align:justify;
-}
-
-.footer-block ul{
-    list-style:none;
-    margin:0;
-    padding:0;
-}
-
-.footer-block li{
-    margin-bottom:12px;
-}
-
-.footer-block a{
-    color:#b9d8ff;
-    text-decoration:none;
-    transition:color .25s ease;
-}
-
-.footer-block a:hover{
-    color:#ffffff;
-}
-
-.footer-bottom{
-    border-top:1px solid rgba(255,255,255,.12);
-    text-align:center;
-    padding:18px 20px;
-    background:#171a1e;
-}
-
-.footer-bottom p{
-    margin:0;
-    color:#aeb6bf;
-    font-size:.9rem;
 }
 
 
