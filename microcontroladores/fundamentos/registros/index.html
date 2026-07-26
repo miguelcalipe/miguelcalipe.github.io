@@ -29,14 +29,12 @@
     <main>
        
         <article>
-            <section>
             <header class="article-header">
-            <h1>LOS REGISTROS DEL MICROCONTROLADOR</h1>
+            <h1>LOS REGISTROS DEL &#956;C</h1>
             <p style="text-align:center">
                 En este artículo se estudian los diferentes tipos de registros presentes en un microcontrolador, su papel dentro de la arquitectura del sistema y la forma en que permiten al software interactuar con el hardware.
             </p>
-            </header>
-            </section>
+            </header>            
             
             <aside id="indice"></aside>
 
@@ -231,7 +229,8 @@
 
             <section>
             <h2> 5. DIFERENCIAS ENTRE LOS REGISTROS Y LA MEMORIA RAM</h2>  
-            Aunque ambos almacenan información, los registros y la memoria RAM cumplen funciones muy diferentes.
+            <p>Aunque ambos almacenan información, los registros y la memoria RAM cumplen funciones muy diferentes.</p>
+            <div class="table-container">
             <table> 
                 <thead> 
                     <tr> 
@@ -264,6 +263,8 @@
                     </tr>
                 </tbody>
             </table>
+            </div>
+
                 <p>Por ejemplo:</p>
 <pre><code>uint8_t contador = 10;</code></pre>
             <p>La variable normalmente se almacena en RAM.</p>

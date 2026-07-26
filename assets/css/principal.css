@@ -2,12 +2,12 @@
    VARIABLES GLOBALES
    ========================================== */
 :root {
-    --primary-color: #1e3a8a;
-    --secondary-color: #3b82f6;
-    --text-color: #1f2937;
-    --bg-color: #0c39ef29;
-    --card-bg: #ffffff;
-    --border-color: #e2e8f0;
+    --primary-color: #1e3a8a;   /* Azul oscuro para títulos */
+    --secondary-color: #2563eb; /* Azul brillante */
+    --text-color: #1f2937;      /* Gris oscuro para lectura */
+    --bg-color: #dae2f9;        /* Azul claro / lavanda suave */
+    --card-bg: #ffffff;        /* Fondo blanco para las tarjetas e índice */
+    --border-color: #cbd5e1;    /* Borde suave para los contenedores */
     --code-bg: #f1f5f9;
 }
 
@@ -27,7 +27,7 @@
 
 body.principal {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f5f5f5;
+    background-color: var(--bg-color); /* Aplica el fondo suave en la portada */
     margin: 0;
     padding: 10px;
 }
@@ -37,7 +37,7 @@ body.principal {
    =========================== */
 
 #site-header {
-    background-color: #2563EB;
+    background-color: var(--secondary-color);
     padding: 0;
     text-align: center;
 }
@@ -46,6 +46,56 @@ body.principal {
     max-width: 100%;
     height: auto;
 }
+
+/* ==========================================
+   CONTENIDO PRINCIPAL
+   ========================================== */
+/* Asegura que los contenedores/cajas principales de la portada sean blancos */
+.principal main section,
+.principal .card,
+.principal .contenedor-caja {
+    background-color: #ffffff; /* Fondo blanco para destacar del fondo lavanda */
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Sombra suave */
+}
+
+
+.principal main {
+    width: 100%;
+    max-width: 1080px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.article-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: #ffffff !important; /* Asegura texto blanco */
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    border-radius: 10px;
+}
+
+.article-header h1,
+.article-header p {
+    color: #ffffff !important; /* Forzar blanco en título y subtítulo */
+}
+
+.article-header h1 {
+    margin: 0;
+    font-size: 2.2rem;
+    font-weight: 700;
+}
+
+.article-header p {
+    margin: 0 auto;
+    font-size: 1.1rem;
+    opacity: 0.9;
+    text-align: center;
+}
+
 
 /* ===========================
    TIPOGRAFÍA
@@ -223,7 +273,7 @@ nav ul ul a:hover {
 }
 
 .footer-block p{
-    color:#c5ccd3;
+    color:#ffffff !important; /* Aseguramos blanco  en el parrafo del footer */
     line-height:1.8;
     text-align:justify;
 }
@@ -255,8 +305,8 @@ nav ul ul a:hover {
     background:#171a1e;
 }
 
-.footer-bottom p{
-    margin:0;
-    color:#aeb6bf;
-    font-size:.9rem;
+.footer-bottom p {
+    margin: 0;
+    color: #ffffff !important; /* Aseguramos blanco también en la parte inferior del footer */
+    font-size: .9rem;
 }

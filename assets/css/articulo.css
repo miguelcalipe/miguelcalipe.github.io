@@ -6,54 +6,24 @@ body.articulo {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
     color: var(--text-color);
-    background-color:var(--bg-color);
+    background-color: var(--bg-color); /* Aplica el fondo suave en los artículos */
     margin: 0;
     padding: 0;
 }
 
-.article-header {
-    background: linear-gradient(
-        135deg,
-        var(--primary-color),
-        var(--secondary-color)
-    );
-    color: white;
-    padding: 2.5rem 1.5rem;
-    text-align: left;
-}
-
-.article-header h1 {
-    margin: 0;
-    font-size: 2.2rem;
-    font-weight: 700;
-}
-
-.article-header p {
-    margin: 0 auto;
-    font-size: 1.1rem;
-    opacity: 0.9;
-}
-
+/* ==========================================
+   CONTENIDO DEL ARTÍCULO
+   ========================================== */
 .articulo main {
-   width: 100%;
-   max-width: 1080px;
-   margin: 2rem auto;
-   padding: 0 1rem;
+    width: 100%;
+    max-width: 1080px;
+    margin: 2rem auto;
+    padding: 0 1rem;
 }
 
-/*
-section {
-    background-color:var(--card-bg);
-    border-radius: 8px;
-    padding: 1.25rem 1.5rem;
-    margin-bottom: 2rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    border: 1px solid var(--border-color);
-    overflow: hidden;
-}
-*/
-section {
-    background-color:var(--card-bg);
+/* Secciones del artículo */
+.articulo main section {
+    background-color: var(--card-bg);
     border: 2px solid var(--border-color);
     border-radius: 10px;
     padding: 2rem;
@@ -62,62 +32,75 @@ section {
     overflow: hidden;
 }
 
+/* Cabecera del artículo */
+.articulo .article-header {
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.386);
+    overflow: hidden;
+}
 
-h2 {
+/* Párrafos dentro de las secciones */
+.articulo main section p {
+    margin: 0.8rem 0;
+    text-align: justify;
+}
+
+.articulo main section h2 {
     color: var(--primary-color);
     border-bottom: 2px solid var(--secondary-color);
     padding-bottom: 0.5rem;
     margin-top: 0;
     font-size: 1.5rem;
-}
+    }
 
-h3 {
+.articulo main section  h3 {
     color: var(--secondary-color);
     font-size: 1.2rem;
     margin-top: 1.5rem;
-}
-
-p {
-    margin: 0.8rem 0;
-    text-align: justify;
-}
-
-ul,
-ol {
+    }
+    
+.articulo main ul,
+.articulo main ol {
     padding-left: 1.5rem;
-}
+    }
 
-li {
+.articulo main li {
     margin-bottom: 0.5rem;
-}
+    }
 
-.table-container {
+/* ===========================
+   TABLAS
+   =========================== */
+
+.articulo main .table-container {
     overflow-x: auto;
     margin: 2rem 0;
 }
 
-table {
+.articulo main .table-container table {
     width: 100%;
     border-collapse: collapse;
     margin: 1.5rem 0;
 }
 
-th,
-td {
+.articulo main .table-container th,
+.articulo main .table-container td {
     border: 1px solid var(--border-color);
     padding: 0.75rem;
     text-align: left;
 }
 
-th {
+.articulo main .table-container th {
     background-color: var(--bg-color);
     color: var(--primary-color);
     font-weight: 600;
 }
 
-tr:nth-child(even) {
+.articulo main .table-container tr:nth-child(even) {
     background-color: #fafafa;
 }
+
 /* ===========================
    FÓRMULAS
    =========================== */
@@ -302,18 +285,21 @@ font-weight:bold;
     ÍNDICE
 ==========================================================*/
 
-#indice{
-
-    background:#f8f9fa;
-    border:1px solid #d9d9d9;
-    border-radius:8px;
-    padding:18px;
-    margin-bottom:30px;
+#indice {
+    background: #ffffff; /* Fondo blanco en lugar de gris pálido */
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--secondary-color); /* Detalle visual acorde al sitio */
+    border-radius: 8px;
+    padding: 18px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-#indice h2{
-    margin-top:0;
-    margin-bottom:10px;
+#indice h2 {
+    color: var(--primary-color);
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.3rem;
 }
 
 .lista-indice{
