@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compilación de un microcontrolador. Compilación nativa y cruzada | MC Mundo Tech</title>
+    <!-- Estilo para los colores del código -->
+    <link rel="stylesheet" href="https://cloudflare.com">
+    <!-- Motor que detecta y pinta el código -->
+    <script src="https://cloudflare.com"></script>
+    <script>hljs.highlightAll();</script>
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+        <header class="article-header">
+            <h1>LA COMPILACIÓN NATIVA Y LA COMPILACIÓN CRUZADA</h1>
+            <p></p>
+        </header>
+                        
+        <aside id="indice"></aside>    
+           
+         
+        <section>
+            <h2>INTRODUCCIÓN</h2>
+            <p>
+                Los equipos linux utilizan como compilador nativo GCC. Cuando comenzamos a programar microcontroladores es habitual instalar herramientas como AVR-GCC cuando queremos trabajar con un ATmega o un ATtiny, ARM GCC para programar un  STM32  o ESP-IDF para un microcontrolador de Espressif, sin preguntarnos por qué no basta con utilizar el compilador gcc que ya viene instalado en Linux. La respuesta está en dos conceptos fundamentales del desarrollo de software: la compilación nativa y la compilación cruzada (<em>cross compilation</em>).
+            </p>
+            <p>
+                Comprender esta diferencia es esencial para desarrollar firmware para microcontroladores como los ATmega, ATtiny, STM32 o ESP32, especialmente si utilizamos una computadora como una Raspberry Pi 5 como estación de desarrollo
+            </p>
+        </section>                  
+
+        <section>
+            <h2>LA COMPILACIÓN NATIVA</h2>
+            <p>
+                Se denomina compilación nativa al proceso mediante el cual un compilador genera un programa destinado a ejecutarse sobre la misma arquitectura donde dicho compilador está funcionando
+            </p>
+            <p>
+                Supongamos que estamos trabajando en un equipo que corre bajo linux, específicamente una Raspberry Pi 5. La Raspberry Pi posee un procesador ARM64 y el compilador gcc instalado por el sistema operativo también se ejecuta sobre esa arquitectura
+            </p>
+            <p>Cuando ejecutamos en la terminal:</p>
+            
+            <pre><code class="language-bash">gcc programa.c -o programa</code></pre>
+            
+            <p>El resultado será un ejecutable para ARM64 que correrá desde la terminal de la R-Pi5.</p>
+            
+            <p>En este caso, el equipo donde se compila y el equipo donde se ejecutará el programa son, desde el punto de vista de la arquitectura, el mismo. La mayoría de las aplicaciones de escritorio y muchas utilidades de Linux se desarrollan mediante compilación nativa.</p>
+        </section>
+
+        <section>
+            <h2>LA COMPILACIÓN CRUZADA</h2>
+            <p>
+                La compilación cruzada ocurre cuando el compilador se ejecuta sobre una arquitectura determinada, pero genera código máquina destinado a otra arquitectura diferente.
+            </p>
+            <p>
+                Por ejemplo, si utilizamos una Raspberry Pi 5 para desarrollar firmware para un ATmega328P, el compilador que utilizaremos no debe generar instrucciones ARM64, sino instrucciones para un AVR.
+            </p>
+            <p>En ese caso utilizaremos:</p>
+            
+            <pre><code class= "language-bash">avr-gcc programa.c -mmcu=atmega328p</code></pre>
+            
+            <p>
+                Aunque el compilador se está ejecutando sobre un procesador ARM64, el código generado está pensado exclusivamente para un microcontrolador AVR. Precisamente por eso recibe el nombre de compilador cruzado (<em><strong>cross compiler</strong></em>).</p>
+        </section>
+
+        <section>
+            <h2>INCOMPATIBILIDAD DEL COMPILADOR GCC ESTÁNDAR EN MICROCONTROLADORES</h2>
+
+            <p>
+                Muchos piensan que el compilador  gcc sirve para compilar cualquier código en C. Esto es un error. Aunque el lenguaje C se escribe igual en todos lados, el chip de una computadora (ya sea Intel, AMD o un ARM de una Mac/Laptop moderna) tiene recursos gigantescos. En cambio, el chip de un microcontrolador es diminuto y habla un dialecto totalmente diferente. Una computadora (con chip Intel, AMD o ARM) procesa la información con un sistema operativo completo. Un microcontrolador corre el código directamente en el hardware, es decir en él mismo.</p>
+            
+            <p>
+                Por eso, el gcc estándar de tu computadora solo crea programas para sistemas operativos de computadora no sirve para la arquitectura limitada de un microcontrolador. Para ello necesitas un compilador especial que traduzca el código a su escala.
+            </p>
+                
+            <p>Consideremos el siguiente programa:</p>
+            <pre><code>#include &lt;avr/io.h&gt;
+int main(void) 
+{
+    DDRB |= (1 << PB5);
+    
+    while (1) 
+    {
+        PORTB ^= (1 << PB5);
+    }
+}</code></pre>
+            <p>
+                Este programa manipula directamente los registros del ATmega328P. Si intentamos compilarlo con <code>gcc programa.c</code>, obtendremos errores porque:</p>
+            <ul>
+                <li>
+                    gcc no conoce la biblioteca <code>avr/io.h</code>.</li>
+                <li>Desconoce los registros propios de la arquitectura AVR.</li>
+                <li>Genera instrucciones ARM, no instrucciones AVR</li>
+            </ul>
+            <p>En cambio, utilizando</p>
+                
+                <pre><code class="language-bash">avr-gcc programa.c -mmcu=atmega328p</code></pre>                
+            
+            <p>
+                el compilador reconoce la arquitectura AVR, las bibliotecas correspondientes y genera un ejecutable adecuado para el microcontrolador.
+            </p>
+        </section>
+
+        <section>
+            <h2>FUNCIONAMIENTO DE UN COMPILADOR CRUZADO</h2>
+            
+            <p>
+                Un compilador cruzado no solo genera el código máquina para una arquitectura distinta de aquella en la que se ejecuta. También incluye el conjunto de herramientas y recursos necesarios para desarrollar aplicaciones destinadas al microcontrolador objetivo, entre ellos:
+            </p>
+            
+            <ul>
+                <li>Bibliotecas estándar adaptadas al microcontrolador de destino.</li>
+                <li>Archivos de cabecera con la definición necesaria para trabajar con el hardware del dispositivo.</li>
+                <li>El ensamblador y el enlazador (<em>linker</em>).</li>
+                <li>Scripts de enlazado que describen la distribución de la memoria.</li>
+                <li>Herramientas para generar archivos ejecutables y de programación en formatos como ELF, BIN o HEX.</li>
+                <li>Utilidades para el análisis, depuración y manipulación de archivos binarios.</li>
+            </ul>
+
+            <p>
+                Por ejemplo, la cadena de herramientas para AVR suele incluir: <code>avr-gcc</code>, <code>avr-libc</code>, <code>avr-ld</code>, <code>avr-objcopy</code>, <code>avr-size</code> y <code>avr-ar</code>. Todas estas herramientas trabajan conjuntamente para producir el firmware que finalmente será grabado en el microcontrolador.
+            </p>
+        </section>
+
+        <section>
+            
+            <h2>Flujo de trabajo del código fuente al microcontrolador</h2>
+
+            <p>
+                En un proyecto típico para un microcontrolador STM32, por ejemplo una placa NUCLEO-F446RE, el flujo de trabajo comienza con el código fuente escrito por el desarrollador y termina con la programación del firmware en la memoria Flash del dispositivo. Utilizando la GNU Arm Embedded Toolchain, el proceso desde la terminal puede representarse de la siguiente manera:
+            </p>
+
+            <pre><code class="language-bash">
+            # 1. Compilar el código fuente
+            arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb \
+                -c main.c -o main.o
+
+            # 2. Enlazar el programa
+            arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb \
+                main.o startup_stm32f446xx.o \
+                -T STM32F446RE_FLASH.ld \
+                -o firmware.elf
+
+            # 3. Generar el archivo para programar el microcontrolador
+            arm-none-eabi-objcopy -O binary firmware.elf firmware.bin
+
+            # (Opcional) Generar un archivo Intel HEX
+            arm-none-eabi-objcopy -O ihex firmware.elf firmware.hex
+
+            # 4. Programar el microcontrolador mediante ST-Link
+            st-flash write firmware.bin 0x08000000
+            </code></pre>
+
+            <p>En un proyecto típico para AVR, el flujo de trabajo es el siguiente:</p>
+            <ol>
+            <li>Código fuente (<code>.c</code>)[cite: 1]</li>
+            <li>Compilación con <code>avr-gcc</code>[cite: 1]</li>
+            <li>Generación de archivo ELF (<code>.elf</code>)[cite: 1]</li>
+            <li>Procesamiento con <code>avr-objcopy</code>[cite: 1]</li>
+            <li>Generación de archivo HEX (<code>.hex</code>)[cite: 1]</li>
+            <li>Transferencia con <code>avrdude</code>[cite: 1]</li>
+            <li>Ejecución en el microcontrolador AVR[cite: 1]</li>
+            </ol>
+            <p>El archivo <code>.elf</code> contiene el programa junto con información de depuración[cite: 1]. Posteriormente, <code>avr-objcopy</code> genera el archivo hex, que contiene únicamente los datos necesarios para programar la memoria Flash del microcontrolador[cite: 1]. Finalmente, herramientas como AVRDUDE transfieren ese archivo al dispositivo mediante un programador, como un USBasp o un Arduino configurado como ISP[cite: 1].</p>
+        </section>
+
+        <section>
+            <h2>Conceptos de Host y Target</h2>
+            <p>En compilación cruzada aparecen dos términos muy utilizados[cite: 1]:</p>
+            <ul>
+            <li><strong>Host:</strong> Es el equipo donde se ejecutan las herramientas de desarrollo[cite: 1].</li>
+            <li><strong>Target:</strong> Es el dispositivo para el cual se genera el programa[cite: 1].</li>
+            </ul>
+            <p>Ejemplo 1:</p>
+            <ul>
+            <li><strong>Host:</strong> Raspberry Pi 5[cite: 1]</li>
+            <li><strong>Compilador:</strong> AVR-GCC[cite: 1]</li>
+            <li><strong>Target:</strong> ATmega328P[cite: 1]</li>
+            </ul>
+            <p>Ejemplo 2:</p>
+            <ul>
+            <li><strong>Host:</strong> PC con Windows[cite: 1]</li>
+            <li><strong>Compilador:</strong> arm-none-eabi-gcc[cite: 1]</li>
+            <li><strong>Target:</strong> STM32F446RE[cite: 1]</li>
+            </ul>
+            <p>En ambos casos existe compilación cruzada porque el programa no se ejecutará en el mismo sistema donde fue compilado[cite: 1].</p>
+        </section>
+
+        <section>
+            <h2>Compiladores cruzados habituales</h2>
+            <p>Dependiendo de la arquitectura del microcontrolador se utilizan distintas cadenas de herramientas[cite: 1]:</p>
+            <table>
+            <thead>
+                <tr>
+                <th>Compilador</th>
+                <th>Arquitectura destino</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                <td><code>avr-gcc</code></td>
+                <td>AVR (ATmega, ATtiny)</td>
+                </tr>
+                <tr>
+                <td><code>arm-none-eabi-gcc</code></td>
+                <td>ARM Cortex-M</td>
+                </tr>
+                <tr>
+                <td><code>riscv-none-elf-gcc</code></td>
+                <td>Microcontroladores RISC-V</td>
+                </tr>
+                <tr>
+                <td><code>xtensa-esp32-elf-gcc</code></td>
+                <td>ESP32 basados en Xtensa</td>
+                </tr>
+            </tbody>
+            </table>
+            <p>Todos ellos derivan del proyecto GNU Compiler Collection (GCC), pero cada uno está configurado para generar código máquina para una arquitectura diferente y acompañado por las bibliotecas y herramientas específicas de su plataforma[cite: 1].</p>
+        </section>
+
+        <section>
+            <h2>Importancia de la compilación cruzada en sistemas embebidos</h2>
+            <p>Los microcontroladores suelen disponer de recursos muy limitados: poca memoria RAM, escasa memoria Flash y una capacidad de procesamiento reducida[cite: 1]. Muchos ni siquiera ejecutan un sistema operativo[cite: 1].</p>
+            <p>Por ello, el desarrollo normalmente se realiza en un equipo mucho más potente —como una computadora de escritorio o una Raspberry Pi—, donde se editan los archivos, se compilan, se depuran los errores y finalmente se genera el firmware[cite: 1]. Ese firmware se transfiere posteriormente al microcontrolador mediante un programador o un depurador[cite: 1].</p>
+            <p>Este método permite desarrollar de forma cómoda y rápida sin depender de las limitaciones del dispositivo destino[cite: 1].</p>
+        </section>
+
+        <section>
+            <h2>Conclusión</h2>
+            <p>La diferencia entre compilación nativa y compilación cruzada radica en el destino del código generado[cite: 1].</p>
+            <p>En la compilación nativa, el compilador produce un programa para la misma arquitectura donde se está ejecutando[cite: 1]. Es el caso del comando gcc utilizado para crear aplicaciones que funcionarán directamente en una Raspberry Pi o en un PC[cite: 1].</p>
+            <p>En la compilación cruzada, en cambio, el compilador se ejecuta en un equipo anfitrión (host), pero genera código para una arquitectura distinta, denominada target[cite: 1]. Este es el modelo habitual en el desarrollo de firmware para microcontroladores, donde herramientas como AVR-GCC o arm-none-eabi-gcc permiten crear programas para dispositivos que no podrían compilar su propio código[cite: 1].</p>
+            <p>Comprender esta diferencia facilita entender por qué existen distintas cadenas de herramientas para cada familia de microcontroladores y por qué instalar únicamente gcc no es suficiente cuando se trabaja con sistemas embebidos[cite: 1].</p>
+        </section>
+</article>
+        
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>

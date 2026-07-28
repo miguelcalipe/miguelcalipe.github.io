@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    --+
+    -
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compilacion de Firmware | MC Mundo Tech</title>
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+        <header class="article-header">
+            <h1>COMPILACIÓN DE FIRMWARE PARA &#956;C</h1>
+            <p>Diferencias en el desarrollo para microcontroladores y para PC</p>
+        </header>
+                        
+        <aside id="indice"></aside>    
+                 
+        <section>
+        <h2>INTRODUCCIÓN</h2>
+        <p>
+           Cuando comenzamos a programar microcontroladores es común pensar que el proceso de compilaciónes igual al que se utiliza para crear aplicaciones en Windows, Linux o macOS. Después de todo, en ambos casos escribimos código en C o C++, lo compilamos y obtenemos un programa ejecutable. Sin embargo, detrás de esa aparente similitud existe una diferencia fundamental: un microcontrolador no ejecuta el mismo tipo de programas que un computador. Su arquitectura, su memoria y su forma deargar el código hacen que el proceso de compilación sea diferente. 
+        </p>
+        
+        <p>
+            Comprender estas diferencias explica por qué existen compiladores específicos como AVR-GCC o ARM-GCC, qué implica una compilación cruzada y cómo se organiza la memoria dentro del chip.
+        </p>
+        </section>
+
+        <section>
+        <h2>LA COMPILACIÓN DE UN PROGRAMA. EL COMPILADOR</h2>
+        <p>
+            Compilar consiste en transformar el código fuente de un programa escrito por un ser humano en un lenguaje de programación, como C o C++, en instrucciones máquina que el procesador puede ejecutar directamente. Esa tarea la hae un programa llamado compilador
+        </p>           
+        
+        <p>En una PC el código se compila de forma nativa; el archivo ejecutable se crea y corre en la misma computadora.</p>
+
+        <p>
+            En un microcontrolador o un sistema embebido se usa compilación cruzada. Una PC potente (anfitriona) compila el código adaptándolo a la arquitectura específica  del microcontrolador de destino (ej. ARM o AVR).
+        </p>
+
+            <h3>Distinción entre compilar, programar y flashear</h3>
+                <p>
+                    Compilar, programar y flashear son dos tareas distintas en el desarrollo embebido. La programación es programar, escribir el código fuente en un lenguaje determinado, de alto o bajo nivel. 
+                    
+                <p> La compilación es transformar ese lenguaje entendibe por el ser humao, en un lenguaje que la máquina "entienda". La compilación finaliza cuando las herramientas generan los archivos ELF y HEX en la computadora. </p>
+                
+                <p>En sistemas embebidos, "quemar", "flashear" o "cargar" son los pasos finales para transferir ese código ya traducido a la memoria del microcontrolador para que pueda ejecutarlo; es una fase posterior donde ese archivo se transmite físicamente a la Flash del microcontrolador para que este pueda ejecutarlo de forma independiente.  Quemar es un término antiguo que antes se usaba para los chips que se grababan una sola vez (ROM/PROM), pero hoy se usa como sinónimo de flashear.
+                </p>    
+                <p>Por ejemplo, al escribir un programa en C:</p>
+
+<pre><code class="language-c">int main(void) {
+    return 0;
+}</code></pre>
+                <p>
+                    El compilador analiza el código, verifica que sea correcto y genera un archivo ejecutable compuesto por instrucciones específicas para un <strong>determinado procesador</strong> o código máquina.
+                </p>
+
+                <p>
+                    El archivo HEX debe grabarse en la memoria Flash mediante un programador. Algunos ejemplos y de acuerdo al microcontrolador de destino, son:
+                <p>
+                
+                <ul>
+                    <li>USBasp</li>
+                    <li>ST-Link</li>
+                    <li>J-Link</li>
+                    <li>PICkit</li>                   
+                </ul>    
+                <p>
+                    Una vez grabado, el programa queda almacenado permanentemente en la memoria Flash hasta que  sea reemplazado por otro firmware.
+                </p>
+                <p>
+                    Hay un detalle importante: el código máquina generado depende completamente de la arquitectura del procesador para el que se está compilando.
+                </p>
+
+        </section>
+
+        <section>
+        <h2>DIFERENCIAS DE LENGUAJE ENTRE ARQUITECTURAS DE PROCESADORES</h2>
+        <p>
+            Aunque todos los procesadores ejecutan instrucciones binarias, cada familia posee su propio conjunto de instrucciones (Instruction Set Architecture o ISA).
+        </p>
+        <p>Por ejemplo:</p>
+            <ul>
+                <li>Un ATmega328P utiliza la arquitectura AVR de 8 bits.</li>
+                <li>Un STM32F446RE utiliza la arquitectura ARM Cortex-M4 de 32 bits.</li>
+                <li>Un ESP32 emplea la arquitectura Xtensa (o RISC-V en modelos recientes).</li>
+                <li>Un procesador Intel de computadora utiliza x86_64.</li>
+                <li>Una Raspberry Pi 5 utiliza un procesador ARM Cortex-A76 de 64 bits (AArch64).</li>
+            </ul>
+
+        <p>
+            Debido a estas diferencias físicas en el diseño de los chips, un archivo compilado para una PC o Raspberry Pi no puede ejecutarse en un microcontrolador de 8 o 32 bits, ni el firmware de un AVR funcionará en un STM32.
+        </p>
+
+        <p>Cada una de estas arquitecturas posee:</p>
+            <ul>
+                <li>Instrucciones diferentes.</li>
+                <li>Registros diferentes.</li>
+                <li>Distintos tamaños de palabra.</li>
+                <li>Diferentes modos de direccionamiento.</li>
+                <li>Distintos mecanismos para acceder a la memoria y a los periféricos.</li>
+            </ul>
+            
+        <p>En consecuencia, un programa compilado para una arquitectura no puede ejecutarse sobre otra distinta.</p>
+        </section>
+
+        <section>
+        <h2>LA COMPILACIÓN EN ENTORNOS EMBEBIDOS</h2>
+        <p>
+            Cuando ejecutas un programa en una PC, el sistema operativo (Windows, Linux) se encarga de cargarlo en la memoria RAM, darle permisos y gestionarlo.
+        </p>
+
+        <p>
+            En un microcontrolador no hay sistema operativo. El código que grabas toma el control total del chip desde el momento en que recibe energía. Ese programa se llama firmware. En lugar de pedirle cosas al sistema operativo, tu código lee y escribe directamente en direcciones fijas del chip para encender un pin, enviar datos por puerto serie o reaccionar cuando alguien presiona un botón.
+        </p>
+        <p> Un bloque de código simple como:</p>
+
+<pre><code class="language-c">int suma(int a, int b) {
+    return a + b;
+}</code></pre>
+        
+        <p>
+            es legible para el programador, pero el chip necesita secuencias numéricas concretas para operar. Durante la compilación, las herramientas analizan la sintaxis, aplican optimizaciones y generan el código máquina adecuado para el chip de destino.
+        </p>
+        
+            <h3>Etapas del proceso de compilación para un microcontrolador.</h3>
+                <p>
+                    El término "compilar" abarca en realidad un flujo de varias herramientas en cadena (<em>toolchain</em>). 
+
+                <p>
+                    El flujo general de construcción de un programa para sistemas embebidos es el siguiente:
+                </p>
+                <ol>
+                    <li><strong>Preprocesado:</strong> El preprocesador analiza las directivas como <code>#include</code> y <code>#define</code>, expande las macros e incluye los archivos de cabecera.</li>
+                    <li><strong>Compilación:</strong> El compilador traduce el código C a lenguaje ensamblador específico de la arquitectura objetivo. Por ejemplo, modificar un puerto con <code>PORTB |= (1 &lt;&lt; PB5);</code> genera una instrucción concreta en AVR, pero requerirá una secuencia totalmente distinta en ARM.</li>
+                    <li><strong>Ensamblado:</strong> El ensamblador convierte las instrucciones de ensamblador en código máquina binario y genera archivos objeto (<code>.o</code>).</li>
+                    <li><strong>Enlazado (<em>Linking</em>):</strong> El enlazador une los archivos objeto, las bibliotecas, el código de arranque (<em>startup code</em>) y la tabla de vectores de interrupción. El resultado es un archivo ejecutable en formato ELF (<code>.elf</code>) que contiene todo el programa junto con metadatos de organización.</li>
+                    <li><strong>Generación de la imagen para Flash:</strong> Finalmente, con herramientas como <code>objcopy</code>, se extraen del archivo ELF únicamente los datos que van a grabarse en el chip, generando archivos en formato Intel HEX (<code>.hex</code>) o binario puro (<code>.bin</code>).</li>
+                    </ol>
+        
+                <p> 
+                    El proceso de construcción de un programa es prácticamente el mismo para la mayoría de los microcontroladores, ya sean AVR, ARM Cortex-M (STM32, NXP, Nordic, etc.), PIC, MSP430 o RISC-V. Todas estas arquitecturas siguen las mismas etapas fundamentales: preprocesado, compilación, ensamblado, enlazado y generación de la imagen final que será grabada en la memoria Flash.
+                </p>
+
+                <p>
+                    Lo que cambia entre una arquitectura y otra es el código que produce el compilador, las bibliotecas utilizadas, el código de inicialización (startup code), el script de enlazado (linker script) y, en algunos casos, el formato del archivo que finalmente se programa en el microcontrolador.
+                </p>
+
+                <p> Por ejemplo:</p>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Etapa</th>
+                                <th>AVR</th>
+                                <th>STM32 (ARM Cortex-M)</th>
+                                <th>PIC</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>Preprocesado</th>
+                                <td>Igual</td>
+                                <td>Igual</td>
+                                <td>Igual</td>
+                            </tr>
+                            <tr>
+                                <th>Compilación</th>
+                                <td>Genera ensamblador AVR</td>
+                                <td>Genera ensamblador Thumb-2</td>
+                                <td>Genera ensamblador PIC</td>
+                            </tr>
+                            <tr>
+                                <th>Ensamblado</th>
+                                <td>Código máquina AVR</td>
+                                <td>Código máquina ARM</td>
+                                <td>Código máquina PIC</td>
+                            </tr>
+                            <tr>
+                                <th>Enlazado</th>
+                                <td>Une objetos y librerías AVR</td>
+                                <td>Une objetos, CMSIS, <em>startup</em> y <em>linker script</em></td>
+                                <td>Une objetos y librerías PIC</td>
+                            </tr>
+                            <tr>
+                                <th>Imagen final</th>
+                                <td><code>.hex</code> (habitualmente)</td>
+                                <td><code>.elf</code>, <code>.bin</code> o <code>.hex</code></td>
+                                <td><code>.hex</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+               
+                <p>
+                    Aunque el flujo general de compilación es el mismo, la etapa de
+                    <strong>enlazado</strong> presenta diferencias importantes entre las distintas
+                    arquitecturas de microcontroladores, principalmente debido a la forma en que
+                    cada una organiza su memoria y realiza la inicialización del sistema.
+                </p>
+
+                <ul>
+                    <li>
+                        <strong>AVR:</strong> El código de inicio (<em>startup code</em>) es
+                        relativamente sencillo y, por lo general, lo proporciona la biblioteca
+                        <code>avr-libc</code>. Su función es inicializar las variables globales y
+                        estáticas, limpiar la sección <code>.bss</code> y, finalmente, transferir
+                        el control a la función <code>main()</code>.
+                    </li>
+
+                    <li>
+                        <strong>ARM Cortex-M (STM32):</strong> El proceso es más complejo.
+                        Intervienen un archivo de inicio, normalmente denominado
+                        <code>startup_stm32xxxx.s</code>, un <em>script de enlazado</em>
+                        (<em>linker script</em>, <code>.ld</code>) y las bibliotecas del fabricante
+                        o <strong>CMSIS</strong>. Durante el arranque se configura el puntero de
+                        pila (<em>stack pointer</em>), se instala la tabla de vectores de
+                        interrupción, se copia la sección <code>.data</code> desde la memoria
+                        Flash hacia la RAM, se inicializa la sección <code>.bss</code> y,
+                        finalmente, se invoca a <code>main()</code>.
+                    </li>
+
+                    <li>
+                        <strong>PIC:</strong> Microchip proporciona su propio código de inicio,
+                        bibliotecas y archivos de configuración adaptados a cada familia de
+                        microcontroladores. Aunque los detalles internos difieren de AVR y ARM,
+                        el objetivo es el mismo: preparar el entorno de ejecución antes de que
+                        comience la ejecución del programa principal.
+                    </li>
+                </ul>
+            
+            <h3>Función del enlazador y el <em>Linker Script</em></h3>
+            <p>
+                El enlazador es el encargado de organizar la estructura interna del programa dentro de la memoria física del chip. Mediante un archivo de configuración denominado <em>Linker Script</em> (archivo <code>.ld</code>), el enlazador define exactamente en qué direcciones de memoria se ubican el código, las constantes, las variables globales, la pila (<em>stack</em>) y el área de memoria dinámica (<em>heap</em>).
+            </p>
+        
+            
+            <h3>Diferencia entre archivos ELF y HEX</h3>
+            <p>
+                El archivo ELF es el resultado estructural completo de la compilación. Contiene las secciones de memoria, nombres de funciones, tablas de símbolos y la información de depuración necesaria para herramientas como GDB.
+            </p>
+            <p>
+                El archivo HEX o BIN es simplemente una extracción simplificada del ELF que contiene únicamente los bytes puros que se van a grabar en la Flash del chip. Por este motivo, para depurar código se utiliza el archivo ELF, mientras que para grabar el chip se usa el HEX o BIN.
+            </p>
+
+            <p>
+                El archivo HEX o BIN debe grabarse de forma permanente en la memoria Flash usando un programador físico (como un ST-Link, J-Link o USBasp) o un <em>bootloader</em>. Una vez grabado, el código queda almacenado ahí y el chip empieza a ejecutarlo en cuanto recibe energía.
+            </p>
+
+            
+
+        </section>
+
+        <section>
+        <h2>GESTIÓN DEL PROGRAMA TRAS LA COMPILACIÓN</h2>
+        <p>
+            En una computadora, el sistema operativo recibe el ejecutable y lo acomoda dinámicamente en la memoria RAM para correrlo. En un microcontrolador no existe un sistema operativo encargado de esa tarea.
+        </p>
+        
+            <h3>Distribución de la memoria física</h3>
+            <p>Los microcontroladores dividen sus recursos en diferentes tipos de memoria:</p>
+                <ul>
+                    <li><strong>Flash:</strong> Memoria no volátil donde se guarda el programa y los datos de solo lectura. Por ejemplo, arreglos constantes como <code>const char texto[] = "Hola";</code> se asignan a la Flash.</li>
+                    <li><strong>RAM:</strong> Memoria rápida y volátil para variables que cambian durante la ejecución, como <code>char buffer[64];</code>.</li>
+                    <li><strong>EEPROM:</strong> Presente en algunos chips para guardar datos que deben persistir entre reinicios pero que cambian con poca frecuencia.</li>
+                </ul>
+            <p>
+                Durante el arranque, el código de inicio copia los valores iniciales de las variables globales desde la Flash a la RAM para que el programa pueda modificarlas.
+            </p>        
+             
+            <h3>Naturaleza del firmware</h3>
+            <p>
+                El código que corre en un microcontrolador se denomina firmware. A diferencia de una aplicación de escritorio, el firmware toma el control total del hardware: lee sensores, genera señales PWM, controla motores, gestiona pantallas y atiende interrupciones directamente sobre los periféricos del chip.
+            </p>
+        </section>
+
+        <section>
+        <h2>NECESIDAD DE COMPILADORES ESPECÍFICOS</h3>
+        <p>
+            En una Raspberry Pi o una PC con Linux se puede usar el comando estándar <code>gcc</code> para compilar código que correrá en esa misma máquina. Sin embargo, ese compilador no sabe cómo generar instrucciones para un ATmega328 o un STM32.
+        </p>
+        <p>Por esa razón se utilizan compiladores cruzados específicos:</p>
+            <ul>
+            <li><code>avr-gcc</code> para chips AVR.</li>
+            <li><code>arm-none-eabi-gcc</code> para procesadores ARM <em>bare-metal</em> (sin sistema operativo).</li>
+            <li><code>riscv-none-elf-gcc</code> para microcontroladores RISC-V.</li>
+            </ul>
+        <p>Y esto es materia del siguiente artículo</p>
+        </section>
+   
+        </article>
+
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "";
+    document.getElementById("articulo-anterior").textContent = "← ";
+
+    document.getElementById("articulo-siguiente").href = "/microcontroladores/programacion-micros/compilacion-nativa-cruzada/";
+    document.getElementById("articulo-siguiente").textContent = "Compilación nativa y cruzada →";
+
+});
+</script>
+
+</body>
+
+</html>

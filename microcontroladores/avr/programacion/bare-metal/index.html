@@ -37,18 +37,43 @@
                         
             <aside id="indice"></aside>    
             
+            <section>
+            <h2>INTRODUCCIÓN</h2>
+            <p>
+                Desarrollar aplicaciones para un microcontrolador AVR desde la línea de comandos no consiste en utilizar un único programa, sino un conjunto de herramientas especializadas que trabajan de forma coordinada. Cada una cumple una función específica dentro del proceso de desarrollo: unas traducen el código fuente a lenguaje máquina, otras generan los archivos finales en el formato adecuado para la memoria del microcontrolador y otras permiten depurar la aplicación.
+            </p>
+            <p>
+                A este conjunto de herramientas se le denomina toolchain o cadena de herramientas. En el caso de los microcontroladores AVR, la más utilizada es la GNU AVR Toolchain, considerada el estándar de facto para el desarrollo bare-metal sobre esta arquitectura. Su popularidad se debe a que es libre, multiplataforma y está ampliamente documentada. Además, constituyen las herramientas que corren debajo de numerosos entornos de desarrollo actuales y clásicos como Arduino, PlatformIO, Eclipse, Microchip Studio e incluso el compilador MPLAB XC8 de Microchip en su modo para AVR.
+            </p>    
+            <p>
+                Para programar microcontroladores AVR con Raspberry Pi 5 desde la línea de comandos utilizaremos la Toolchain de GNU para VR, una colección de herramientas y librerías usadas para crear programas para microcontroladores AVR. 
+            </p>
+
+            </section>
+            
             <section> 
             <h2>1. ¿QUÉ ES UNA TOOLCHAIN?</h2>
             <p>
                 Una <strong>toolchain</strong> (cadena de herramientas) es un conjunto de programas independientes que trabajan de forma secuencial para transformar el código fuente escrito por el desarrollador en un archivo de firmware ejecutable por la unidad de procesamiento del microcontrolador.</p>
             <p>
-                Cada herramienta realiza una tarea muy concreta y entrega su resultado como entrada a la siguiente herramienta de la cadena. En una toolchain, los programas están diseñados para complementarse y automatizar por completo el proceso de construcción del software (<em>build</em>).
+                En una toolchain. cada herramienta realiza una tarea muy concreta y entrega su resultado como entrada a la siguiente herramienta de la cadena; los programas que forman parte de la cadena están diseñados para complementarse y automatizar por completo el proceso de construcción del software .
             </p>
         
                 <h3>Toolchain vs. Toolkit</h3>
-                <p>Aunque ambos términos suelen confundirse, no significan lo mismo:</p>
+                <p>Aunque ambos términos suelen confundirse, no significan lo mismo</p>                
+
+                <p>En la documentación de GCC, LLVM, ARM, Microchip, etc., toolchain suele referirse solo a la cadena de compilación, es decir, a las herramientas que generan el ejecutable.</p>p>
+
+                <p> Las herramientas que escriben ese ejecutable en la memoria Flash suelen llamarse:</p>
+                    <ul>
+                        <li>Programming tools</li>
+                        <li></li>Flashing tools</li>
+                        <li></li>Debug tools</li>
+                        <li></li>Programming utilities</li>
+                    </ul>
+
                 <ul>
-                    <li><strong>Toolchain (cadena de herramientas):</strong> Es el conjunto específico de programas que intervienen directamente en la fabricación del binario final. Existe un flujo de trabajo estrictamente definido donde no se puede alterar el orden de los pasos ni omitir una etapa sin romper el proceso de construcción.</li>
+                    <li><strong>Toolchain (cadena de herramientas):</strong> Es el conjunto específico de programas que intervienen directamente en la fabricación del archivo binario final. Existe un flujo de trabajo estrictamente definido donde no se puede alterar el orden de los pasos ni omitir una etapa sin romper el proceso de construcción.</li>
                     <li><strong>Toolkit (kit de herramientas):</strong> Es una colección más amplia de utilidades que ayudan al desarrollo pero que no forman una cadena secuencial obligatoria (por ejemplo: analizadores de consumo, herramientas de configuración gráfica de pines o generadores de código).</li>
                 </ul>
                 
@@ -63,8 +88,8 @@
                     <li>Un depurador en tiempo real.</li>
                 </ul>
                 <p>
-                    Todas estas aplicaciones pertenecen al mismo kit de desarrollo, pero no forman parte de la cadena secuencial de procesamiento del código fuente.<
-                    /p>
+                    Todas estas aplicaciones pertenecen al mismo kit de desarrollo, pero no forman parte de la cadena secuencial de procesamiento del código fuente.
+                </p>
             
                 <h3>El flujo esencial de una Toolchain</h3>
                 <p>Sin importar la arquitectura del chip, el flujo sigue siempre este orden:</p>
@@ -84,6 +109,7 @@
                 </ol>
             </section>
 
+            
             <section>
             <h2>2. LA TOOLCHAIN PARA AVR EN ENTORNO LINUX (RASPBERRY PI 5)</h2>
             <p>
@@ -239,11 +265,7 @@ Copyright (C) 2022 Free Software Foundation, Inc.</code></pre>
 
             <pre><code class="bash">ls /usr/lib/avr/include/util</code></pre>
 
-            <div class="imagen">
-                <img src="/microcontroladores/avr/programacion/bare-metal/img/FLUJOavr.jpg" alt="Estructura de directorios de cabeceras avr-libc y utilidades dentro del sistema de archivos de la Raspberry Pi 5" >
-            </div>
-
-            <h4>3.4.3. Verificación de las utilidades de binarios (GNU Binutils para AVR)</h4>
+                    <h4>3.4.3. Verificación de las utilidades de binarios (GNU Binutils para AVR)</h4>
             <p>Para asegurar que las herramientas de bajo nivel para manipulación de binarios (como el extractor de símbolos o el conversor de objetos) se instalaron correctamente, audite el estado del paquete mediante el gestor de bajo nivel:</p>
 
             <pre><code class="bash">dpkg -l binutils-avr</code></pre>
