@@ -46,7 +46,7 @@
                 A este conjunto de herramientas se le denomina toolchain o cadena de herramientas. En el caso de los microcontroladores AVR, la más utilizada es la GNU AVR Toolchain, considerada el estándar de facto para el desarrollo bare-metal sobre esta arquitectura. Su popularidad se debe a que es libre, multiplataforma y está ampliamente documentada. Además, constituyen las herramientas que corren debajo de numerosos entornos de desarrollo actuales y clásicos como Arduino, PlatformIO, Eclipse, Microchip Studio e incluso el compilador MPLAB XC8 de Microchip en su modo para AVR.
             </p>    
             <p>
-                Para programar microcontroladores AVR con Raspberry Pi 5 desde la línea de comandos utilizaremos la Toolchain de GNU para VR, una colección de herramientas y librerías usadas para crear programas para microcontroladores AVR. 
+                Para programar microcontroladores AVR con Raspberry Pi 5 desde la línea de comandos utilizaremos la Toolchain de GNU para AVR, una colección de herramientas y librerías usadas para crear programas para microcontroladores AVR. 
             </p>
 
             </section>
@@ -62,14 +62,14 @@
                 <h3>Toolchain vs. Toolkit</h3>
                 <p>Aunque ambos términos suelen confundirse, no significan lo mismo</p>                
 
-                <p>En la documentación de GCC, LLVM, ARM, Microchip, etc., toolchain suele referirse solo a la cadena de compilación, es decir, a las herramientas que generan el ejecutable.</p>p>
+                <p>En la documentación de GCC, LLVM, ARM, Microchip, etc., toolchain suele referirse solo a la cadena de compilación, es decir, a las herramientas que generan el ejecutable.</p>
 
                 <p> Las herramientas que escriben ese ejecutable en la memoria Flash suelen llamarse:</p>
                     <ul>
                         <li>Programming tools</li>
-                        <li></li>Flashing tools</li>
-                        <li></li>Debug tools</li>
-                        <li></li>Programming utilities</li>
+                        <li>Flashing tools</li>
+                        <li>Debug tools</li>
+                        <li>Programming utilities</li>
                     </ul>
 
                 <ul>
@@ -98,15 +98,6 @@
                     Código Fuente &rarr; Preprocesado &rarr; Compilación &rarr; Ensamblado &rarr; Enlazado &rarr; Imagen de Firmware &rarr; Programación/Flasheo del &#956;C
                 </div>
 
-                <ol>
-                    <li><strong>Código fuente:</strong> Archivos escritos en lenguajes de alto o medio nivel (como C, C++ o Rust) y ensamblador.</li>
-                    <li><strong>Preprocesador:</strong> Modifica el código fuente procesando directivas (como inclusiones de archivos <code>#include</code> o macros).</li>
-                    <li><strong>Compilador:</strong> Traduce el código de alto nivel a código ensamblador específico de la arquitectura destino.</li>
-                    <li><strong>Ensamblador:</strong> Convierte el código ensamblador en código de máquina (archivos objeto en código binario no reubicable).</li>
-                    <li><strong>Enlazador (Linker):</strong> Combina los archivos objeto con las librerías y, guiado por un script de enlazado (<em>linker script</em>), organiza el mapa de memoria específico del microcontrolador (definiendo dónde van la Flash y la RAM).</li>
-                    <li><strong>Imagen de Firmware:</strong> El resultado final optimizado en el formato que requiera el programador (formatos comunes: <code>.hex</code>, <code>.bin</code>, <code>.elf</code>, <code>.srec</code>).</li>
-                    <li><strong>Programación/Flasheo:</strong> Herramienta que transfiere esa imagen binaria a la memoria no volátil del microcontrolador mediante una interfaz de depuración (como JTAG, SWD, ICSP o por un <em>bootloader</em>).</li>
-                </ol>
             </section>
 
             

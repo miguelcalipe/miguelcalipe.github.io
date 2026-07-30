@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compilación de un microcontrolador. Compilación nativa y cruzada | MC Mundo Tech</title>
+    <!-- Estilo para los colores del código -->
+    <link rel="stylesheet" href="https://cloudflare.com">
+    <!-- Motor que detecta y pinta el código -->
+    <script src="https://cloudflare.com"></script>
+    <script>hljs.highlightAll();</script>
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+        <header class="article-header">
+            <h1>LA COMPILACIÓN DE FIRMWARE EN SISTEMAS EMBEBIDOS</h1>
+            <p>La Compilación Cruzada</p>
+        </header>
+                        
+        <aside id="indice"></aside>    
+           
+         
+        <section>
+            <h2>INTRODUCCIÓN</h2>
+            <p>
+                En una PC el código se compila de forma nativa; el archivo ejecutable se crea y corre en la misma computadora.
+            </p>
+            
+            <p>
+                Los equipos linux utilizan como compilador nativo <strong><code>GCC</code></strong>;  en Windows el compilador nativo y oficial es <strong><code>MSVC</code> (Microsoft Visual C++)</strong>. Pero para programar microcontroladores no basta con utilizar el compilador <code>GCC</code>  que ya viene instalado en Linux o <code>MSVC</code> que se debe instalar en windows. Debemos recurrir a la compilación cruzada.  </p>
+                
+            <p>
+                Comprender esta diferencia es esencial para desarrollar firmware para microcontroladores como los ATmega, ATtiny, STM32 o ESP32, especialmente si utilizamos una computadora que corre en linux o una <strong>Raspberry Pi 5</strong> como estación de desarrollo
+            </p>
+        </section>     
+        
+        <section>
+            <h2>1. CONCEPTOS DE HOST Y TARGET</h2>
+                <p>En compilación cruzada aparecen dos términos muy utilizados:</p>
+                <ul>
+                    <li><strong>Host:</strong> Es el equipo donde se ejecutan las herramientas de desarrollo.</li>
+                    <li><strong>Target:</strong> Es el dispositivo para el cual se genera el programa.</li>
+                </ul>
+                <p>Ejemplo 1:</p>
+                    <ul>
+                    <li><strong>Host:</strong> Raspberry Pi 5</li>
+                    <li><strong>Compilador:</strong> AVR-GCC</li>
+                    <li><strong>Target:</strong> ATmega328P</li>
+                    </ul>
+                <p>Ejemplo 2:</p>
+                    <ul>
+                    <li><strong>Host:</strong> PC con Windows</li>
+                    <li><strong>Compilador:</strong> arm-none-eabi-gcc</li>
+                    <li><strong>Target:</strong> STM32F446RE</li>
+                    </ul>
+                <p>En ambos casos existe compilación cruzada porque el programa no se ejecutará en el mismo sistema donde fue compilado.</p>
+        </section>
+
+        <section>
+            <h2>2. LA COMPILACIÓN CRUZADA</h2>
+            <p>
+                Cuando el desarrollo del programa se realiza en una computadora cuya arquitectura es diferente de la del microcontrolador objetivo, se utiliza un <strong>compilador cruzado</strong> el cual se ejecuta sobre una arquitectura determinada, pero genera código máquina destinado a otra arquitectura diferente; y se requiere una <strong>toolchain de compilación cruzada</strong> (<em>cross-compilation toolchain</em>). Esta no solo genera código máquina para otra arquitectura, sino que también proporciona el conjunto de herramientas, bibliotecas y utilidades necesarias para construir aplicaciones destinadas al sistema embebido.
+            </p>
+            
+            <p>
+                Por ejemplo, si utilizamos una Raspberry Pi 5 para desarrollar firmware para un ATmega328P, el compilador que utilizaremos no debe generar instrucciones ARM64, sino instrucciones para un AVR.
+            </p>
+            <p>En ese caso utilizaremos:</p>
+            
+            <pre><code class= "language-bash">avr-gcc programa.c -mmcu=atmega328p</code></pre>
+            
+            <p>
+                Aunque el compilador se está ejecutando sobre un procesador ARM64, el código generado está pensado exclusivamente para un microcontrolador AVR. Precisamente por eso recibe el nombre de compilador cruzado (<em><strong>cross compiler</strong></em>).
+            </p>            
+        
+                <h3>Incompatibilidad del compilador GCC estándar con microcontroladores</h3>
+
+                    <p>
+                        Muchos piensan que el compilador  <code>GCC</code> sirve para compilar cualquier código en C. Esto es un error. El <code>GCC</code> estándar de la estación de trabajo solo crea programas para sistemas operativos de computadora y no sirve para la arquitectura limitada de un microcontrolador. Por esta razón, no basta con usar el compilador común del equipo (host), sino que se necesita un conjunto de herramientas especializado que traduzca el código a la medida exacta del hardware de destino (target).
+                    </p>
+                    
+                    <p> 
+                        Aunque el lenguaje C se escribe igual en todos lados, el chip de una computadora (ya sea Intel, AMD o un ARM de una Mac/Laptop moderna) tiene recursos gigantescos. En cambio, el chip de un microcontrolador es diminuto y habla un dialecto totalmente diferente. Una computadora (con chip Intel, AMD o ARM) procesa la información con un sistema operativo completo. Un microcontrolador corre el código directamente en el hardware, es decir en él mismo.
+                    </p>
+                    
+                    <p>Consideremos el siguiente programa:</p>
+            <pre><code class="language-c">#include &lt;avr/io.h&gt;
+int main(void) 
+{
+    DDRB |= (1 << PB5);
+        
+    while (1) 
+    {
+        PORTB ^= (1 << PB5);
+    }
+}</code></pre>
+                <p>
+                    Este programa manipula directamente los registros del ATmega328P. Si intentamos compilarlo con <code>gcc programa.c</code>, obtendremos errores porque:</p>
+                <ul>
+                    <li><code>GCC</code> no conoce la biblioteca <code>avr/io.h</code>.</li>
+                    <li>Desconoce los registros propios de la arquitectura AVR.</li>
+                    <li>Genera instrucciones ARM, no instrucciones AVR</li>
+                </ul>
+                <p>En cambio, utilizando</p>
+                    
+                    <pre><code class="language-bash">avr-gcc programa.c -mmcu=atmega328p</code></pre>                
+                
+                <p>
+                    el compilador reconoce la arquitectura AVR, las bibliotecas correspondientes y genera un ejecutable adecuado para el microcontrolador.
+                </p>
+            </section>
+
+        <section>
+            <h2>3. FUNCIONAMIENTO DE UN COMPILADOR CRUZADO</h2>
+            
+                <p>
+                    Un compilador cruzado no solo genera el código máquina para una arquitectura distinta de aquella en la que se ejecuta. También incluye el conjunto de herramientas y recursos necesarios para desarrollar aplicaciones destinadas al microcontrolador objetivo, entre ellos:
+                </p>
+                
+                <ul>
+                    <li>Bibliotecas estándar adaptadas al microcontrolador de destino.</li>
+                    <li>Archivos de cabecera con la definición necesaria para trabajar con el hardware del dispositivo.</li>
+                    <li>El ensamblador y el enlazador (<em>linker</em>).</li>
+                    <li>Scripts de enlazado que describen la distribución de la memoria.</li>
+                    <li>Herramientas para generar archivos ejecutables y de programación en formatos como ELF, BIN o HEX.</li>
+                    <li>Utilidades para el análisis, depuración y manipulación de archivos binarios.</li>
+                </ul>
+                <p>
+                    El proceso de construcción de un programa para un microcontrolador o, en general, para un sistema embebido, sigue una secuencia de etapas que transforman el código fuente escrito por el desarrollador en un archivo que puede almacenarse en la memoria del microcontroldor de destino.
+                </p>
+                <ol>
+                    <li><strong>Preprocesado:</strong> El preprocesador procesa las instrucciones  del código fuente, como <code>#include</code>, <code>#define</code> y las directivas de compilación condicional. En esta etapa se expanden las macros, se incorporan los archivos de cabecera y se prepara el código para la compilación.</li>
+                    <li><strong>Compilación:</strong> El compilador traduce el código C a lenguaje ensamblador específico de la arquitectura del microcontrolador de destino (target). Cuando un programa utiliza únicamente construcciones estándar del lenguaje C, el mismo código fuente puede compilarse para distintas arquitecturas, pero el ensamblador generado será diferente en cada una. Sin embargo, en el desarrollo de sistemas embebidos es habitual acceder a registros y periféricos propios del microcontrolador, por lo que el código también suele ser específico de la familia de dispositivos utilizada.</li>
+                    <li><strong>Ensamblado:</strong> El ensamblador convierte las instrucciones del código ensamblador en código máquina binario  y genera uno o varios archivos objeto (<code>.o</code>), que contienen instrucciones binarias aún no listas para ejecutarse como un programa completo.</li>
+                    <li><strong>Enlazado (<em>Linking</em>):</strong> El enlazador combina todos los archivos objeto junto con las bibliotecas necesarias, el código de inicialización del sistema (<em>startup code</em>) y otros elementos específicos de la plataforma, como la tabla de vectores de interrupción cuando la arquitectura la requiere. Asimismo, organiza las distintas secciones del programa (código, datos, variables inicializadas y no inicializadas) de acuerdo con el mapa de memoria definido para el dispositivo. El producto final es un archivo en formato ELF (Executable and Linkable Format, <code>.elf</code>). Aunque en microcontroladores se suele extraer de este un archivo binario puro (.bin o .hex) para grabarlo en la Flash, el ELF se denomina ejecutable porque contiene formalmente la estructura completa del programa —segmentos de código, datos y símbolos de depuración— organizada para que el sistema o las herramientas de desarrollo lo reconozcan listo para funcionar y sepa cómo ubicarlo en la memoria y empezar a correrlo.</li> 
+                    <li><strong>Generación de la imagen de programación:</strong> A partir del archivo ELF se generan los archivos que serán grabados en la memoria no volátil del dispositivo. Dependiendo de la herramienta y de la plataforma, estos pueden estar en formato Intel HEX (<code>.hex</code>), Motorola S-Record (<code>.srec</code>) o binario puro (<code>.bin</code>), entre otros.</li>
+                    <li><strong>Programación del dispositivo:</strong> Finalmente, una herramienta de programación transfiere la imagen generada a la memoria Flash (o a otro tipo de memoria no volátil) del microcontrolador mediante interfaces como JTAG, SWD, ISP, ICSP, UART, USB o un <em>bootloader</em>, según las capacidades del hardware de destino.</li>  
+                </ol>    
+                                  
+                <img src="img/procesoCompilacion-uC.png" alt="Proceso de Compilación y Grabacion de un Microcontrolador" class="imagen-centrada"> 
+            
+            <p> 
+                El proceso de construcción de un programa es prácticamente el mismo para la mayoría de los microcontroladores, ya sean AVR, ARM Cortex-M (STM32, NXP, Nordic, etc.), PIC, MSP430 o RISC-V. Todas estas arquitecturas siguen las mismas etapas fundamentales: preprocesado, compilación, ensamblado, enlazado y generación de la imagen final que será grabada en la memoria Flash.
+            </p>
+
+            <p>
+                Lo que cambia entre una arquitectura y otra es el código que produce el compilador, las bibliotecas utilizadas, el código de inicialización (startup code), el script de enlazado (linker script) y, en algunos casos, el formato del archivo que finalmente se programa en el microcontrolador.
+            </p>
+
+            <p> Por ejemplo:</p>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Etapa</th>
+                                <th>AVR</th>
+                                <th>STM32 (ARM Cortex-M)</th>
+                                <th>PIC</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>Preprocesado</th>
+                                <td>Igual</td>
+                                <td>Igual</td>
+                                <td>Igual</td>
+                            </tr>
+                            <tr>
+                                <th>Compilación</th>
+                                <td>Genera ensamblador AVR</td>
+                                <td>Genera ensamblador Thumb-2</td>
+                                <td>Genera ensamblador PIC</td>
+                            </tr>
+                            <tr>
+                                <th>Ensamblado</th>
+                                <td>Código máquina AVR</td>
+                                <td>Código máquina ARM</td>
+                                <td>Código máquina PIC</td>
+                            </tr>
+                            <tr>
+                                <th>Enlazado</th>
+                                <td>Une objetos y librerías AVR</td>
+                                <td>Une objetos, CMSIS, <em>startup</em> y <em>linker script</em></td>
+                                <td>Une objetos y librerías PIC</td>
+                            </tr>
+                            <tr>
+                                <th>Imagen final</th>
+                                <td><code>.hex</code> (habitualmente)</td>
+                                <td><code>.elf</code>, <code>.bin</code> o <code>.hex</code></td>
+                                <td><code>.hex</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+               
+            <p>
+                Aunque el flujo general de compilación es el mismo, la etapa de <strong>enlazado</strong> presenta diferencias importantes entre las distintas arquitecturas de microcontroladores, principalmente debido a la forma en que cada una organiza su memoria y realiza la inicialización del sistema.
+            </p>
+
+                <ul>
+                    <li>
+                        <strong>AVR:</strong> El código de inicio (<em>startup code</em>) es relativamente sencillo y, por lo general, lo proporciona la biblioteca <code>avr-libc</code>. Su función es inicializar las variables globales y estáticas, limpiar la sección <code>.bss</code> y, finalmente, transferir
+                        el control a la función <code>main()</code>.
+                    </li>
+
+                    <li>
+                        <strong>ARM Cortex-M (STM32):</strong> El proceso es más complejo. Intervienen un archivo de inicio, normalmente denominado <code>startup_stm32xxxx.s</code>, un <em>script de enlazado</em> (<em>linker script</em>, <code>.ld</code>) y las bibliotecas del fabricante o <strong>CMSIS</strong>. Durante el arranque se configura el puntero de pila (<em>stack pointer</em>), se instala la tabla de vectores de interrupción, se copia la sección <code>.data</code> desde la memoria
+                        Flash hacia la RAM, se inicializa la sección <code>.bss</code> y, finalmente, se invoca a <code>main()</code>.
+                    </li>
+
+                    <li>
+                        <strong>PIC:</strong> Microchip proporciona su propio código de inicio,
+                        bibliotecas y archivos de configuración adaptados a cada familia de
+                        microcontroladores. Aunque los detalles internos difieren de AVR y ARM,
+                        el objetivo es el mismo: preparar el entorno de ejecución antes de que
+                        comience la ejecución del programa principal.
+                    </li>
+                </ul>
+            
+                <h3>Función del enlazador y el <em>Linker Script</em></h3>
+                    <p>
+                        El enlazador es el encargado de organizar la estructura interna del programa dentro de la memoria física del chip. Mediante un archivo de configuración denominado <em>Linker Script</em> (archivo <code>.ld</code>), el enlazador define exactamente en qué direcciones de memoria se ubican el código, las constantes, las variables globales, la pila (<em>stack</em>) y el área de memoria dinámica (<em>heap</em>).
+                    </p>
+            
+                
+                <h3>Diferencia entre archivos ELF y HEX</h3>
+                    <p>
+                        El archivo ELF es el resultado estructural completo de la compilación. Contiene las secciones de memoria, nombres de funciones, tablas de símbolos y la información de depuración necesaria para herramientas como GDB.
+                    </p>
+                    <p>
+                        El archivo HEX o BIN es simplemente una extracción simplificada del ELF que contiene únicamente los bytes puros que se van a grabar en la Flash del chip. Por este motivo, para depurar código se utiliza el archivo ELF, mientras que para grabar el chip se usa el HEX o BIN.
+                    </p>
+
+                    <p>
+                        El archivo HEX o BIN debe grabarse de forma permanente en la memoria Flash usando un programador físico (como un ST-Link, J-Link o USBasp) o un <em>bootloader</em>. Una vez grabado, el código queda almacenado ahí y el chip empieza a ejecutarlo en cuanto recibe energía.
+                    </p>
+        </section>
+
+        <section>
+            <h2>4. COMPILADORES CRUZADOS HABITUALES</h2>
+            <p>Dependiendo de la arquitectura del microcontrolador se utilizan distintas cadenas de herramientas[cite: 1]:</p>
+
+            <div class="table-container">
+                <table >
+                <thead>
+                    <tr>
+                    <th>Compilador</th>
+                    <th>Arquitectura destino</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                    <td><code>avr-gcc</code></td>
+                    <td>AVR (ATmega, ATtiny)</td>
+                    </tr>
+                    <tr>
+                    <td><code>arm-none-eabi-gcc</code></td>
+                    <td>ARM Cortex-M</td>
+                    </tr>
+                    <tr>
+                    <td><code>riscv-none-elf-gcc</code></td>
+                    <td>Microcontroladores RISC-V</td>
+                    </tr>
+                    <tr>
+                    <td><code>xtensa-esp32-elf-gcc</code></td>
+                    <td>ESP32 basados en Xtensa</td>
+                    </tr>
+                </tbody>
+                </table>
+            </div>
+            <p>Todos ellos derivan del proyecto GNU Compiler Collection (GCC), pero cada uno está configurado para generar código máquina para una arquitectura diferente y acompañado por las bibliotecas y herramientas específicas de su plataforma[cite: 1].</p>
+        </section>
+
+        <section>
+            <h2>5. TOOLCHAIN PARA MICROCONTROLADORES AVR</h2>
+                    
+                <p>
+                    Para un microcontrolador AVR, la <strong>toolchain de compilación</strong> suele estar formada por las siguientes herramientas:
+                </p>
+
+                <ul>
+                    <li><code>avr-gcc</code>: compilador de C y C++ para microcontroladores AVR.</li>
+                    <li><code>avr-libc</code>: implementación de la biblioteca estándar de C y cabeceras específicas para AVR.</li>
+                    <li><code>avr-ld</code>: enlazador que une los archivos objeto y las bibliotecas para generar el archivo ejecutable.</li>
+                    <li><code>avr-objcopy</code>: convierte el archivo ejecutable (<code>.elf</code>) en formatos como <code>.hex</code>, utilizados para programar el microcontrolador.</li>
+                    <li><code>avr-size</code>: muestra el tamaño de las distintas secciones del programa, como código y datos.</li>
+                    <li><code>avr-ar</code>: crea y administra bibliotecas estáticas.</li>
+                    </ul>
+                <p>
+                    Todas estas herramientas trabajan conjuntamente para generar el firmware que posteriormente será grabado en el microcontrolador.
+                </p>
+
+                <p>
+                    Una vez finalizada la compilación, el firmware se graba en el microcontrolador mediante un <strong>programador</strong>. Para ello se utilizan normalmente las siguientes herramientas:
+                </p>
+
+                <ul>
+                    <li><code>USBasp</code>: programador de hardware muy utilizado para microcontroladores AVR.</li>
+                    <li><code>AVRDUDE</code>: software encargado de transferir el archivo <code>.hex</code> al microcontrolador y de configurar parámetros como los fusibles (<em>fuses</em>).</li>
+                    <li><code>ISP (In-System Programming)</code>: interfaz utilizada para programar el microcontrolador sin retirarlo de la placa.</li>
+                </ul>
+
+                <img src="img/FlujoAVR.png" alt="Proceso de Compilación y Grabacion de un Microcontrolador AVR" class="imagen-centrada"> 
+        </section>
+
+        <section>
+            <h2>6.TOOLCHAIN PARA MICROCONTROLADORES STM32</h2>
+                <p> Para un microcontrolador STM32F446RE, la <strong>toolchain de compilación</strong> suele estar formada por:</p>
+
+                <ul> 
+                    <li><code>arm-none-eabi-gcc</code>: compilador de C y C++ para microcontroladores ARM.</li>
+                    <li><code>arm-none-eabi-as</code>: ensamblador que convierte el código ensamblador en código objeto.</li>
+                    <li><code>arm-none-eabi-ld</code>: enlazador que une los archivos objeto y las bibliotecas para generar el ejecutable.</li>
+                    <li><code>arm-none-eabi-ar</code>: crea y administra bibliotecas estáticas.</li>
+                    <li><code>arm-none-eabi-objcopy</code>: convierte el archivo ejecutable (<code>.elf</code>) en formatos como <code>.bin</code> o <code>.hex</code>.</li> 
+                    <li><code>arm-none-eabi-size</code>: muestra el tamaño de las distintas secciones del programa.</li>
+                    <li><code>newlib</code> o <code>newlib-nano</code>: implementación de la biblioteca estándar de C para sistemas embebidos.</li> 
+                    </ul>
+                                
+                    <p> 
+                        Todas estas herramientas trabajan conjuntamente para generar el firmware que será ejecutado por el microcontrolador. 
+                    </p> 
+                    
+                    <p> 
+                        Una vez finalizada la compilación, el firmware se graba en el STM32 mediante un <strong>programador o depurador</strong>. Para ello se utilizan normalmente las siguientes herramientas: 
+                    </p> 
+                    
+                    <ul> 
+                        <li><code>ST-LINK</code>: programador y depurador de hardware que se comunica con el microcontrolador.</li> 
+                        <li><code>OpenOCD</code>: software que controla el ST-LINK y permite programar y depurar el microcontrolador.</li> 
+                        <li><code>STM32CubeProgrammer</code>: herramienta oficial de STMicroelectronics para grabar, verificar y administrar la memoria del microcontrolador.</li> 
+                        <li><code>SWD (Serial Wire Debug)</code>: interfaz física de comunicación utilizada por el ST-LINK para programar y depurar el STM32.
+                        </li> 
+                    </ul>
+
+                    <img src="img/FlujoSTM32.png" alt="Proceso de Compilación y Grabacion de un Microcontrolador STM32" class="imagen-centrada">             
+
+        </section>
+<!-- 
+        <section>
+            
+            <h2>Flujo de trabajo del código fuente al microcontrolador</h2>
+
+            <p>
+                En un proyecto típico para un microcontrolador STM32, por ejemplo una placa NUCLEO-F446RE, el flujo de trabajo comienza con el código fuente escrito por el desarrollador y termina con la programación del firmware en la memoria Flash del dispositivo. Utilizando la GNU Arm Embedded Toolchain, el proceso puede representarse de la siguiente manera:
+            </p>
+
+            <pre><code class="language-bash">
+            # 1. Compilar los archivos fuente
+            arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -c main.c
+            arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -c system_stm32f4xx.c
+            arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -c startup_stm32f446xx.s
+
+            # 2. Enlazar el programa
+            arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb \
+                main.o startup_stm32f446xx.o \
+                -T STM32F446RE_FLASH.ld \
+                -o firmware.elf
+
+            # 3. Generar el archivo para programar el microcontrolador
+            arm-none-eabi-objcopy -O binary firmware.elf firmware.bin
+
+            # O (Opcional) Generar un archivo Intel HEX
+            arm-none-eabi-objcopy -O ihex firmware.elf firmware.hex
+
+            # 4. Programar el microcontrolador mediante ST-Link
+            st-flash write firmware.bin 0x08000000
+            </code></pre>
+
+
+            <p>En un proyecto típico para AVR, el flujo de trabajo es el siguiente:</p>
+            <ol>
+            <li>Código fuente (<code>.c</code>)[cite: 1]</li>
+            <li>Compilación con <code>avr-gcc</code>[cite: 1]</li>
+            <li>Generación de archivo ELF (<code>.elf</code>)[cite: 1]</li>
+            <li>Procesamiento con <code>avr-objcopy</code>[cite: 1]</li>
+            <li>Generación de archivo HEX (<code>.hex</code>)[cite: 1]</li>
+            <li>Transferencia con <code>avrdude</code>[cite: 1]</li>
+            <li>Ejecución en el microcontrolador AVR[cite: 1]</li>
+            </ol>
+
+
+
+            
+            <p>El archivo <code>.elf</code> contiene el programa junto con información de depuración[cite: 1]. Posteriormente, <code>avr-objcopy</code> genera el archivo hex, que contiene únicamente los datos necesarios para programar la memoria Flash del microcontrolador[cite: 1]. Finalmente, herramientas como AVRDUDE transfieren ese archivo al dispositivo mediante un programador, como un USBasp o un Arduino configurado como ISP[cite: 1].</p>
+        </section>
+    -->
+        
+
+        
+
+               <section>
+            <h2>CONCLUSIONES</h2>
+            <ul>
+                <li>En la compilación nativa, el compilador produce un programa para la misma arquitectura donde se está ejecutando. Es el caso del comando gcc utilizado para crear aplicaciones que funcionarán directamente en una Raspberry Pi o en un PC.</li>
+                <li>En la compilación cruzada, en cambio, el compilador se ejecuta en un equipo anfitrión (host), pero genera código para una arquitectura distinta, denominada target. Este es el modelo habitual en el desarrollo de firmware para microcontroladores, donde herramientas como AVR-GCC o arm-none-eabi-gcc permiten crear programas para dispositivos que no podrían compilar su propio código.</li>
+                <li>Comprender esta diferencia facilita entender por qué existen distintas cadenas de herramientas para cada familia de microcontroladores y por qué instalar únicamente gcc no es suficiente cuando se trabaja con sistemas embebidos.</li>
+            </ul>
+
+            <p>
+                Hasta aquí hemos desarrollado teóricamente la compilación del firmware para microcontroladores ¿como es el proceso en la práctica?. Navega en el menú y escoge el microcontrolador que usarás en tu proyecto. 
+            </p>                     
+            
+            </section>
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "microcontroladores/programacion-micros/compilacion-cruzada/index.html";
+    document.getElementById("articulo-anterior").textContent = "← QUE ES LA COMPILACIÓN. Compilación Nativa";
+
+    document.getElementById("articulo-siguiente").href = "";
+    document.getElementById("articulo-siguiente").textContent = "→";
+
+});
+</script>
+
+
+</body>
+
+</html>

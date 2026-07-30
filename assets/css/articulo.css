@@ -177,6 +177,9 @@ pre code {
     font-size: 0.95em;
 }
 
+/* ===========================
+   DOS COLUMNAS
+   =========================== */
 .dos-columnas {
     column-count: 2;
     column-gap: 2rem;
@@ -188,6 +191,9 @@ pre code {
     }
 }
 
+/* ===========================
+   MARCADOR DE POSICIÓN
+   =========================== */
 
 .image-placeholder {
     background-color: var(--code-bg);
@@ -200,6 +206,9 @@ pre code {
     font-style: italic;
 }
 
+/* ===========================
+   MENU DE NAVEGACIÓN ENTRE ARTÍCULOS (EN LA PARTE INFERIOR)
+   =========================== */
 .articulo-nav{
 
 display:flex;
@@ -230,6 +239,20 @@ font-weight:bold;
 .volver-arriba:hover{
     background:#1D4ED8;
 }
+
+/* ===========================
+   IMAGEN INDIVIDUAL CENTRADA
+   =========================== */
+.imagen-centrada {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 1.5rem auto;
+}
+
+/* ===========================
+   GALERÍA DE IMÁGENES
+   =========================== */
 
 .galeria {
     display: flex;
