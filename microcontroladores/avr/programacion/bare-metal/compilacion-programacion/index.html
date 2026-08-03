@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compilación y Grabación de Firmware para Microcontroladores AVR desde la Línea de Comandos | MC Mundo Tech</title>
+    <meta name="description" content="Como hacer la compilación del firmware usando la toolchain GNU AVR y Avrdude  desde la línea de comandos ">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>COMPILACIÓN Y GRABACIÓN DE FIRMWARE PARA MICROCONTROLADORES AVR DESDE LA LÍNEA DE COMANDOS</h1>
+            </header>
+                        
+            <aside id="indice"></aside>    
+                        
+            <section> 
+            <h2>
+                INTRODUCCIÓN</h2>
+                <p>
+                    La programación de microcontroladores AVR no requiere obligatoriamente un entorno de desarrollo integrado (IDE) como Arduino IDE,  Microchip Studio, MPLAB X IDE o IAR Embedded Workbench para AVR. En equipos escasos de recursos o entornos de desarrollo limitados, estas herramientas se hacen inviables. 
+                </p>                    
+                <p>
+                    Toda la cadena de herramientas puede utilizarse directamente desde la línea de comandos, lo que permite comprender mejor el proceso de generación del firmware, automatizar tareas mediante scripts o Makefiles y trabajar en cualquier sistema GNU/Linux. 
+                </p>
+            
+                <p>
+                    En este artículo se muestra el proceso completo para compilar un programa escrito en lenguaje C, generar el archivo ejecutable para el microcontrolador y grabarlo en la memoria Flash utilizando un programador USBasp.
+                </p>
+            </section>
+
+            <section>
+                <h2>1. ESCRIBIR EL PROGRAMA</h2>
+
+                <p>
+                    El primer paso consiste en escribir el programa que ejecutará el microcontrolador. En este
+                    artículo utilizaremos el lenguaje <strong>C</strong>, ya que es el lenguaje más utilizado para
+                    desarrollar aplicaciones sobre microcontroladores AVR. Aunque existen otros lenguajes y
+                    herramientas que permiten programarlos, prácticamente toda la documentación, ejemplos y
+                    bibliotecas oficiales están pensadas para C.
+                </p>
+
+                <p>
+                    El programa lo guardaremos en un <strong>archivo de código fuente</strong> cuya extensión es
+                    <code>.c</code>. Este archivo no contiene instrucciones que el microcontrolador pueda ejecutar
+                    directamente; únicamente almacena el código escrito por el programador en un formato de texto
+                    plano. Dicho de otra manera, es un archivo legible por una persona, pero todavía incomprensible
+                    para el microcontrolador. Más adelante será el compilador quien se encargue de traducirlo al
+                    lenguaje máquina.
+                </p>
+
+                <p>
+                    Para escribir el programa puedes utilizar cualquier editor de texto. En GNU/Linux existen muchas
+                    alternativas, como <code>nano</code>, <code>vim</code>, <code>emacs</code>, Visual Studio Code,
+                    Geany o incluso un editor gráfico sencillo como Gedit. En este artículo utilizaremos
+                    <code>nano</code>, ya que está instalado por defecto en la mayoría de distribuciones y resulta
+                    muy fácil de usar desde la línea de comandos.
+                </p>
+
+                <p>
+                    Antes de crear el archivo conviene abrir una terminal y situarse en la carpeta donde deseamos
+                    guardar el proyecto. Puedes crear una carpeta específica para tus programas AVR o utilizar
+                    cualquier directorio de trabajo. Por ejemplo:
+                </p>
+
+                <pre><code class="language-bash">mkdir avr
+cd avr</code></pre>
+
+                <p>
+                    Todos los archivos que vayamos creando durante el desarrollo (código fuente, archivos objeto,
+                    ejecutables y archivos para programar el microcontrolador) se generarán dentro de esta carpeta que hemos denominado avr (puede ser cualquier otro nombre). Esto permite mantener todos los archivos relacionados con el proyecto en un solo lugar, lo que facilita mantener organizado el proyecto.
+                </p>
+
+                <p>
+                    Una vez dentro del directorio de trabajo, creamos un nuevo archivo llamado
+                    <code>blink.c</code> ejecutando:
+                </p>
+
+                <pre><code class="language-bash">nano blink.c</code></pre>
+
+                <p>
+                    Al hacerlo, <code>nano</code> abrirá un archivo nuevo. Si el archivo ya existía, simplemente lo
+                    abrirá para editarlo.
+                </p>
+
+                <p>
+                    Escribimos entonces el siguiente programa:
+                </p>
+
+                <pre><code class="language-c">
+    #include &lt;avr/io.h&gt;
+    #include &lt;util/delay.h&gt;
+
+    int main(void)
+    {
+        DDRB |= (1 &lt;&lt; DDB1);      // PB1 como salida
+
+        while (1)
+        {
+            PORTB ^= (1 &lt;&lt; PORTB1);
+            _delay_ms(300);
+        }
+    }</code></pre>
+
+                <p>
+                    Una vez terminado, debemos guardar el archivo. En <code>nano</code> se hace presionando
+                    <kbd>Ctrl</kbd> + <kbd>O</kbd> (de <em>Write Out</em>). El editor mostrará el nombre del archivo,
+                    en este caso <code>blink.c</code>. Simplemente presionamos <kbd>Enter</kbd> para confirmar.
+                    Después salimos del editor con <kbd>Ctrl</kbd> + <kbd>X</kbd>.
+                </p>
+
+                <p>
+                    El nombre del archivo puede ser cualquiera siempre que termine con la extensión
+                    <code>.c</code>. Por ejemplo, <code>led.c</code>, <code>contador.c</code>,
+                    <code>prueba.c</code> o <code>main.c</code>. En este artículo utilizaremos el nombre
+                    <code>blink.c</code> porque el programa hace parpadear un LED.
+                </p>
+                
+                <p>
+                    En este punto únicamente hemos creado el <strong>código fuente</strong>. Es decir, un archivo de
+                    texto que contiene instrucciones escritas en lenguaje C. Todavía no existe un programa que el
+                    microcontrolador pueda ejecutar. En el siguiente paso utilizaremos el compilador
+                    <code>avr-gcc</code>, que traducirá este código fuente a lenguaje máquina para el
+                    ATmega328P.
+                </p>
+            </section>
+           
+            <section>
+                <h2>2. COMPILAR EL PROGRAMA</h2>
+
+                <p>
+                    En este ejemplo trabajaremos con un <strong>ATmega328P</strong>, el mismo microcontrolador que incorpora la placa Arduino Uno. Si utilizas otro AVR, no hay ningún problema: el procedimiento será exactamente el mismo. Lo único que cambiará será el modelo de microcontrolador que indicaremos al compilador y al programa de grabación.
+                </p>
+            
+    <pre><code class="language-bash">avr-gcc -mmcu=atmega328p -DF_CPU=16000000UL -Os blink.c -o blink.elf</code></pre>
+                <p>
+                    Este es el comando que transforma el archivo <code>blink.c</code> en un programa ejecutable para un microcontrolador AVR. Aunque solemos decir que <code>avr-gcc</code> compila el programa, en realidad hace bastante más. 
+                </p>
+
+                <p>
+                    Primero ejecuta el <strong>preprocesador</strong>, que procesa las directivas como
+                    <code>#include</code> y <code>#define</code>. Después traduce el código C a lenguaje ensamblador.
+                    A continuación, el ensamblador convierte ese código en instrucciones máquina para la arquitectura AVR. Finalmente, el enlazador (<em>linker</em>) une el programa con las bibliotecas necesarias y genera un archivo ejecutable en formato <strong>ELF</strong>.
+                </p>
+
+                <p>
+                    Veamos con más detalle qué hace cada uno de los parámetros utilizados.
+                </p>
+
+                    <h3>Parámetro <code>-mmcu=atmega328p</code></h3>
+
+                        <p>
+                            Este parámetro indica el modelo exacto del microcontrolador para el cual se está compilando el programa. En este caso, se trata de un <code>ATmega328P</code>.
+                        </p>
+
+                        <p>
+                            Esta información es fundamental para el compilador. Gracias a ella sabe qué conjunto de instrucciones puede utilizar, cómo está organizada la memoria del dispositivo, qué registros de hardware existen,cuáles son las direcciones de esos registros y qué archivos de soporte debe enlazar durante la compilación.
+                        </p>
+
+                        <p>
+                            Si se especifica un microcontrolador incorrecto, el programa podría compilar sin mostrar errores, pero  el código generado podría utilizar registros o instrucciones que el microcontrolador real no posee, provocando un funcionamiento incorrecto o incluso impidiendo la programación del dispositivo.
+                        </p>
+
+                        <p>
+                            Si no conoces el modelo exacto de tu microcontrolador, puedes encontrarlo impreso sobre el encapsulado. Por ejemplo:
+                        </p>
+
+                        <ul>
+                            <li><code>ATmega328P-PU</code></li>
+                            <li><code>ATmega88PA-PU</code></li>
+                            <li><code>ATtiny85</code></li>
+                            <li><code>ATmega16A</code></li>
+                        </ul>
+
+                        <p>
+                            Ese nombre comercial también determina el identificador que utilizaremos  con <code>avr-gcc</code>. 
+                        </p>
+
+                        <p>
+                            Si usamos otro microcontrolador como el ATmega88PA, el parámetro sería <code>-mmcu=atmega88pa</code>. Es importante escribirlo exactamente como corresponde al modelo del microcontrolador, ya que el compilador distingue entre mayúsculas y minúsculas y requiere la forma correcta para generar el código adecuado.
+                        </p>
+
+                        <p>Para saber el identificador del microcontrolador que usamos, podemos listar todos los micros soportados por avrdude escribiendo en una terminal:</p>
+
+                        <pre><code class="language-bash"></code>avrdude -p ?</code></pre>
+
+                        <p>Y nos dará un extenso listado con los códigos de los micros soportados por el grabador</p>
+
+<pre><code>
+Valid parts are:
+uc3a0512   = AT32UC3A0512
+c128       = AT90CAN128
+...
+m168       = ATmega168
+m168a      = ATmega168A
+m168p      = ATmega168P
+m168pa     = ATmega168PA
+m168pb     = ATmega168PB
+...
+m8         = ATmega8
+...
+t13        = ATtiny13
+t13a       = ATtiny13A
+...
+</code></pre>
+
+                    <h3>Parámetro <code>-DF_CPU=16000000UL</code></h3>
+
+                        <p>
+                            Este parámetro define la constante <code>F_CPU</code>, que representa la
+                            <strong>frecuencia de funcionamiento del microcontrolador expresada en hercios (Hz) </strong>. En este caso son 16 millones de HZ.
+                        </p>
+
+                        <p>
+                            En este ejemplo, <code>16000000</code> significa que el microcontrolador funciona a
+                            <strong>16&nbsp;000&nbsp;000 ciclos por segundo</strong>, es decir,
+                            <strong>16&nbsp;MHz</strong>.
+                        </p>
+
+                        <p>
+                            Es importante comprender que <code>F_CPU</code> no configura la frecuencia del microcontrolador. No modifica fusibles (<em>fuses</em>), no cambia el oscilador interno ni altera el cristal de cuarzo. Simplemente informa al compilador cuál será la frecuencia de reloj para que pueda generar determinados cálculos correctamente.
+                        </p>
+
+                        <p>
+                            Muchas bibliotecas de AVR utilizan esta constante. Un ejemplo muy conocido es
+                            <code>&lt;util/delay.h&gt;</code>, donde funciones como <code>_delay_ms()</code> y
+                            <code>_delay_us()</code> calculan el número de ciclos de reloj necesarios para producir el retardo
+                            solicitado.
+                        </p>
+
+                        <p>
+                            Si no se define <code>F_CPU</code> y el programa utiliza estas funciones de retardo, normalmente el compilador emitirá advertencias o errores, ya que no dispone de la información necesaria para calcular los tiempos correctamente. Otras partes del programa que no dependan de la frecuencia podrían seguir compilando sin problemas.
+                        </p>
+
+                        <p>
+                            Definir un valor incorrecto puede producir errores difíciles de detectar. Por ejemplo, si el
+                            microcontrolador realmente funciona a 8&nbsp;MHz pero se define <code>F_CPU=16000000UL</code>, una llamada a <code>_delay_ms(1000)</code> no durará un segundo, sino 
+                            aproximadamente medio segundo. De forma similar, si el microcontrolador trabaja a 16&nbsp;MHz pero se define <code>8000000UL</code>, el retardo será aproximadamente el doble de lo esperado.
+                        </p>
+
+                        <p>
+                            Lo mismo ocurre con otros cálculos que dependen de la velocidad del reloj, como la configuración de  temporizadores, la comunicación serie (UART), SPI o I²C. Si <code>F_CPU</code> no coincide con la frecuencia real del microcontrolador, estos periféricos pueden funcionar con errores o dejar de comunicarse correctamente.
+                        </p>
+
+                        <p>
+                            Puede definirse tanto en el código fuente como en la línea de comandos. Ambas opciones son válidas, pero definirla desde la línea de comandos presenta una ventaja importante: el mismo archivo <code>blink.c</code> puede compilarse para distintas frecuencias sin modificar una sola línea del código.   Basta con cambiar el valor del parámetro durante la compilación.
+                        </p>
+
+                        <p>
+                            Por ejemplo:
+                        </p>
+
+                        <pre><code class="language-bash">avr-gcc -mmcu=atmega328p -DF_CPU=8000000UL ...</code></pre>
+
+                        <pre><code class="language-bash">avr-gcc -mmcu=atmega328p -DF_CPU=16000000UL ...</code></pre>
+
+                        <p>
+                            Esto resulta especialmente útil cuando un mismo programa debe ejecutarse en placas diferentes, algunas con el oscilador interno de 8&nbsp;MHz y otras con un cristal externo de 16&nbsp;MHz.
+                        </p>
+
+                        <p>
+                            También conviene entender el significado del sufijo <code>UL</code>.
+                        </p>
+
+                        <ul>
+                            <li><code>U</code> significa <strong>Unsigned</strong>, es decir, un entero sin signo.</li>
+                            <li><code>L</code> significa <strong>Long</strong>, es decir, un entero largo.</li>
+                        </ul>
+
+                        <p>
+                            En consecuencia, <code>16000000UL</code> indica al compilador que el número
+                            <code>16000000</code> debe tratarse como una constante de tipo
+                            <code>unsigned long</code>. Esto evita problemas de desbordamiento y asegura que los cálculos
+                            realizados por las bibliotecas sean correctos.
+                        </p>
+
+                        <p>
+                            Los sufijos pueden escribirse tanto en mayúsculas como en minúsculas. Por ejemplo,
+                            <code>16000000UL</code>, <code>16000000Ul</code>, <code>16000000uL</code> y
+                            <code>16000000ul</code> son equivalentes para el compilador. Sin embargo, por legibilidad y porque es la forma utilizada en la documentación de AVR-LibC y en la mayoría de los ejemplos, es recomendable escribir siempre <code>16000000UL</code>.
+                        </p>
+
+                        <p>
+                            En cambio, expresiones como <code>16MHz</code>, <code>16Mhz</code>,
+                            <code>16mhz</code>, <code>16MHZ</code> o cualquier otra variante similar
+                            <strong>no son válidas</strong>. El compilador espera un valor numérico que represente la frecuencia en hercios, no un texto con unidades. La forma correcta de expresar 16&nbsp;MHz es
+                            <code>16000000UL</code>.
+                        </p>
+
+                    <h3>Parámetro <code>-Os</code></h3>
+
+                        <p>
+                            Esta opción solicita al compilador que optimice el programa para reducir su tamaño.
+                            La letra <code>O</code> corresponde a <em>Optimization</em> y la
+                            <code>s</code> significa <em>size</em>.
+                        </p>
+
+                        <p>
+                            En los microcontroladores esta opción es muy utilizada porque la memoria Flash suele ser limitada. El compilador intenta generar un programa más pequeño sin modificar su comportamiento, eliminando instrucciones innecesarias y reorganizando el código cuando es posible.
+                        </p>
+
+                        <p>
+                            Existen otros niveles de optimización, como <code>-O0</code>, <code>-O1</code>,
+                            <code>-O2</code> y <code>-O3</code>, pero <code>-Os</code> suele ofrecer un buen equilibrio entre tamaño del programa y rendimiento, por lo que es una de las opciones más habituales en proyectos AVR.
+                        </p>
+
+                    <h3>Resultado de la compilación</h3>
+
+                        <p>
+                            Si el proceso termina correctamente, el producto obtenido será el archivo
+                            <code>blink.elf</code>.
+                        </p>
+
+                        <p>
+                            La extensión <code>.elf</code> corresponde al formato
+                            <strong>Executable and Linkable Format (ELF)</strong>, un formato estándar utilizado por numerosos compiladores y herramientas de desarrollo.
+                        </p>
+
+                        <p>
+                            Este archivo contiene mucho más que el código máquina que ejecutará el microcontrolador. También almacena información sobre las distintas secciones del programa (como el código, las variables inicializadas y los datos constantes), la tabla de símbolos utilizada por el depurador, información para el enlazador y, si se compila con opciones de depuración, datos adicionales que permiten analizar el programa durante el desarrollo.
+                        </p>
+
+                        <p>
+                            Salvo que se indique otra ruta, <code>blink.elf</code> se genera en el mismo directorio donde se  ejecutó el comando <code>avr-gcc</code>.
+                        </p>
+
+                        <p>
+                            Aunque el archivo ELF ya contiene el programa compilado, normalmente todavía no es el archivo que se graba directamente en el microcontrolador. En el siguiente paso se extraerá de él un archivo en formato Intel HEX, que es el que habitualmente utiliza <code>avrdude</code> para programar la memoria Flash del dispositivo.
+                        </p>
+            </section>
+            
+            <section>
+                <h2>GENERAR EL ARCHIVO HEX</h2>
+
+                <pre><code class="language-bash">avr-objcopy -O ihex blink.elf blink.hex</code></pre>
+
+                <p>
+                    Una vez que el programa ha sido compilado, el resultado es un archivo
+                    <code>blink.elf</code>. Sin embargo, este todavía no es el archivo que normalmente
+                    se utiliza para programar el microcontrolador.
+                </p>
+
+                <p>
+                    El siguiente paso consiste en generar un archivo en formato
+                    <strong>Intel HEX</strong>, que es el formato que entienden la mayoría de los
+                    programadores para microcontroladores AVR, como <code>USBasp</code>, y también
+                    herramientas de programación como <code>avrdude</code>.
+                </p>
+
+                <p>
+                    Para realizar esta conversión se utiliza la herramienta
+                    <code>avr-objcopy</code>, que forma parte de la colección de utilidades
+                    <strong>GNU Binutils</strong>. Su función es extraer del archivo ELF únicamente
+                    la información necesaria para grabar el programa en la memoria Flash del
+                    microcontrolador.
+                </p>
+
+                <p>
+                    Durante este proceso se descartan elementos que resultan muy útiles durante el
+                    desarrollo, como la información de depuración, la tabla de símbolos y otros
+                    metadatos utilizados por el compilador, el enlazador y los depuradores. El
+                    resultado es un archivo mucho más simple, que contiene únicamente los datos que
+                    deben escribirse en la memoria del dispositivo.
+                </p>
+
+                <h3>Parámetro <code>-O ihex</code></h3>
+
+                <p>
+                    La opción <code>-O</code> indica el formato de salida (<em>Output format</em>)
+                    que debe generar <code>avr-objcopy</code>. En este caso, el formato elegido es
+                    <code>ihex</code>, abreviatura de <strong>Intel HEX</strong>.
+                </p>
+
+                <p>
+                    El formato Intel HEX no almacena la información como una secuencia de bytes
+                    binarios, sino como un archivo de texto formado por líneas de caracteres ASCII.
+                    Cada línea representa un registro que contiene información como la dirección de
+                    memoria donde deben grabarse los datos, la cantidad de bytes, los propios datos
+                    y un byte de verificación (<em>checksum</em>) que permite detectar errores de
+                    transmisión.
+                </p>
+
+                <p>
+                    Gracias a esta estructura, el archivo puede abrirse con cualquier editor de texto.
+                    Aunque su contenido no resulta fácil de interpretar para una persona, sí puede
+                    comprobarse que está formado por caracteres ASCII y no por datos binarios.
+                </p>
+
+                <p>
+                    Por ejemplo, una línea típica de un archivo Intel HEX puede verse así:
+                </p>
+
+                <pre><code>:100000000C945C000C946E000C946E000C946E00A4</code></pre>
+
+                <p>
+                    Cada uno de esos caracteres representa información codificada en formato
+                    hexadecimal que posteriormente será interpretada por el programador para grabar
+                    correctamente la memoria Flash del microcontrolador.
+                </p>
+
+                 <p>
+                    Esto suele generar cierta confusión. El programa que finalmente ejecutará el microcontrolador sí está formado por instrucciones binarias almacenadas en la memoria Flash. Sin embargo, antes de ser grabadas, esas instrucciones se representan mediante líneas de texto en formato Intel HEX para facilitar su almacenamiento, transporte y programación.
+                </p>
+
+                <h3>Dónde se genera el archivo .hex</h3>
+
+                <p>
+                    En el comando anterior, el último argumento indica el nombre del archivo de salida:
+                </p>
+
+                <pre><code class="language-bash">blink.hex</code></pre>
+
+                <p>
+                    Salvo que se especifique otra ruta, este archivo se genera en el mismo directorio desde el cual se ejecutó el comando <code>avr-objcopy</code>. Es decir, si la compilación se realiza dentro de la carpeta del proyecto, allí aparecerá también el archivo <code>blink.hex</code>, junto al archivo <code>blink.elf</code>.
+                </p>
+
+                <p>
+                    El nombre del archivo no está fijado por ninguna regla. En este ejemplo se llama <code>blink.hex</code> simplemente porque el programa se llama <code>blink</code>, pero podría haberse utilizado cualquier otro nombre, por
+                    ejemplo:
+                </p>
+
+                <pre><code class="language-bash">avr-objcopy -O ihex blink.elf programa_final.hex</code></pre>
+
+                <p>
+                    En ese caso, el archivo generado se llamaría  <code>programa_final.hex</code>.
+                </p>
+
+                <p>
+                    En resumen, el archivo <code>blink.hex</code> es una representación textual del  contenido que debe escribirse en la memoria Flash del microcontrolador. Será el archivo que, en el siguiente paso, utilizaremos junto con <code>avrdude</code> y un programador como <code>USBasp</code> para transferir el programa al ATmega328P.
+                </p>
+            </section>
+
+            <section>
+                <h2>4. PROGRAMAR EL MICROCONTROLADOR</h2>
+                    <pre><code class="language-bash">avrdude -c usbasp -p m328p -U flash:w:blink.hex</code></pre>
+
+                    <p><code>avrdude</code> es la utilidad encargada de comunicarse con el programador y, a través de él, con el microcontrolador. Además de escribir la memoria Flash, también puede leer la EEPROM, consultar la firma del dispositivo y modificar los fusibles.</p>
+
+                    <h3>Significado de los parámetros</h3>
+                        <ul>
+                            <li><strong>-c usbasp</strong>: selecciona el programador USBasp.</li>
+                            <li><strong>-p m328p</strong>: indica que el dispositivo es un ATmega328P.</li>
+                            <li><strong>-U flash:w:blink.hex</strong>: indica a <code>avrdude</code> qué operación debe realizar sobre la memoria del microcontrolador. Este parámetro está formado por tres partes separadas por dos puntos (<code>:</code>):
+                            <ul>
+                                <li><strong>flash</strong>: especifica la memoria sobre la que se realizará la operación. En este caso, la memoria Flash, donde se almacena el programa que ejecutará el microcontrolador. También es posible operar sobre otras memorias, como la EEPROM o los fusibles (<em>fuses</em>).</li>
+
+                                <li><strong>w</strong>: indica la acción que se desea realizar. La letra <code>w</code> proviene de <em>write</em> (escribir) y ordena a <code>avrdude</code> grabar datos en la memoria seleccionada. Existen otras operaciones, como <code>r</code> (<em>read</em>, leer) o <code>v</code> (<em>verify</em>, verificar).</li>
+
+                                <li><strong>blink.hex</strong>: es el archivo que contiene el programa que será grabado en la memoria Flash. En el paso anterior generamos este archivo a partir de <code>blink.elf</code> mediante <code>avr-objcopy</code>. Durante la programación, <code>avrdude</code> lee su contenido y lo transfiere, a través del programador USBasp, a la memoria Flash del ATmega328P.</li>
+                            </ul>
+                        </ul>
+
+                        <p>
+                            Una vez finalizada la grabación, el microcontrolador conserva el programa en su memoria Flash incluso aunque se desconecte la alimentación. Cuando vuelva a encenderse o se reinicie, comenzará a ejecutar el programa almacenado desde la dirección inicial de la memoria.
+                        </p>
+
+            </section>
+            
+            <section>
+                <h2>4. INTERPRETANDO LA SALIDA DE AVRDUDE</h2>
+                <pre><code>avrdude: AVR device initialized and ready to accept instructions
+avrdude: device signature = 0x1e950f (probably m328p)
+avrdude: erasing chip
+avrdude: writing 156 bytes flash ...
+avrdude: verifying flash memory against blink.hex
+avrdude: 156 bytes of flash verified
+avrdude done. Thank you.</code></pre>
+
+                    <p>Estos mensajes indican que la comunicación fue correcta, la firma del microcontrolador coincide con la esperada, la memoria Flash fue borrada, el programa se grabó correctamente y la verificación confirmó que los datos escritos coinciden exactamente con el archivo HEX.</p>
+            </section>
+            
+            <section>
+                <h2>5. EL AVISO «cannot set sck period»</h2>
+                    <p>Algunos USBasp antiguos muestran el mensaje <code>cannot set sck period</code>. Aunque aparece la palabra «error», normalmente solo indica que el firmware del programador no soporta el ajuste dinámico de la frecuencia SCK. Si posteriormente la memoria se escribe y verifica correctamente, el aviso puede ignorarse.</p>
+
+                <h2>6. COMPROBAR EL TAMAÑO DEL PROGRAMA</h2>
+                <pre><code class="language-bash">avr-size blink.elf</code></pre>
+
+                <pre><code>text    data    bss    dec    hex
+                156       0      0     156     9c</code></pre>
+
+                    <p>Esta información permite comprobar cuánta memoria Flash y SRAM utiliza el programa, algo muy importante cuando se trabaja con microcontroladores de recursos limitados.</p>
+            </section>
+
+            <section>
+                <h2>RESUMEN</h2>
+<pre><code class="language-bash">nano blink.c</code></pre>
+<pre><code class="language-bash">avr-gcc -mmcu=atmega328p -DF_CPU=16000000UL -Os blink.c -o </code></pre>
+<pre><code class="language-bash">blink.elf </code></pre>
+<pre><code class="language-bash">avr-objcopy -O ihex blink.elf blink.hex </code></pre>
+<pre><code class="language-bash">avr-size blink.elf </code></pre>
+<pre><code class="language-bash">avrdude -c usbasp -p m328p -U flash:w:blink.hex</code></pre>
+
+                <p>Comprender este flujo de trabajo ayuda a entender cómo un archivo de texto escrito en C termina convirtiéndose en un firmware que se ejecuta dentro del microcontrolador. Además, proporciona una base sólida para automatizar el proceso mediante scripts o Makefiles y facilita la resolución de problemas cuando algo no funciona como se esperaba.</p>
+            </section>
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>

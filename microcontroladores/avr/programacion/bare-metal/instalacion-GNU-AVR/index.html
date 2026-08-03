@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instalación de la GNU AVR Toolchain y AVRDUDE en entorno Linux (Raspberry Pi 5) | MC Mundo Tech</title>
+    <meta name="description" content="Guía paso a paso para instalar la GNU AVR Toolchain y AVRDUDE en Raspberry Pi 5">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>INSTALACIÓN DE LA GNU AVR TOOLCHAIN Y AVRDUDE EN ENTORNO LINUX (RASPBERRY PI 5)</h1>
+            <p>Guía paso a paso para instalar la GNU AVR Toolchain y AVRDUDE en Raspberry Pi 5</p>
+            </header>
+                        
+            <aside id="indice"></aside>    
+            
+            <section>
+            <h2>1. ACTUALIZACIÓN DE LOS ÍNDICES DE PAQUETES DEL SISTEMA</h2>
+            
+                <p>
+                    Antes de instalar cualquier paquete, es obligatorio actualizar las listas de los repositorios para asegurar que el gestor de paquetes de Debian/Raspberry Pi OS descargue las versiones compatibles más recientes de la Toolchain.
+                </p>
+
+                <pre><code class="bash">sudo apt update && sudo apt upgrade -y</code></pre>
+
+                <p>
+                    Para comprobar que el proceso de actualización finalizó correctamente sin errores en segundo plano, podemos evaluar la variable de estado de salida del shell con el siguiente comando inmediatamente después de que termine la ejecución:
+                </p>
+
+                <pre><code class="bash">echo $?</code></pre>
+
+                <p>
+                    Si la terminal devuelve un valor de <code>0</code>, significa que el sistema se ha actualizado correctamente. Cualquier valor distinto de cero indica un fallo o interrupción en el gestor de paquetes.
+                </p>
+            </section>
+
+            <section>
+            <h2>2. VERIFICACIÓN Y PREPARACIÓN DEL ENTORNO NATIVO (BUILD-ESSENTIAL)</h2>
+                
+                <p>
+                    Aunque <code>gcc</code> nativo no compila para AVR, la instalación de las herramientas de compilación de la Raspberry Pi proporciona utilidades de enlazado, cabeceras del sistema y herramientas de gestión de binarios necesarias como base.
+                </p>
+
+                <p>
+                    En entornos de desarrollo basados en Debian, no se recomienda instalar el compilador de forma aislada. Lo óptimo es validar la presencia del metapaquete <code>build-essential</code>, el cual agrupa de forma automática el compilador de C (<code>gcc</code>), el de C++ (<code>g++</code>), el gestor de automatización <code>make</code> y las librerías de desarrollo nativas fundamentales (<code>libc6-dev</code>).
+                </p>
+
+                <h3>2.1. Verificación del metapaquete build-essential</h3>
+                    <p>
+                        Haremos una consulta de los paquetes instalados filtrando por el paquete requerido, <code>build-essential</code>. En esta consulta utilizaremos dos comandos encadenados mediante el operador de pipeline o tubería <code>|</code>:
+                    </p>  
+
+                    <ul>
+                        <li><code>dpkg -l</code>: Nos presenta una lista todos los paquetes instalados en el sistema.</li>
+                        <li><code> | </code>(pipe o tubería): Envía la salida del primer comando al siguiente.</li>
+                        <li><code>grep build-essential</code>: Filtra la salida del comando anterior y muestra únicamente las líneas que contienen la cadena "build-essential".</li>
+                    </ul>    
+
+                    <p>
+                        De esta forma, ambos comandos trabajan conjuntamente para realizar una consulta filtrada de los paquetes instalados, una técnica muy utilizada en la administración de sistemas Linux.                    
+                    </p>
+
+                    <pre><code class="bash">dpkg -l | grep build-essential</code></pre>
+
+                    <p>Si el paquete ya está instalado en la Raspberry Pi 5, la terminal mostrará un registro con el estado <code>ii</code> (installs ok, installed):</p>
+
+                    <pre><code>ii  build-essential   12.12   arm64   Informational list of build-essential packages</code></pre>
+                
+                <h3>2.2. Instalación del metapaquete build-essential</h3>
+
+                    <p>
+                        En caso de que el comando no devuelva ninguna línea de texto, el entorno de compilación base está ausente. Debe instalarlo inmediatamente ejecutando:
+                    </p>
+
+                    <pre><code class="bash">sudo apt update && sudo apt install build-essential -y</code></pre>
+
+                    <p>Luego de la instalación, para verificar si el compilador nativo básico se encuentra en el sistema, ejecute:</p>
+
+                    <pre><code class="bash">gcc --version</code></pre>
+
+                    <p>Si el sistema tiene el compilador instalado, se imprimirá un mensaje parecido al siguiente:</p>
+
+                <pre><code>gcc (Debian 14.2.0-19) 14.2.0;
+Copyright (C) 2022 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+</code></pre>
+
+                    <p>
+                        Para conocer la ruta exacta donde se aloja este binario ejecutable, emplee el comando <code>which</code>:
+                    </p>
+
+                    <pre><code class="bash">which gcc</code></pre>
+
+                    <p>Por regla general, la salida estándar devolverá la ruta absoluta: <code>/usr/bin/gcc</code>.</p>
+
+                    <p>Si el sistema operativo responde con un error del tipo "command not found", el paquete no está presente. </p>   
+            </section>
+            
+            <section>
+            <h2>3. INSTALACIÓN DE LA GNU AVR TOOLCHAIN Y AVRDUDE</h2>
+                
+                <p>
+                    Una vez garantizado el entorno base, se procede con la instalación de las cuatro herramientas clave para el desarrollo embebido AVR:
+                </p>
+
+                <ul>
+                    <li><code>gcc-avr</code>: El compilador cruzado que traduce código fuente C/C++ a instrucciones entendibles por el procesador AVR.</li>
+                    <li><code>avr-libc</code>: La librería estándar de C modificada específicamente para microcontroladores AVR (provee funciones críticas como el manejo de registros de E/S, interrupciones y retardos de tiempo).</li>
+                    <li><code>binutils-avr</code>: Conjunto de herramientas utilitarias encargadas de tareas como el ensamblado (<code>avr-as</code>), el enlazado de objetos (<code>avr-ld</code>) y la conversión de formatos binarios a archivos legibles por programadores como el formato Intel HEX (<code>avr-objcopy</code>).</li>
+                    <li><code>avrdude</code>: El software encargado de interactuar mediante protocolos serie o USB con los programadores físicos (como USBAsp, ArduinoISP o AVRISP mkII) para descargar el archivo comprimido .hex dentro de la memoria Flash del microcontrolador.</li>
+                </ul>
+
+                <p>
+                    Para instalar todos los paquetes de la Toolchain y el software de programación en un solo paso, ejecute el siguiente comando en la terminal:
+                </p>
+                <pre><code class="bash">sudo apt install gcc-avr avr-libc binutils-avr avrdude -y</code></pre>
+            </section>
+
+            <section>
+            <h2>4. COMPROBACIÓN Y AUDITORÍA TÉCNICA DE LOS COMPONENTES INSTALADOS</h2>
+                
+                <p>
+                    Una vez completada la descarga e instalación, es crucial verificar de manera analítica que cada binario y las librerías se hayan posicionado correctamente en las rutas del sistema y respondan de manera adecuada.
+                </p>
+
+                <h3>4.1. Verificación del compilador cruzado (avr-gcc)</h3>
+                    <p>
+                        Al instalar la toolchain hemos invocado al compilador como <code>gcc-avr</code> porque así se denomina en los repositorios de Debian; la distribución Linux define los nombres de los paquetes  anteponiendo el software a la arquitectura para organizar sus paquetes (gcc-avr). Sin embargo, una vez instalado, el compilador se ejecuta desde la terminal mediante el comando <code>avr-gcc</code>. Esta diferencia se debe a que los ejecutables de las herramientas de compilación cruzada siguen la convención de GNU, que antepone la arquitectura al nombre de la herramienta.
+                    </p>
+
+                    <ul> 
+                        <li><strong>Nombre del paquete en Debian:</strong> <code>gcc-avr</code> (se utiliza para instalar el compilador).</li>
+                        <li><strong>Nombre del ejecutable:</strong> <code>avr-gcc</code> (se utiliza para invocar el compilador desde la terminal).</li>
+                    </ul>                        
+                    
+                    <p>Para comprobar que el compilador cruzado está operativo y reconocer su versión de compilación, debemos ejecutar:</p>
+
+                    <pre><code class="bash">avr-gcc --version</code></pre>
+
+                    <p>Determinamos la localización exacta del binario ejecutable para certificar que se encuentra mapeado dentro de las variables de entorno del sistema (<code>$PATH</code>):</p>
+
+                    <pre><code class="bash">which avr-gcc</code></pre>
+
+                    <p>La salida estándar esperada en sistemas operativos limpios debe apuntar a la ruta: <code>/usr/bin/avr-gcc</code>.</p>
+
+                <h3>4.2. Verificación de la estructura de librerías y cabeceras (avr-libc)</h3>
+                    <p>
+                        A diferencia de los programas normales, las cabeceras de <code>avr-libc</code> deben estar ubicadas en un directorio aislado para que el compilador cruzado las localice durante la fase de preprocesamiento. Utilizamos el comando <code>ls</code> para auditar el directorio raíz de inclusión de AVR:
+                    </p>
+
+                        <pre><code class="bash">ls /usr/lib/avr/include</code></pre>
+
+                        <p>
+                            El sistema debe listar carpetas troncales como <code>avr/</code> y <code>util/</code>, así como archivos de cabecera estándar indispensables, por ejemplo, <code>stdio.h</code>.
+                        </p>
+
+                        <p>
+                            Para verificar las librerías de temporización e instrucciones de retardo de hardware, que son críticas en sistemas embebidos, se debe constatar la existencia del archivo de cabecera <code>delay.h</code> dentro de la subcarpeta de utilidades mediante el siguiente comando:
+                        </p>
+
+                        <pre><code class="bash">ls /usr/lib/avr/include/util</code></pre>
+
+                <h3>4.3. Verificación de las utilidades de binarios (GNU Binutils para AVR)</h3>
+                    <p>
+                        Para asegurar que las herramientas de bajo nivel para manipulación de binarios (como el extractor de símbolos o el conversor de objetos) se instalaron correctamente, auditamos el estado del paquete mediante el gestor de bajo nivel:
+                    </p>
+
+                    <pre><code class="bash">dpkg -l binutils-avr</code></pre>
+
+                    <p>
+                        Para un control de calidad exhaustivo y automatizado de la Toolchain, se puede comprobar si cada una de las herramientas individuales empaquetadas dentro de <code>binutils-avr</code> en la ruta de ejecutables responde correctamente al llamado del sistema operativo. Ejecutamos el siguiente bucle en Bash:
+                    </p>
+
+                    <pre><code class="bash">for cmd in $(dpkg -L binutils-avr | grep '^/usr/bin/'); do $cmd --version | head -n 1; done</code></pre>
+
+                    <p>Este comando iterará sobre cada binario instalado (como <code>avr-objcopy</code>, <code>avr-size</code>, <code>avr-nm</code>), imprimiendo únicamente la primera línea de su respuesta técnica para validar que no existan librerías dinámicas rotas.</p>
+
+                    <pre><code class="language-bash"># Una respuesta típica es la siguiente
+o $cmd --version | head -n 1; done
+GNU addr2line (GNU Binutils) 2.43.90.20250122
+GNU c++filt (GNU Binutils) 2.43.90.20250122
+GNU elfedit (GNU Binutils) 2.43.90.20250122
+GNU gprof (GNU Binutils) 2.43.90.20250122
+GNU size (GNU Binutils) 2.43.90.20250122
+GNU strings (GNU Binutils) 2.43.90.20250122
+GNU ar (GNU Binutils) 2.43.90.20250122
+Ensamblador (GNU Binutils) 2.43.90.20250122 de GNU
+GNU ld (GNU Binutils) 2.43.90.20250122
+GNU ld (GNU Binutils) 2.43.90.20250122
+GNU nm (GNU Binutils) 2.43.90.20250122
+GNU objcopy (GNU Binutils) 2.43.90.20250122
+GNU objdump (GNU Binutils) 2.43.90.20250122
+GNU ranlib (GNU Binutils) 2.43.90.20250122
+GNU readelf (GNU Binutils) 2.43.90.20250122
+GNU strip (GNU Binutils) 2.43.90.20250122
+</code></pre>
+
+
+                <h4>4.4. Verificación del software de flasheo (avrdude)</h4>
+                    
+                    <p>Finalmente, comprobamos que la herramienta de flasheo o programación esté operativa y cargue de forma correcta sus archivos de configuración de hardware predeterminados (<code>avrdude.conf</code>):</p>
+
+                    <pre><code class="bash">avrdude -v</code></pre>
+
+                    <p>Este comando detallado mostrará en la terminal la versión de software activa y un listado exhaustivo de todos los programadores e interfaces de comunicación soportados de manera nativa, confirmando la compatibilidad con dispositivos de desarrollo populares como <code>usbasp</code>, clones directos USBasp, y configuraciones de depuración embebida como <code>arduinoisp</code>.</p>
+
+                    <p>Validamos la ruta de instalación del binario con:</p>
+
+                    <pre><code class="bash">which avrdude</code></pre>
+
+                    <p>El sistema devolverá la ruta estandarizada de operación: <code>/usr/bin/avrdude</code>.</p>
+
+                    <p>Y ya estamos listos para cargar nuestro código en el microcontrolador AVR.</p>
+                    
+            </section>
+
+                
+            
+           
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>
