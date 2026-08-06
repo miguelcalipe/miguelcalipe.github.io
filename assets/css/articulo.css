@@ -192,6 +192,51 @@ pre code {
 }
 
 /* ===========================
+   TRES COLUMNAS
+   =========================== */
+.tres-columnas {
+    column-count: 3;
+    column-gap: 2rem;
+}
+
+@media (max-width: 768px) {
+    .tres-columnas {
+        column-count: 1;
+    }
+}
+
+/* ===========================
+   CUATRO COLUMNAS
+   =========================== */
+.cuatro-columnas {
+    column-count: 4;
+    column-gap: 2rem;
+}
+
+@media (max-width: 768px) {
+    .cuatro-columnas {
+        column-count: 1;
+    }
+}
+
+/* ===========================
+   CINCO COLUMNAS
+   =========================== */
+.cinco-columnas {
+    column-count: 5;
+    column-gap: 2rem;
+}
+
+@media (max-width: 768px) {
+    .cinco-columnas {
+        column-count: 1;
+    }
+}
+
+
+
+
+/* ===========================
    MARCADOR DE POSICIÓN
    =========================== */
 

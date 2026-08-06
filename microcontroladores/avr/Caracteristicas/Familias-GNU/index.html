@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Familias soportadas por la GNU AVR Toolchain | MC Mundo Tech</title>
+    <meta name="description" content="Dominando la Toolchain GNU desde la línea  del firmware, Avrdude ">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+                <h1>FAMILIAS DE DISPOSITIVOS AVR SOPORTADOS POR LA GNU AVR TOOLCHAIN</h1>
+            </header>
+                        
+            <aside id="indice"></aside>    
+           
+            <section>
+            <h2>INTRODUCCIÓN</h2>
+
+                <p>
+                    En esta web usamos la <strong>GNU AVR Toolchain</strong> para la compialción y programación de microcontroladores AVR. </p>
+                
+                <p>
+                    La <strong>GNU AVR Toolchain</strong> proporciona soporte para una gran cantidad de  microcontroladores AVR de Microchip (antes Atmel). Para facilitar la compilación, los dispositivos se agrupan en diferentes subfamilias de arquitecturas internas denominadas  <strong>avr1, avr2, avr25, avr3, avr4, avr5, avr51, avr6, avrxmega</strong>, etc. .
+                </p>
+
+                <p> 
+                    Cada arquitectura agrupa decenas de microcontroladores diferentes, y no todos tienen las mismas características. Por ejemplo, en avr5 conviven un ATmega16 (16 KB Flash, 40 pines) y un ATmega328P (32 KB Flash, 28 pines) o un ATmega64 (64 KB Flash).
+                </p>
+
+            </section>  
+            <section>
+                <h2>1. SUBARQUITECTURAS DEL NÚCLEO AVR SOPORTADAS POR LA GNU AVR TOOLCHAIN</h2>
+                <p>
+                    A continuación se muestra una tabla resumen de las SUBARQUITECTURAS DEL NÚCLEO AVR soportadas por la GNU AVR Toolchain, junto con una breve descripción de cada una y los dispositivos que pertenecen a cada una de ellas.
+                </p>
+
+                <p>
+                    La agrupación de los microcontroladores AVR en subarquitecturas no se basa en el encapsulado, la cantidad de memoria Flash, la cantidad de pines o el consumo de energía, sino en las características del núcleo AVR (CPU) y en los recursos arquitectónicos que el compilador necesita conocer para generar código. 
+                </p>
+
+                <p> Lo que distingue a cada subarquitectura es una combinación de características como:</p>
+
+                <ul> 
+                    <li>El conjunto de instrucciones (Instruction Set Architecture, ISA);</li>
+                    <li>El tamaño del contador de programa (Program Counter, PC);</li>
+                    <li>El ancho de las instrucciones CALL y JMP;</li>
+                    <li>La capacidad de direccionamiento de la memoria de programa;</li>
+                    <li>La presencia de instrucciones adicionales (como MOVW, MUL, DES, etc.);</li>
+                    <li>El tipo de espacio de E/S (I/O Space);</li>
+                    <li>El modelo de interrupciones;</li>
+                    <li>La arquitectura del núcleo (Classic AVR, Enhanced AVR, XMEGA, tinyAVR 0/1, etc.).</li>
+                </ul>
+
+                <h3>Tabla Resumen</h3>
+                    <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Subarquitectura</th>
+                                <th>Tipo de núcleo</th>
+                                <th>PC (contador de programa)</th>
+                                <th>Descripción</th>
+                                <th>Características arquitectónicas</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            <tr>
+                                <td><strong>avr1</strong></td>
+                                <td>AVR clásico</td>
+                                <td>16 bits</td>
+                                <td>
+                                    Primera generación de microcontroladores AVR, formada por dispositivos muy pequeños y con recursos limitados.
+                                </td>
+                                <td>
+                                    Primer núcleo AVR. No incorpora las instrucciones <code>MOVW</code> ni multiplicador por hardware (<code>MUL</code>). Actualmente está considerado obsoleto y fue utilizado en muy pocos dispositivos.
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>avr2</strong></td>
+                                <td>AVR clásico</td>
+                                <td>16 bits</td>
+                                <td>
+                                    Familia de microcontroladores AVR clásicos con memoria Flash reducida y arquitectura de 16 bits para el contador de programa.
+                                </td>
+                                <td>
+                                    Implementa el conjunto básico de instrucciones AVR. No dispone de multiplicador por hardware y está orientado a dispositivos con aproximadamente hasta 8 KB de memoria Flash.
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>avr25</strong></td>
+                                <td>AVR clásico mejorado</td>
+                                <td>16 bits</td>
+                                <td>
+                                    Subarquitectura utilizada principalmente por numerosos microcontroladores <strong>ATtiny clásicos</strong> de bajo consumo, como las familias ATtiny13, ATtiny24/44/84 y ATtiny25/45/85. Está orientada a aplicaciones donde se requiere un reducido número de pines, bajo consumo de energía y  bajo costo, manteniendo una buena capacidad de procesamiento.
+                                </td>
+                                <td>
+                                    Evolución de la arquitectura <strong>avr2</strong>. Incorpora mejoras en el  conjunto de instrucciones y soporte para periféricos más modernos. Muchos dispositivos añaden oscilador interno calibrado, temporizadores mejorados, convertidor analógico-digital (ADC), comparador analógico, interfaz SPI e I²C (USI), watchdog mejorado y modos avanzados de ahorro de energía. Gracias a estas características, la subarquitectura avr25 se convirtió durante muchos años en la plataforma de referencia para los  microcontroladores AVR de propósito general con pocos pines y bajo consumo.
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>avr3</strong></td>
+                                <td>AVR clásico</td>
+                                <td>16 bits</td>
+                                <td>
+                                    Pequeña familia destinada principalmente a dispositivos USB tempranos y algunos microcontroladores especializados.
+                                </td>
+                                <td>
+                                    Diseñada para dispositivos con mayor memoria Flash (aproximadamente entre 16 KB y 64 KB), manteniendo el núcleo AVR clásico sin multiplicador por hardware.
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>avr31</strong></td>
+                                <td>AVR clásico</td>
+                                <td>22 bits</td>
+                                <td>
+                                    Subarquitectura destinada a microcontroladores AVR clásicos con mayor capacidad de memoria Flash. Incorpora un contador de programa (PC) de 22 bits para soportar espacios de memoria de programa más amplios que los disponibles en las subarquitecturas AVR de 16 bits.
+                                </td>
+                                <td>
+                                    Variante de avr3 con contador de programa ampliado a 22 bits para soportar memorias Flash superiores a 128 KB.
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>avr35</strong></td>
+                                <td>AVR clásico</td>
+                                <td>22 bits</td>
+                                <td>
+                                    Familia que incorpora principalmente pequeños AVR con controlador USB integrado y algunos dispositivos automotrices.
+                                </td>
+                                <td>
+                                    Similar a avr31, utilizando un contador de programa de 22 bits y soporte para determinadas familias USB y variantes específicas.
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>avr4</strong></td>
+                                <td>Enhanced AVR</td>
+                                <td>16 bits</td>
+                                <td>
+                                    Familia clásica formada por los populares ATmega8, ATmega48 y ATmega88, además de algunos AVR PWM y dispositivos automotrices.
+                                </td>
+                                <td>
+                                    Introduce el núcleo <strong>Enhanced AVR</strong>, incorporando instrucciones como <code>MOVW</code>, multiplicador por hardware (<code>MUL</code>) y mejoras importantes de rendimiento respecto a los AVR clásicos.
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>avr5</strong></td>
+                                <td>Enhanced AVR</td>
+                                <td>16 bits</td>
+                                <td>
+                                    La familia más extensa y conocida de la arquitectura AVR, incluyendo la mayoría de los ATmega utilizados en proyectos de electrónica y sistemas embebidos.
+                                </td>
+                                <td>
+                                    Evolución del núcleo Enhanced AVR. Mantiene las instrucciones avanzadas (<code>MOVW</code>), multiplicador por hardware (<code>MUL</code>) y mejor rendimiento. Incluye dispositivos ampliamente difundidos como ATmega16, ATmega32, ATmega48, ATmega88, ATmega168 y ATmega328.
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>avr51</strong></td>
+                                <td>Enhanced AVR</td>
+                                <td>22 bits</td>
+                                <td>
+                                    Agrupa los AVR de mayor capacidad dentro de la familia ATmega de 128 KB de Flash, ampliamente utilizados en sistemas embebidos complejos y aplicaciones industriales.
+                                </td>
+                                <td>
+                                    Basado en la arquitectura Enhanced AVR de avr5, pero incorpora un contador de programa de 22 bits para soportar dispositivos con memorias Flash superiores a 128 KB.
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>avr6</strong></td>
+                                <td>Enhanced AVR</td>
+                                <td>22 bits</td>
+                                <td>
+                                    Familia de microcontroladores AVR con memorias Flash superiores a 128 KB y contador de programa ampliado. Incluye dispositivos ATmega de alta capacidad destinados a aplicaciones complejas que requieren mayor memoria de programa.
+                                </td>
+                                <td>
+                                    Núcleo Enhanced AVR para los AVR clásicos de mayor capacidad. Soporta direccionamiento extendido de memoria de programa mediante un contador de programa de 22 bits. Ejemplo representativo: ATmega2560.
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>avrxmega2</strong></td>
+                                <td>AVR XMEGA</td>
+                                <td>16 bits</td>
+                                <td>
+                                    Primera subfamilia XMEGA de menor capacidad. Incorpora arquitectura AVR mejorada con controlador de interrupciones avanzado, DMA, sistema de eventos y periféricos de alto rendimiento para aplicaciones de baja y media complejidad.
+                                </td>
+                                <td>
+                                    Introduce el núcleo AVR XMEGA con una arquitectura de periféricos completamente renovada respecto a los AVR clásicos. Mantiene un contador de programa de 16 bits.
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>avrxmega4</strong></td>
+                                <td>AVR XMEGA</td>
+                                <td>16 bits</td>
+                                <td>
+                                    Subfamilia XMEGA de capacidad intermedia, con mayor cantidad de memoria Flash y periféricos que avrxmega2. Mantiene las prestaciones avanzadas como DMA, sistema de eventos y múltiples temporizadores.
+                                </td>
+                                <td>
+                                    Basada en el núcleo AVR XMEGA, ofrece mayor memoria y un conjunto más amplio de periféricos avanzados manteniendo un contador de programa de 16 bits.
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>avrxmega5</strong></td>
+                                <td>AVR XMEGA</td>
+                                <td>22 bits</td>
+                                <td>
+                                    Subfamilia XMEGA que incorpora controlador USB de alta velocidad junto con las características avanzadas de la arquitectura XMEGA, orientada a aplicaciones con conectividad USB integrada.
+                                </td>
+                                <td>
+                                    Variante XMEGA para dispositivos con memorias mayores y direccionamiento ampliado mediante contador de programa de 22 bits.
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>avrxmega6</strong></td>
+                                <td>AVR XMEGA</td>
+                                <td>22 bits</td>
+                                <td>
+                                    Subfamilia XMEGA de alta capacidad, con mayor memoria Flash, SRAM y EEPROM, además de un amplio conjunto de periféricos de comunicación, temporización y conversión analógica para aplicaciones exigentes.
+                                </td>
+                                <td>
+                                    Núcleo AVR XMEGA de gama alta con contador de programa de 22 bits, arquitectura de periféricos renovada y soporte para grandes espacios de memoria.
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>avrxmega7</strong></td>
+                                <td>AVR XMEGA</td>
+                                <td>22 bits</td>
+                                <td>
+                                    Subfamilia XMEGA de mayor capacidad y prestaciones. Integra grandes memorias, controlador USB, sistema de eventos, DMA y numerosos periféricos, destinada a aplicaciones embebidas de alto rendimiento.
+                                </td>
+                                <td>
+                                    Representa la máxima categoría de los XMEGA clásicos. Utiliza un contador de programa de 22 bits y reúne todas las capacidades avanzadas de la arquitectura XMEGA.
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>avrtiny</strong></td>
+                                <td>tinyAVR (núcleo moderno)</td>
+                                <td>16 bits</td>
+                                <td>
+                                    Arquitectura correspondiente a la nueva generación de microcontroladores tinyAVR (series 0, 1 y 2). Incorpora un núcleo AVR modernizado con periféricos mejorados, sistema de eventos simplificado, menor consumo y mayor eficiencia respecto a los ATtiny clásicos.
+                                </td>
+                                <td>
+                                    Utiliza un núcleo AVR moderno con espacio de registros de E/S reorganizado, nuevos periféricos y mejoras arquitectónicas respecto a los AVR clásicos, manteniendo un contador de programa de 16 bits.
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                     </table>
+                    </div>
+            </section>
+
+            <section>
+            <h2>2. LISTADO DE SUBARQUITECTURAS DEL NÚCLEO AVR Y MODELOS DE MICROCONTROLADORES UTILIZADAS POR GNU AVR TOOLCHAIN</h2>
+                <h3>avr1</h3>
+                    <p>
+                        Corresponde a la primera generación de microcontroladores AVR de 8 bits.
+                        Emplean el núcleo AVR original con un conjunto de instrucciones más reducido
+                        que el de las generaciones posteriores, además de una capacidad limitada de
+                        memoria y periféricos. Actualmente se utilizan principalmente con fines
+                        educativos, de estudio de la evolución de la arquitectura AVR o para el
+                        mantenimiento de equipos antiguos.
+                    </p>
+                    <div class="cinco-columnas">
+                    <section>
+                        <h4>Familia AT90S</h4>
+                        <ul>
+                            <li>at90s1200</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h4>Familia ATtiny</h4>
+                        <ul>
+                            <li>attiny11</li>
+                            <li>attiny12</li>
+                            <li>attiny15</li>
+                            <li>attiny28</li>
+                        </ul>
+                    </section>
+                </div>
+            </section>
+
+            <section>
+                <h3>avr2</h3>
+
+                    <p> 
+                        La subarquitectura del núcleo AVR2 incorpora el conjunto completo de instrucciones AVR, un contador de programa de 16 bits y admite hasta 8 KB de memoria Flash. Incluye dispositivos de las familias AT90S y ATtiny, utilizados en aplicaciones de propósito general de baja complejidad.
+                    </p>
+
+                    <div class="cinco-columnas">
+                    <section>
+                        <h4>AT90S (2 KB)</h4>
+                            <ul>
+                                <li>at90s2313</li>
+                                <li>at90s2323</li>
+                                <li>at90s2333</li>
+                                <li>at90s2343</li>
+                            </ul>
+                    </section>
+
+                    <section>
+                        <h4>AT90S (4 KB)</h4>
+                            <ul>
+                                <li>at90s4414</li>
+                                <li>at90s4433</li>
+                                <li>at90s4434</li>
+                            </ul>
+                    </section>
+
+                    <section>
+                        <h4>AT90S (8 KB)</h4>
+                            <ul>
+                                <li>at90s8515</li>
+                                <li>at90c8534</li>
+                                <li>at90s8535</li>
+                            </ul>
+                    </section>
+                    <section>
+                        <h4>ATtiny</h4>
+                            <ul>
+                                <li>attiny22</li>
+                                <li>attiny26</li>
+                            </ul>
+                    </section>
+                    </div>
+            </section>
+
+            <section>
+                <h3>avr25</h3>
+                    <p>
+                        La subarquitectura AVR25 del núcleo AVR agrupa microcontroladores con  características arquitectónicas comunes, como un contador de programa de  16 bits y soporte para hasta 8 KB de memoria Flash. Incluye principalmente  dispositivos de la familia ATtiny, junto con algunos modelos de las familias ATA y AT86RF destinados a aplicaciones de automoción y comunicaciones inalámbricas.
+                    </p>
+
+                    <div class="cinco-columnas">
+
+                        <section>
+                        <h4>Serie ATtiny 13</h4>
+                        <ul>
+                            <li>attiny13</li>
+                            <li>attiny13a</li>
+                        </ul>
+                        </section>
+
+                        <section>   
+                        <h4>Serie ATtiny 24/44/84</h4>
+                        <ul>
+                            <li>attiny24</li>
+                            <li>attiny24a</li>
+                            <li>attiny44</li>
+                            <li>attiny44a</li>
+                            <li>attiny84</li>
+                            <li>attiny84a</li>
+                        </ul>
+                        </section>
+
+                        <section>
+                        <h4>Serie ATtiny 25/45/85</h4>
+                        <ul>
+                            <li>attiny25</li>
+                            <li>attiny45</li>
+                            <li>attiny85</li>
+                        </ul>
+                        </section>
+
+                        <section>
+                        <h4>Serie ATtiny 43/87</h4>
+                        <ul>
+                            <li>attiny43u</li>
+                            <li>attiny87</li>
+                        </ul>
+                        </section>
+
+                        <section>
+                        <h4>Serie ATtiny 48/88</h4>
+                        <ul>
+                            <li>attiny48</li>
+                            <li>attiny88</li>
+                        </ul>
+
+                        </section>
+
+                        <section>
+                        <h4>Serie ATtiny 2313/4313</h4>
+                        <ul>
+                            <li>attiny2313</li>
+                            <li>attiny2313a</li>
+                            <li>attiny4313</li>
+                        </ul>
+                        </section>
+
+                        <section>
+                        <h4>Serie ATtiny 261/461/861</h4>
+                        <ul>
+                            <li>attiny261</li>
+                            <li>attiny261a</li>
+                            <li>attiny461</li>
+                            <li>attiny461a</li>
+                            <li>attiny861</li>
+                            <li>attiny861a</li>
+                        </ul>
+                        </section>
+
+                        <section>
+                        <h4>Serie ATtiny 441/841</h4>
+                        <ul>
+                            <li>attiny441</li>
+                            <li>attiny841</li>
+                        </ul>
+                        </section>
+
+                        <section>
+
+                        <h4>Serie ATtiny 828</h4>
+                        <ul>
+                            <li>attiny828</li>
+                        </ul>
+                        </section>
+
+                        <section>
+                        <h4>Familia ATA</h4>
+                        <ul>
+                            <li>ata5272</li>
+                            <li>ata6616c</li>
+                        </ul>
+                        </section>
+
+                        <section>
+                        <h4>Familia AT86RF</h4>
+                        <ul>
+                            <li>at86rf401</li>
+                        </ul>
+                        </section>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>avr3</h3>
+
+                    <p>
+                        La subarquitectura AVR3 agrupa un número reducido de microcontroladores
+                        con un contador de programa de 22 bits, lo que permite direccionar más de 128 KB de espacio de programa. Fue utilizada en algunos  dispositivos especializados, principalmente orientados a aplicaciones con interfaz USB o funciones específicas. En la práctica, muy pocos dispositivos utilizaron esta subarquitectura.
+                    </p>
+
+                    <div class="cinco-columnas">
+                        <section>
+                            <h4>Familia AT43USB</h4>
+                            <ul>
+                                <li>at43usb355</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Familia AT76C</h4>
+                            <ul>
+                                <li>at76c711</li>
+                            </ul>
+                        </section>
+
+                    </div>
+                </section>
+
+                <section>
+                    <h3>avr31</h3>
+
+                    <p>
+                        La subarquitectura AVR31 emplea un contador de programa de 22 bits pero con diferencias en la organización del núcleo respecto a otras subarquitecturas. Fue utilizada por un número muy reducido de dispositivos. Incluye el histórico ATmega103, uno de los primeros AVR de alta capacidad de  memoria Flash, además de algunos microcontroladores especializados con  interfaz USB. 
+                    </p>
+
+                    <div class="cinco-columnas">
+
+                        <section>
+                            <h4>Familia ATmega</h4>
+                            <ul>
+                                <li>atmega103</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Familia AT43USB</h4>
+                            <ul>
+                                <li>at43usb320</li>
+                            </ul>
+                        </section>
+
+                    </div>
+                </section>
+
+                <section>
+                    <h3>avr35</h3>
+
+                    <p>
+                        La subarquitectura AVR35 agrupa principalmente microcontroladores con
+                        interfaz USB de velocidad completa (Full-Speed USB), además de algunos
+                        dispositivos especializados de la familia ATA destinados a aplicaciones
+                        de automoción.
+                    </p>
+
+                    <div class="cinco-columnas">
+
+                        <section>
+                            <h4>Familia ATA</h4>
+                            <ul>
+                                <li>ata5505</li>
+                                <li>ata6617c</li>
+                                <li>ata664251</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie AT90USB</h4>
+                            <ul>
+                                <li>at90usb82</li>
+                                <li>at90usb162</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATmega U2</h4>
+                            <ul>
+                                <li>atmega8u2</li>
+                                <li>atmega16u2</li>
+                                <li>atmega32u2</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATtiny 16 (16xx)</h4>
+                            <ul>
+                                <li>attiny1634</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATtiny 87/167</h4>
+                            <ul>
+                                <li>attiny167</li>
+                            </ul>
+                        </section>
+
+                    </div>
+                </section>
+               
+                <section>
+                    <h3>avr4</h3>
+
+                    <p>
+                        La subarquitectura AVR4 agrupa microcontroladores con un contador de
+                        programa de 16 bits y soporte para hasta 8 KB de memoria Flash.
+                        Incluye principalmente dispositivos de las familias ATmega, AT90PWM
+                        y ATA, ampliamente utilizados en aplicaciones de propósito general,
+                        control de motores y sistemas automotrices.
+                    </p>
+
+                    <div class="cuatro-columnas">
+
+                        <section>
+                            <h4>Serie ATmega8</h4>
+                            <ul>
+                                <li>atmega8</li>
+                                <li>atmega8a</li>
+                                <li>atmega8hva</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATmega48</h4>
+                            <ul>
+                                <li>atmega48</li>
+                                <li>atmega48a</li>
+                                <li>atmega48p</li>
+                                <li>atmega48pa</li>
+                                <li>atmega48pb</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATmega88</h4>
+                            <ul>
+                                <li>atmega88</li>
+                                <li>atmega88a</li>
+                                <li>atmega88p</li>
+                                <li>atmega88pa</li>
+                                <li>atmega88pb</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATmega8515/8535</h4>
+                            <ul>
+                                <li>atmega8515</li>
+                                <li>atmega8535</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Familia AT90PWM</h4>
+                            <ul>
+                                <li>at90pwm1</li>
+                                <li>at90pwm2</li>
+                                <li>at90pwm2b</li>
+                                <li>at90pwm3</li>
+                                <li>at90pwm3b</li>
+                                <li>at90pwm81</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Familia ATA</h4>
+                            <ul>
+                                <li>ata6285</li>
+                                <li>ata6286</li>
+                                <li>ata6289</li>
+                                <li>ata6612c</li>
+                            </ul>
+                        </section>
+
+                    </div>
+                </section>
+
+                <section>
+                    <h3>avr5</h3>
+
+                    <p>
+                        La subarquitectura AVR5 agrupa un amplio conjunto de microcontroladores
+                        con contador de programa de 16 bits y soporte para hasta 128 KB de memoria
+                        Flash. Incluye la mayor parte de los dispositivos de la familia ATmega,
+                        además de microcontroladores especializados con interfaces USB, CAN,
+                        radiofrecuencia, control de motores y aplicaciones automotrices. Entre
+                        ellos se encuentra el popular ATmega328P, ampliamente utilizado en placas
+                        Arduino.
+                    </p>
+
+                    <div class="cuatro-columnas">
+
+                        <section>
+                            <h4>Serie ATmega16</h4>
+                            <ul>
+                                <li>atmega16</li>
+                                <li>atmega16a</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATmega161/162/163</h4>
+                            <ul>
+                                <li>atmega161</li>
+                                <li>atmega162</li>
+                                <li>atmega163</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATmega164</h4>
+                            <ul>
+                                <li>atmega164a</li>
+                                <li>atmega164p</li>
+                                <li>atmega164pa</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATmega165</h4>
+                            <ul>
+                                <li>atmega165</li>
+                                <li>atmega165a</li>
+                                <li>atmega165p</li>
+                                <li>atmega165pa</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATmega168</h4>
+                            <ul>
+                                <li>atmega168</li>
+                                <li>atmega168a</li>
+                                <li>atmega168p</li>
+                                <li>atmega168pa</li>
+                                <li>atmega168pb</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATmega169</h4>
+                            <ul>
+                                <li>atmega169</li>
+                                <li>atmega169a</li>
+                                <li>atmega169p</li>
+                                <li>atmega169pa</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATmega323/324</h4>
+                            <ul>
+                                <li>atmega323</li>
+                                <li>atmega324a</li>
+                                <li>atmega324p</li>
+                                <li>atmega324pa</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATmega325/3250</h4>
+                            <ul>
+                                <li>atmega325</li>
+                                <li>atmega325a</li>
+                                <li>atmega325p</li>
+                                <li>atmega325pa</li>
+                                <li>atmega3250</li>
+                                <li>atmega3250a</li>
+                                <li>atmega3250p</li>
+                                <li>atmega3250pa</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATmega328</h4>
+                            <ul>
+                                <li>atmega328</li>
+                                <li>atmega328p</li>
+                                <li>atmega328pb</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATmega329/3290</h4>
+                            <ul>
+                                <li>atmega329</li>
+                                <li>atmega329a</li>
+                                <li>atmega329p</li>
+                                <li>atmega329pa</li>
+                                <li>atmega3290</li>
+                                <li>atmega3290a</li>
+                                <li>atmega3290p</li>
+                                <li>atmega3290pa</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATmega406</h4>
+                            <ul>
+                                <li>atmega406</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATmega640/644/645/649</h4>
+                            <ul>
+                                <li>atmega640</li>
+                                <li>atmega644</li>
+                                <li>atmega644a</li>
+                                <li>atmega644p</li>
+                                <li>atmega644pa</li>
+                                <li>atmega645</li>
+                                <li>atmega645a</li>
+                                <li>atmega645p</li>
+                                <li>atmega6450</li>
+                                <li>atmega6450a</li>
+                                <li>atmega6450p</li>
+                                <li>atmega649</li>
+                                <li>atmega649a</li>
+                                <li>atmega649p</li>
+                                <li>atmega6490</li>
+                                <li>atmega6490a</li>
+                                <li>atmega6490p</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATmega M1</h4>
+                            <ul>
+                                <li>atmega16m1</li>
+                                <li>atmega32m1</li>
+                                <li>atmega64m1</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATmega C1</h4>
+                            <ul>
+                                <li>atmega32c1</li>
+                                <li>atmega64c1</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATmega U4/U6</h4>
+                            <ul>
+                                <li>atmega16u4</li>
+                                <li>atmega32u4</li>
+                                <li>atmega32u6</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATmega HVA/HVB/HVE</h4>
+                            <ul>
+                                <li>atmega16hva</li>
+                                <li>atmega16hva2</li>
+                                <li>atmega16hvb</li>
+                                <li>atmega16hvbrevb</li>
+                                <li>atmega32hvb</li>
+                                <li>atmega32hvbrevb</li>
+                                <li>atmega64hve</li>
+                                <li>atmega64hve2</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATmega RFR2</h4>
+                            <ul>
+                                <li>atmega64rfr2</li>
+                                <li>atmega644rfr2</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Familia AT90CAN</h4>
+                            <ul>
+                                <li>at90can32</li>
+                                <li>at90can64</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Familia AT90PWM</h4>
+                            <ul>
+                                <li>at90pwm161</li>
+                                <li>at90pwm216</li>
+                                <li>at90pwm316</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Familia AT90USB</h4>
+                            <ul>
+                                <li>at90usb646</li>
+                                <li>at90usb647</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Familia AT90SCR</h4>
+                            <ul>
+                                <li>at90scr100</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Familia ATA</h4>
+                            <ul>
+                                <li>ata5702m322</li>
+                                <li>ata5782</li>
+                                <li>ata5790</li>
+                                <li>ata5790n</li>
+                                <li>ata5791</li>
+                                <li>ata5795</li>
+                                <li>ata5831</li>
+                                <li>ata6613c</li>
+                                <li>ata6614q</li>
+                                <li>ata8210</li>
+                                <li>ata8510</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Familias especiales</h4>
+                            <ul>
+                                <li>at94k</li>
+                                <li>m3000</li>
+                            </ul>
+                        </section>
+
+                    </div>
+                </section>
+
+                <section>
+                    <h3>avr51</h3>
+
+                    <p>
+                        La subarquitectura AVR51 utiliza un contador de programa de 17 bits,
+                        permitiendo direccionar hasta 128 KB de memoria Flash. Incluye
+                        microcontroladores de las familias ATmega, AT90CAN y AT90USB, además
+                        de variantes con transceptor de radio IEEE 802.15.4 integrado.
+                    </p>
+
+                    <div class="cuatro-columnas">
+
+                        <section>
+                            <h4>Serie ATmega128</h4>
+                            <ul>
+                                <li>atmega128</li>
+                                <li>atmega128a</li>
+                                <li>atmega1281</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATmega1280</h4>
+                            <ul>
+                                <li>atmega1280</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATmega1284</h4>
+                            <ul>
+                                <li>atmega1284</li>
+                                <li>atmega1284p</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATmega RFR</h4>
+                            <ul>
+                                <li>atmega128rfa1</li>
+                                <li>atmega128rfr2</li>
+                                <li>atmega1284rfr2</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Familia AT90CAN</h4>
+                            <ul>
+                                <li>at90can128</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Familia AT90USB</h4>
+                            <ul>
+                                <li>at90usb1286</li>
+                                <li>at90usb1287</li>
+                            </ul>
+                        </section>
+
+                    </div>
+                </section>
+
+                <section>
+                <h3>avr6</h3>
+
+                <p>
+                    La subarquitectura AVR6 utiliza un contador de programa de 22 bits y
+                    está destinada a los AVR clásicos de mayor capacidad. Incluye
+                    dispositivos con hasta 256 KB de memoria Flash y variantes con
+                    transceptor de radio IEEE 802.15.4 integrado.
+                </p>
+
+                <div class="cuatro-columnas">
+
+                    <section>
+                        <h4>Serie ATmega2560</h4>
+                        <ul>
+                            <li>atmega2560</li>
+                            <li>atmega2561</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h4>Serie ATmega RFR</h4>
+                        <ul>
+                            <li>atmega256rfr2</li>
+                            <li>atmega2564rfr2</li>
+                        </ul>
+                    </section>
+
+                </div>
+                </section>
+
+                <section>
+                    <h3>avrxmega2</h3>
+
+                    <p>
+                        La subarquitectura AVRXMEGA2 agrupa los XMEGA de menor capacidad,
+                        normalmente entre 8 KB y 32 KB de memoria Flash. Incorporan una
+                        arquitectura avanzada con controlador de interrupciones PMIC,
+                        sistema de eventos (Event System) y controlador DMA.
+                    </p>
+
+                    <div class="cuatro-columnas">
+
+                        <section>
+                            <h4>Serie ATxmega8</h4>
+                            <ul>
+                                <li>atxmega8e5</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATxmega16</h4>
+                            <ul>
+                                <li>atxmega16a4</li>
+                                <li>atxmega16a4u</li>
+                                <li>atxmega16c4</li>
+                                <li>atxmega16d4</li>
+                                <li>atxmega16e5</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATxmega32</h4>
+                            <ul>
+                                <li>atxmega32a4</li>
+                                <li>atxmega32a4u</li>
+                                <li>atxmega32c3</li>
+                                <li>atxmega32c4</li>
+                                <li>atxmega32d3</li>
+                                <li>atxmega32d4</li>
+                                <li>atxmega32e5</li>
+                            </ul>
+                        </section>
+
+                    </div>
+                </section>
+
+                <section>
+                    <h3>avrxmega4</h3>
+
+                    <p>
+                        La subarquitectura AVRXMEGA4 reúne dispositivos XMEGA con hasta
+                        64 KB de memoria Flash y un mayor número de periféricos y opciones
+                        de conectividad.
+                    </p>
+
+                    <div class="cuatro-columnas">
+
+                        <section>
+                            <h4>Serie ATxmega64</h4>
+                            <ul>
+                                <li>atxmega64a3</li>
+                                <li>atxmega64a3u</li>
+                                <li>atxmega64a4u</li>
+                                <li>atxmega64b1</li>
+                                <li>atxmega64b3</li>
+                                <li>atxmega64c3</li>
+                                <li>atxmega64d3</li>
+                                <li>atxmega64d4</li>
+                            </ul>
+                        </section>
+
+                    </div>
+                </section>
+
+                <section>
+                    <h3>avrxmega5</h3>
+
+                    <p>
+                        La subarquitectura AVRXMEGA5 comprende variantes XMEGA de 64 KB
+                        optimizadas para aplicaciones que requieren un mayor número de
+                        periféricos y líneas de entrada/salida.
+                    </p>
+
+                    <div class="cuatro-columnas">
+
+                        <section>
+                            <h4>Serie ATxmega64A1</h4>
+                            <ul>
+                                <li>atxmega64a1</li>
+                                <li>atxmega64a1u</li>
+                            </ul>
+                        </section>
+
+                    </div>
+                </section>
+
+                <section>
+                    <h3>avrxmega6</h3>
+
+                    <p>
+                        La subarquitectura AVRXMEGA6 agrupa dispositivos XMEGA de alta
+                        capacidad, con memorias Flash comprendidas entre 128 KB y 384 KB.
+                    </p>
+
+                    <div class="cuatro-columnas">
+
+                        <section>
+                            <h4>Serie ATxmega128</h4>
+                            <ul>
+                                <li>atxmega128a3</li>
+                                <li>atxmega128a3u</li>
+                                <li>atxmega128b1</li>
+                                <li>atxmega128b3</li>
+                                <li>atxmega128c3</li>
+                                <li>atxmega128d3</li>
+                                <li>atxmega128d4</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATxmega192</h4>
+                            <ul>
+                                <li>atxmega192a3</li>
+                                <li>atxmega192a3u</li>
+                                <li>atxmega192c3</li>
+                                <li>atxmega192d3</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATxmega256</h4>
+                            <ul>
+                                <li>atxmega256a3</li>
+                                <li>atxmega256a3b</li>
+                                <li>atxmega256a3bu</li>
+                                <li>atxmega256a3u</li>
+                                <li>atxmega256c3</li>
+                                <li>atxmega256d3</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATxmega384</h4>
+                            <ul>
+                                <li>atxmega384c3</li>
+                                <li>atxmega384d3</li>
+                            </ul>
+                        </section>
+
+                    </div>
+                </section>
+
+                <section>
+                    <h3>avrxmega7</h3>
+
+                    <p>
+                        La subarquitectura AVRXMEGA7 representa la gama superior de la
+                        primera generación XMEGA e incluye dispositivos con una elevada
+                        integración de periféricos.
+                    </p>
+
+                    <div class="cuatro-columnas">
+
+                        <section>
+                            <h4>Serie ATxmega128A1</h4>
+                            <ul>
+                                <li>atxmega128a1</li>
+                                <li>atxmega128a1u</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATxmega128A4</h4>
+                            <ul>
+                                <li>atxmega128a4u</li>
+                            </ul>
+                        </section>
+
+                    </div>
+                </section>
+
+                <section>
+                    <h3>avrtiny</h3>
+
+                    <p>
+                        La subarquitectura AVRTINY agrupa los microcontroladores tinyAVR de
+                        nueva generación basados en un núcleo AVR simplificado y optimizado
+                        para aplicaciones de muy bajo consumo, equipos portátiles y sistemas
+                        embebidos compactos.
+                    </p>
+
+                    <div class="cuatro-columnas">
+
+                        <section>
+                            <h4>Serie ATtiny4/5/9/10</h4>
+                            <ul>
+                                <li>attiny4</li>
+                                <li>attiny5</li>
+                                <li>attiny9</li>
+                                <li>attiny10</li>
+                            </ul>
+                        </section>
+
+                        <section>
+                            <h4>Serie ATtiny20/40</h4>
+                            <ul>
+                                <li>attiny20</li>
+                                <li>attiny40</li>
+                            </ul>
+                        </section>
+
+                    </div>
+                </section>
+
+        </article>
+        
+    </main>
+
+</body>
+</html>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>
