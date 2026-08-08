@@ -56,19 +56,58 @@
             <section>
             <h2>2. PROGRAMACIÓN DE UN MICROCONTROLADOR Y LA GESTIÓN DE SUS REGISTROS</h2>
             <p>
-                Programar un microcontrolador consiste en desarrollar el firmware que ejecutará su CPU para controlar el funcionamiento del dispositivo electrónico en el que se encuentra integrado.
+                Programar un microcontrolador consiste en desarrollar el <strong>firmware</strong>
+                que ejecutará su CPU para realizar una determinada función dentro de un sistema electrónico.
             </p>
-            <p> 
-                Desde el punto de vista del programador, esto implica configurar los periféricos internos, supervisar su estado y coordinar su funcionamiento para realizar una determinada aplicación. Para lograrlo, el firmware utiliza un mecanismo común a prácticamente todas las arquitecturas de microcontroladores: la lectura y escritura de registros internos.
+
+            <p>
+                El firmware debe hacer que el microcontrolador realice tareas como leer una entrada,
+                activar una salida, medir una señal, contar eventos, generar una señal PWM,
+                comunicarse con otro dispositivo o responder a una interrupción.
             </p>
-            <p> 
-                La CPU, por sí sola, no puede encender un LED, iniciar una conversión analógico-digital, transmitir datos por un puerto serie o generar una señal PWM. Su capacidad se limita a ejecutar instrucciones que leen y escriben datos en memoria. Cuando esas operaciones se realizan sobre registros especiales conectados al hardware del microcontrolador, producen cambios en el comportamiento de sus periféricos.
+
+            <p>
+                Para conseguirlo, el programa interactúa con los distintos recursos de la arquitectura
+                del microcontrolador. La CPU utiliza sus registros para procesar datos y controlar la
+                ejecución del programa, mientras que los periféricos se configuran y controlan mediante
+                sus <strong>registros de hardware</strong>.
             </p>
-            <p> 
-                Por esta razón, puede afirmarse que, en gran medida, programar un microcontrolador consiste en gestionar sus registros internos. A través de ellos el firmware configura los módulos de hardware, controla el funcionamiento del procesador y obtiene información sobre el estado del sistema.
+
+            <p>
+                Estos registros están conectados lógicamente con los circuitos que forman cada periférico.
+                Por eso, escribir un valor en un registro no significa simplemente almacenar un dato.
+                La escritura puede modificar directamente el funcionamiento del hardware.
             </p>
-            <p> 
-                Aunque los nombres de los registros, sus direcciones y sus funciones específicas varían entre fabricantes, el modelo de programación es esencialmente el mismo en todas las familias de microcontroladores.
+
+            <p>
+                Por ejemplo, al escribir en un registro que controla un puerto de E/S, el programa puede
+                cambiar el estado lógico de uno o varios pines. De la misma manera, al escribir en los
+                registros de un temporizador se puede configurar su funcionamiento, y al escribir en los
+                registros de un ADC se puede iniciar o configurar una conversión.
+            </p>
+
+            <p>
+                La lectura de estos registros también permite al firmware obtener información del hardware.
+                Puede, por ejemplo, conocer el estado de una entrada, comprobar una condición de un
+                temporizador o determinar si una transmisión ha terminado.
+            </p>
+
+            <p>
+                Por eso, <strong>los registros son una pieza fundamental de la programación de
+                microcontroladores</strong>. El programa utiliza los registros de la CPU para trabajar
+                con los datos y controlar la ejecución, y utiliza los registros de hardware para
+                configurar, controlar y consultar los periféricos.
+            </p>
+
+            <p>
+                La organización, los nombres y las funciones de estos registros cambian entre arquitecturas
+                y fabricantes, pero el principio general se mantiene:
+                <strong>el firmware interactúa con los recursos de hardware del microcontrolador mediante
+                una interfaz de registros</strong>.
+            </p>
+
+            <p>
+                En buena medida, programar un microcontrolador significa  <strong>gestionar los recursos de su arquitectura mediante registros</strong>.
             </p>
             </section>
 
@@ -309,25 +348,57 @@
             <p>
                 Este mecanismo ofrece una enorme ventaja: desde el punto de vista del programador, controlar un complejo circuito electrónico resulta tan sencillo como leer o escribir el contenido de un registro.
             </p>
-                <h3>Del firmware al software</h3>
-                <p>
-                    El siguiente ejemplo ilustra el recorrido que sigue una instrucción escrita en lenguaje C:
-                </p>
+                <h3>Del Código al Hardware</h3>
+                    <p>
+                        Hasta este punto hemos visto que programar un microcontrolador no consiste solamente
+                        en escribir instrucciones en C. El programa debe interactuar con la arquitectura del
+                        dispositivo y, especialmente, con los registros que permiten controlar sus recursos
+                        de hardware.
+                    </p>
 
-<pre><code class="language-c">PORTB |= (1 << PB5); </code></pre>
-                <p>El proceso ocurre de la siguiente manera:</p>                
-                <ol>
-                    <li>El compilador traduce la instrucción C a código máquina.</li>
-                    <li>La CPU ejecuta las instrucciones generadas.</li>
-                    <li>La CPU escribe un nuevo valor en el registro <code>PORTB</code>.</li>
-                    <li>El circuito del puerto B detecta el cambio en ese registro.</li>
-                    <li>El latch de salida actualiza su contenido.</li>
-                    <li>El transistor de salida cambia de estado.</li>
-                    <li>El nivel lógico del pin físico <code>PB5</code> pasa a nivel alto.</li>
-                </ol>
-                <p>
-                Todo este proceso ocurre en unos pocos ciclos de reloj y constituye el mecanismo básico mediante el cual el software controla el hardware del microcontrolador.
-                </p>                
+                    <p>
+                        Consideremos, por ejemplo, una instrucción habitual en un AVR:
+                    </p>
+
+                    <pre><code>PORTB |= (1 &lt;&lt; PB5);</code></pre>
+
+                    <p>
+                        Para el programador, esta instrucción expresa algo sencillo: establecer en
+                        <code>1</code> el bit correspondiente a <code>PB5</code> del registro
+                        <code>PORTB</code>. Pero detrás de esa línea intervienen varios niveles de la
+                        arquitectura.
+                    </p>
+
+                    <p>
+                        El compilador convierte el código C en instrucciones que la CPU puede ejecutar.
+                        La CPU ejecuta esas instrucciones y realiza la operación necesaria para modificar
+                        el registro <code>PORTB</code>. Los bits de ese registro están conectados con la
+                        lógica de control del puerto, que utiliza su contenido para determinar el
+                        comportamiento de las salidas.
+                    </p>
+
+                    <p>
+                        Si <code>PB5</code> está configurado como salida, el cambio del bit correspondiente
+                        modifica el estado de la etapa de salida del puerto y, finalmente, el nivel lógico
+                        presente en el pin físico cambia.
+                    </p>
+
+                    <p>
+                        Así se completa el recorrido:
+                    </p>
+
+                    <p>
+                        <strong>
+                            código fuente &rarr; instrucciones de máquina &rarr; CPU &rarr;
+                            registro de hardware &rarr; periférico &rarr; pin físico
+                        </strong>
+                    </p>
+
+                    <p>
+                        Este recorrido resume una de las ideas fundamentales de la programación de
+                        microcontroladores: <strong>el firmware controla el hardware utilizando las
+                        capacidades de la CPU y los registros que sirven de interfaz con los periféricos</strong>.
+                    </p>              
             </section>
         
         </article>       
