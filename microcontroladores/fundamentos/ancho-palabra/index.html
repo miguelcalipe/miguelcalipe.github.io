@@ -29,100 +29,204 @@
     <main>
         
         <article>
-            <header class="article-header">
-            <h1>ANCHO DE PALABRA DEL &#956;C</h1>
-            <p style="text-align:center">El ancho de palabra es el concepto que distingue a las arquitecturas de 8, 16 y 32 bits.</p>
-            </header>           
-            
-            <aside id="indice"></aside>    
-            
-            <section> 
-            <h2>¿QUE SIGNIFICA QUE UN MICROCONTROLADOR SEA DE  8, 16 O 32 BITS?</h2>
-            <p> 
-                Cuando se afirma que un microcontrolador es de 8, 16 o 32 bits, no se está indicando la cantidad de memoria que posee, sino el ancho de palabra (word size) de su arquitectura. Este ancho representa la cantidad de bits que la CPU está diseñada para procesar de forma natural en una sola operación.
-            </p>
-            
-            <p>            
-                En términos generales, el ancho de palabra influye directamente en varios elementos fundamentales del procesador:
-            </p>
-                <ul>
-                    <li>El tamaño de los registros de propósito general.</li>
-                    <li>La cantidad de bits que puede procesar la Unidad Aritmético-Lógica (ALU) en una operación.</li>
-                    <li> El ancho del camino de datos (datapath) utilizado para transportar información dentro del núcleo.</li>
-                    <li>El tamaño de muchos operandos y direcciones manejados por el conjunto de instrucciones de la arquitectura.</li>
-                </ul>
-            <p>
-                Por ejemplo, en un microcontrolador AVR de 8 bits, la mayoría de los registros de propósito general tienen un ancho de 8 bits y la ALU realiza operaciones sobre datos de ese tamaño. En cambio, en un microcontrolador basado en ARM Cortex-M3, los registros generales tienen 32 bits y la ALU procesa operandos de 32 bits de forma natural.
-            </p>
-            <p> Esto significa que una suma como la siguiente:</p>
+    <header class="article-header">
+        <h1>ANCHO DE PALABRA DEL &#956;C</h1>
+        <p style="text-align:center">El ancho de palabra es el concepto que distingue a las arquitecturas de 8, 16 y 32 bits.</p>
+    </header>
 
-<pre><code class="language-c"> uint8_t a, b, c;c = a + b;</code></pre>
-            <p>            
-                puede realizarse mediante una única operación de 8 bits en un AVR.
-            </p>
-            <p>
-                De manera similar, en un Cortex-M3, una operación como:
-            </p>
-<pre><code class="language-c">uint32_t a, b, c;
-c = a + b;</code></pre>
-            <p> 
-                también puede ejecutarse mediante una única operación, pero esta vez sobre datos de 32 bits.
-            </p>
-            <p> 
-                Cuando el programa necesita operar con datos mayores que el ancho de palabra de la CPU, el compilador debe generar varias instrucciones para completar la operación. Por ejemplo, sumar dos valores de 32 bits en un microcontrolador de 8 bits requiere varias sumas parciales con propagación del acarreo (carry) entre los distintos bytes.</p>    
+    <aside id="indice"></aside>
 
-            <p>
-                Es importante destacar que el ancho de palabra no determina por sí solo el rendimiento del microcontrolador. La velocidad de ejecución también depende de numerosos factores, como la frecuencia de reloj, la arquitectura del conjunto de instrucciones (ISA), la organización interna del procesador, el número de etapas del pipeline, el sistema de buses, la memoria caché (cuando existe) y otros mecanismos de optimización.
-            </p>
-            <p>
-                Tampoco debe confundirse el ancho de palabra con la capacidad de memoria del dispositivo. Un microcontrolador de 8 bits puede disponer de una gran cantidad de memoria Flash o RAM, mientras que uno de 32 bits puede tener menos memoria dependiendo del modelo. Del mismo modo, muchos periféricos utilizan registros de 8, 16 o incluso 64 bits independientemente del ancho de palabra del núcleo de la CPU.
-            </p>
-            </section>
+    <section>
+        <h2>1. ¿QUÉ SIGNIFICA QUE UN MICROCONTROLADOR SEA DE 8, 16 O 32 BITS?</h2>
 
-            <section>
-            <h2>COMPARACIÓPN ENTRE ARQUITECTURAS DE 8 Y 32 BITS</h2>
-            <p>
-                Decir que un microcontrolador es de 32 bits no significa que todos sus registros tengan 32 bits. El ancho de palabra se refiere principalmente a la arquitectura del núcleo de la CPU y a sus registros de propósito general. Los registros de los periféricos pueden tener tamaños diferentes según la función que desempeñan.
-            </p>
-            <p>
-                El ancho de palabra también suele influir en el tamaño de los buses internos y en la forma en que la CPU accede a la memoria. Sin embargo, estas características dependen de cada arquitectura y no siempre coinciden exactamente con el ancho de palabra del procesador.
-            </p>
-                <h3>Compatibilidad de IDEs con Raspberry Pi 5</h3>
-                <div class="table-container">
-                <table>
-                    <thead> 
-                        <tr> 
-                            <th>Característica</th>
-                            <th>MCU de 8 bits</th>
-                            <th>MCU de 32 bits </th>
-                        </tr>
-                    </thead>
-                    <tbody> 
-                        <tr> 
-                            <td>Tamaño natural de los registros</td>
-                            <td>8 bits</td>
-                            <td>32 bits</td>
-                        </tr>
-                        <tr>
-                            <td>Operación natural de la ALU</td>
-                            <td>8 bits</td>
-                            <td>32 bits</td>
-                        </tr>
-                        <tr>
-                            <td>Suma de un entero de 32 bits</td>
-                            <td>Requiere varias instrucciones</td>
-                            <td>Generalmente una instrucción</td>
-                        </tr>
-                        <tr>
-                            <td>Tamaño de la palabra</td>
-                            <td>8 bits</td>
-                            <td>32 bits</td>
-                        </tr>        
-                </table>
-                </div>
-            </section>
+            <p>Cuando se afirma que un microcontrolador es de 8, 16 o 32 bits, no se está indicando la cantidad de memoria que posee, sino el <strong>ancho de palabra</strong> (word size) de su arquitectura: la cantidad de bits que la CPU está diseñada para procesar de forma natural en una sola operación.</p>
 
-        </article>
+            <p>En términos generales, el ancho de palabra influye directamente en varios elementos fundamentales del procesador:</p>
+            <ul>
+                <li>El tamaño de los registros de propósito general.</li>
+                <li>La cantidad de bits que puede procesar la Unidad Aritmético-Lógica (ALU) en una operación.</li>
+                <li>El ancho del camino de datos (datapath) utilizado para transportar información dentro del núcleo.</li>
+                <li>El tamaño de muchos operandos y direcciones manejados por el conjunto de instrucciones de la arquitectura.</li>
+            </ul>
+
+            <p>Por ejemplo, en un microcontrolador AVR de 8 bits, la mayoría de los registros de propósito general tienen un ancho de 8 bits y la ALU realiza operaciones sobre datos de ese tamaño: opera de manera natural con números de 0 a 255 (o -128 a 127 en complemento a dos). En cambio, en un microcontrolador basado en ARM Cortex-M3, los registros generales tienen 32 bits y la ALU procesa operandos de 32 bits de forma natural.</p>
+
+            <p>Esto significa que una suma como la siguiente:</p>
+
+            <pre><code class="language-c">uint8_t a, b, c;
+    c = a + b;</code></pre>
+
+            <p>puede realizarse mediante una única operación de 8 bits en un AVR.</p>
+
+            <p>De manera similar, en un Cortex-M3, una operación como:</p>
+
+            <pre><code class="language-c">uint32_t a, b, c;
+    c = a + b;</code></pre>
+
+            <p>también puede ejecutarse mediante una única operación, pero esta vez sobre datos de 32 bits.</p>
+
+            <p>Cuando el programa necesita operar con datos mayores que el ancho de palabra de la CPU, el compilador debe generar varias instrucciones para completar la operación. Por ejemplo, sumar dos valores de 32 bits en un microcontrolador de 8 bits requiere varias sumas parciales con propagación del acarreo (carry) entre los distintos bytes.</p>
+
+            <p>Es importante destacar que el ancho de palabra no determina por sí solo el rendimiento del microcontrolador. La velocidad de ejecución también depende de numerosos factores, como la frecuencia de reloj, la arquitectura del conjunto de instrucciones (ISA), la organización interna del procesador, el número de etapas del pipeline, el sistema de buses, la memoria caché (cuando existe) y otros mecanismos de optimización.</p>
+
+            <p>Tampoco debe confundirse el ancho de palabra con otros dos aspectos del microcontrolador:</p>
+
+            <ul>
+                <li><strong>La memoria RAM o Flash disponible:</strong> un micro de 8 bits puede perfectamente tener más memoria Flash que uno de 16 bits; son características independientes del ancho de palabra de la CPU.</li>
+                <li><strong>El ancho de los registros de periféricos:</strong> es común encontrar temporizadores de 16 bits o conversores ADC de 10 o 12 bits dentro de un microcontrolador cuya CPU es de 8 bits. El ancho del núcleo y el de sus periféricos no tienen por qué coincidir.</li>
+            </ul>
+
+            <p>Vale además una aclaración adicional: en la práctica, el número "de bits" que aparece en la hoja de datos no siempre describe de forma perfectamente uniforme toda la arquitectura. Existen casos históricos donde el ancho de la ALU, el del bus de datos externo y el de la palabra de instrucción no coinciden entre sí. Por ejemplo, algunos microcontroladores de la familia <strong>PIC</strong> se clasifican como "de 8 bits" por el ancho de su ALU, aunque sus instrucciones ocupan palabras de 14 o 16 bits. Por eso, la clasificación en bits es una guía útil y ampliamente usada, pero conviene tomarla como una simplificación práctica y no como una regla absoluta que describa todos los detalles internos del chip.</p>
+
+            <h3>Microcontroladores de 8 bits</h3>
+
+            <p>En un microcontrolador de 8 bits, como muchos AVR clásicos, la CPU procesa naturalmente datos de 8 bits. Esto significa que:</p>
+
+            <ul>
+                <li>los registros de propósito general son de 8 bits (en el caso de AVR, 32 registros de este tipo, algunos de los cuales se pueden combinar en pares de 16 bits para formar punteros de direccionamiento indirecto);</li>
+                <li>la ALU realiza operaciones aritméticas básicas sobre operandos de 8 bits;</li>
+                <li>los números mayores deben procesarse mediante varias instrucciones.</li>
+            </ul>
+
+            <p>La ventaja tradicional de esta arquitectura es su <strong>simplicidad</strong>, su <strong>bajo consumo energético</strong> y su <strong>costo reducido</strong>, lo que la hizo durante décadas la opción natural para sistemas embebidos sencillos. Es importante aclarar, sin embargo, que esta ventaja ya no es exclusiva: hoy existen microcontroladores de 32 bits de gama baja que igualan o superan a los de 8 bits en consumo y precio, por lo que la elección entre arquitecturas depende cada vez más del caso de uso que del ancho de palabra en sí mismo.</p>
+
+            <h3>Microcontroladores de 16 bits</h3>
+
+            <p>En una arquitectura de 16 bits, la CPU puede procesar directamente palabras de 16 bits. Esto permite:</p>
+
+            <ul>
+                <li>mayor rango numérico por operación sin necesidad de dividirla en varios pasos;</li>
+                <li>mejor rendimiento en cálculos de precisión media;</li>
+                <li>un diseño que suele acompañarse de buses de direcciones más amplios, aunque —como se explicó antes— esto es una decisión de diseño y no una consecuencia obligatoria del ancho de palabra.</li>
+            </ul>
+
+            <p>Son frecuentes en aplicaciones industriales y de control donde se busca un equilibrio entre prestaciones y consumo. Ejemplos típicos son la familia <strong>MSP430</strong> de Texas Instruments y los <strong>PIC24/dsPIC</strong> de Microchip.</p>
+
+            <h3>Microcontroladores de 32 bits</h3>
+
+            <p>En una arquitectura de 32 bits, la CPU dispone de registros y una ALU capaces de manipular datos de 32 bits en una sola operación. Esto ofrece ventajas importantes:</p>
+
+            <ul>
+                <li>operaciones matemáticas más rápidas con números grandes, sin fragmentarlas en varias instrucciones;</li>
+                <li>direccionamiento de memoria más amplio, ya que en la práctica estos núcleos suelen combinarse con buses de direcciones igualmente anchos;</li>
+                <li>mejor rendimiento en algoritmos complejos;</li>
+                <li>ejecución más eficiente de sistemas operativos embebidos y protocolos de comunicación avanzados.</li>
+            </ul>
+
+            <p>Por ello, los microcontroladores de 32 bits —encabezados por la familia <strong>ARM Cortex-M</strong>— dominan actualmente aplicaciones como Internet de las Cosas (IoT), procesamiento digital de señales, interfaces gráficas, control avanzado de motores y sistemas embebidos de alto rendimiento.</p>
+        </section>
+
+        <section>
+        
+        <h2>COMPARACIÓN GENERAL</h2>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Característica</th>
+                        <th>8 bits</th>
+                        <th>16 bits</th>
+                        <th>32 bits</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Tamaño natural de los registros principales</td>
+                        <td>8 bits</td>
+                        <td>16 bits</td>
+                        <td>32 bits</td>
+                    </tr>
+                    <tr>
+                        <td>Operaciones aritméticas por ciclo</td>
+                        <td>8 bits</td>
+                        <td>16 bits</td>
+                        <td>32 bits</td>
+                    </tr>
+                    <tr>
+                        <td>Rango numérico procesado directamente</td>
+                        <td>Bajo</td>
+                        <td>Medio</td>
+                        <td>Alto</td>
+                    </tr>
+                    <tr>
+                        <td>Complejidad típica del hardware</td>
+                        <td>Baja</td>
+                        <td>Media</td>
+                        <td>Media a alta (existen excepciones de bajo costo, como los Cortex-M0)</td>
+                    </tr>
+                    <tr>
+                        <td>Consumo energético</td>
+                        <td>Bajo</td>
+                        <td>Bajo a medio</td>
+                        <td>Muy variable: desde consumo ultra bajo en núcleos como Cortex-M0/M0+ hasta consumo alto en núcleos de aplicación</td>
+                    </tr>
+                    <tr>
+                        <td>Memoria típica direccionable</td>
+                        <td>Reducida (algunos KB)</td>
+                        <td>Media (decenas a cientos de KB)</td>
+                        <td>Amplia (puede superar varios MB o GB, según el bus de direcciones implementado)</td>
+                    </tr>
+                    <tr>
+                        <td>Aplicaciones típicas</td>
+                        <td>Control básico, automatización sencilla, sensores</td>
+                        <td>Control industrial, instrumentación</td>
+                        <td>IoT, procesamiento digital, comunicaciones, sistemas embebidos complejos</td>
+                    </tr>
+                    <tr>
+                        <td>Ejemplos representativos</td>
+                        <td>ATmega328 (Arduino Uno), PIC16</td>
+                        <td>MSP430, PIC24/dsPIC</td>
+                        <td>STM32 (Cortex-M), ESP32</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p><strong>Nota:</strong> el ancho del bus de direcciones (y por tanto la memoria máxima direccionable) es, en principio, un parámetro independiente del ancho de palabra de la ALU. De hecho, esta independencia no es solo teórica: si un microcontrolador de 8 bits usara también un bus de direcciones de 8 bits, solo podría direccionar 256 posiciones de memoria, algo insuficiente incluso para las aplicaciones más simples. Por eso los AVR de 8 bits, por ejemplo, trabajan con un bus de direcciones de 16 bits (hasta 64 KB) y recurren a mecanismos de paginación cuando necesitan direccionar una memoria Flash mayor. En la práctica, de todos modos, los fabricantes suelen diseñar ambos parámetros de forma coherente: es poco común encontrar un núcleo de 32 bits limitado a unos pocos kilobytes de memoria direccionable.</p>
+    </section>
+
+    <section>
+        <h2>CONSECUENCIAS ADICIONALES DEL ANCHO DE PALABRA</h2>
+
+        <p>Más allá del procesamiento aritmético y del direccionamiento de memoria ya explicados, el ancho de palabra tiene otras dos implicaciones que conviene conocer: cómo se organiza el espacio de memoria y cómo se diseñan los registros que controlan los periféricos.</p>
+
+        <h3>DIRECCIONAMIENTO: HARVARD VS. MAPA UNIFICADO</h3>
+
+        <p>Además de las diferencias de tamaño en el bus de direcciones ya mencionadas, ambas arquitecturas organizan ese espacio de forma distinta. Los AVR clásicos usan una <strong>arquitectura Harvard</strong>, con espacios de direcciones separados para la memoria de programa (Flash) y la memoria de datos (SRAM). Los Cortex-M, en cambio, presentan al programador un <strong>mapa de memoria unificado</strong>, donde Flash, RAM y registros de periféricos conviven dentro del mismo espacio de direcciones de 32 bits, aunque internamente el núcleo siga usando buses separados para instrucciones y datos.</p>
+
+        <p>Esta mayor capacidad de direccionamiento permite incorporar periféricos más complejos, grandes memorias Flash, RAM, interfaces de comunicación avanzadas y aceleradores de hardware.</p>
+
+        <h3>ORGANIZACIÓN DE LOS REGISTROS DE HARDWARE</h3>
+
+        <p>El ancho de palabra también afecta el diseño de los registros que controlan los periféricos.</p>
+
+        <p>En los AVR de 8 bits, la mayoría de los registros de hardware tienen un tamaño de 8 bits.</p>
+
+        <p>Por ejemplo:</p>
+
+        <pre><code>DDRB
+PORTB
+PINB
+TCCR0A
+TCCR0B
+TIMSK0</code></pre>
+
+        <p>Cada uno ocupa un byte y controla funciones específicas mediante bits individuales.</p>
+
+        <p>En microcontroladores de 32 bits es habitual encontrar registros de 32 bits, capaces de controlar muchas más funciones simultáneamente. Por ejemplo, un único registro GPIO puede contener la configuración completa de varios pines del puerto.</p>
+
+        <p>Esto reduce la cantidad de registros necesarios y mejora la eficiencia del hardware.</p>
+
+        <p>No obstante, independientemente de su tamaño, el principio sigue siendo exactamente el mismo:</p>
+
+        <blockquote>
+            <p>El software controla el hardware escribiendo o leyendo registros especiales de memoria.</p>
+        </blockquote>
+
+        <p>Esta idea permanece constante en prácticamente todas las arquitecturas modernas.</p>
+    </section>
+</article>
         
     </main>
 

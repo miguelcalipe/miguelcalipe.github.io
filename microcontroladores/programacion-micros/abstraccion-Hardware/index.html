@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Niveles de abstracción del hardware | MC Mundo Tech</title>
-    <meta name="description" content="Con el paso del tiempo han aparecido distintos niveles de abstracción cuyo objetivo es simplificar el desarrollo de software. Mientras mayor es la abstracción, menor es la cantidad de detalles del hardware que el programador necesita conocer, a costa de perder algo de control y eficiencia ">
+    <meta name="description" content="Dominando la Toolchain GNU desde la línea  del firmware, Avrdude ">
     <link rel="stylesheet" href="/assets/css/principal.css">
     <link rel="stylesheet" href="/assets/css/articulo.css">
     
@@ -30,21 +30,21 @@
     <main>        
         <article>            
             <header class="article-header">
-            <h1>ABSTRACCIÓN DEL HARDWARE</h1>
-            
+            <h1>ABSTRACCIÓN DEL HARDWARE</h1>            
             </header>
                         
             <aside id="indice"></aside>    
             <!-- CONTENIDO DEL ARTÍCULO   -->
             
-            <section> 
-            
-            <H2>INTRODUCCIÓN</H2>
+            <section>            
+            <h2>INTRODUCCIÓN</h2>
                 <p>Todo microcontrolador, sin importar su arquitectura, se controla mediante <strong>registros de hardware</strong>. Lo que cambia entre proyectos es cuánto contacto directo tiene el programador con esos registros.</p>
 
                 <p>Con el paso del tiempo aparecieron distintos niveles de abstracción cuyo objetivo es simplificar el desarrollo de software. Mientras mayor es la abstracción, menor es la cantidad de detalles del hardware que el programador necesita conocer, a costa de perder algo de control y eficiencia.</p>
+            </section>
 
-            <h2>BARE METAL</h2>
+            <section>
+            <h2>1. BARE METAL</h2>
 
                 <p>La programación <strong>Bare Metal</strong> consiste en escribir directamente sobre los registros del microcontrolador sin utilizar bibliotecas intermedias.</p>
 
@@ -58,15 +58,17 @@
                 <p>Las ventajas son:</p>
 
                 <ul>
-                    <li><strong>Máximo rendimiento.</strong></li>
-                    <li>Código muy eficiente.</li>
-                    <li><strong>Control absoluto</strong> del hardware.</li>
-                    <li>Bajo consumo de memoria.</li>
+                <li><strong>Máximo rendimiento.</strong></li>
+                <li>Código muy eficiente.</li>
+                <li><strong>Control absoluto</strong> del hardware.</li>
+                <li>Bajo consumo de memoria.</li>
                 </ul>
 
                 <p>Como desventaja, el programador debe conocer detalladamente la arquitectura del microcontrolador y consultar continuamente la hoja de datos.</p>
+            </section>
 
-                <h2>CMSIS</h2>
+            <section>
+            <h2>2. CMSIS</h2>
 
                 <p>En los microcontroladores ARM apareció el estándar <strong>CMSIS (Cortex Microcontroller Software Interface Standard)</strong>.</p>
 
@@ -83,8 +85,10 @@
                 <p>Pero CMSIS va un poco más allá de solo nombrar registros: también estandariza funciones para elementos comunes del núcleo ARM Cortex-M, como el manejo del <strong>NVIC</strong> (el controlador que gestiona las interrupciones) o del <strong>SysTick</strong> (el temporizador de sistema), y define la estructura de los archivos de arranque (<em>startup files</em>) junto con el mapa de vectores de interrupción. Por eso se dice que CMSIS estandariza el acceso al <em>núcleo</em>, no a los periféricos específicos de cada fabricante.</p>
 
                 <p>Su principal ventaja es que proporciona una <strong>interfaz común</strong> para los distintos fabricantes de microcontroladores basados en núcleos ARM Cortex.</p>
+            </section>
 
-                <h2>HAL Y NIVELES INTERMEDIOS</h2>
+            <section>
+            <h2>3. HAL Y NIVELES INTERMEDIOS</h2>
 
                 <p><strong>HAL</strong> significa <strong>Hardware Abstraction Layer</strong>.</p>
 
@@ -98,28 +102,34 @@
 
                 <p>Las ventajas de HAL son:</p>
 
-                    <ul>
-                    <li><strong>Desarrollo más rápido.</strong></li>
-                    <li>Mayor <strong>portabilidad</strong> entre dispositivos del mismo fabricante.</li>
-                    <li>Código más sencillo de comprender para proyectos grandes.</li>
+                <ul>
+                <li><strong>Desarrollo más rápido.</strong></li>
+                <li>Mayor <strong>portabilidad</strong> entre dispositivos del mismo fabricante.</li>
+                <li>Código más sencillo de comprender para proyectos grandes.</li>
                 </ul>
 
                 <p>Como contrapartida:</p>
 
                 <ul>
-                    <li>Mayor consumo de memoria Flash.</li>
-                    <li>Más uso de RAM.</li>
-                    <li>Menor velocidad de ejecución.</li>
-                    <li><strong>Menor control</strong> sobre el hardware.</li>
+                <li>Mayor consumo de memoria Flash.</li>
+                <li>Más uso de RAM.</li>
+                <li>Menor velocidad de ejecución.</li>
+                <li><strong>Menor control</strong> sobre el hardware.</li>
                 </ul>
 
                 <p>En la práctica, además, el código HAL rara vez se escribe línea por línea a mano: herramientas como <strong>STM32CubeMX</strong> permiten configurar los periféricos de forma gráfica y generan automáticamente el código HAL correspondiente, lo que acelera aún más el desarrollo.</p>
 
                 <p>Entre CMSIS y HAL existe también un nivel intermedio que vale la pena conocer: los drivers <strong>LL (Low-Layer)</strong>, ofrecidos por fabricantes como STMicroelectronics. Son más cercanos al registro que HAL —y por lo tanto más rápidos y ligeros— pero sin la verbosidad de escribir directamente sobre bits individuales, como en Bare Metal.</p>
+            </section>
 
-                <p>Y todavía existe un nivel de abstracción mayor que el propio HAL: el framework de <strong>Arduino</strong>, con funciones como <code>digitalWrite()</code> o <code>pinMode()</code>, que oculta casi por completo los detalles del hardware subyacente y prioriza la simplicidad por encima del control o la eficiencia.</p>
+            <section>
+            <h2>4. FRAMEWORKS DE ALTO NIVEL</h2>
 
-                <p>Por esta razón, en aplicaciones críticas de tiempo real o con recursos muy limitados todavía es frecuente utilizar programación Bare Metal o directamente CMSIS/LL, mientras que HAL y frameworks como Arduino se prefieren cuando importa más la velocidad de desarrollo que el control fino del hardware.</p>
+                <p>Y todavía existe un nivel de abstracción mayor que el propio HAL: el framework de <strong>Arduino</strong>, con funciones como <code>digitalWrite()</code> o <code>pinMode()</code>, que oculta casi por completo los detalles del hardware subyacente y prioriza la simplicidad por encima del control o la eficiencia. Aun así, el código de Arduino se sigue compilando a instrucciones nativas del microcontrolador: la abstracción ocurre en la forma de escribir el programa, pero no en la forma en que finalmente se ejecuta.</p>
+
+                <p>Existe todavía un escalón más de abstracción cuando, además de simplificar el acceso al hardware, se cambia también el <strong>modelo de ejecución</strong> del programa. Es el caso de placas como la <strong>micro:bit</strong> programada en <strong>MicroPython</strong>: el código no se compila a nativo, sino que corre sobre un intérprete —una máquina virtual escrita en C— alojado en la memoria del microcontrolador, con tipado dinámico y recolección automática de basura para gestionar la memoria. Por eso, aunque tanto Arduino (C) como micro:bit con MicroPython ofrecen funciones de alto nivel para el hardware, no están en el mismo escalón de abstracción: el segundo agrega una capa adicional de interpretación en tiempo de ejecución que el primero no tiene. El equivalente más directo a Arduino dentro del ecosistema micro:bit sería programarla en C/C++ (vía mbed), mientras que el equivalente más directo a MicroPython dentro del mundo Arduino sería correr MicroPython sobre un ESP32, u optar por un editor por bloques como MakeCode, que abstrae incluso más que el propio Python.</p>
+
+                <p>Por esta razón, en aplicaciones críticas de tiempo real o con recursos muy limitados todavía es frecuente utilizar programación Bare Metal o directamente CMSIS/LL, mientras que HAL y frameworks como Arduino se prefieren cuando importa más la velocidad de desarrollo que el control fino del hardware. Los entornos interpretados como MicroPython, al añadir una capa más, se reservan generalmente para prototipado rápido, proyectos educativos o aplicaciones donde el tiempo de respuesta no es crítico.</p>
 
                 <p>Vale la pena tener presente que, sin importar el nivel de abstracción utilizado, todos terminan produciendo el mismo resultado final: una escritura o lectura sobre el mismo registro físico. De hecho, es habitual encontrar proyectos que combinan varios niveles a la vez —por ejemplo, usar HAL para la mayor parte del código y recurrir a Bare Metal solo en la rutina de interrupción más crítica, donde cada ciclo de reloj cuenta.</p>
             </section>
