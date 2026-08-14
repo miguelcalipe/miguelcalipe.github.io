@@ -28,14 +28,18 @@
     <div id="migas-pan"></div>
 
     <main>        
-        <article>            
+        <article>    
+            
+            <section>
             <header class="article-header">
             <h1>EL LENGUAJE ENSAMBLADOR</h1>
             </header>
-                        
+            </section>
+
             <aside id="indice"></aside>    
             <!-- CONTENIDO DEL ARTÍCULO   -->  
-  
+            
+            <section>
             <h2>INTRODUCCIÓN</h2>
             <p>
                 Cuando un microcontrolador ejecuta un programa, no importa en qué lenguaje se
@@ -46,7 +50,9 @@
                 cómo se relaciona con el lenguaje máquina y el código binario, cómo se construye
                 una instrucción a nivel de bits, y en qué situaciones reales de la industria
                 todavía se usa hoy.
+            </section>
 
+            <section>
             <h2>CÓDIGO BINARIO Y LENGUAJE MÁQUINA</h2>
 
                 <p>
@@ -63,7 +69,9 @@
                     procesador entiende; "código binario" pone el foco en cómo están codificadas esas
                     instrucciones.
                 </p>
+            </section>
 
+            <section>
             <h2>EL LENGUAJE ENSAMBLADOR: VERSIÓN LEGIBLE DEL LENGUAJE MÁQUINA</h2>
 
                 <p>
@@ -75,7 +83,7 @@
                     (<code>MOV AL, 1</code>).
                 </p>
 
-                <h2>Un programa ensamblador traduce mnemónicos a números, sin tomar decisiones</h2>
+                <h3>Un programa ensamblador traduce mnemónicos a números, sin tomar decisiones</h3>
 
                 <p>
                     Para pasar de lenguaje ensamblador a binario hace falta un programa llamado
@@ -109,7 +117,9 @@
                     Los tres describen, en el fondo, la misma secuencia de instrucciones. La
                     diferencia está en cómo se representa esa secuencia, no en qué hace.
                 </p>
+            </section>
 
+            <section>
             <h2>CADA ARQUITECTURA TIENE SU PROPIO JUEGO DE INSTRUCCIONES</h2>
 
                 <p>
@@ -153,7 +163,9 @@
                     arquitectura habla su propio idioma: los mnemónicos son una convención del
                     fabricante, y el mismo texto no garantiza el mismo número por debajo.
                 </p>
+            </section>
 
+            <section>
             <h2>CADA INSTRUCCIÓN SE ARMA COMBINANDO CAMPOS DE BITS CON UN SIGNIFICADO FIJO</h2>
 
             <p>
@@ -189,18 +201,9 @@
                 una traducción mecánica, y ahí está la diferencia clave con lo que hace un
                 compilador de C, que sí toma decisiones sobre cómo generar el código.
             </p>
+            </section>
 
-            <h2>ESCRIBIR EN BINARIO PURO ES POSIBLE, PERO DEJÓ DE SER PRÁCTICO</h2>
-
-            <p>
-                Escribir instrucciones directamente en binario es técnicamente posible — así se
-                programaban las primeras computadoras, físicamente, con interruptores o tarjetas
-                perforadas que representaban cada bit. Pero es tan tedioso y propenso a errores
-                que el lenguaje ensamblador terminó reemplazando esa forma de trabajar casi por
-                completo: el mnemónico no cambia en nada lo que finalmente se ejecuta, solo le
-                da a la persona que programa un nombre en el que apoyarse en lugar de un número.
-            </p>
-
+            <section>
             <h2>LAS INSTRUCCIONES NATIVAS SON LAS QUE EL PROCESADOR EJECUTA SIN INTÉRPRETE DE POR MEDIO</h2>
 
             <p>
@@ -227,7 +230,22 @@
                 los microcontroladores no tiene la capacidad de correr un compilador sobre sí
                 mismo.
             </p>
+            </section>
 
+            <section>
+            <h2>ESCRIBIR EN BINARIO PURO ES POSIBLE, PERO DEJÓ DE SER PRÁCTICO</h2>
+
+            <p>
+                Escribir instrucciones directamente en binario es técnicamente posible — así se
+                programaban las primeras computadoras, físicamente, con interruptores o tarjetas
+                perforadas que representaban cada bit. Pero es tan tedioso y propenso a errores
+                que el lenguaje ensamblador terminó reemplazando esa forma de trabajar casi por
+                completo: el mnemónico no cambia en nada lo que finalmente se ejecuta, solo le
+                da a la persona que programa un nombre en el que apoyarse en lugar de un número.
+            </p>
+            </section>
+
+            <section>
             <h2>EL ENSAMBLADOR SIGUE EN USO HOY, EN TAREAS PUNTUALES</h2>
 
             <p>
@@ -273,7 +291,9 @@
                 ofrecen una forma de usar una instrucción de ensamblador puntual sin escribir
                 ensamblador propiamente dicho.
             </p>
+            </section>
 
+            <section>
             <h2>EL ENSAMBLADOR ES EL PUNTO DE PARTIDA DE Toda LA JERARQUÍA DE ABSTRACCIÓN</h2>
 
             <p>
@@ -286,7 +306,7 @@
                 comprender qué está pasando realmente por debajo de cualquier otro nivel de
                 abstracción que se use después.
             </p>
-
+            </section>
 
         </article>
         
