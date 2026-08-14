@@ -37,16 +37,14 @@
             <!-- CONTENIDO DEL ARTÍCULO   -->
             
             <section>            
-            <h2>INTRODUCCIÓN</h2>
-                <section>
-                <h2>Introducción</h2>
+            <section>
+                <h2>INTRODUCCIÓN</h2>
                     <p>Todo microcontrolador, sin importar su arquitectura, se controla en última instancia de la misma forma: escribiendo y leyendo bits sobre registros de hardware. Encender un pin, configurar un temporizador o leer un valor de un conversor analógico-digital son, a nivel de hardware, más allá de las capas de software que lo disfrazan, la misma operación repetida: acceder a una dirección de memoria específica y modificar los bits que le importan al periférico correspondiente.</p>
                     <p>Lo que cambia entre un un nivel de abstracción y otro no es esa realidad de fondo, sino cuánto contacto directo tiene el programador con el hardware. Con el tiempo fueron apareciendo distintas capas de software pensadas para simplificar ese contacto, y es habitual describirlas en términos de "alto nivel" y "bajo nivel". Vale la pena aclarar qué significa eso, porque no son categorías de calidad. Bajo nivel significa cercano al hardware: el código se parece a lo que la máquina ejecuta realmente. Alto nivel significa lejano al hardware: el código se parece más a la intención del programador —"prender este pin", "escribir este valor"— que al funcionamiento interno del chip. Ninguno es mejor que el otro: el bajo nivel da más control y más eficiencia, el alto nivel da más velocidad de desarrollo, y cuál conviene depende de lo que el proyecto necesite.</p>
                     <p>Cada capa que se agrega esconde más detalles del hardware, y a cambio el programador escribe menos código y necesita conocer menos la arquitectura específica del chip. La otra cara de esa comodidad es que se pierde control fino y, en mayor o menor medida, rendimiento.</p>
                     <p>Esta jerarquía suele explicarse como una escalera única que todo microcontrolador recorre de la misma manera, pero eso no es del todo preciso. Algunos escalones son universales —el ensamblador y la programación Bare Metal existen para cualquier arquitectura— y otros son específicos de una familia de chips en particular. CMSIS, por ejemplo, es exclusivo de los núcleos ARM Cortex-M: no tiene equivalente directo en AVR, PIC o MSP430. En esas arquitecturas se pasa de Bare Metal directamente a las librerías o al HAL propios del fabricante, sin ningún paso intermedio comparable.</p>
                     <p>En este artículo se recorren esos niveles de menor a mayor abstracción: ensamblador, programación Bare Metal, CMSIS, HAL y los drivers de bajo nivel (LL), y finalmente los frameworks de alto nivel como Arduino, Micro:bit y los entornos interpretados como MicroPython. En cada uno se muestra un ejemplo de código equivalente, para que quede claro qué es lo que realmente cambia de un nivel a otro y qué es lo que, por debajo de todas las capas, sigue siendo exactamente lo mismo: una escritura o lectura sobre un registro físico.</p>
                 </section>
-            </section>
 
             <section>
             <h2>0. ENSAMBLADOR</h2>
