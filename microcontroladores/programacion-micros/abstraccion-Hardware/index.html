@@ -30,7 +30,7 @@
     <main>        
         <article>            
             <header class="article-header">
-            <h1>ABSTRACCIÓN DEL HARDWARE</h1>            
+            <h1>NIVELES DEABSTRACCIÓN DEL HARDWARE EN MICROCONTROLADORES</h1>            
             </header>
                         
             <aside id="indice"></aside>    
@@ -38,9 +38,115 @@
             
             <section>            
             <h2>INTRODUCCIÓN</h2>
-                <p>Todo microcontrolador, sin importar su arquitectura, se controla mediante <strong>registros de hardware</strong>. Lo que cambia entre proyectos es cuánto contacto directo tiene el programador con esos registros.</p>
+                <section>
+                <h2>Introducción</h2>
+                    <p>Todo microcontrolador, sin importar su arquitectura, se controla en última instancia de la misma forma: escribiendo y leyendo bits sobre registros de hardware. Encender un pin, configurar un temporizador o leer un valor de un conversor analógico-digital son, a nivel de hardware, más allá de las capas de software que lo disfrazan, la misma operación repetida: acceder a una dirección de memoria específica y modificar los bits que le importan al periférico correspondiente.</p>
+                    <p>Lo que cambia entre un un nivel de abstracción y otro no es esa realidad de fondo, sino cuánto contacto directo tiene el programador con el hardware. Con el tiempo fueron apareciendo distintas capas de software pensadas para simplificar ese contacto, y es habitual describirlas en términos de "alto nivel" y "bajo nivel". Vale la pena aclarar qué significa eso, porque no son categorías de calidad. Bajo nivel significa cercano al hardware: el código se parece a lo que la máquina ejecuta realmente. Alto nivel significa lejano al hardware: el código se parece más a la intención del programador —"prender este pin", "escribir este valor"— que al funcionamiento interno del chip. Ninguno es mejor que el otro: el bajo nivel da más control y más eficiencia, el alto nivel da más velocidad de desarrollo, y cuál conviene depende de lo que el proyecto necesite.</p>
+                    <p>Cada capa que se agrega esconde más detalles del hardware, y a cambio el programador escribe menos código y necesita conocer menos la arquitectura específica del chip. La otra cara de esa comodidad es que se pierde control fino y, en mayor o menor medida, rendimiento.</p>
+                    <p>Esta jerarquía suele explicarse como una escalera única que todo microcontrolador recorre de la misma manera, pero eso no es del todo preciso. Algunos escalones son universales —el ensamblador y la programación Bare Metal existen para cualquier arquitectura— y otros son específicos de una familia de chips en particular. CMSIS, por ejemplo, es exclusivo de los núcleos ARM Cortex-M: no tiene equivalente directo en AVR, PIC o MSP430. En esas arquitecturas se pasa de Bare Metal directamente a las librerías o al HAL propios del fabricante, sin ningún paso intermedio comparable.</p>
+                    <p>En este artículo se recorren esos niveles de menor a mayor abstracción: ensamblador, programación Bare Metal, CMSIS, HAL y los drivers de bajo nivel (LL), y finalmente los frameworks de alto nivel como Arduino, Micro:bit y los entornos interpretados como MicroPython. En cada uno se muestra un ejemplo de código equivalente, para que quede claro qué es lo que realmente cambia de un nivel a otro y qué es lo que, por debajo de todas las capas, sigue siendo exactamente lo mismo: una escritura o lectura sobre un registro físico.</p>
+                </section>
+            </section>
 
-                <p>Con el paso del tiempo aparecieron distintos niveles de abstracción cuyo objetivo es simplificar el desarrollo de software. Mientras mayor es la abstracción, menor es la cantidad de detalles del hardware que el programador necesita conocer, a costa de perder algo de control y eficiencia.</p>
+            <section>
+            <h2>0. ENSAMBLADOR</h2>
+
+                <p>
+                    El procesador, en el fondo, solo entiende números: secuencias de unos y ceros
+                    que representan instrucciones y datos. A eso se le llama <strong>código binario</strong>
+                    o <strong>lenguaje máquina</strong>, y es lo único que el hardware puede ejecutar
+                    directamente. Todo lo demás —C, HAL, Arduino, Python— termina convertido en esto
+                    antes de correr.
+                </p>
+
+                <p>
+                    El <strong>ensamblador</strong> es la forma más simple de escribir ese mismo
+                    lenguaje máquina de manera legible para una persona. En vez de memorizar que una
+                    instrucción es el número <code>10110000 00000001</code>, se le pone un nombre:
+                    <code>MOV AL, 1</code>. Cada línea de ensamblador corresponde, casi siempre, a
+                    una sola instrucción real del procesador. No hay traducción de por medio, solo
+                    una tabla fija que convierte cada nombre (mnemónico) en su número correspondiente
+                    (opcode).
+                </p>
+
+                <p>En AVR, prender un pin en ensamblador se ve así:</p>
+                <pre><code>sbi DDRB, 0</code></pre>
+
+                <p>En ARM Cortex-M, mover un valor a memoria se ve así:</p>
+                <pre><code>MOVS R0, #1
+                STR  R0, [R1]</code></pre>
+
+                <p>
+                    <code>R0</code> y <code>R1</code> son registros del núcleo del procesador, los
+                    espacios de memoria más rápidos que existen, usados para operar directamente con
+                    los datos. El programador decide a mano qué dato va en qué registro y cuándo se
+                    mueve a memoria — no hay ninguna estructura de lenguaje de por medio, como una
+                    variable o una expresión, que lo decida por él.
+                </p>
+
+                <p>
+                    Cuando en C se escribe algo como <code>DDRB |= (1 &lt;&lt; PB0);</code>, el
+                    compilador lee esa línea, decide qué registros usar, en qué orden ejecutar las
+                    operaciones, y genera él mismo las instrucciones de máquina necesarias para
+                    lograr el mismo resultado. En ensamblador ese trabajo no existe: cada instrucción
+                    que aparece en el código es exactamente la instrucción que el procesador va a
+                    ejecutar, sin que nadie más decida nada en el medio.
+                </p>
+
+                <p>
+                    Escribir directamente en binario es técnicamente posible —así se programaban las
+                    primeras computadoras, con interruptores o tarjetas perforadas— pero es tan
+                    tedioso y propenso a errores que se terminó reemplazando esa forma de
+                    trabajar casi por completo.
+                </p>
+
+                <h3>¿Se usa ensamblador en la industria?</h3>
+
+                <p>
+                    Sí, pero para cosas puntuales, no para escribir aplicaciones completas. Los casos
+                    donde sigue apareciendo con frecuencia son:
+                </p>
+
+                <ul>
+                    <li>
+                    <strong>Código de arranque (startup code).</strong> Antes de que exista una
+                    pila (stack) configurada o el entorno de C esté listo para correr, hace falta
+                    ensamblador para dejar el procesador en condiciones de ejecutar C. Los archivos
+                    <code>startup_stm32...s</code> que genera CMSIS son un ejemplo de esto, aunque
+                    en las versiones más recientes buena parte de ese trabajo se movió a C con
+                    funciones intrínsecas.
+                    </li>
+                    <li>
+                    <strong>Interrupciones muy críticas</strong>, donde hace falta controlar con
+                    exactitud cuántos ciclos de reloj toma una operación o cómo se guarda el
+                    contexto del procesador — por ejemplo, en el cambio de contexto de un sistema
+                    operativo de tiempo real (RTOS).
+                    </li>
+                    <li>
+                    <strong>Delays de precisión muy fina</strong>, de pocos ciclos de reloj, donde
+                    no se puede confiar en que el compilador genere exactamente la cantidad de
+                    instrucciones necesaria.
+                    </li>
+                    <li>
+                    <strong>Optimización de rutinas puntuales</strong>, como procesamiento de
+                    señales o criptografía, donde el compilador no siempre genera código tan
+                    eficiente como uno escrito a mano.
+                    </li>
+                    <li>
+                    <strong>Bootloaders y código de arranque seguro</strong>, donde a veces se
+                    necesita control total del procesador antes de saltar a la aplicación
+                    principal.
+                    </li>
+                </ul>
+
+                <p>
+                    Fuera de estos casos, el ensamblador casi no aparece en proyectos modernos.
+                    Incluso en un proyecto Bare Metal, la gran mayoría del código es C; el
+                    ensamblador queda reducido a algunas instrucciones sueltas insertadas dentro del
+                    código C mediante ensamblador inline, o a funciones como <code>__NOP()</code>,
+                    que ofrece CMSIS como forma de usar una instrucción de ensamblador puntual sin
+                    escribir ensamblador propiamente dicho.
+                </p>
             </section>
 
             <section>
@@ -70,7 +176,7 @@
             <section>
             <h2>2. CMSIS</h2>
 
-                <p>En los microcontroladores ARM apareció el estándar <strong>CMSIS (Cortex Microcontroller Software Interface Standard)</strong>.</p>
+                <p>En los microcontroladores ARM —y solo en ellos— apareció el estándar CMSIS (Cortex Microcontroller Software Interface Standard). En arquitecturas como AVR o PIC este nivel simplemente no existe, y se pasa de Bare Metal directamente a las librerías o HAL propios del fabricante</strong>.</p>
 
                 <p>CMSIS no oculta los registros. Simplemente proporciona nombres estandarizados, estructuras y archivos de definición para acceder a ellos de forma más organizada.</p>
 
@@ -124,14 +230,52 @@
 
             <section>
             <h2>4. FRAMEWORKS DE ALTO NIVEL</h2>
-
-                <p>Y todavía existe un nivel de abstracción mayor que el propio HAL: el framework de <strong>Arduino</strong>, con funciones como <code>digitalWrite()</code> o <code>pinMode()</code>, que oculta casi por completo los detalles del hardware subyacente y prioriza la simplicidad por encima del control o la eficiencia. Aun así, el código de Arduino se sigue compilando a instrucciones nativas del microcontrolador: la abstracción ocurre en la forma de escribir el programa, pero no en la forma en que finalmente se ejecuta.</p>
-
-                <p>Existe todavía un escalón más de abstracción cuando, además de simplificar el acceso al hardware, se cambia también el <strong>modelo de ejecución</strong> del programa. Es el caso de placas como la <strong>micro:bit</strong> programada en <strong>MicroPython</strong>: el código no se compila a nativo, sino que corre sobre un intérprete —una máquina virtual escrita en C— alojado en la memoria del microcontrolador, con tipado dinámico y recolección automática de basura para gestionar la memoria. Por eso, aunque tanto Arduino (C) como micro:bit con MicroPython ofrecen funciones de alto nivel para el hardware, no están en el mismo escalón de abstracción: el segundo agrega una capa adicional de interpretación en tiempo de ejecución que el primero no tiene. El equivalente más directo a Arduino dentro del ecosistema micro:bit sería programarla en C/C++ (vía mbed), mientras que el equivalente más directo a MicroPython dentro del mundo Arduino sería correr MicroPython sobre un ESP32, u optar por un editor por bloques como MakeCode, que abstrae incluso más que el propio Python.</p>
-
-                <p>Por esta razón, en aplicaciones críticas de tiempo real o con recursos muy limitados todavía es frecuente utilizar programación Bare Metal o directamente CMSIS/LL, mientras que HAL y frameworks como Arduino se prefieren cuando importa más la velocidad de desarrollo que el control fino del hardware. Los entornos interpretados como MicroPython, al añadir una capa más, se reservan generalmente para prototipado rápido, proyectos educativos o aplicaciones donde el tiempo de respuesta no es crítico.</p>
-
-                <p>Vale la pena tener presente que, sin importar el nivel de abstracción utilizado, todos terminan produciendo el mismo resultado final: una escritura o lectura sobre el mismo registro físico. De hecho, es habitual encontrar proyectos que combinan varios niveles a la vez —por ejemplo, usar HAL para la mayor parte del código y recurrir a Bare Metal solo en la rutina de interrupción más crítica, donde cada ciclo de reloj cuenta.</p>
+                <p>Un nivel de abstracción mayor que el propio HAL es el framework de Arduino,, con funciones como <code>digitalWrite()</code> o <code>pinMode()</code> que ocultan casi todos los detalles del hardware y prioriza que el código sea simple de escribir, aunque eso signifique perder control fino sobre el microcontrolador. Aun así, el código de Arduino se compila a instrucciones en el lenguaje máquina propio de esa arquitectura de CPU del microcontrolador: la abstracción está en cómo se escribe el programa, no en cómo termina ejecutándose.</p>
+                <p>Con placas como la micro:bit programada en MicroPython pasa algo distinto, y conviene separar dos cosas que suelen mezclarse: una es qué tan lejos está el código del hardware, y otra es cómo se ejecuta ese código una vez compilado. Arduino y MicroPython son parecidos en la primera —ambos ofrecen funciones de alto nivel que evitan tocar registros— pero muy distintos en la segunda.</p>
+                
+                <p>El código de Arduino se compila a binario nativo y corre directo en el microcontrolador:</p>
+                <pre><code>digitalWrite(13, HIGH);</code></pre>
+                
+                <p>El de MicroPython, en cambio, no se compila a nativo: corre sobre un intérprete —una máquina virtual escrita en C— que vive en la memoria del microcontrolador, con tipado dinámico y recolección automática de basura:</p>
+                <pre><code>pin13.write_digital(1)</code></pre>
+                
+                <p>En la superficie el código se ve igual de simple en ambos casos, pero por debajo son cosas distintas: uno termina como instrucciones ejecutándose directo sobre el hardware, el otro como una llamada que el intérprete resuelve en tiempo real.</p>
+                
+                    <table>
+                    <thead>
+                        <tr>
+                        <th scope="col">Característica</th>
+                        <th scope="col">Arduino (C)</th>
+                        <th scope="col">MicroPython (micro:bit)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                        <th scope="row">Se compila a</th>
+                        <td>Binario nativo</td>
+                        <td>Bytecode interpretado</td>
+                        </tr>
+                        <tr>
+                        <th scope="row">Dónde corre</th>
+                        <td>Directo en el microcontrolador</td>
+                        <td>Sobre una VM alojada en el microcontrolador</td>
+                        </tr>
+                        <tr>
+                        <th scope="row">Gestión de memoria</th>
+                        <td>Manual</td>
+                        <td>Automática (garbage collector)</td>
+                        </tr>
+                        <tr>
+                        <th scope="row">Tipado</th>
+                        <td>Estático</td>
+                        <td>Dinámico</td>
+                        </tr>
+                    </tbody>
+                    </table>
+                
+                <p>Por eso Arduino y micro:bit con MicroPython no están en el mismo escalón de abstracción, aunque a primera vista lo parezca: MicroPython agrega una capa de interpretación en tiempo de ejecución que Arduino no tiene.</p>
+                <p>Vale la pena aclarar también que ninguno de los dos está atado a una sola arquitectura ni a un solo lenguaje. Dentro del ecosistema micro:bit, el equivalente más directo a Arduino sería programar en C/C++ vía mbed. Dentro del mundo Arduino, el equivalente más directo a MicroPython sería correr MicroPython sobre un ESP32 —o, yendo un paso más allá en abstracción, usar un editor por bloques como MakeCode.</p>
+                <p>Por eso, en aplicaciones críticas de tiempo real o con recursos muy limitados sigue siendo frecuente usar Bare Metal o CMSIS/LL, mientras que HAL y Arduino se preferirán cuando importa más la velocidad de desarrollo que el control fino del hardware. Los entornos interpretados como MicroPython, al sumar esa capa extra, se reservan generalmente para prototipado rápido, proyectos educativos o casos donde el tiempo de respuesta no es crítico.</p>
             </section>
 
         </article>

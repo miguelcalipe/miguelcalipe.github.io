@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Niveles de abstracción del hardware | MC Mundo Tech</title>
+    <meta name="description" content="Con el paso del tiempo han aparecido distintos niveles de abstracción cuyo objetivo es simplificar el desarrollo de software. Mientras mayor es la abstracción, menor es la cantidad de detalles del hardware que el programador necesita conocer, a costa de perder algo de control y eficiencia ">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>
+
+            <section>           
+            <header class="article-header">
+                <h1>NIVELES DE ABSTRACCIÓN DE HARDWARE EN MICROCONTROLADORES AVR</h1>
+            </header>
+            </section>
+
+            <section>
+            <h2>INTRODUCCIÓN</h2>
+                <p>Cualquiera que empiece a programar un AVR —ya sea un ATmega328 en una placa Arduino o un chip suelto en un proyecto propio— se topa tarde o temprano con la misma pregunta: ¿debería escribir directamente sobre los registros, o conviene usar una función de más alto nivel? La respuesta depende de qué tan cerca del hardware necesita trabajar el programador, y de qué está dispuesto a sacrificar a cambio de comodidad.</p>
+
+                <p>Este artículo recorre los niveles de abstracción disponibles en AVR, de menor a mayor, mostrando cómo identificarlos en el código y qué se gana y se pierde en cada uno.</p>
+            </section>
+
+            <section>
+            <h2>EL PUNTO DE PARTIDA: EL REGISTRO</h2>
+
+                <p>Antes de hablar de abstracción, vale la pena recordar qué es lo que se está abstrayendo. Un microcontrolador AVR controla sus periféricos —pines, temporizadores, conversores analógico-digitales, interfaces de comunicación— a través de <strong>registros</strong>: posiciones de memoria especiales, mapeadas a direcciones fijas, donde cada bit tiene un significado concreto. Escribir un 1 en el bit <code>PB0</code> del registro <code>PORTB</code> pone en alto el pin correspondiente. Leer el registro <code>PINB</code> indica el estado actual de esos pines.</p>
+
+                <p>Todo lo que ocurre por encima de esto —sea una macro, una función o una biblioteca completa— termina, en algún punto de la cadena, escribiendo o leyendo uno de estos registros. Los niveles de abstracción no cambian esa realidad; cambian cuánto de ella tiene que conocer el programador para trabajar con el hardware.</p>
+            </section>
+
+            <section>
+            <h2>NIVEL 1: BARE METAL</h2>
+
+                <p>El nivel más bajo consiste en escribir directamente sobre los registros, sin ninguna biblioteca de por medio más que las definiciones básicas del compilador.</p>
+
+                <pre><code class="language-c">#include &lt;avr/io.h&gt;
+
+        int main(void) {
+            DDRB |= (1 &lt;&lt; PB0);   // configura PB0 como salida
+            PORTB |= (1 &lt;&lt; PB0);  // pone PB0 en alto
+
+            while (1) {
+            }
+        }</code></pre>
+
+                <p>Aquí <code>DDRB</code> y <code>PORTB</code> no son funciones: son macros que apuntan directamente a las direcciones de memoria de esos registros, definidas en <code>&lt;avr/io.h&gt;</code> según el chip específico que se esté compilando (por eso ese archivo cambia de contenido según el <code>-mmcu</code> que se le pase al compilador). No hay ninguna capa intermedia entre el código fuente y el hardware; lo único que aporta el compilador es la comodidad de escribir un nombre legible en lugar de una dirección numérica.</p>
+
+                <p><strong>Ventajas:</strong></p>
+                <ul>
+                    <li>Control total y exacto sobre cada bit del hardware.</li>
+                    <li>Máxima eficiencia: el código compilado es prácticamente idéntico a lo que un programador escribiría a mano en ensamblador.</li>
+                    <li>Sin dependencias externas ni código oculto que pueda introducir comportamientos inesperados.</li>
+                </ul>
+
+                <p><strong>Desventajas:</strong></p>
+                <ul>
+                    <li>Exige conocer de memoria (o tener siempre a mano) el datasheet del chip: qué registro controla qué función, y qué significa cada bit.</li>
+                    <li>El código es específico del modelo exacto de microcontrolador. Migrar de un ATmega328 a un ATmega2560 puede implicar revisar registros que cambiaron de nombre o de comportamiento.</li>
+                    <li>Es fácil cometer errores sutiles, como olvidar una máscara de bits y afectar pines que no correspondía tocar.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>NIVEL 2: BARE METAL ASISTIDO POR AVR-LIBC</h2>
+
+                <p>El siguiente nivel no abandona el acceso directo a los registros, pero se apoya en <strong>avr-libc</strong>, la biblioteca estándar de C para AVR, que ofrece macros y funciones auxiliares para hacer ese acceso menos propenso a errores.</p>
+
+                <pre><code class="language-c">#include &lt;avr/io.h&gt;
+        #include &lt;util/delay.h&gt;
+
+        int main(void) {
+            DDRB |= _BV(PB0);
+
+            while (1) {
+                PORTB ^= _BV(PB0);
+                _delay_ms(500);
+            }
+        }</code></pre>
+
+                <p>La macro <code>_BV(PB0)</code> es equivalente a <code>(1 &lt;&lt; PB0)</code>, pero deja más clara la intención del código. <code>_delay_ms()</code> genera un retardo calibrado según la frecuencia de reloj del chip, evitando que el programador tenga que calcular ciclos de CPU a mano. <code>avr-libc</code> también aporta funciones para el manejo de interrupciones (<code>sei()</code>, <code>cli()</code>), EEPROM, y otras utilidades.</p>
+
+                <p>Es importante notar que este nivel sigue siendo, en esencia, Bare Metal: el registro se sigue escribiendo directamente, con su nombre y su máscara de bits. La diferencia es que ya no se parte de cero para cada operación común. Es, en la práctica, el nivel donde trabaja la mayoría de los proyectos AVR profesionales que necesitan control fino sin renunciar a algo de comodidad.</p>
+            </section>
+
+            <section>
+                <h2>NIVEL 3: EL FRAMEWORK DE ARDUINO</h2>
+
+                <p>El nivel de abstracción más alto disponible de forma estándar para AVR es el framework de Arduino. Aquí desaparecen los nombres de registro y son reemplazados por funciones descriptivas:</p>
+
+                <pre><code class="language-c">void setup() {
+            pinMode(8, OUTPUT);
+        }
+
+        void loop() {
+            digitalWrite(8, HIGH);
+            delay(500);
+            digitalWrite(8, LOW);
+            delay(500);
+        }</code></pre>
+
+                <p>El programador ya no necesita saber que el pin digital 8 de un Arduino Uno corresponde al bit <code>PB0</code> del registro <code>PORTB</code>: esa traducción la resuelve el framework internamente, mediante tablas de correspondencia entre número de pin y registro/bit físico definidas en su código fuente.</p>
+
+                <p>Vale la pena mirar una vez qué hace realmente <code>digitalWrite()</code> por debajo, porque es un buen ejercicio para entender el costo real de la abstracción. Internamente, la función consulta esas tablas, determina a qué puerto y bit corresponde el pin solicitado, verifica si el pin está configurado como salida PWM para desactivarlo si es necesario, y recién entonces escribe sobre el registro correspondiente. Todo ese trabajo ocurre en cada llamada, en tiempo de ejecución. El resultado: la misma operación que en Bare Metal toma un ciclo de reloj, en Arduino puede tomar varias decenas.</p>
+
+                <p><strong>Ventajas:</strong></p>
+                <ul>
+                    <li>Código legible y rápido de escribir, sin necesidad de consultar el datasheet para tareas básicas.</li>
+                    <li>Portabilidad razonable entre distintas placas Arduino, siempre que se respete la numeración de pines de cada una.</li>
+                    <li>Curva de aprendizaje mucho más baja, ideal para prototipado y para quien recién empieza.</li>
+                </ul>
+
+                <p><strong>Desventajas:</strong></p>
+                <ul>
+                    <li>Menor eficiencia: cada llamada de alto nivel implica trabajo adicional en tiempo de ejecución.</li>
+                    <li>Menor control: algunas configuraciones avanzadas de un periférico simplemente no están expuestas por las funciones del framework, y hay que "bajar" a Bare Metal para lograrlas.</li>
+                    <li>Mayor consumo de memoria Flash, por el código adicional de las funciones del framework.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>CÓMO IDENTIFICAR EL NIVEL EN UN VISTAZO</h2>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Señal en el código</th>
+                                <th>Nivel</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Nombres de registro en mayúsculas + operadores de bits (<code>DDRB |= (1 &lt;&lt; PB0)</code>)</td>
+                                <td>Bare Metal</td>
+                            </tr>
+                            <tr>
+                                <td>Lo anterior, combinado con macros de avr-libc (<code>_BV()</code>, <code>_delay_ms()</code>, <code>sei()</code>)</td>
+                                <td>Bare Metal asistido</td>
+                            </tr>
+                            <tr>
+                                <td><code>setup()</code> / <code>loop()</code>, <code>pinMode()</code>, <code>digitalWrite()</code>, números de pin en vez de nombres de registro</td>
+                                <td>Framework Arduino</td>
+                            </tr>
+                            <tr>
+                                <td>Bibliotecas de objetos sobre periféricos específicos (<code>Serial.print()</code>, <code>Wire.begin()</code>)</td>
+                                <td>Framework Arduino, con capas adicionales</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section>
+                <h2>CUÁNDO CONVIENE CADA NIVEL</h2>
+
+                <p>No hay un nivel "correcto" en términos absolutos; la elección depende del proyecto:</p>
+
+                <ul>
+                    <li><strong>Bare Metal o Bare Metal asistido</strong> conviene cuando el proyecto tiene restricciones estrictas de tiempo (por ejemplo, una rutina de interrupción que debe ejecutarse en un número exacto de ciclos), cuando la memoria Flash o RAM es muy limitada, o cuando se necesita una función del periférico que el framework de Arduino no expone directamente.</li>
+                    <li><strong>El framework de Arduino</strong> conviene cuando lo que importa es desarrollar rápido, cuando el proyecto no tiene requisitos de tiempo real estrictos, o en contextos educativos donde entender cada registro no es el objetivo principal.</li>
+                </ul>
+
+                <p>Es también habitual combinar ambos niveles dentro de un mismo proyecto: usar el framework de Arduino para la mayor parte del código, y recurrir a Bare Metal puntualmente —por ejemplo, dentro de una rutina de interrupción— cuando esa parte específica necesita el máximo rendimiento posible. Ambos enfoques, al final, terminan haciendo exactamente lo mismo: escribir o leer un bit en un registro físico. La diferencia está en cuánto de ese proceso queda a la vista del programador.</p>
+            </section>
+        </article>       
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>

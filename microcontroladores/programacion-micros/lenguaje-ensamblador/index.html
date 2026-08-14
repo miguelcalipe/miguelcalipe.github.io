@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Niveles de abstracción del hardware | MC Mundo Tech</title>
+    <meta name="description" content="Con el paso del tiempo han aparecido distintos niveles de abstracción cuyo objetivo es simplificar el desarrollo de software. Mientras mayor es la abstracción, menor es la cantidad de detalles del hardware que el programador necesita conocer, a costa de perder algo de control y eficiencia ">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>EL LENGUAJE ENSAMBLADOR</h1>
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   -->  
+  
+            <h2>INTRODUCCIÓN</h2>
+            <p>
+                Cuando un microcontrolador ejecuta un programa, no importa en qué lenguaje se
+                haya escrito originalmente: al final, todo se reduce a una secuencia de números
+                que el procesador interpreta como instrucciones. El lenguaje ensamblador es el
+                punto donde un ser humano se acerca más a esa realidad, sin perder del todo la
+                capacidad de leer y escribir el código con sentido. Este artículo explica qué es,
+                cómo se relaciona con el lenguaje máquina y el código binario, cómo se construye
+                una instrucción a nivel de bits, y en qué situaciones reales de la industria
+                todavía se usa hoy.
+
+            <h2>CÓDIGO BINARIO Y LENGUAJE MÁQUINA</h2>
+
+                <p>
+                    El lenguaje máquina es el conjunto de instrucciones que el procesador ejecuta
+                    directamente. El código binario es simplemente la forma en que se representa ese
+                    lenguaje: como secuencias de unos y ceros, porque es lo único que el hardware
+                    puede almacenar y procesar eléctricamente, mediante dos niveles de voltaje que
+                    corresponden a encendido y apagado.
+                </p>
+
+                <p>
+                    No hay traducción entre uno y otro. Son la misma cosa vista desde dos ángulos
+                    distintos: "lenguaje máquina" pone el foco en que son instrucciones que el
+                    procesador entiende; "código binario" pone el foco en cómo están codificadas esas
+                    instrucciones.
+                </p>
+
+            <h2>EL LENGUAJE ENSAMBLADOR: VERSIÓN LEGIBLE DEL LENGUAJE MÁQUINA</h2>
+
+                <p>
+                    El ensamblador no es lenguaje máquina ni código binario: es una notación textual
+                    que representa lenguaje máquina de forma que una persona la pueda leer y escribir
+                    sin memorizar números. Cada instrucción de ensamblador corresponde a una
+                    instrucción de máquina específica, pero no son la misma cosa: una es un número
+                    (<code>10110000 00000001</code>), la otra es un nombre, un mnemónico
+                    (<code>MOV AL, 1</code>).
+                </p>
+
+                <h2>Un programa ensamblador traduce mnemónicos a números, sin tomar decisiones</h2>
+
+                <p>
+                    Para pasar de lenguaje ensamblador a binario hace falta un programa llamado
+                    <strong>ensamblador</strong> (assembler), que no debe confundirse con el lenguaje
+                    ensamblador propiamente dicho. Ese programa lee el código fuente en ensamblador y
+                    lo convierte en binario usando una tabla fija de equivalencias: cada mnemónico
+                    tiene un opcode numérico asignado de antemano por el fabricante del procesador.
+                </p>
+
+                <p>
+                    Es una traducción prácticamente uno a uno, sin ninguna decisión de por medio: no
+                    hay optimización, no hay elección de qué registro conviene usar. El ensamblador
+                    (el programa) busca cada mnemónico en la tabla y escribe el número que le
+                    corresponde. Eso lo diferencia de un compilador de C, que sí decide cosas — qué
+                    registros usar, en qué orden ejecutar las operaciones, si conviene desenrollar un
+                    bucle. El programa ensamblador no decide nada de eso: solo traduce.
+                </p>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                        <tr><th></th><th>¿Qué es?</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr><td>Lenguaje máquina</td><td>Las instrucciones que el procesador ejecuta</td></tr>
+                        <tr><td>Código binario</td><td>Esas mismas instrucciones, representadas en unos y ceros</td></tr>
+                        <tr><td>Lenguaje ensamblador</td><td>Esas mismas instrucciones, con nombres legibles para humanos</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>
+                    Los tres describen, en el fondo, la misma secuencia de instrucciones. La
+                    diferencia está en cómo se representa esa secuencia, no en qué hace.
+                </p>
+
+            <h2>CADA ARQUITECTURA TIENE SU PROPIO JUEGO DE INSTRUCCIONES</h2>
+
+                <p>
+                    A continuación se muestran ejemplos reales, con la instrucción en binario puro,
+                    en hexadecimal (la misma información, escrita de forma más compacta agrupando
+                    los bits de a cuatro) y su equivalente en ensamblador.
+                </p>
+
+                <h3>AVR</h3>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                        <tr><th>Binario</th><th>Hex</th><th>Ensamblador</th><th>Qué hace</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr><td><code>1001 1010 0010 0000</code></td><td><code>9A20</code></td><td><code>sbi DDRB, 0</code></td><td>Pone en 1 el bit 0 del registro DDRB</td></tr>
+                        <tr><td><code>0000 0000 0000 0000</code></td><td><code>0000</code></td><td><code>nop</code></td><td>No hace nada, solo gasta un ciclo de reloj</td></tr>
+                        <tr><td><code>1001 0101 0000 1000</code></td><td><code>9508</code></td><td><code>ret</code></td><td>Vuelve de una subrutina</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>ARM Cortex-M (juego de instrucciones Thumb, de 16 bits)</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                        <tr><th>Binario</th><th>Hex</th><th>Ensamblador</th><th>Qué hace</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr><td><code>0010 0000 0000 0001</code></td><td><code>2001</code></td><td><code>MOVS R0, #1</code></td><td>Carga el valor 1 en el registro R0</td></tr>
+                        <tr><td><code>0100 0010 1000 1000</code></td><td><code>4288</code></td><td><code>CMP R0, R1</code></td><td>Compara los valores de R0 y R1</td></tr>
+                        <tr><td><code>1011 1111 0000 0000</code></td><td><code>BF00</code></td><td><code>NOP</code></td><td>No hace nada, solo gasta un ciclo</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>
+                    Nótese que el mismo mnemónico <code>NOP</code> se codifica con un patrón de bits
+                    completamente distinto en AVR y en ARM. Eso es porque el ensamblador de cada
+                    arquitectura habla su propio idioma: los mnemónicos son una convención del
+                    fabricante, y el mismo texto no garantiza el mismo número por debajo.
+                </p>
+
+            <h2>CADA INSTRUCCIÓN SE ARMA COMBINANDO CAMPOS DE BITS CON UN SIGNIFICADO FIJO</h2>
+
+            <p>
+                Una instrucción en binario no es un número arbitrario: dentro de esa secuencia
+                de bits hay campos, y cada campo codifica una parte distinta de la operación. El
+                formato de esos campos lo define el fabricante del procesador al diseñar el
+                juego de instrucciones.
+            </p>
+
+            <p>
+                Tomemos <code>1001 1010 0010 0000</code>, la instrucción <code>sbi DDRB, 0</code>
+                de AVR. El formato general de una instrucción <code>sbi</code> en AVR es:
+            </p>
+
+            <pre><code>1001 1010 0AAA AABBB</code></pre>
+
+            <p>
+                El bloque <code>1001101</code> identifica que se trata de una instrucción
+                <code>sbi</code>. El campo <code>AAAAA</code> codifica de qué registro de
+                entrada/salida se trata — en este caso, la dirección correspondiente a
+                <code>DDRB</code>. El campo <code>BBB</code> codifica qué bit dentro de ese
+                registro hay que modificar — en este caso, el bit 0.
+            </p>
+
+            <p>
+                El procesador no "entiende" <code>sbi</code> como un concepto abstracto. Entiende
+                que, cuando detecta ese patrón de bits en esa posición exacta, tiene que activar
+                el circuito interno que pone en 1 un bit específico de un registro de
+                entrada/salida específico. Es lo que hace el programa ensamblador al traducir:
+                calcula el número de <code>DDRB</code> como dirección de E/S, calcula el número
+                del bit 0, y arma la instrucción completa combinando esas piezas según el formato
+                fijo que el fabricante definió. No hay creatividad ni decisión de por medio — es
+                una traducción mecánica, y ahí está la diferencia clave con lo que hace un
+                compilador de C, que sí toma decisiones sobre cómo generar el código.
+            </p>
+
+            <h2>ESCRIBIR EN BINARIO PURO ES POSIBLE, PERO DEJÓ DE SER PRÁCTICO</h2>
+
+            <p>
+                Escribir instrucciones directamente en binario es técnicamente posible — así se
+                programaban las primeras computadoras, físicamente, con interruptores o tarjetas
+                perforadas que representaban cada bit. Pero es tan tedioso y propenso a errores
+                que el lenguaje ensamblador terminó reemplazando esa forma de trabajar casi por
+                completo: el mnemónico no cambia en nada lo que finalmente se ejecuta, solo le
+                da a la persona que programa un nombre en el que apoyarse en lugar de un número.
+            </p>
+
+            <h2>LAS INSTRUCCIONES NATIVAS SON LAS QUE EL PROCESADOR EJECUTA SIN INTÉRPRETE DE POR MEDIO</h2>
+
+            <p>
+                Cuando se dice que un programa "se compila a instrucciones nativas del
+                microcontrolador", nativo se refiere a que esas instrucciones pertenecen al
+                lenguaje máquina propio de esa arquitectura de procesador — el AVR de un Arduino
+                Uno, el ARM Cortex-M de otra placa — y el procesador las ejecuta directamente,
+                sin ningún intérprete traduciéndolas mientras el programa corre. Es distinto a lo
+                que ocurre con un lenguaje interpretado como MicroPython, donde el
+                microcontrolador nunca ejecuta directamente lo que escribió la persona: ejecuta
+                una máquina virtual, y esa máquina virtual va resolviendo el código instrucción
+                por instrucción a medida que el programa avanza.
+            </p>
+
+            <p>
+                Conviene no confundir esto con la diferencia entre compilador nativo y compilador
+                cruzado, que es otro asunto: un compilador nativo corre en la misma arquitectura
+                para la que genera código, mientras que un compilador cruzado (cross-compiler)
+                corre en una arquitectura pero genera código para otra distinta. AVR-GCC, por
+                ejemplo, es un compilador cruzado: corre en la computadora de quien programa
+                —típicamente x86 o ARM— pero genera instrucciones nativas para la arquitectura
+                AVR del microcontrolador, que luego se cargan en el chip mediante un programador
+                o un bootloader. Es el caso habitual en desarrollo embebido, porque la mayoría de
+                los microcontroladores no tiene la capacidad de correr un compilador sobre sí
+                mismo.
+            </p>
+
+            <h2>EL ENSAMBLADOR SIGUE EN USO HOY, EN TAREAS PUNTUALES</h2>
+
+            <p>
+                En un proyecto moderno, la inmensa mayoría del código se escribe en C u otro
+                lenguaje de alto nivel, y el ensamblador queda reservado para casos específicos
+                donde el control fino sobre el hardware es indispensable:
+            </p>
+
+            <ul>
+                <li>
+                <strong>Código de arranque (startup code).</strong> Antes de que exista una
+                pila (stack) configurada o el entorno de ejecución de C esté listo, hace falta
+                ensamblador para dejar el procesador en condiciones de correr C.
+                </li>
+                <li>
+                <strong>Interrupciones muy críticas</strong>, donde hace falta controlar con
+                exactitud cuántos ciclos de reloj toma una operación o cómo se guarda el
+                contexto del procesador — por ejemplo, en el cambio de contexto de un sistema
+                operativo de tiempo real (RTOS).
+                </li>
+                <li>
+                <strong>Delays de precisión muy fina</strong>, de pocos ciclos de reloj, donde
+                no se puede confiar en que el compilador genere exactamente la cantidad de
+                instrucciones necesaria.
+                </li>
+                <li>
+                <strong>Optimización de rutinas puntuales</strong>, como procesamiento de
+                señales o criptografía, donde el compilador no siempre genera código tan
+                eficiente como uno escrito a mano.
+                </li>
+                <li>
+                <strong>Bootloaders y código de arranque seguro</strong>, donde a veces se
+                necesita control total del procesador antes de saltar a la aplicación
+                principal.
+                </li>
+            </ul>
+
+            <p>
+                Fuera de estos casos, el ensamblador prácticamente no aparece en el desarrollo
+                de aplicaciones completas. Su presencia habitual en un proyecto moderno se
+                reduce a un puñado de instrucciones insertadas dentro del código C mediante
+                ensamblador inline, o a funciones intrínsecas como <code>__NOP()</code>, que
+                ofrecen una forma de usar una instrucción de ensamblador puntual sin escribir
+                ensamblador propiamente dicho.
+            </p>
+
+            <h2>EL ENSAMBLADOR ES EL PUNTO DE PARTIDA DE Toda LA JERARQUÍA DE ABSTRACCIÓN</h2>
+
+            <p>
+                Cualquier programa, sin importar en qué lenguaje se haya escrito ni cuántas
+                capas de software tenga por encima, termina convertido en esta misma forma antes
+                de correr: instrucciones de máquina, codificadas en binario, ejecutándose sobre
+                el procesador. El lenguaje ensamblador es el nivel donde esa realidad todavía se
+                puede leer y escribir directamente, sin ningún compilador tomando decisiones por
+                quien programa. Entenderlo no es solo un ejercicio histórico: es lo que permite
+                comprender qué está pasando realmente por debajo de cualquier otro nivel de
+                abstracción que se use después.
+            </p>
+
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>
