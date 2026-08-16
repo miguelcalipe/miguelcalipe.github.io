@@ -492,40 +492,40 @@ Instrucción condicional</code></pre>
     <section>
         <h2>11. LOS REGISTROS EN C</h2>
 
-        <p>El programador normalmente no necesita trabajar directamente con direcciones binarias o instrucciones de máquina.</p>
+            <p>El programador normalmente no necesita trabajar directamente con direcciones binarias o instrucciones de máquina.</p>
 
-        <p>Los fabricantes, proveedores de compiladores y desarrolladores de software proporcionan archivos de cabecera, definiciones y estructuras que permiten representar los registros mediante nombres comprensibles.</p>
+            <p>Los fabricantes, proveedores de compiladores y desarrolladores de software proporcionan archivos de cabecera, definiciones y estructuras que permiten representar los registros mediante nombres comprensibles.</p>
 
-        <p>Por ejemplo, en un entorno AVR puede encontrarse una expresión como:</p>
+            <p>Por ejemplo, en un entorno AVR puede encontrarse una expresión como:</p>
 
-        <pre><code>PORTB = 0x01;</code></pre>
+            <pre><code>PORTB = 0x01;</code></pre>
 
-        <p>El identificador <code>PORTB</code> representa un registro definido por la arquitectura concreta del dispositivo.</p>
+            <p>El identificador <code>PORTB</code> representa un registro definido por la arquitectura concreta del dispositivo.</p>
 
-        <p>El programador escribe una operación de asignación, pero el compilador debe convertirla en las instrucciones necesarias para realizar el acceso correspondiente.</p>
+            <p>El programador escribe una operación de asignación, pero el compilador debe convertirla en las instrucciones necesarias para realizar el acceso correspondiente.</p>
 
-        <p>El resultado final depende del microcontrolador, del compilador, de la optimización y de las características de la instrucción disponible.</p>
+            <p>El resultado final depende del microcontrolador, del compilador, de la optimización y de las características de la instrucción disponible.</p>
 
-        <p>Otro ejemplo:</p>
+            <p>Otro ejemplo:</p>
 
         <pre><code>DDRB |= (1 &lt;&lt; PB3);</code></pre>
 
-        <p>Conceptualmente, esta expresión significa:</p>
+            <p>Conceptualmente, esta expresión significa:</p>
 
-        <ol>
-            <li>obtener el valor actual del registro;</li>
-            <li>establecer el bit correspondiente;</li>
-            <li>conservar los demás bits;</li>
-            <li>escribir el nuevo valor.</li>
-        </ol>
+            <ol>
+                <li>obtener el valor actual del registro;</li>
+                <li>establecer el bit correspondiente;</li>
+                <li>conservar los demás bits;</li>
+                <li>escribir el nuevo valor.</li>
+            </ol>
 
-        <p>El compilador traduce esa operación a las instrucciones apropiadas para la arquitectura.</p>
+            <p>El compilador traduce esa operación a las instrucciones apropiadas para la arquitectura.</p>
 
-        <p>La sintaxis puede cambiar completamente entre familias de microcontroladores, pero el concepto permanece:</p>
+            <p>La sintaxis puede cambiar completamente entre familias de microcontroladores, pero el concepto permanece:</p>
 
-        <blockquote>
-            <p><strong>el código C proporciona una representación de alto nivel de las operaciones que finalmente debe ejecutar la CPU sobre los recursos definidos por la arquitectura.</strong></p>
-        </blockquote>
+            <blockquote>
+                <p><strong>el código C proporciona una representación de alto nivel de las operaciones que finalmente debe ejecutar la CPU sobre los recursos definidos por la arquitectura.</strong></p>
+            </blockquote>
     </section>
 
     <section>
