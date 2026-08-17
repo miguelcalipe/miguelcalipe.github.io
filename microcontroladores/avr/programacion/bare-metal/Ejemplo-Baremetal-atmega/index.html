@@ -74,73 +74,89 @@
                 <p>
                     El recorrido que estudiaremos es:
                 </p>
-
-                <pre><code>Código C
-                    ↓
-                Compilador
-                    ↓
-                Instrucciones máquina
-                    ↓
-                CPU
-                    ↓
-                Registro DDRB
-                    ↓
-                Configuración del puerto
-                    ↓
-                Registro PORTB
-                    ↓
-                Latch de salida
-                    ↓
-                Driver CMOS
-                    ↓
-                Pin físico PB0
-                    ↓
-                Corriente por el LED
-                    ↓
-                LED encendido</code></pre>            
+                <img src="/microcontroladores/avr/programacion/bare-metal/Ejemplo-Baremetal-atmega/img/ejemplo.jpeg"
+                    alt="Ejemplo Bare metal para encender un LED" 
+                    title="Diagrama de flujo del ejemplo de encendido de un LED en un ATmega168"
+                    class="imagen-centrada">                       
             </section>
             
             <section>
                 <h2>1. EL CIRCUITO DEL EJEMPLO</h2>
 
-                <p>
-                    Para este ejemplo utilizaremos el pin <strong>PB0</strong> del puerto B del ATmega168.
-                    En un ATmega168 con encapsulado DIP de 28 pines, PB0 corresponde al <strong>pin físico 14</strong>.
-                </p>
+                <p>Para este ejemplo utilizaremos el pin <strong>PB0</strong> del puerto B del ATmega168. En un ATmega168 con encapsulado DIP de 28 pines, PB0 corresponde al <strong>pin físico 14</strong>.</p>
 
-                <p>
-                    El LED no debe conectarse directamente al pin sin una resistencia. La resistencia limita la
-                    corriente que circula por el LED y protege tanto al LED como al circuito de salida del
-                    microcontrolador.
-                </p>
+                <p>Antes de conectar el LED, debemos montar en la protoboard el <strong>circuito mínimo necesario para que el ATmega168 funcione de forma independiente (standalone)</strong>. En este montaje utilizaremos el oscilador interno del microcontrolador, por lo que no es necesario añadir un cristal externo ni sus condensadores.</p>
 
-                <p>
-                    Una conexión sencilla es la siguiente:
-                </p>
+                    <h3>1. Alimentación del ATmega168</h3>
 
-                <pre><code>PB0
-            │
-            │
-            [220 Ω]
-            │
-            ▼
-            LED
-            │
-            ▼
-            GND</code></pre>
+                    <p>El primer paso consiste en conectar correctamente la alimentación del microcontrolador:</p>
 
-                <p>
-                    En esta configuración, cuando PB0 se encuentra en nivel alto, existe una diferencia de
-                    potencial entre el pin y GND. Esa diferencia de potencial hace que circule corriente a
-                    través de la resistencia y del LED, provocando que el LED emita luz.
-                </p>
+                    <ul>
+                        <li><strong>VCC (pin 7)</strong> → positivo de la alimentación.</li>
+                        <li><strong>AVCC (pin 20)</strong> → positivo de la alimentación.</li>
+                        <li><strong>GND (pin 8)</strong> → tierra.</li>
+                        <li><strong>GND (pin 22)</strong> → tierra.</li>
+                    </ul>
 
-                <p>
-                    La resistencia de 220 Ω es solamente un valor de ejemplo. El valor adecuado depende de la
-                    tensión de alimentación, de la caída de tensión del LED y de la corriente que se quiera
-                    hacer circular. Además, siempre deben respetarse las especificaciones eléctricas del
-                    ATmega168, especialmente los límites de corriente de sus pines.
-                </p>
+                    <p>AVCC debe conectarse a VCC incluso si el programa no utiliza el convertidor analógico-digital (ADC), ya que este pin también está relacionado con la alimentación del puerto C.</p>
+
+
+                        <img src="/microcontroladores/avr/programacion/bare-metal/Ejemplo-Baremetal-atmega/img/alimentacion-atmega168.jpeg"
+                            alt="Alimentación del ATmega168 en protoboard"
+                            title="Conexión de VCC, AVCC y GND del ATmega168"
+                            class="imagen-centrada">
+
+                    <h3>2. Condensador de desacoplo</h3>
+
+                    <p>Se recomienda colocar un condensador cerámico de <strong>100 nF</strong> entre VCC y GND, situado lo más cerca posible del ATmega168. Su función es reducir las pequeñas perturbaciones de la tensión de alimentación producidas por los cambios de corriente internos del microcontrolador.</p>
+
+                        <img src="/microcontroladores/avr/programacion/bare-metal/Ejemplo-Baremetal-atmega/img/2-Atemega168_bb.png"
+                            alt="Condensador de desacoplo del ATmega168"
+                            title="Condensador cerámico de 100 nF entre VCC y GND"
+                            class="imagen-centrada">
+
+                    <h3>3. Conexión del RESET</h3>
+
+                    <p>El pin <strong>RESET (pin 1)</strong> debe mantenerse normalmente en nivel alto para que el microcontrolador pueda ejecutar el programa. Para ello, se conecta una resistencia de aproximadamente <strong>10 kΩ entre RESET y VCC</strong>.</p>
+
+                    <p>La resistencia actúa como <em>pull-up</em> y evita que el pin RESET quede flotante, reduciendo la posibilidad de reinicios provocados por perturbaciones eléctricas.</p>
+
+                    <div class="imagen-centrada">
+                        <img src="/microcontroladores/avr/programacion/bare-metal/Ejemplo-Baremetal-atmega/img/reset-atmega168.png"
+                            alt="Resistencia pull-up de 10 kΩ en el pin RESET del ATmega168"
+                            title="Resistencia de 10 kΩ entre RESET y VCC"
+                            class="imagen-centrada">
+                    </div>
+
+                    <h3>4. Conexión del LED en PB0</h3>
+
+                    <p>Una vez establecidas las conexiones básicas del microcontrolador, podemos conectar el LED que utilizaremos para comprobar el funcionamiento del programa.</p>
+
+                    <p>El LED no debe conectarse directamente al pin PB0 sin una resistencia. La resistencia limita la corriente que circula por el LED y protege tanto al LED como al circuito de salida del microcontrolador.</p>
+
+                    <p>Una conexión sencilla es:</p>
+
+                    <p><strong>PB0 (pin 14) → resistencia de 220 Ω → LED → GND</strong></p>
+
+                    <p>Cuando PB0 se encuentra en nivel alto, existe una diferencia de potencial entre el pin y GND. Esta diferencia de potencial hace que circule corriente a través de la resistencia y del LED, provocando que el LED emita luz.</p>
+
+                    <div class="imagen-centrada">
+                        <img src="/microcontroladores/avr/programacion/bare-metal/Ejemplo-Baremetal-atmega/img/LedAtmega168_bb.png"
+                            alt="LED conectado al pin PB0 del ATmega168"
+                            title="LED conectado a PB0 mediante una resistencia de 220 ohmios"
+                            class="imagen-centrada">
+                    </div>
+
+                    <p>La resistencia de <strong>220 Ω</strong> es solamente un valor de ejemplo. El valor adecuado depende de la tensión de alimentación, de la caída de tensión del LED y de la corriente que se quiera hacer circular. En todos los casos deben respetarse las especificaciones eléctricas del ATmega168, especialmente los límites de corriente de sus pines.</p>
+
+                    <h3>5. Circuito standalone completo</h3>
+
+                    <p>Al integrar las conexiones anteriores obtenemos el circuito mínimo del ATmega168 para este ejemplo: alimentación, desacoplo, resistencia de <em>pull-up</em> en RESET y LED conectado a PB0. El microcontrolador puede funcionar de forma independiente en la protoboard utilizando su oscilador interno.</p>
+
+                        <img src="/microcontroladores/avr/programacion/bare-metal/Ejemplo-Baremetal-atmega/img/completoAtemega168_bb.png"
+                            alt="Circuito completo del ATmega168 standalone en protoboard"
+                            title="Circuito mínimo del ATmega168 standalone con LED en PB0"
+                            class="imagen-centrada">       
             </section>
 
             <section>

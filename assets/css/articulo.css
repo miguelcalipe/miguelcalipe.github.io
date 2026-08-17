@@ -286,9 +286,20 @@ font-weight:bold;
 }
 
 /* ===========================
-   IMAGEN INDIVIDUAL CENTRADA
+   IMAGEN INDIVIDUAL CENTRADA (centra la imagen en <main>)
    =========================== */
 .imagen-centrada {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 1.5rem auto;
+}
+
+
+/* ===========================
+   IMAGEN INDIVIDUAL CENTRADA (centra la imagen en la sección del artículo)
+   =========================== */
+.articulo main .imagen-centrada {
     display: block;
     max-width: 100%;
     height: auto;
