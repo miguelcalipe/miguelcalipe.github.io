@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Niveles de abstracción del hardware | MC Mundo Tech</title>
+    <title>8 Matriz LED 8x8 con Max7219 y tres botones | MC Mundo Tech</title>
     <meta name="description" content="Con el paso del tiempo han aparecido distintos niveles de abstracción cuyo objetivo es simplificar el desarrollo de software. Mientras mayor es la abstracción, menor es la cantidad de detalles del hardware que el programador necesita conocer, a costa de perder algo de control y eficiencia ">
     <link rel="stylesheet" href="/assets/css/principal.css">
     <link rel="stylesheet" href="/assets/css/articulo.css">
@@ -82,6 +82,8 @@
             <h3>2.1 ¿Por qué se utilizan MAX7219?</h3>
 
             <p>Una matriz de 8×8 contiene 8 × 8 = 64 LEDs.   Si se intentara controlar directamente una matriz de este tipo desde el microcontrolador, habría que ocuparse de las filas y columnas, además de gestionar el multiplexado de los LED.</p>
+            
+            <p>el MAX7219 dispone de ocho registros de datos para ocho dígitos/filas de multiplexación, y en módulos matriciales comerciales se utiliza para controlar una matriz 8×8.</p>
 
             <p>El MAX7219 simplifica considerablemente esta tarea.</p>
 
@@ -925,7 +927,7 @@ pinMode(BOTON_Ana, INPUT_PULLUP);</code></pre>
             </section>
 
             <section>
-            <h2>5. ATMEGA328P EN CIRCUITO PROPIO </h2>
+            <h2>5. CIRCUITO COMPLETO CON ATMEGA328P STANDALONE </h2>
             <img src="img/Matriz8x8_bb3Botones.png" alt="AMtega328P on a breadboard con Max7219" class="imagen-centrada"> 
 
             </section>
