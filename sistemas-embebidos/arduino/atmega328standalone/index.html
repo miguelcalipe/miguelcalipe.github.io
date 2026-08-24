@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Niveles de abstracción del hardware | MC Mundo Tech</title>
+    <meta name="description" content="Con el paso del tiempo han aparecido distintos niveles de abstracción cuyo objetivo es simplificar el desarrollo de software. Mientras mayor es la abstracción, menor es la cantidad de detalles del hardware que el programador necesita conocer, a costa de perder algo de control y eficiencia ">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>MATRIZ LED 8×8 CON MAX7219 Y TRES BOTONES</h1>
+            <p> Diseño y funcionamiento</p>
+            </header>
+                        
+            <aside id="indice"></aside>    
+                        
+            <section> 
+            <h2>1. INTRODUCCIÓN</h2>
+
+            <p>El proyecto consiste en construir una pequeña pantalla de mensajes utilizando ocho matrices LED de 8×8, controladas mediante circuitos integrados MAX7219, y tres pulsadores que permiten seleccionar diferentes mensajes.</p>
+
+            <p>Desarrollaremos el programa en Arduino y lo grabaremos en un ATmega328P standalone: en una placa con el circutio mínimo para su funcionamiento. Durante el desarrollo utilizaremos una placa Arduino UNO Rev. 3 como plataforma de programación y prueba; en la versión final, el programa se ejecutará directamente sobre el ATmega328P en configuración standalone.</p>
+
+            <p>La idea es sencilla: la pantalla muestra de forma continua un mensaje de bienvenida que se desplaza de derecha a izquierda. Cuando el usuario presiona uno de los tres botones, la pantalla abandona temporalmente el mensaje de bienvenida y muestra un mensaje asociado a ese botón. Una vez terminada la animación, el sistema vuelve automáticamente a la pantalla principal.</p>
+
+            <p>El proyecto resulta interesante porque reúne varios conceptos importantes de sistemas embebidos:</p>
+
+            <ul>
+            <li>control de matrices LED;</li>
+            <li>comunicación serie mediante SPI;</li>
+            <li>utilización de periféricos externos;</li>
+            <li>lectura de entradas digitales;</li>
+            <li>resistencias pull-up internas;</li>
+            <li>organización de datos mediante arreglos;</li>
+            <li>funciones para evitar repetir código;</li>
+            <li>animaciones no bloqueantes mediante <code>displayAnimate()</code>;</li>
+            <li>detección del final de una tarea para cambiar de estado.</li>
+            </ul>
+
+            <p>Aunque el resultado es una pantalla de mensajes relativamente sencilla, el programa permite estudiar una estructura que aparece con mucha frecuencia en sistemas embebidos: un microcontrolador supervisa entradas, controla un periférico y modifica su comportamiento según los eventos recibidos.</p>
+            </section>
+
+
+            <section>
+            <h2>2. ARQUITECTURA GENERAL DEL SITEMA</h2>
+
+            <p>El sistema está formado por tres partes principales:</p>
+
+            <ul>
+            <li><strong>Microcontrolador:</strong> un ATmega328P.</li>
+            <li><strong>Pantalla:</strong> formada por ocho módulos de matriz LED 8×8 con MAX7219.</li>
+            <li><strong>Interfaz de usuario:</strong> formada por tres pulsadores.</li>
+            </ul>
+
+            <img src="img/EstructuraPy.jpeg" alt="Estructura del sistema" class="imagen-centrada"> 
+
+            <p>En el proyecto usamos 8 matrices de 8x8 conectados en cascada, formando una pantalla de 64x8 leds. Cada matriz de 8x8 es controlada por un cicuito integrado MAX7219.</p>
+
+
+            <h3>2.1 ¿Por qué se utilizan MAX7219?</h3>
+
+            <p>Una matriz de 8×8 contiene 8 × 8 = 64 LEDs.   Si se intentara controlar directamente una matriz de este tipo desde el microcontrolador, habría que ocuparse de las filas y columnas, además de gestionar el multiplexado de los LED.</p>
+
+            <p>El MAX7219 simplifica considerablemente esta tarea.</p>
+
+            <p>En los módulos utilizados en este proyecto, el circuito integrado se encarga de controlar la matriz, realizar internamente el multiplexado y refresco de los LED, controlar la intensidad y recibir los datos mediante una interfaz serie.</p>
+
+            <p>Por ello, el microcontrolador no necesita dedicar continuamente sus pines a manejar directamente los 64 LED de cada matriz.</p>
+
+            <p>En este proyecto hay ocho matrices: 8 × 64 = 512 LEDs</p>
+
+            <p>Por tanto, físicamente la pantalla contiene 512 posiciones LED.</p>
+
+            <p>Esto no significa que el ATmega328P tenga que controlar 512 LED individualmente. Los MAX7219 realizan la mayor parte del trabajo relacionado con el accionamiento y multiplexado de las matrices.</p>
+
+
+            <h3>2.2 Comunicación entre el ATmega328P y los MAX7219</h3>
+
+            <p>Los MAX7219 reciben la información mediante una interfaz serie síncrona compatible funcionalmente con SPI.</p>
+
+            <p>En un ATmega328P, para la comunicación serial SPI se utilizan:</p>
+
+            <div class="table-container">
+            <table>
+            <thead>
+            <tr>
+            <th>Señal</th>
+            <th>Pin ATmega328P</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+            <td>MOSI</td>
+            <td>17 (PB3)</td>
+            <tr>
+            <td>MISO</td>
+            <td>18 (PB4)</td>    
+            </tr>
+            </tr>
+            <tr>
+            <td>SCK</td>
+            <td>19 (PB5)</td>
+            </tr>
+            <tr>
+            <td>SS</td>
+            <td>16 (PB2)</td>
+            </tr>
+            </tbody>
+            </table>
+            </div>
+
+            <p>El MAX7219 no necesita devolver información al ATmega328P en este proyecto, por lo que MISO no participa en la comunicación utilizada. La interfaz empleada utiliza tres señales principales: datos, reloj y selección del dispositivo.</p>
+
+            <div class="table-container">
+            <table>
+            <thead>
+                <tr>
+                    <th>Espiga MAX7219</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>DIN</td>
+                <tr>
+                    <td>CLK</td>                      
+                </tr>                
+                <tr>
+                    <td>CS</td>
+                </tr>
+                <tr>
+                    <td>GND</td>
+                </tr>
+            </tbody>
+            </table>
+            </div>
+
+            <p>La conexión entre ambos circuitos integrados es:</p>
+
+            <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ATmega328P<br>
+                            SEÑAL (pin) - Puerto </th>
+                        <th>MAX7219</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>MOSI (17) - PB3</td>
+                        <td>DIN</td>
+                    </tr>
+                    <tr>
+                        <td>SCK (19) - PB5</td>
+                        <td>CLK</td>
+                    </tr>
+                    <tr>
+                        <td>SS (16) - PB2</td>
+                        <td>CS</td>
+                    </tr>
+                    <tr>
+                        <td>GND</td>
+                        <td>GND</td>
+                    </tr>
+                </tbody>
+            </table>
+            </div>
+
+            <p>Cuando existen varios MAX7219, los dispositivos se conectan en cascada. Esto permite enviar una secuencia de datos que se visualizarán en la pantalla formada por los ocho dispositivos.</p>
+
+            <img src="img/ATmegaConMax7219.png" alt="Conexionado del MAX7219 con el ATmega328P" class="imagen-centrada"> 
+
+            <p>La alimentación de una cadena de ocho módulos debe dimensionarse considerando la corriente total de los MAX7219 y de las matrices LED. La fuente utilizada debe proporcionar la tensión requerida y una corriente suficiente para la carga, manteniendo además una conexión de GND común con el microcontrolador.</p>
+
+            </section>
+
+            <section>
+            <h2>3. CODIGO DEL PROGRAMA EN ARDUINO</h2>
+
+            <p>El código del programa desarrolladop en el IDE de Arduino es el siguiente. Posteriormente se desarrollará cada una de sus partes para comprender cómo funciona.</p>
+
+            <pre languaje="c"><code>#include &lt;MD_Parola.h&gt;
+#include &lt;MD_MAX72xx.h&gt;
+#include &lt;SPI.h&gt;
+            
+#define HARDWARE_TYPE MD_MAX72XX::FC16_HW
+#define MAX_DEVICES 8
+#define CS_PIN 10
+            
+#define BOTON_Miguel 2
+#define BOTON_Sergio 3
+#define BOTON_Ana 4
+            
+MD_Parola matriz(
+HARDWARE_TYPE,
+CS_PIN,
+MAX_DEVICES
+);
+            
+            const char* mensajes[] = {
+            "Hola Armando. Bendiciones para ti en este dia tan especial. Por favor presiona el boton para recibir un mensaje",
+            "Te amo mucho mi HIJITO LINDO. Exitos y lo mejor de la vida para ti.",
+            "Feliz cumpleanios hermano. Te quiero mucho",
+            "Armando, espero que lo hayas pasado bonito hoy en tu dia. Te deseo lo mejor. Que cumplas muchos anios mas",
+            };
+            
+            const byte TOTAL_MENSAJES =
+            sizeof(mensajes) / sizeof(mensajes[0]);
+            
+            byte indiceMensaje = 0;
+            
+            void mostrarMensaje(byte indice)
+            {
+            matriz.displayClear();
+            
+            matriz.displayText(
+            mensajes[indice],
+            PA_LEFT,
+            40,
+            500,
+            PA_SCROLL_LEFT,
+            PA_SCROLL_LEFT
+            );
+            
+            matriz.displayReset();
+            }
+            
+            void setup()
+            {
+            matriz.begin();
+            
+            matriz.setIntensity(15);
+            
+            matriz.displayClear();
+            
+            pinMode(BOTON_Miguel, INPUT_PULLUP);
+            pinMode(BOTON_Sergio, INPUT_PULLUP);
+            pinMode(BOTON_Ana, INPUT_PULLUP);
+            
+            mostrarMensaje(indiceMensaje);
+            }
+            
+            void loop()
+            {
+            if (digitalRead(BOTON_Miguel) == LOW)
+            {
+            indiceMensaje = 1;
+            
+            mostrarMensaje(indiceMensaje);
+            
+            delay(200);
+            }
+            
+            if (digitalRead(BOTON_Sergio) == LOW)
+            {
+            indiceMensaje = 2;
+            
+            mostrarMensaje(indiceMensaje);
+            
+            delay(200);
+            }
+            
+            if (digitalRead(BOTON_Ana) == LOW)
+            {
+            indiceMensaje = 3;
+            
+            mostrarMensaje(indiceMensaje);
+            
+            delay(200);
+            }
+            
+            if (matriz.displayAnimate())
+            {
+            indiceMensaje = 0;
+            
+            mostrarMensaje(indiceMensaje);
+            }
+            }</code></pre>
+
+
+            <h3>3.1. Configuración del hardware en el programa</h3>
+
+            <p>El código comienza estableciendo el tipo de módulo:</p>
+
+            <pre><code>#define HARDWARE_TYPE MD_MAX72XX::FC16_HW</code></pre>
+
+            <p>Esta definición es importante.</p>
+
+            <p>No todos los módulos comerciales basados en MAX7219 tienen exactamente la misma disposición física de las matrices. El controlador puede ser el mismo, pero la conexión entre el MAX7219 y los LED puede variar.</p>
+
+            <p>Por eso MD_MAX72xx necesita conocer el tipo de hardware.</p>
+
+            <p>En este caso:</p>
+
+            <pre><code>MD_MAX72XX::FC16_HW</code></pre>
+
+            <p>corresponde a la disposición utilizada por los módulos tipo FC-16.</p>
+
+            <p>Después se indica el número de dispositivos:</p>
+
+            <pre><code>#define MAX_DEVICES 8</code></pre>
+
+            <p>Esto informa a la biblioteca de que existen ocho dispositivos MAX7219.</p>
+
+            <p>Finalmente se define el pin utilizado como CS en la placa de Arduino:</p>
+
+            <pre><code>#define CS_PIN 10</code></pre>
+
+            <p>Con estos parámetros se crea el objeto que representa la pantalla:</p>
+
+            <pre><code>MD_Parola matriz(
+HARDWARE_TYPE,
+CS_PIN,
+MAX_DEVICES
+);</code></pre>
+
+            <p>La variable <code>matriz</code> será utilizada posteriormente para inicializar la pantalla, configurar su brillo, mostrar textos y ejecutar las animaciones.</p>
+
+
+            <h3>3.2. Las bibliotecas utilizadas</h3>
+
+            <p>El programa utiliza tres bibliotecas:</p>
+
+            <pre><code>#include &lt;MD_Parola.h&gt;
+#include &lt;MD_MAX72xx.h&gt;
+#include &lt;SPI.h&gt;</code></pre>
+
+            <p>Cada una tiene una función diferente.</p>
+
+            <p><strong>MD_Parola</strong></p>
+
+            <p>Es la biblioteca de más alto nivel. Facilita la presentación de textos y efectos de animación.</p>
+
+            <p>Por ejemplo:</p>
+
+            <pre><code>matriz.displayText(...)</code></pre>
+
+            <p>permite preparar un texto para mostrarlo en la pantalla.</p>
+
+            <p><strong>MD_MAX72xx</strong></p>
+
+            <p>Se ocupa del control de los MAX7219. Es la capa que permite trabajar con los dispositivos y sus matrices LED.</p>
+
+            <p><strong>SPI</strong></p>
+
+            <p>Proporciona el soporte para la comunicación serie utilizada por los MAX7219.</p>
+
+           <h3>3.3. Los tres botones</h3>
+
+            <p>Los tres pulsadores están conectados a los pines digitales 2, 3 y 4 de Arduino (en términos de programación), pero que a nivel de hardware, en el ATmega328P configurado para funcionar de forma independiente en un circuito propio, fuera de la placa de desarrollo Arduino (<emp>standalone</emp>), son los pines 4 (PD2), 5 (PD3), 6 (PD4) :</p>
+
+            <pre><code>#define BOTON_Miguel 2
+#define BOTON_Sergio 3
+#define BOTON_Ana 4</code></pre>
+
+            <p>Cada botón está conectado entre el pin correspondiente y GND.</p>
+
+            <p>El programa configura los pines de esta manera:</p>
+
+            <pre><code>pinMode(BOTON_Miguel, INPUT_PULLUP);
+pinMode(BOTON_Sergio, INPUT_PULLUP);
+pinMode(BOTON_Ana, INPUT_PULLUP);</code></pre>
+
+            <p>Aquí aparece un concepto fundamental de electrónica digital: la resistencia pull-up.</p>
+
+
+            <h3>3.4. ¿Qué hace INPUT_PULLUP?</h3>
+
+            <p>Cuando una entrada digital queda eléctricamente desconectada, su estado puede quedar indefinido. El microcontrolador podría interpretar el pin unas veces como HIGH y otras como LOW.</p>
+
+            <p>La resistencia pull-up mantiene normalmente la entrada en un nivel lógico alto.</p>
+
+            <p>En este caso, la resistencia pull-up está integrada en el ATmega328P y se habilita mediante <code>INPUT_PULLUP</code>, por lo que no es necesario añadir una resistencia externa para cada botón.</p>
+
+            <p>El circuito queda conceptualmente así:</p>
+
+            <img src="img/Pullup.jpeg" alt="Idea de la resistencia pullup" class="imagen-centrada"> 
+            
+            <p>Cuando el botón está libre:</p>
+
+            <pre>Pin = HIGH</pre>
+
+            <p>Cuando se presiona:</p>
+
+            <pre>Pin = LOW</pre>
+
+            <p>Por eso el programa comprueba:</p>
+
+            <pre><code>if (digitalRead(BOTON_Miguel) == LOW)</code></pre>
+
+            <p>No debemos interpretar LOW como un error o como una entrada desactivada. En este circuito, LOW significa botón presionado.</p>
+
+            <p>Esta lógica se conoce como <strong>lógica activa en bajo</strong>.</p>
+
+
+            <h3>3.5. Organización de los mensajes</h3>
+
+            <p>El programa utiliza un arreglo de cadenas:</p>
+
+            <pre><code>const char* mensajes[] = {
+            "Hola Armando. Bendiciones para ti en este dia tan especial.  Por favor presiona el boton para recibir un mensaje",
+            "Te amo mucho mi HIJITO LINDO. Exitos y lo mejor de la vida para ti.",
+            "Feliz cumpleanios hermano. Te quiero mucho",
+            "Armando, espero que lo hayas pasado bonito hoy en tu dia. Te deseo lo mejor. Que cumplas muchos anios mas",
+            };</code></pre>
+
+            <p>Esto es mejor que crear una variable independiente para cada mensaje.</p>
+
+            <p>Los mensajes quedan organizados mediante índices:</p>
+
+            <pre>
+            mensajes[0] → Bienvenida
+            mensajes[1] → Miguel
+            mensajes[2] → Sergio
+            mensajes[3] → Ana
+            </pre>
+
+            <p>Esta organización simplifica considerablemente el programa.</p>
+
+            <p>Por ejemplo:</p>
+
+            <pre><code>mostrarMensaje(2);</code></pre>
+
+            <p>significa mostrar el mensaje almacenado en:</p>
+
+            <pre><code>mensajes[2]</code></pre>
+
+            <p>es decir, el mensaje de Sergio.</p>
+
+            <p>Los textos se han escrito sin caracteres acentuados, como en <code>cumpleanios</code> y <code>anios</code>, para evitar depender de la representación de caracteres extendidos y de la tabla de caracteres utilizada por la biblioteca y el módulo de visualización.</p>
+
+
+            <h3>3.6. Cálculo automático de la cantidad de mensajes</h3>
+
+            <p>El programa utiliza:</p>
+
+            <pre><code>const byte TOTAL_MENSAJES =
+            sizeof(mensajes) / sizeof(mensajes[0]);</code></pre>
+
+            <p>El objetivo es obtener automáticamente la cantidad de elementos del arreglo.</p>
+
+            <p>Si existen cuatro mensajes:</p>
+
+            <pre>
+            mensajes[0]
+            mensajes[1]
+            mensajes[2]
+            mensajes[3]
+            </pre>
+
+            <p>entonces:</p>
+
+            <pre>TOTAL_MENSAJES = 4</pre>
+
+            <p>Esta técnica tiene una ventaja importante.</p>
+
+            <p>Si posteriormente se agrega un quinto mensaje, no es necesario cambiar manualmente <code>TOTAL_MENSAJES</code>. El compilador calculará nuevamente la cantidad de elementos.</p>
+
+            <p>En este programa concreto, <code>TOTAL_MENSAJES</code> se calcula pero no se utiliza posteriormente en la lógica principal. Se conserva porque resulta útil si el programa evoluciona y se necesita recorrer, validar o gestionar dinámicamente el conjunto de mensajes.</p>
+
+
+            <h3>3.7. La variable indiceMensaje</h3>
+
+            <p>El programa mantiene una variable que identifica el mensaje que debe mostrarse:</p>
+
+            <pre><code>byte indiceMensaje = 0;</code></pre>
+
+            <p>El valor inicial es 0, porque el sistema debe comenzar con el mensaje de bienvenida.</p>
+
+            <p>La correspondencia es:</p>
+
+            <pre>
+            indiceMensaje = 0 → Bienvenida
+            indiceMensaje = 1 → Mensaje de Miguel
+            indiceMensaje = 2 → Mensaje de Sergio
+            indiceMensaje = 3 → Mensaje de Ana
+            </pre>
+
+            <p>Este mecanismo es sencillo pero muy importante.</p>
+
+            <p>En lugar de tener que manejar cuatro programas diferentes, el programa trabaja con un único concepto: el mensaje que debe mostrarse actualmente.</p>
+
+
+            <h3>3.8. La función mostrarMensaje()</h3>
+
+            <p>Una de las decisiones más importantes del programa es haber concentrado el cambio de mensaje en una función:</p>
+
+            <pre><code>void mostrarMensaje(byte indice)</code></pre>
+
+            <p>La función realiza tres operaciones fundamentales.</p>
+
+            <p><strong>Primera operación: limpiar la pantalla</strong></p>
+
+            <pre><code>matriz.displayClear();</code></pre>
+
+            <p>Esto elimina el contenido que estaba siendo mostrado.</p>
+
+            <p><strong>Segunda operación: configurar el nuevo texto</strong></p>
+
+            <pre><code>matriz.displayText(
+mensajes[indice],
+PA_LEFT,
+40,
+500,
+PA_SCROLL_LEFT,
+PA_SCROLL_LEFT
+;</code></pre>
+
+            <p>Aquí se le indica a MD_Parola qué debe mostrar y cómo debe animarlo.</p>
+
+            <p><strong>Tercera operación: reiniciar la animación</strong></p>
+
+            <pre><code>matriz.displayReset();</code></pre>
+
+            <p>Esto hace que el mensaje empiece nuevamente desde el principio.</p>
+
+            <p>La función encapsula todo el procedimiento.</p>
+
+            <p>Así, desde cualquier parte del programa basta con escribir:</p>
+
+            <pre><code>mostrarMensaje(1);</code></pre>
+
+            <p>para cambiar al mensaje de Miguel.</p>
+
+
+            <h3>3.9. Configuración de la animación</h3>
+
+            <p>La llamada:</p>
+
+            <pre><code>matriz.displayText(
+mensajes[indice],PA_LEFT,
+40,
+500,
+PA_SCROLL_LEFT,
+PA_SCROLL_LEFT
+);</code></pre>
+
+            <p>contiene varios parámetros.</p>
+
+            <p>El primero:</p>
+
+            <pre><code>mensajes[indice]</code></pre>
+
+            <p>es el texto que se desea mostrar.</p>
+
+            <p>El segundo:</p>
+
+            <pre><code>PA_LEFT</code></pre>
+
+            <p>define la alineación.</p>
+
+            <p>El tercero:</p>
+
+            <pre><code>40</code></pre>
+
+            <p>es el intervalo temporal utilizado por la animación y determina su velocidad de actualización.</p>
+
+            <p>El cuarto:</p>
+
+            <pre><code>500</code></pre>
+
+            <p>define la pausa configurada para la animación.</p>
+
+            <p>Los dos últimos parámetros corresponden a los efectos de entrada y salida:</p>
+
+            <pre><code>PA_SCROLL_LEFT,
+PA_SCROLL_LEFT</code></pre>
+
+            <p>En ambos casos se utiliza el desplazamiento hacia la izquierda. Por ello, el texto se presenta mediante una animación de desplazamiento hacia la izquierda.</p>
+
+
+            <h3>3.10. Inicialización mediante setup()</h3>
+
+            <p>La función:</p>
+
+            <pre><code>void setup()</code></pre>
+
+            <p>se ejecuta una sola vez después de encender o reiniciar el microcontrolador.</p>
+
+            <p>Primero se inicializa la pantalla:</p>
+
+            <pre><code>matriz.begin();</code></pre>
+
+            <p>Después se establece el brillo:</p>
+
+            <pre><code>matriz.setIntensity(15);</code></pre>
+
+            <p>El MAX7219 permite seleccionar diferentes niveles de intensidad. En este caso se utiliza:</p>
+
+            <pre>
+            0  → mínimo
+            15 → máximo
+            </pre>
+
+            <p>Por tanto:</p>
+
+            <pre><code>matriz.setIntensity(15);</code></pre>
+
+            <p>configura la máxima intensidad disponible mediante este control.</p>
+
+            <p>Después se limpia la pantalla:</p>
+
+            <pre><code>matriz.displayClear();</code></pre>
+
+            <p>Esto garantiza que el sistema comience desde un estado conocido.</p>
+
+
+            <h3>3.11. Configuración de los botones</h3>
+
+            <p>A continuación se configuran las tres entradas:</p>
+
+            <pre><code>pinMode(BOTON_Miguel, INPUT_PULLUP);
+pinMode(BOTON_Sergio, INPUT_PULLUP);
+pinMode(BOTON_Ana, INPUT_PULLUP);</code></pre>
+
+            <p>Finalmente se muestra el primer mensaje:</p>
+
+            <pre><code>mostrarMensaje(indiceMensaje);</code></pre>
+
+            <p>Como:</p>
+
+            <pre><code>indiceMensaje = 0;</code></pre>
+
+            <p>el programa comienza mostrando:</p>
+
+            <pre><code>mensajes[0]</code></pre>
+
+            <p>es decir, el mensaje de bienvenida.</p>
+
+
+            <h3>3.12. El papel de loop()</h3>
+
+            <p>La función:</p>
+
+            <pre><code>void loop()</code></pre>
+
+            <p>se ejecuta continuamente.</p>
+
+            <p>A diferencia de <code>setup()</code>, que se ejecuta una sola vez, <code>loop()</code> se repite mientras el microcontrolador esté funcionando.</p>
+
+            <p>En cada iteración el programa realiza dos tareas:</p>
+
+            <ul>
+            <li>comprobar los tres botones;</li>
+            <li>avanzar la animación de la pantalla.</li>
+            </ul>
+
+            <p>La estructura general es:</p>
+
+            <pre>
+            loop()
+            │
+            ├── ¿Botón Miguel?
+            │
+            ├── ¿Botón Sergio?
+            │
+            ├── ¿Botón Ana?
+            │
+            └── ejecutar displayAnimate()
+            </pre>
+
+            <p>Este esquema es característico de muchos programas sencillos para microcontroladores.</p>
+
+
+            <h3>3.13. ¿Qué ocurre al presionar el botón de Miguel?</h3>
+
+            <p>El programa comprueba:</p>
+
+            <pre><code>if (digitalRead(BOTON_Miguel) == LOW)</code></pre>
+
+            <p>Si el resultado es verdadero, significa que el botón está presionado.</p>
+
+            <p>Entonces:</p>
+
+            <pre><code>indiceMensaje = 1;</code></pre>
+
+            <p>selecciona el mensaje de Miguel.</p>
+
+            <p>Después:</p>
+
+            <pre><code>mostrarMensaje(indiceMensaje);</code></pre>
+
+            <p>limpia la pantalla y comienza la animación.</p>
+
+            <p>Finalmente:</p>
+
+            <pre><code>delay(200);</code></pre>
+
+            <p>introduce una espera de 200 ms que reduce la posibilidad de que una única pulsación mecánica sea interpretada como múltiples pulsaciones.</p>
+
+            <p>El mismo principio se utiliza para Sergio y Ana.</p>
+
+
+            <h3>3.14. El rebote mecánico de los pulsadores</h3>
+
+            <p>Un pulsador mecánico no cambia de estado eléctrico de manera perfectamente limpia.</p>
+
+            <p>Cuando se presiona, los contactos pueden producir durante un corto intervalo una secuencia parecida a:</p>
+
+            <pre>
+            HIGH ─────┐
+                    │
+                    └─LOW─HIGH─LOW─HIGH─LOW────────
+            </pre>
+
+            <p>El microcontrolador podría interpretar esas transiciones como varias pulsaciones.</p>
+
+            <p>El programa utiliza:</p>
+
+            <pre><code>delay(200);</code></pre>
+
+            <p>como una forma sencilla de antirrebote.</p>
+
+            <p>Para un proyecto didáctico y una interfaz que solamente necesita responder a pulsaciones ocasionales, este método puede ser suficiente. Sin embargo, <code>delay(200)</code> bloquea temporalmente la ejecución del programa durante 200 ms.</p>
+
+            <p>Por ello, no debe confundirse esta solución con un sistema de antirrebote completamente no bloqueante. En un sistema más exigente convendría implementar un antirrebote basado en tiempo, utilizando por ejemplo <code>millis()</code>, sin detener el procesador con <code>delay()</code>.</p>
+
+
+            <h3>3.15. La parte más importante: displayAnimate()</h3>
+
+            <p>Una de las características más interesantes del programa es:</p>
+
+            <pre><code>if (matriz.displayAnimate())</code></pre>
+
+            <p>La animación no se ejecuta mediante un <code>for</code> o un <code>while</code> que bloquee completamente el programa. <code>displayAnimate()</code> realiza una parte del trabajo de la animación y devuelve el control al programa. En la siguiente iteración de <code>loop()</code> vuelve a ser llamada para continuar el proceso.</p>
+
+            <p>De esta manera, la animación se construye mediante muchas llamadas sucesivas en lugar de mantener al microcontrolador detenido dentro de un bucle durante toda la duración del efecto.</p>
+
+            <p>Conceptualmente:</p>
+
+            <pre>
+            loop()
+            │
+            ▼
+            displayAnimate()
+            │
+            ├── todavía no termina → false
+            │
+            └── terminó → true
+            </pre>
+
+            <p>Esto permite que el programa vuelva a ejecutar <code>loop()</code> y, por tanto, continúe comprobando los botones mientras la animación está avanzando.</p>
+
+            <p>Por ejemplo, si se está mostrando el mensaje de Miguel y el usuario presiona el botón de Sergio, el programa puede abandonar la animación actual y configurar el mensaje de Sergio.</p>
+
+            <p>Esta característica es especialmente importante en sistemas embebidos porque permite combinar la presentación de información con la supervisión de entradas sin mantener al procesador atrapado dentro de un bucle de espera.</p>
+
+
+            <h3>3.16. ¿Qué ocurre si se presionan dos botones?</h3>
+
+            <p>El programa comprueba los tres botones mediante tres instrucciones <code>if</code> independientes:</p>
+
+            <pre><code>if (digitalRead(BOTON_Miguel) == LOW)
+            {
+            ...
+            }
+
+            if (digitalRead(BOTON_Sergio) == LOW)
+            {
+            ...
+            }
+
+            if (digitalRead(BOTON_Ana) == LOW)
+            {
+            ...
+            }</code></pre>
+
+            <p>Por tanto, si dos botones permanecen presionados simultáneamente, más de una condición puede resultar verdadera durante la misma ejecución de <code>loop()</code>.</p>
+
+            <p>En ese caso, un bloque puede seleccionar un mensaje y el siguiente bloque puede reemplazar inmediatamente esa selección. Para este proyecto se considera que el usuario presiona un solo botón a la vez.</p>
+
+
+            <h3>3.17. Regreso automático al mensaje de bienvenida</h3>
+
+            <p>Cuando:</p>
+
+            <pre><code>matriz.displayAnimate()</code></pre>
+
+            <p>devuelve <code>true</code>, significa que la animación ha terminado.</p>
+
+            <p>Entonces el programa ejecuta:</p>
+
+            <pre><code>indiceMensaje = 0;</code></pre>
+
+            <p>y vuelve a llamar:</p>
+
+            <pre><code>mostrarMensaje(indiceMensaje);</code></pre>
+
+            <p>El flujo completo queda así:</p>
+
+            <pre>
+                        ┌───────────────────────┐
+                        │  MENSAJE BIENVENIDA   │
+                        │       mensajes[0]     │
+                        └───────────┬───────────┘
+                                    │
+                        se presiona un botón
+                                    │
+                    ┌──────────────┼──────────────┐
+                    │              │              │
+                    ▼              ▼              ▼
+                mensajes[1]     mensajes[2]    mensajes[3]
+                Miguel          Sergio          Ana
+                    │              │              │
+                    └──────────────┼──────────────┘
+                                    │
+                            termina animación
+                                    │
+                                    ▼
+                        ┌───────────────────────┐
+                        │  MENSAJE BIENVENIDA   │
+                        │       mensajes[0]     │
+                        └───────────────────────┘
+            </pre>
+
+            <p>Por tanto, el mensaje de bienvenida actúa como estado normal o estado de reposo del sistema.</p>
+            </section>
+
+
+            <section>
+            <h2>4. Una interpretación como máquina de estados</h2>
+
+            <p>El código está organizado en bloques con responsabilidades claras:</p>
+
+            <ol>
+            <li>Bibliotecas</li>
+            <li>Configuración del hardware</li>
+            <li>Configuración de botones</li>
+            <li>Mensajes</li>
+            <li>Número de mensajes</li>
+            <li>Mensaje actual</li>
+            <li>Función <code>mostrarMensaje()</code></li>
+            <li><code>setup()</code></li>
+            <li><code>loop()</code></li>
+            </ol>
+
+            <p>Esta organización no es solamente estética.</p>
+
+            <p>Ayuda a localizar rápidamente cada parte del programa.</p>
+
+            <p>Por ejemplo:</p>
+
+            <ul>
+            <li>si cambia el número de matrices → sección de hardware;</li>
+            <li>si cambia un botón → sección de botones;</li>
+            <li>si cambia un texto → sección de mensajes;</li>
+            <li>si cambia el efecto → <code>mostrarMensaje()</code>;</li>
+            <li>si cambia la lógica de selección → <code>loop()</code>.</li>
+            </ul>
+
+            <p>Esta separación es recomendable incluso en programas pequeños.</p>
+
+            <p>Aunque el programa no utiliza formalmente una enumeración <code>enum</code> ni una máquina de estados explícita, conceptualmente puede entenderse de esa manera.</p>
+
+            <p>No debemos confundir esta interpretación conceptual con una implementación formal de una máquina de estados. En el código no existe un <code>enum</code>, una variable de estado específica ni una estructura <code>switch</code> que gestione explícitamente las transiciones. La variable <code>indiceMensaje</code> cumple parcialmente esa función.</p>
+
+            <p>Tenemos cuatro estados conceptuales:</p>
+
+            <pre>
+            ESTADO 0 → Bienvenida
+            ESTADO 1 → Mensaje Miguel
+            ESTADO 2 → Mensaje Sergio
+            ESTADO 3 → Mensaje Ana
+            </pre>
+
+            <p>La transición depende de los botones:</p>
+
+            <pre>
+                            Botón Miguel
+                                │
+                                ▼
+                        ┌──────────────┐
+                        │    MIGUEL    │
+                        └──────┬───────┘
+                                │
+                                ▼
+                            BIENVENIDA
+
+
+                            Botón Sergio
+                                │
+                                ▼
+                        ┌──────────────┐
+                        │    SERGIO    │
+                        └──────┬───────┘
+                                │
+                                ▼
+                            BIENVENIDA
+
+
+                            Botón Ana
+                                │
+                                ▼
+                        ┌──────────────┐
+                        │     ANA      │
+                        └──────┬───────┘
+                                │
+                                ▼
+                            BIENVENIDA
+            </pre>
+
+            <p>Esta forma de analizar el programa es muy útil porque permite comprender la lógica independientemente de la biblioteca utilizada.</p>
+            </section>
+
+            <section>
+            <h2>5. ATMEGA328P EN CIRCUITO PROPIO </h2>
+            <img src="img/Matriz8x8_bb3Botones.png" alt="AMtega328P on a breadboard con Max7219" class="imagen-centrada"> 
+
+            </section>
+
+            <section>
+            <h2>5. Conclusión</h2>
+
+            <p>Este proyecto es un buen ejemplo de cómo un sistema embebido puede construirse a partir de elementos relativamente sencillos.</p>
+
+            <p>El ATmega328P recibe información de tres entradas digitales. Los pulsadores utilizan las resistencias pull-up internas, por lo que una pulsación se interpreta como un nivel LOW.</p>
+
+            <p>El microcontrolador mantiene un índice que determina qué mensaje debe mostrarse. Los textos están almacenados en un arreglo y una función específica, <code>mostrarMensaje()</code>, concentra las operaciones necesarias para cambiar de contenido.</p>
+
+            <p>La pantalla está formada por ocho matrices de 8×8 controladas mediante MAX7219. Los ocho controladores trabajan en cascada y reciben los datos desde el microcontrolador mediante una interfaz serie compatible con SPI.</p>
+
+            <p>La biblioteca MD_Parola se encarga de una parte importante de la lógica de presentación y animación, mientras que MD_MAX72xx proporciona el control de los dispositivos MAX7219.</p>
+
+            <p>Finalmente, <code>displayAnimate()</code> permite avanzar la animación sin detener completamente el funcionamiento del programa. Cuando el mensaje seleccionado termina, el programa vuelve al mensaje de bienvenida y queda nuevamente esperando una pulsación.</p>
+
+            <p>Lo más valioso del proyecto, sin embargo, no es solamente conseguir que aparezca un texto en ocho matrices. Es la estructura que hay detrás:</p>
+
+            <pre>
+            entrada → decisión → estado → salida → fin de la animación → retorno al estado normal
+            </pre>
+
+            <p>Esa misma lógica puede encontrarse, con mayor complejidad, en paneles de información, interfaces de usuario, sistemas de control, máquinas industriales y muchos otros sistemas embebidos.</p>
+            </section>
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>
