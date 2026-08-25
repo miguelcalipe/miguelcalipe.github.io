@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistemas Embebidos | MC Mundo Tech</title>
+    <meta name="description" content="Que son los sistemas embebidos, su estructura y como funcionan">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>SISTEMAS EMBEBIDOS: FUNDAMENTOS, ARQUITECTURA Y APLICACIONES</h1>
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   -->          
+
+            <section>
+            <h2>1. INTRODUCCIÓN</h2>
+
+             <p>
+                Un sistema embebido (<em>embedded system</em>) es un sistema informático especializado diseñado para cumplir una función determinada dentro de un equipo, máquina o producto. Su hardware se construye alrededor de un dispositivo de procesamiento, que puede ser un microprocesador o un microcontrolador (MCU, <em>Microcontroller Unit</em>).
+            </p>
+
+            <p>
+                A diferencia de un computador de propósito general, un sistema embebido no está pensado para ejecutar una amplia variedad de aplicaciones para un usuario. Su diseño está orientado a resolver una tarea concreta o un conjunto limitado de tareas. Puede, por ejemplo, medir una variable física, procesar esa información, tomar una decisión y controlar un actuador.
+            </p>
+
+            <p>
+                Esto no significa que todos los sistemas embebidos tengan la misma arquitectura. El hardware utilizado depende directamente de los requisitos del sistema: capacidad de procesamiento, memoria, entradas y salidas, consumo energético, costo, tamaño, tiempo de respuesta y condiciones de funcionamiento.
+            </p>
+
+            <p>
+                En términos generales, un sistema embebido combina hardware, software y periféricos especializados para realizar una función específica de manera autónoma y confiable.
+            </p>
+            
+            </section>
+
+            <section>
+            <h2>2. CARACTERÍSTICAS FUNDAMENTALES DE UN SISTEMA EMBEBIDO</h2>
+
+            <p>Aunque existe una gran variedad de sistemas embebidos, hay varias características que permiten reconocerlos.</p>
+
+                <h3>2.1. Función Especializada</h3>
+
+                    <p>Un sistema embebido normalmente está diseñado para realizar una tarea bien definida.</p>
+
+                    <p>La tarea puede ejecutarse:</p>
+
+                    <ul>
+                        <li>periódicamente;</li>
+                        <li>como respuesta a un evento;</li>
+                        <li>como consecuencia de una señal proveniente de un sensor;</li>
+                        <li>o mediante una combinación de estas situaciones.</li>
+                    </ul>
+
+                    <p>Por ejemplo, un controlador puede leer periódicamente un sensor de temperatura y modificar una salida para mantener una temperatura determinada.</p>
+
+                    <p>El sistema no necesita disponer de todas las capacidades de un computador personal. Solo necesita los recursos necesarios para realizar correctamente la función para la cual fue diseñado.</p>
+                    
+                <h3>2.2. procesamiento y computación</h3>
+
+                    <p>Los sistemas embebidos tienen capacidades de procesamiento y cálculo que dependen de la aplicación.</p>
+
+                    <p>En algunos casos basta con un microcontrolador sencillo. En otros se necesita un dispositivo con mayor capacidad de procesamiento.</p>
+
+                    <p>La elección del procesador está relacionada directamente con los requisitos del sistema. Una computadora para bicicleta, por ejemplo, puede realizar sus cálculos con un microcontrolador de recursos relativamente modestos. En cambio, una unidad de control de un motor de automóvil necesita procesar una cantidad mucho mayor de información y cumplir restricciones temporales más exigentes.</p>
+                
+            <h3>2.3. Bajo Consumo Energético</h2>
+
+                <p>Muchos sistemas embebidos funcionan con una fuente de energía limitada, como una batería. Por esta razón, el consumo energético es un parámetro importante durante el diseño.</p>
+
+                <p>El consumo no puede analizarse de forma independiente de los demás requisitos. Aumentar el rendimiento del procesador puede incrementar el consumo, mientras que reducir demasiado la capacidad de procesamiento puede impedir que el sistema cumpla sus tiempos de respuesta.</p>
+
+                <p>Por ello, el diseño busca un equilibrio entre:</p>
+
+                <ul>
+                    <li>rendimiento;</li>
+                    <li>consumo de energía;</li>
+                    <li>costo;</li>
+                    <li>tamaño;</li>
+                    <li>capacidad de procesamiento.</li>
+                </ul>
+            
+            <h3>2.4. Bajo costo y tamaño reducido</h3>
+
+                <p>Los sistemas embebidos suelen estar integrados dentro de productos que tienen restricciones de costo y espacio.</p>
+
+                <p>Una computadora para bicicleta, por ejemplo, debe ser pequeña, ligera, económica y capaz de funcionar durante un período prolongado con una batería.</p>
+
+                <p>En aplicaciones automotrices también existe una restricción importante de espacio. La unidad electrónica debe integrarse en un vehículo donde el tamaño del dispositivo y sus condiciones de instalación son factores relevantes.</p>
+            
+            <h2>2.5. Funcionamiento Autónomo</h2>
+
+                <p>Muchos sistemas embebidos deben funcionar durante largos períodos sin intervención directa de un operador.</p>
+
+                <p>Esto introduce un requisito importante: el sistema debe ser capaz de manejar condiciones de fallo sin bloquearse o detener completamente su funcionamiento.</p>
+
+                <p>El software de un sistema embebido, por tanto, no solo debe contemplar el funcionamiento normal. También debe incluir mecanismos para detectar, gestionar y diagnosticar determinadas condiciones anómalas.</p>
+            
+            </section>
+
+            <section>
+            <h2>3. PROCESAMIENTO EN TIEMPO REAL</h2>
+
+            <p>Una característica especialmente importante de muchos sistemas embebidos es su relación con el tiempo real (<em>real-time</em>).</p>
+
+            <p>Un sistema en tiempo real debe producir una salida significativa dentro de un intervalo de tiempo definido. No basta con obtener el resultado correcto; también es necesario obtenerlo dentro del plazo establecido.</p>
+
+            <p>Esto es fundamental en aplicaciones donde el momento en que se produce una respuesta forma parte del comportamiento correcto del sistema.</p>
+
+            <p>Por ejemplo, en una unidad de control del motor de un automóvil, los cálculos relacionados con la inyección de combustible y el encendido deben realizarse en momentos determinados. Si el cálculo termina demasiado tarde, aunque el valor calculado sea correcto, el sistema puede funcionar de manera incorrecta.</p>
+
+            <p>Por eso, en un sistema de tiempo real existen dos aspectos que deben considerarse:</p>
+
+            <ul>
+                <li><strong>Corrección del resultado.</strong></li>
+                <li><strong>Cumplimiento del tiempo de respuesta requerido.</strong></li>
+            </ul>
+
+            <p>Por ejemplo, la computadora para bicicleta es un sistema de tiempo real débil (<em>weak real-time system</em>). En este caso, el procesamiento debe realizarse entre dos impulsos del sensor de la rueda, pero los requisitos temporales no son comparables con los de sistemas de control más críticos.</p>
+            </section>
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>
