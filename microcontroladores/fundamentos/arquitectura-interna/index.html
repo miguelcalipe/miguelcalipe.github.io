@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arquitectura Interna de un Microcontrolador | MC Mundo Tech</title>
+    <meta name="description" content="Cómo se organiza internamente ese conjunto y qué función cumple cada bloque">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>ARQUITECTURA INTERNA DE UN MICROCONTROLADOR</h1>
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   -->
+            
+           
+
+<section>
+    <h2>INTRODUCCIÓN</h2>
+
+<p>
+    En otro artículo  vimos que un microcontrolador (MCU) integra en un mismo circuito la capacidad de procesamiento, la memoria y diferentes periféricos. Ahora corresponde analizar cómo se organiza internamente ese conjunto y qué función cumple cada bloque.
+</p>
+
+<p>
+    Un microcontrolador no es solamente una CPU dentro de un encapsulado. Para que pueda funcionar como controlador de un sistema embebido necesita disponer de recursos que le permitan almacenar el programa y los datos, recibir información del exterior, generar señales, medir intervalos de tiempo, responder a eventos y comunicarse con otros dispositivos.
+</p>
+
+<p>
+    Por eso, cuando se estudia la arquitectura interna de un MCU, es necesario observar la relación entre varios bloques:
+</p>
+
+<ul>
+    <li>CPU;</li>
+    <li>memoria;</li>
+    <li>GPIO;</li>
+    <li>temporizadores;</li>
+    <li>sistema de interrupciones;</li>
+    <li>buses;</li>
+    <li>periféricos.</li>
+</ul>
+
+<p>
+    El microcontrolador integra un procesador con bloques de memoria, E/S digitales y analógicas, temporizadores y otros periféricos, todos ellos comunicados mediante un bus interno del sistema.
+</p>
+
+<p>
+    Este artículo desarrolla esos conceptos desde una perspectiva general, sin asociarlos a una familia concreta de microcontroladores. Los nombres de registros, buses, controladores y periféricos pueden cambiar entre fabricantes y dispositivos, pero los conceptos funcionales son ampliamente aplicables.
+</p>
+```
+
+</section>
+
+<section>
+    <h2>1. VISIÓN GENERAL DE LA ARQUITECTURA INTERNA</h2>
+
+<p>
+    Un microcontrolador integra varios bloques de hardware que trabajan conjuntamente para ejecutar una aplicación embebida.
+</p>
+
+<p>
+    Una forma práctica de entender la arquitectura de un MCU es pensar en él como un conjunto de bloques especializados que trabajan coordinadamente.
+</p>
+
+<p>
+    Una representación conceptual de un microcontrolador puede ser la siguiente:
+</p>
+
+    <img src="img/ConceptoMicrocontroladorjpeg"
+        alt="Representación Conceptual de un Microcontrolador"
+        class="imagen-centrada">
+
+<p>
+    Este esquema es deliberadamente general. Un MCU concreto puede tener más bloques, menos bloques o diferentes formas de interconectarlos.
+</p>
+
+<p>
+    Por ejemplo, algunos microcontroladores incorporan ADC, DAC, interfaces de comunicación, PWM, DMA, watchdog, RTC y otros recursos. Otros pueden carecer de algunos de ellos.
+</p>
+
+<p>
+    Este modelo permite entender la función de cada elemento sin depender de una arquitectura específica.
+</p>
+
+<ul>
+    <li>La CPU ejecuta las instrucciones del programa y realiza el procesamiento.</li>
+    <li>La memoria almacena el programa y los datos necesarios para su funcionamiento.</li>
+    <li>Los GPIO proporcionan entradas y salidas digitales para interactuar con circuitos externos.</li>
+    <li>Los temporizadores y contadores permiten realizar funciones relacionadas con tiempo, conteo y generación de señales.</li>
+    <li>El sistema de interrupciones permite que determinados eventos soliciten la atención de la CPU.</li>
+    <li>Los periféricos proporcionan funciones especializadas, como conversión analógica, comunicación o generación de señales.</li>
+    <li>Los buses y sistemas de interconexión permiten que CPU, memoria y periféricos intercambien información.</li>
+</ul>
+
+<p>
+    La arquitectura concreta varía entre microcontroladores. Por eso, conceptos como la cantidad de memoria, organización de buses, estructura de interrupciones, funciones de GPIO y características de los temporizadores deben verificarse siempre en la documentación del dispositivo específico.
+</p>
+
+<p>
+    La idea fundamental que debemos conservar es esta:
+</p>
+
+<p>
+    <strong>Un microcontrolador es un sistema integrado de procesamiento, memoria e interfaces hardware especializadas. La CPU ejecuta el software, mientras que los periféricos realizan funciones específicas y permiten que ese software interactúe con el sistema físico.</strong>
+</p>
+
+<p>
+    Este concepto será la base para comprender posteriormente GPIO, temporizadores, interrupciones, ADC, PWM y protocolos de comunicación con mucha mayor facilidad.
+</p>
+
+<p>
+    La selección de estos recursos depende del propósito para el que se diseñó el dispositivo. Los componentes adicionales de un microcontrolador se eligen según la finalidad del controlador.
+</p>
+
+
+</section>
+
+<section>
+    <h2>2. LA CPU DENTRO DEL MICROCONTROLADOR</h2>
+
+
+<div class="imagen-derecha">
+    <img src="img/FuncionamientoCPU.jpeg"          
+    alt="Modelo conceptual de CPU basado en 3 etapas">
+    
+    <div class="texto">
+        <p>
+            La CPU (Central Processing Unit) es el bloque encargado de ejecutar las instrucciones del programa.
+        </p>
+
+        <p>
+            En un artículo anterior vimos que el funcionamiento básico de la CPU puede entenderse mediante el ciclo:
+        </p>
+
+        <p>
+            <strong>Fetch → Decode → Execute</strong>
+        </p>
+
+        <p>
+            es decir:
+        </p>
+
+        <p>
+            <strong>Búsqueda → Decodificación → Ejecución.</strong>
+        </p>
+
+    </div>
+    </div>
+        <p>
+            La CPU realiza operaciones aritméticas y lógicas mediante la ALU (Arithmetic Logic Unit) y utiliza los demás recursos del microcontrolador para obtener instrucciones, leer datos y controlar los periféricos.
+        </p>
+
+        <p>
+            Por ejemplo, una aplicación podría ejecutar conceptualmente la siguiente secuencia:
+        </p>
+
+        <pre>
+
+        Leer dato
+        ↓
+        Procesar dato
+        ↓
+        Comparar resultado
+        ↓
+        Tomar una decisión
+        ↓
+        Modificar una salida </pre>
+
+        <p>
+            La CPU ejecuta las instrucciones necesarias para realizar esta secuencia, pero no necesita realizar directamente todas las operaciones físicas.
+        </p>
+        
+
+<p>
+    Si el sistema tiene que leer una entrada digital, por ejemplo, la CPU accede al periférico correspondiente. Si necesita generar una señal periódica, puede configurar un temporizador. Si necesita recibir datos mediante una interfaz de comunicación, utilizará el periférico de comunicación correspondiente.
+</p>
+
+<p>
+    Esta separación de funciones es fundamental para comprender la arquitectura de un MCU.
+</p>
+
+
+</section>
+
+<section>
+    <h2>3. MEMORIA DEL MICROCONTROLADOR</h2>
+
+
+<p>
+    La CPU necesita memoria para ejecutar un programa y trabajar con los datos que utiliza durante su funcionamiento.
+</p>
+
+<p>
+    La memoria proporciona almacenamiento para las instrucciones, los datos y otra información necesaria durante el funcionamiento del sistema. En términos generales, un microcontrolador dispone de diferentes tipos de memoria con funciones distintas.
+</p>
+
+<p>
+    Los microcontroladores pueden utilizar diferentes tecnologías y organizaciones de memoria.
+</p>
+
+<p>Entre ellas se encuentran:</p>
+
+<ul>
+    <li>Flash;</li>
+    <li>SRAM;</li>
+    <li>EEPROM;</li>
+    <li>ROM;</li>
+    <li>OTP;</li>
+    <li>otros tipos de memoria no volátil o volátil.</li>
+</ul>
+
+<p>
+    No todos los MCU utilizan la misma combinación.
+</p>
+
+<p>
+    Los recursos de memoria se optimizan considerando factores como velocidad, costo, durabilidad y eficiencia energética.
+</p>
+
+<p>
+    En microcontroladores modernos es habitual encontrar memoria no volátil para almacenar el programa y memoria volátil para los datos de ejecución. La implementación concreta depende del dispositivo.
+</p>
+
+<h3>3.1. Memoria para el programa</h3>
+
+<p>
+    El programa contiene las instrucciones que la CPU debe ejecutar.
+</p>
+
+<p>
+    Una memoria no volátil permite conservar el programa cuando se desconecta la alimentación.
+</p>
+
+<p>
+    Dependiendo del dispositivo, puede implementarse mediante Flash, ROM, OTP u otra tecnología no volátil.
+</p>
+
+<p>
+    En muchos microcontroladores esta función se realiza mediante memoria Flash, aunque no todos los dispositivos utilizan exactamente la misma tecnología.
+</p>
+
+<p>
+    La CPU obtiene las instrucciones desde el espacio de memoria correspondiente y las ejecuta.
+</p>
+
+<h3>3.2. Memoria para los datos</h3>
+
+<p>
+    Durante la ejecución del programa, la CPU necesita almacenar información temporal como variables, resultados intermedios, estados y otros datos.
+</p>
+
+<p>Por ejemplo:</p>
+
+<ul>
+    <li>valores obtenidos de sensores;</li>
+    <li>resultados intermedios;</li>
+    <li>variables;</li>
+    <li>estados del sistema;</li>
+    <li>contadores;</li>
+    <li>datos recibidos mediante una comunicación.</li>
+</ul>
+
+<p>
+    Para ello, los microcontroladores suelen disponer de memoria de datos, frecuentemente implementada mediante SRAM. La RAM permite realizar operaciones de lectura y escritura durante la ejecución del programa.
+</p>
+
+<p>
+    La diferencia funcional puede resumirse así:
+</p>
+    <img src="img/MemoriaMCU.jpeg"
+    alt="Memoria en el Microcontrolador"
+    class="imagen-centrada">
+
+<p>
+    La cantidad disponible depende del microcontrolador. No todos los MCU ofrecen la misma capacidad ni utilizan exactamente la misma organización de memoria.
+</p>
+
+<h3>3.3. Organización de la memoria</h3>
+
+<p>
+    La forma en que la CPU accede a instrucciones y datos depende de la arquitectura.
+</p>
+
+<p>
+    En una organización tipo Von Neumann, instrucciones y datos utilizan un espacio o camino de memoria compartido.
+</p>
+
+<p>
+    En una organización tipo Harvard, instrucciones y datos utilizan espacios o caminos diferenciados.
+</p>
+
+<p>
+    También existen arquitecturas que combinan características de ambos modelos.
+</p>
+
+<p>
+    Por tanto, la organización de memoria no debe asociarse automáticamente con una única familia de microcontroladores.
+</p>
+
+</section>
+
+<section>
+    <h2>4. ACCESO A LOS PERIFÉRICOS</h2>
+
+<p>
+    La CPU necesita algún mecanismo para configurar y utilizar los periféricos.
+</p>
+
+<p>
+    En muchos microcontroladores, los periféricos disponen de registros de control y estado que permiten al software configurar su funcionamiento y consultar sus condiciones.
+</p>
+
+<p>
+    Por ejemplo, para utilizar un temporizador, el software puede tener que configurar:
+</p>
+
+<ul>
+    <li>fuente de reloj;</li>
+    <li>valor de conteo;</li>
+    <li>modo de funcionamiento;</li>
+    <li>condiciones de comparación;</li>
+    <li>habilitación de una interrupción.</li>
+</ul>
+
+<p>
+    Los detalles exactos dependen del dispositivo.
+</p>
+
+<p>
+    En algunas arquitecturas los periféricos están integrados en un espacio de direcciones de memoria; en otras existen mecanismos de acceso diferentes. Por eso no es correcto asumir que todos los microcontroladores utilizan exactamente el mismo modelo de acceso.
+</p>
+
+<p>
+    Por ejemplo, Microchip documenta arquitecturas donde los periféricos y las E/S están asignados al espacio de memoria y se accede a ellos mediante registros de funciones especiales. (Ayuda para Desarrolladores)
+</p>
+
+</section>
+
+<section>
+    <h2>5. GPIO: INTERFAZ DIGITAL CON EL EXTERIOR</h2>
+<p>
+    Los GPIO (General-Purpose Input/Output) son uno de los recursos más importantes de un microcontrolador.
+</p>
+
+<p>
+    Su función básica es permitir que el MCU intercambie señales digitales con el exterior.
+</p>
+
+<p>
+    Un pin configurado como entrada permite que el microcontrolador lea un estado lógico.
+</p>
+
+<p>
+    Un pin configurado como salida permite que el microcontrolador genere un estado lógico.
+</p>
+
+<p>
+    Conceptualmente:
+</p>
+
+<img src="img/gpio.jpeg"
+alt="General Purpose Input Output"
+class="imagen-centrada">
+
+<p>
+    Esta función convierte al GPIO en una interfaz directa entre el procesamiento digital y el hardware externo.
+</p>
+
+<p>Por ejemplo, un GPIO puede utilizarse para:</p>
+
+<ul>
+    <li>leer un pulsador;</li>
+    <li>detectar el estado de un interruptor;</li>
+    <li>encender o apagar un LED;</li>
+    <li>controlar una señal digital;</li>
+    <li>leer una señal procedente de otro circuito.</li>
+</ul>
+
+<p>
+    Microchip describe los pines GPIO como el vínculo fundamental entre el microcontrolador y el mundo exterior y señala que pueden configurarse como entradas o salidas digitales. (Microchip)
+</p>
+
+<h3>5.1. GPIO como entrada</h3>
+
+<p>
+    Cuando un pin funciona como entrada, el microcontrolador obtiene información procedente de un circuito externo.
+</p>
+
+<p>Por ejemplo:</p>
+
+<pre>
+
+Pulsador
+│
+▼
+GPIO ───► CPU </pre>
+
+<p>
+    El programa puede consultar el estado de ese GPIO y tomar una decisión.
+</p>
+
+<p>
+    Dependiendo del microcontrolador, una entrada puede disponer de características adicionales, como resistencias pull-up o pull-down, filtros o detección de cambios de estado. Estas funciones no están disponibles de la misma manera en todos los dispositivos.
+</p>
+
+<h3>5.2. GPIO como salida</h3>
+
+<p>
+    Cuando un pin está configurado como salida, el microcontrolador controla su estado lógico.
+</p>
+
+<pre>
+
+
+CPU
+│
+▼
+GPIO
+│
+▼
+LED / circuito externo </pre>
+
+
+<p>
+    El software puede modificar el valor de la salida para generar un nivel lógico alto o bajo.
+</p>
+
+<p>
+    Sin embargo, el GPIO no debe interpretarse como una fuente de alimentación general. La corriente máxima que puede entregar o absorber un pin depende de las especificaciones eléctricas concretas del microcontrolador.
+</p>
+
+<p>
+    Este aspecto debe consultarse siempre en la hoja de datos del dispositivo.
+</p>
+
+
+</section>
+
+<section>
+    <h2>6. TEMPORIZADORES Y CONTADORES</h2>
+
+
+<p>
+    Los temporizadores (timers) son periféricos de hardware destinados a realizar funciones relacionadas con el tiempo y el conteo.
+</p>
+
+<p>
+    Su funcionamiento básico consiste en utilizar una señal de reloj para incrementar, decrementar o comparar un valor interno.
+</p>
+
+<p>
+    Una aplicación sencilla puede ser generar una acción después de determinado número de ciclos de reloj.
+</p>
+
+<p>
+    Los temporizadores pueden utilizarse para distintas funciones, dependiendo del dispositivo:
+</p>
+
+<ul>
+    <li>generar intervalos de tiempo;</li>
+    <li>contar eventos;</li>
+    <li>generar interrupciones;</li>
+    <li>producir señales periódicas;</li>
+    <li>generar PWM;</li>
+    <li>medir intervalos;</li>
+    <li>capturar eventos.</li>
+</ul>
+
+
+<h3>6.1. Temporizador frente a retardo por software</h3>
+
+<p>
+    Es importante diferenciar un temporizador de hardware de un retardo implementado mediante software.
+</p>
+
+<p>
+    Un retardo por software mantiene ocupada a la CPU ejecutando instrucciones durante un período determinado.
+</p>
+
+<p>
+    En cambio, un temporizador de hardware puede realizar el conteo independientemente de que la CPU esté ejecutando otras instrucciones.
+</p>
+
+<p>De forma conceptual:</p>
+
+<p><strong>Retardo por software:</strong></p>
+
+<pre>
+
+
+CPU ──► ejecuta instrucciones ──► espera ──► continúa </pre>
+
+<p><strong>Temporizador de hardware:</strong></p>
+
+<pre>
+
+CPU ──► configura timer ──► continúa trabajando
+│
+▼
+TIMER
+│
+▼
+evento </pre>
+
+<p>
+    Esta diferencia es importante en sistemas embebidos porque permite que la CPU utilice su tiempo de procesamiento para otras tareas.
+</p>
+
+
+</section>
+
+<section>
+    <h2>7. INTERRUPCIONES</h2>
+
+<p>
+    Una interrupción permite que un evento solicite la atención de la CPU.
+</p>
+
+<p>
+    En lugar de que el programa tenga que comprobar continuamente si ha ocurrido un evento, el hardware puede generar una solicitud de interrupción cuando se produce una condición determinada.
+</p>
+
+<p>
+    Una fuente de interrupción puede estar asociada, dependiendo del MCU, con:
+</p>
+
+<ul>
+    <li>GPIO;</li>
+    <li>temporizadores;</li>
+    <li>comunicaciones;</li>
+    <li>periféricos analógicos;</li>
+    <li>otros eventos internos o externos.</li>
+</ul>
+
+<img src="img/Interrupcion.jpeg"
+alt="Concepto de Interrupcion"
+class=" imagen-centrada" >
+<p>
+    En un microcontrolador típico, cuando ocurre una interrupción:
+</p>
+
+<ol>
+    <li>El periférico genera una solicitud de interrupción.</li>
+    <li>Controlador de interrupciones / sistema de excepciones determina si la interrupción está habilitada y su prioridad.</li>
+    <li>La CPU acepta la interrupción.</li>
+    <li>El procesador guarda el contexto necesario.</li>
+    <li>El mecanismo de excepción/interrupción obtiene la dirección de la rutina correspondiente.</li>
+    <li>La CPU comienza a ejecutar la ISR desde la memoria de programa.</li>
+    <li>Después de ejecutar la rutina de suspensión, la CPU debe realizar un retorno de excepción/interrupción y reanudar el programa que estaba ejecutando antes de la interrupción.</li>
+</ol>
+
+<p>
+    La organización exacta de las interrupciones, sus prioridades y su gestión dependen de la arquitectura concreta.
+</p>
+
+<p>
+    Por ejemplo, algunas familias disponen de un controlador centralizado de interrupciones y de prioridades configurables, mientras que otras utilizan estructuras diferentes. Microchip documenta diferentes mecanismos de interrupción según la familia de MCU. (Ayuda para Desarrolladores)
+</p>
+
+<p>
+    La CPU atiende la interrupción mediante el mecanismo definido por la arquitectura y posteriormente continúa con el flujo normal del programa.
+</p>
+
+<p>
+    Este mecanismo resulta especialmente útil cuando el sistema debe reaccionar rápidamente ante eventos externos o internos.
+</p>
+
+
+</section>
+
+<section>
+    <h2>8. BUSES INTERNOS</h2>
+
+<p>
+    Los diferentes bloques de un microcontrolador necesitan comunicarse entre sí para intercambiar instrucciones, datos y señales de control.
+</p>
+
+<p>
+    La CPU debe acceder a memoria y periféricos. Los periféricos pueden necesitar intercambiar información con otros bloques. Todo ello requiere una infraestructura de interconexión interna o bus interno del sistema. El bus o sistema de interconexión proporciona el mecanismo mediante el cual la CPU, la memoria y los periféricos intercambian información.
+</p>
+
+<p>
+    En algunos dispositivos esta infraestructura está formada por uno o varios buses. En otros puede utilizarse una estructura de interconexión mucho más compleja, con diferentes caminos, prioridades y mecanismos de acceso.
+</p>
+
+<p>
+    Por tanto, el término bus interno es útil para introducir el concepto, pero no debe interpretarse como una implementación universal. La organización concreta depende del microcontrolador.
+</p>
+
+<p>
+    La arquitectura puede definir diferentes caminos para instrucciones, datos y accesos a periféricos.
+</p>
+
+<p>
+    Por ejemplo, algunas arquitecturas utilizan buses separados para determinadas funciones o diferentes niveles de interconexión.
+</p>
+
+<p>
+    También pueden existir diferentes velocidades de operación o diferentes niveles de interconexión.
+</p>
+
+
+</section>
+
+<section>
+    <h2>9. PERIFÉRICOS</h2>
+
+<p>
+    Los periféricos son bloques de hardware especializados que amplían las capacidades de la CPU.
+</p>
+
+<p>
+    Los periféricos permiten implementar funciones que no necesitan ser realizadas exclusivamente mediante instrucciones ejecutadas directamente por el núcleo de procesamiento.
+</p>
+
+<p>
+    No todos los MCU tienen los mismos periféricos.
+</p>
+
+<p>Entre los más habituales que podemos encontrar en un MCU están:</p>
+
+<ul>
+    <li>GPIO, para entradas y salidas digitales;</li>
+    <li>Temporizadores (timer) y contadores (counter), para medir intervalos o generar eventos;</li>
+    <li>PWM, para generar señales de ancho de pulso variable;</li>
+    <li>UART/USART, para comunicación serie;</li>
+    <li>SPI, para comunicación serie síncrona;</li>
+    <li>I²C, para comunicación serie mediante bus;</li>
+    <li>CAN, en dispositivos que lo incorporan;</li>
+    <li>ADC, para conversión analógico-digital;</li>
+    <li>DAC, para conversión digital - analógico;</li>
+    <li>watchdog, para supervisar el funcionamiento del sistema;</li>
+    <li>RTC, para funciones relacionadas con tiempo;</li>
+    <li>DMA, para determinadas transferencias de datos sin intervención continua de la CPU;</li>
+    <li>otros periféricos especializados.</li>
+</ul>
+
+<p>
+    Esta lista no debe interpretarse como una configuración obligatoria. Cada microcontrolador dispone de una combinación concreta de periféricos.
+</p>
+
+<h3>9.1. Interacción entre CPU y periféricos</h3>
+
+<p>
+    Un punto fundamental para comprender un microcontrolador es que la CPU y los periféricos tienen funciones diferentes, pero trabajan coordinadamente.
+</p>
+
+<p>
+    Supongamos un sistema que necesita medir periódicamente una señal y activar una salida.
+</p>
+
+<p>
+    Una posible secuencia sería:
+</p>
+
+<pre>
+  Timer
+     │
+     │ genera evento
+     ▼
+Interrupción
+     │
+     ▼
+    CPU
+     │
+     │ procesa
+     ▼
+Resultado
+     │
+     ▼
+   GPIO
+     │
+     ▼
+ Actuador
+</pre>
+
+<p>En este ejemplo:</p>
+
+<ul>
+    <li>el timer proporciona la referencia temporal;</li>
+    <li>el sistema de interrupciones informa a la CPU de que ocurrió el evento;</li>
+    <li>la CPU ejecuta el procesamiento;</li>
+    <li>el GPIO proporciona la salida hacia el circuito externo.</li>
+</ul>
+
+<p>
+    Ninguno de estos bloques sustituye a los demás. Cada uno cumple una función específica.
+</p>
+
+<h3>9.2. La configuración de los periféricos</h3>
+
+<p>
+    Los periféricos no suelen funcionar simplemente por estar presentes en el microcontrolador. Normalmente deben configurarse.
+</p>
+
+<p>La configuración puede incluir parámetros como:</p>
+
+<ul>
+    <li>modo de funcionamiento;</li>
+    <li>fuente de reloj;</li>
+    <li>dirección de los GPIO;</li>
+    <li>valores iniciales;</li>
+    <li>habilitación de interrupciones;</li>
+    <li>frecuencia;</li>
+    <li>selección de entradas o salidas;</li>
+    <li>parámetros de comunicación.</li>
+</ul>
+
+<p>
+    Esta configuración se realiza normalmente mediante registros de control asociados al periférico.
+</p>
+
+<p>Conceptualmente:</p>
+
+<pre>
+
+
+Software
+│
+▼
+Registros de configuración
+│
+▼
+Periférico
+│
+▼
+Función hardware </pre>
+
+
+<p>
+    Esta relación entre software, registros y hardware es fundamental en la programación de microcontroladores.
+</p>
+
+<p>
+    Cuando un programa configura un GPIO, un temporizador o una interfaz de comunicación, en realidad está modificando el estado de determinados elementos de hardware mediante el mecanismo de configuración proporcionado por el MCU.
+</p>
+
+<p>
+    La principal ventaja de integrar estos recursos dentro del mismo circuito es que el microcontrolador puede proporcionar una plataforma relativamente completa para controlar un sistema.
+</p>
+
+<p>
+    Este diagrama no representa una arquitectura física concreta. Es un modelo conceptual para comprender las relaciones funcionales entre los bloques.
+</p>
+
+<p>
+    Un MCU real puede tener varias instancias de un mismo periférico, diferentes buses, controladores especializados y otros bloques que no aparecen aquí.
+</p>
+
+
+</section>
+
+<section>
+    <h2>10. RELACIÓN ENTRE ARQUITECTURA Y APLICACIÓN</h2>
+<p>
+    La arquitectura interna de un microcontrolador está directamente relacionada con la aplicación para la que se utilizará.
+</p>
+
+<p>
+    Un sistema que solamente necesita leer algunos interruptores y controlar LEDs puede requerir pocos periféricos.
+</p>
+
+<p>
+    Otro sistema puede necesitar:
+</p>
+
+<ul>
+    <li>varios canales analógicos;</li>
+    <li>múltiples temporizadores;</li>
+    <li>PWM;</li>
+    <li>comunicaciones serie;</li>
+    <li>interrupciones;</li>
+    <li>memoria suficiente para un programa más grande.</li>
+</ul>
+
+<p>
+    Por eso los fabricantes ofrecen microcontroladores con diferentes combinaciones de recursos.
+</p>
+
+<p>
+    La documentación de un MCU permite determinar exactamente qué recursos están disponibles y cuáles son sus limitaciones. No se debe asumir que porque un periférico exista en una familia estará necesariamente presente en todos los dispositivos.
+</p>
+
+<p>
+    Esta variación es visible incluso dentro de las familias de un mismo fabricante. Por ejemplo, las tablas de Microchip muestran diferencias importantes en cantidad de memoria, GPIO, interfaces y temporizadores entre distintos dispositivos. (Microchip Docs)
+</p>
+
+<h3>10.1. Arquitectura interna y diseño de software</h3>
+
+<p>
+    La arquitectura del hardware condiciona directamente la forma en que se escribe el software.
+</p>
+
+<p>El programa necesita:</p>
+
+<ul>
+    <li>configurar el microcontrolador;</li>
+    <li>configurar los periféricos;</li>
+    <li>procesar los datos;</li>
+    <li>responder a eventos;</li>
+    <li>controlar las salidas.</li>
+</ul>
+
+<p>
+    Por ejemplo, un programa puede iniciar configurando un GPIO como entrada, un temporizador para generar un evento periódico y una interrupción para atender ese evento.
+</p>
+
+<p>
+    Después, el programa principal puede realizar otras tareas mientras el hardware se encarga de la temporización.
+</p>
+
+<p>
+    Esta relación entre hardware y software es una de las características centrales de los sistemas embebidos.
+</p>
+
+<p>
+    El programador no trabaja únicamente con instrucciones de la CPU. También debe conocer los recursos hardware que está controlando.
+</p>
+
+
+</section>
+
+<section>
+    <h2>11. ARQUITECTURA INTERNA COMO MODELO DE ESTUDIO</h2>
+
+<p>
+    Para estudiar cualquier microcontrolador nuevo, independientemente del fabricante, resulta útil seguir una secuencia.
+</p>
+
+<p>
+    Primero se identifica el núcleo de procesamiento.
+</p>
+
+<p>
+    Después se estudia la organización de memoria.
+</p>
+
+<p>
+    A continuación se identifican los recursos de entrada y salida.
+</p>
+
+<p>
+    Después se revisan los temporizadores y contadores.
+</p>
+
+<p>
+    Luego se estudia el sistema de interrupciones.
+</p>
+
+<p>
+    Finalmente se analizan los buses y periféricos de comunicación, además de otros bloques disponibles.
+</p>
+
+<p>
+    Este enfoque permite pasar de una arquitectura desconocida a una estructura que resulta familiar.
+</p>
+
+<p>
+    Para trabajar realmente con un microcontrolador no basta con conocer el nombre de sus periféricos.
+</p>
+
+<p>La documentación del dispositivo debe consultarse para conocer, entre otras cosas:</p>
+
+<ul>
+    <li>cantidad de memoria;</li>
+    <li>organización de memoria;</li>
+    <li>cantidad de GPIO;</li>
+    <li>funciones disponibles en cada pin;</li>
+    <li>características eléctricas;</li>
+    <li>temporizadores disponibles;</li>
+    <li>fuentes de interrupción;</li>
+    <li>interfaces de comunicación;</li>
+    <li>registros de configuración;</li>
+    <li>límites de frecuencia;</li>
+    <li>consumo;</li>
+    <li>modos de bajo consumo.</li>
+</ul>
+
+<p>
+    Los ejemplos de documentación técnica de Microchip muestran por qué es necesario consultar la documentación específica de cada dispositivo: las características de los periféricos y de la memoria varían incluso entre diferentes familias y modelos. (Microchip Docs)
+</p>
+
+<p>
+    Por ello, los conceptos explicados en este artículo deben entenderse como principios generales, mientras que los detalles de implementación deben obtenerse siempre de la documentación oficial del MCU utilizado.
+</p>
+
+</section>
+
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>

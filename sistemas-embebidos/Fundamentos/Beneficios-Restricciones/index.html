@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beneficios y Restricciones de los Sistemas Embebidos | MC Mundo Tech</title>
+    <meta name="description" content="Sistema embebido suele utilizarse para referirse a sistemas basados en microcontroladores; pero no se limita únicamente a ellos. En realidad, engloba sistemas que integran la mayor cantidad posible de funcionalidad en un número reducido de componentes">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>BENEFICIOS Y RESTRICCIONES DE LOS SISTEMAS EMBEBIDOS</h1>
+            
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   --> 
+
+        <section>
+            <h2>INTRODUCCIÓN</h2>
+
+    <p>Aunque el término <strong>sistema embebido</strong> suele utilizarse para referirse a sistemas basados en microcontroladores, no se limita únicamente a ellos. En realidad, engloba sistemas que integran la mayor cantidad posible de funcionalidad en un número reducido de componentes.</p>
+
+    <p>Estos sistemas pueden abarcar desde equipos construidos con componentes electrónicos discretos hasta computadoras completamente embebidas, pasando por microprocesadores que incorporan elementos de hardware dedicados.</p>
+</section>
+
+<section>
+    <h2>1. VENTAJAS DE LOS SISTEMAS BASADOS EN MICROCONTROLADORES</h2>
+
+    <p>Los sistemas embebidos basados en microcontroladores ofrecen numerosas ventajas.</p>
+
+    <p>Por ejemplo, las aplicaciones implementadas mediante software son más flexibles que aquellas construidas únicamente con hardware, ya que pueden adaptarse con mayor facilidad a cambios en los requisitos del sistema. Esto incluso puede traducirse en un mejor rendimiento y una mayor eficiencia.</p>
+
+    <p>Al dividir el sistema en componentes de hardware y software, es posible minimizar el costo total del sistema. De esta manera, el producto resulta más económico de fabricar, operar y mantener.</p>
+
+    <p>Los diseños basados en microcontroladores también permiten implementar un mayor número de funciones. Además, mediante la optimización del sistema, es posible reducir la cantidad de memoria necesaria y eliminar redundancias en los componentes integrados del chip.</p>
+
+    <p>Por último, los sistemas basados en microcontroladores suelen ser más confiables, ya que las fallas pueden detectarse, depurarse y, en muchos casos, compensarse.</p>
+</section>
+
+<section>
+    <h2>2. RESTRICCIONES DE LOS SISTEMAS EMBEBIDOS</h2>
+
+    <p>Sin embargo, los sistemas embebidos también están sujetos a diversas restricciones.</p>
+
+    <p>El costo es un factor de gran importancia en la producción de grandes volúmenes, especialmente en los mercados altamente competitivos de la actualidad. Por ello, es necesario mantener un equilibrio entre los costos de diseño, fabricación y producción.</p>
+
+    <p>El tamaño y el peso del dispositivo también pueden representar una limitación, sobre todo en sistemas portátiles y dispositivos vestibles (<em>wearables</em>).</p>
+
+    <p>La capacidad de la batería constituye otra restricción importante, ya que determina el nivel de consumo de energía que el dispositivo puede permitirse.</p>
+
+    <p>Asimismo, los diseñadores deben considerar los problemas de calentamiento que puedan surgir durante el funcionamiento del sistema o debido a las condiciones del entorno.</p>
+</section>
+
+<section>
+    <h2>3. IMPACTO DE LAS RESTRICCIONES EN EL DISEÑO</h2>
+
+    <p>Estas restricciones afectan de distintas maneras a los sistemas embebidos basados en microcontroladores, haciendo que su funcionamiento y la interacción con sus periféricos sean más complejos.</p>
+
+    <p>Por ejemplo, como los periféricos ya están integrados en el propio chip, normalmente se controlan de una forma específica para cada tipo de microcontrolador.</p>
+
+    <p>Aunque esto reduce los costos de fabricación, incrementa los costos de ingeniería asociados al diseño, desarrollo y depuración.</p>
+
+    <p>En otras palabras, disminuye la complejidad de la placa electrónica y del hardware externo, pero aumenta la complejidad del chip y del software que debe programarse.</p>
+</section>
+
+<section>
+    <h2>4. PROGRAMACIÓN DE SISTEMAS EMBEBIDOS</h2>
+
+    <p>La programación se realiza principalmente en <strong>lenguaje C</strong> o <strong>lenguaje ensamblador (Assembly)</strong> debido a su alta eficiencia y al bajo costo computacional del código generado.</p>
+
+    <p>Además, estos lenguajes permiten controlar con mayor precisión la cantidad de ciclos de reloj requeridos por cada operación.</p>
+</section>
+
+<section>
+    <h2>5. SISTEMAS OPERATIVOS EN SISTEMAS EMBEBIDOS</h2>
+
+    <p>Los sistemas operativos son menos comunes en los sistemas embebidos, aunque esta situación está cambiando con la llegada del <strong>Internet de las Cosas (IoT)</strong>.</p>
+
+    <p>Un sistema operativo puede simplificar el desarrollo, pero la sobrecarga introducida por un sistema operativo en tiempo real (RTOS) incrementa el tamaño del código y reduce la transparencia sobre lo que realmente está ocurriendo dentro del microcontrolador (MCU).</p>
+</section>
+
+
+<section>
+    <h2>6. CLASIFICACIÓN DE LAS IMPLEMENTACIONES DE SISTEMAS EMBEBIDOS</h2>
+<div class="table-container">
+    <table>
+    <thead>
+        <tr>
+            <th>Implementación</th>
+            <th>Costo de diseño</th>
+            <th>Costo por unidad</th>
+            <th>Actualización y corrección de errores</th>
+            <th>Tamaño</th>
+            <th>Peso</th>
+            <th>Consumo de energía</th>
+            <th>Velocidad del sistema</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Lógica discreta</td>
+            <td>Bajo</td>
+            <td>Medio</td>
+            <td>Difícil</td>
+            <td>Grande</td>
+            <td>Alto</td>
+            <td>?</td>
+            <td>Muy alta</td>
+        </tr>
+        <tr>
+            <td>ASIC (Circuito Integrado de Aplicación Específica)</td>
+            <td>Alto (≈ 500 000 USD por juego de máscaras)</td>
+            <td>Muy bajo</td>
+            <td>Difícil</td>
+            <td>Muy pequeño</td>
+            <td>Muy bajo</td>
+            <td>Bajo</td>
+            <td>Extremadamente alta</td>
+        </tr>
+        <tr>
+            <td>Lógica programable (FPGA, PLD)</td>
+            <td>Bajo a medio</td>
+            <td>Medio</td>
+            <td>Fácil</td>
+            <td>Pequeño</td>
+            <td>Bajo</td>
+            <td>Medio a alto</td>
+            <td>Muy alta</td>
+        </tr>
+        <tr>
+            <td>Microprocesador + memoria + periféricos</td>
+            <td>Bajo a medio</td>
+            <td>Medio</td>
+            <td>Fácil</td>
+            <td>Pequeño a mediano</td>
+            <td>Bajo a mediano</td>
+            <td>Medio</td>
+            <td>Moderada</td>
+        </tr>
+        <tr>
+            <td>Microcontrolador (memoria y periféricos integrados)</td>
+            <td>Bajo</td>
+            <td>Bajo a medio</td>
+            <td>Fácil</td>
+            <td>Pequeño</td>
+            <td>Bajo</td>
+            <td>Medio</td>
+            <td>Baja a moderada</td>
+        </tr>
+        <tr>
+            <td>Computadora embebida</td>
+            <td>Bajo</td>
+            <td>Alto</td>
+            <td>Fácil</td>
+            <td>Mediano</td>
+            <td>Medio a alto</td>
+            <td>Medio a alto</td>
+            <td>Alta</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+</section>
+
+<section>
+    <h2>7. RESUMEN</h2>
+
+    <p>En resumen, en la mayoría de los sistemas embebidos, los <strong>microcontroladores (MCU)</strong> constituyen la mejor opción porque son económicos, flexibles, están disponibles en múltiples configuraciones y consumen relativamente poca energía.</p>
+
+    <p>Sin embargo, requieren entornos de desarrollo específicos, así como herramientas de soporte para cada tipo de procesador, tanto para cargar el programa como para realizar la depuración.</p>
+</section>
+
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>

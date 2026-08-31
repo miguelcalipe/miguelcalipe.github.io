@@ -100,10 +100,7 @@
 
 
     <section>
-        <h2>1. LA CPU</h2>
-
-        <h3>1.1. Función de la CPU</h3>
-
+        <h2>1. LA CPU</h2>    
         <p>
             La CPU es el componente encargado de ejecutar las instrucciones que forman
             un programa.
@@ -147,7 +144,7 @@
         </p>
 
 
-        <h3>1.2. La unidad de control</h3>
+        <h3>1.1. La unidad de control</h3>
 
         <p>
             La unidad de control coordina la ejecución de las instrucciones.
@@ -181,7 +178,7 @@
         </p>
 
 
-        <h3>1.3. Los registros</h3>
+        <h3>1.2. Los registros</h3>
 
         <p>
             Los registros son elementos de almacenamiento internos de la CPU utilizados
@@ -225,7 +222,7 @@
         </p>
 
 
-        <h3>1.4. La ALU</h3>
+        <h3>1.3. La ALU</h3>
 
         <p>
             La <strong>ALU (Arithmetic Logic Unit, unidad aritmético-lógica)</strong>
@@ -269,7 +266,7 @@
         </p>
 
 
-        <h3>1.5. El contador de programa</h3>
+        <h3>1.4. El contador de programa</h3>
 
         <p>
             El <strong>PC (Program Counter, contador de programa)</strong> es un
@@ -314,7 +311,7 @@
         </p>
 
 
-        <h3>1.6. Los registros de estado</h3>
+        <h3>1.5. Los registros de estado</h3>
 
         <p>
             Las CPU suelen disponer de uno o varios registros que contienen
@@ -348,7 +345,7 @@
         </p>
 
 
-        <h3>1.7. La CPU como conjunto de unidades coordinadas</h3>
+        <h3>1.6. La CPU como conjunto de unidades coordinadas</h3>
 
         <p>
             Desde una perspectiva conceptual, la CPU puede representarse como la
@@ -366,41 +363,11 @@
             La unidad de ejecución puede incluir una ALU y, dependiendo de la
             arquitectura, otras unidades especializadas.
         </p>
-
+        
           <img src="img/1.7.CPU-coordinacion.jpeg"
-                        class="imagen-centrada"
-                        alt="Esquema del efecto de carga">
-        <pre>
-                 ┌──────────────────────────┐
-                 │           CPU            │
-                 │                          │
-                 │  ┌────────────────────┐  │
-                 │  │ Unidad de control  │  │
-                 │  └─────────┬──────────┘  │
-                 │            │             │
-                 │            ▼             │
-                 │  ┌────────────────────┐  │
-                 │  │ Unidad de ejecución│  │
-                 │  │                    │  │
-                 │  │       ┌─────┐      │  │
-                 │  │       │ ALU │      │  │
-                 │  │       └─────┘      │  │
-                 │  └────────────────────┘  │
-                 │                          │
-                 │       Registros          │
-                 │       ├── PC             │
-                 │       ├── Datos          │
-                 │       └── Estado         │
-                 │                          │
-                 └────────────┬─────────────┘
-                              │
-                       Interconexión
-                              │
-                    ┌─────────┴─────────┐
-                    │                   │
-                 Memoria          Otros bloques
-        </pre>
-
+          class="imagen-centrada"
+          alt="Esquema conceptual de una CPU">
+       
         <p>
             Este esquema es conceptual. No representa el diseño físico de una CPU
             concreta.
@@ -435,18 +402,6 @@
             <strong>Búsqueda → Decodificación → Ejecución</strong>
         </p>
 
-        <p>
-            Este modelo resulta útil para introducir el funcionamiento de un
-            procesador, pero debe entenderse como una representación conceptual.
-        </p>
-
-        <p>
-            Una CPU real puede dividir el proceso en más etapas, ejecutar diferentes
-            operaciones de manera simultánea o utilizar mecanismos como
-            <em>pipeline</em>, ejecución paralela u otras técnicas.
-        </p>
-
-
         <h3>2.1. Búsqueda de la instrucción</h3>
 
         <p>
@@ -457,22 +412,7 @@
         <p>
             El contador de programa proporciona la referencia necesaria para localizar
             la instrucción correspondiente.
-        </p>
-
-        <pre>
-                 PC
-                 │
-                 ▼
-        Dirección de instrucción
-                 │
-                 ▼
-              Memoria
-                 │
-                 │ instrucción
-                 ▼
-                 CPU
-        </pre>
-
+        </p>       
         <p>
             La CPU obtiene la instrucción y la prepara para su interpretación.
         </p>
@@ -536,49 +476,47 @@
             <li>interactuar con otros recursos internos.</li>
         </ul>
 
-        <p>
-            Una vez completada la operación, la CPU continúa con la siguiente
-            instrucción según las reglas definidas por la arquitectura.
-        </p>
+        
 
-        <pre>
-                 ┌───────────────┐
-                 │     FETCH     │
-                 │    Búsqueda   │
-                 └───────┬───────┘
-                         │
-                         ▼
-                 ┌───────────────┐
-                 │     DECODE    │
-                 │ Decodificación│
-                 └───────┬───────┘
-                         │
-                         ▼
-                 ┌───────────────┐
-                 │    EXECUTE    │
-                 │   Ejecución   │
-                 └───────┬───────┘
-                         │
-                         ▼
-                   Siguiente
-                   instrucción
-        </pre>
+            <div class="imagen-derecha">
+                <img src="img/FuncionamientoCPU.jpeg"          
+                alt="Modelo conceptual de CPU basado en 3 etapas">
+            
+                <div class="texto">
+                    <p>
+                        Una vez completada la operación, la CPU continúa con la siguiente
+                        instrucción según las reglas definidas por la arquitectura.
+                    </p>
 
-        <p>
-            Este modelo constituye una base fundamental para comprender el
-            funcionamiento de un procesador.
-        </p>
+                    <p>
+                        Este modelo constituye una base fundamental para comprender el
+                        funcionamiento de un procesador.
+                    </p>
 
-        <p>
-            Sin embargo:
-        </p>
+                    <p>
+                        Sin embargo:
+                    </p>
 
-        <blockquote>
-            <p>
-                <strong>Fetch → Decode → Execute es un modelo conceptual y no una
-                descripción física universal de todas las CPU.</strong>
-            </p>
-        </blockquote>
+                    <blockquote>
+                        <p>
+                            <strong>Fetch → Decode → Execute es un modelo conceptual y no una
+                            descripción física universal de todas las CPU.</strong>
+                        </p>
+                    </blockquote>
+
+                     <p>
+                        Este modelo resulta útil para introducir el funcionamiento de un
+                        procesador, pero debe entenderse como una representación conceptual.
+                    </p>
+
+                    <p>
+                        Una CPU real puede dividir el proceso en más etapas, ejecutar diferentes
+                        operaciones de manera simultánea o utilizar mecanismos como
+                        <em>pipeline</em>, ejecución paralela u otras técnicas.
+                    </p>
+
+                </div>
+            </div>
     </section>
 
 
@@ -607,22 +545,7 @@
             <li>interconexión.</li>
         </ul>
 
-        <pre>
-                       ┌───────────┐
-                       │    CPU    │
-                       └─────┬─────┘
-                             │
-                    Interconexión
-                             │
-              ┌──────────────┼──────────────┐
-              │              │              │
-              ▼              ▼              ▼
-           Memoria       Periféricos    Otros bloques
-              │              │
-              │              │
-       Programa y datos   Entrada/salida
-        </pre>
-
+        
         <p>
             La forma en que estos bloques están conectados depende de la arquitectura.
         </p>
@@ -794,306 +717,9 @@
     </section>
 
 
-    <section>
-        <h2>6. LA MEMORIA DEL MICROCONTROLADOR</h2>
-
-        <p>
-            La memoria proporciona almacenamiento para las instrucciones, los datos y
-            otra información necesaria durante el funcionamiento del sistema.
-        </p>
-
-        <p>
-            Los microcontroladores pueden utilizar diferentes tecnologías y
-            organizaciones de memoria.
-        </p>
-
-        <p>Entre ellas se encuentran:</p>
-
-        <ul>
-            <li>Flash;</li>
-            <li>SRAM;</li>
-            <li>EEPROM;</li>
-            <li>ROM;</li>
-            <li>OTP;</li>
-            <li>otros tipos de memoria no volátil o volátil.</li>
-        </ul>
-
-        <p>
-            No todos los MCU utilizan la misma combinación.
-        </p>
-
-        <p>
-            Por eso es más útil distinguir inicialmente entre
-            <strong>memoria de programa</strong> y <strong>memoria de datos</strong>,
-            y estudiar después las tecnologías utilizadas por cada familia.
-        </p>
-
-
-        <h3>6.1. Memoria de programa</h3>
-
-        <p>
-            La memoria de programa contiene las instrucciones que ejecuta la CPU.
-        </p>
-
-        <p>
-            Dependiendo del dispositivo, puede implementarse mediante Flash, ROM, OTP
-            u otra tecnología no volátil.
-        </p>
-
-        <p>
-            Su función es conservar el programa de acuerdo con las características de
-            la tecnología de memoria utilizada.
-        </p>
-
-
-        <h3>6.2. Memoria de datos</h3>
-
-        <p>
-            Durante la ejecución del programa, la CPU necesita almacenar variables,
-            resultados intermedios, estados y otros datos.
-        </p>
-
-        <p>
-            Para ello, los microcontroladores suelen disponer de memoria de datos,
-            frecuentemente implementada mediante SRAM.
-        </p>
-
-        <p>
-            La RAM permite realizar operaciones de lectura y escritura durante la
-            ejecución.
-        </p>
-
-
-        <h3>6.3. Organización de la memoria</h3>
-
-        <p>
-            La forma en que la CPU accede a instrucciones y datos depende de la
-            arquitectura.
-        </p>
-
-        <p>
-            En una organización tipo <strong>Von Neumann</strong>, instrucciones y
-            datos utilizan un espacio o camino de memoria compartido.
-        </p>
-
-        <p>
-            En una organización tipo <strong>Harvard</strong>, instrucciones y datos
-            utilizan espacios o caminos diferenciados.
-        </p>
-
-        <p>
-            También existen arquitecturas que combinan características de ambos
-            modelos.
-        </p>
-
-        <p>
-            Por tanto, la organización de memoria no debe asociarse automáticamente
-            con una única familia de microcontroladores.
-        </p>
-    </section>
-
 
     <section>
-        <h2>7. LOS PERIFÉRICOS</h2>
-
-        <p>
-            Los periféricos son bloques de hardware especializados que amplían las
-            capacidades de la CPU.
-        </p>
-
-        <p>
-            Permiten implementar funciones que no necesitan ser realizadas
-            exclusivamente mediante instrucciones ejecutadas directamente por el
-            núcleo de procesamiento.
-        </p>
-
-        <p>Entre los periféricos que pueden encontrarse en un MCU están:</p>
-
-        <ul>
-            <li><strong>GPIO</strong>, para entradas y salidas digitales;</li>
-            <li><strong>temporizadores y contadores</strong>, para medir intervalos o generar eventos;</li>
-            <li><strong>PWM</strong>, para generar señales moduladas;</li>
-            <li><strong>UART/USART</strong>, para comunicación serie;</li>
-            <li><strong>SPI</strong>, para comunicación síncrona;</li>
-            <li><strong>I²C</strong>, para comunicación mediante bus serie;</li>
-            <li><strong>CAN</strong>, en dispositivos que lo incorporan;</li>
-            <li><strong>ADC</strong>, para conversión analógico-digital;</li>
-            <li><strong>DAC</strong>, cuando está disponible;</li>
-            <li><strong>watchdog</strong>, para supervisar el funcionamiento;</li>
-            <li><strong>RTC</strong>, para funciones relacionadas con tiempo;</li>
-            <li><strong>DMA</strong>, para determinadas transferencias de datos sin intervención continua de la CPU;</li>
-            <li>otros periféricos especializados.</li>
-        </ul>
-
-
-        <h3>7.1. La función de los periféricos</h3>
-
-        <p>
-            Los periféricos pueden realizar determinadas tareas de hardware mientras
-            la CPU ejecuta el programa.
-        </p>
-
-        <p>
-            Por ejemplo, un temporizador puede contar eventos y generar una señal o
-            una interrupción cuando se alcanza una determinada condición.
-        </p>
-
-        <p>
-            Un periférico de comunicación puede encargarse de parte de la transmisión
-            y recepción de datos.
-        </p>
-
-        <p>
-            Un ADC puede realizar la conversión de una señal analógica a un valor
-            digital que posteriormente será procesado por la CPU.
-        </p>
-
-        <p>
-            Esto permite que el sistema distribuya las tareas entre el procesamiento
-            por software y las funciones realizadas directamente por hardware.
-        </p>
-
-        <pre>
-                  ┌───────────┐
-                  │    CPU    │
-                  └─────┬─────┘
-                        │
-                 Interconexión
-                        │
-          ┌─────────────┼─────────────┐
-          │             │             │
-          ▼             ▼             ▼
-       Memoria        Timer         UART
-                        │             │
-                        ▼             ▼
-                     Eventos      Comunicación
-        </pre>
-
-        <p>
-            La forma concreta en que la CPU accede a cada periférico depende de la
-            arquitectura del MCU.
-        </p>
-    </section>
-
-
-    <section>
-        <h2>8. LA INTERCONEXIÓN INTERNA</h2>
-
-        <p>
-            Los diferentes bloques del microcontrolador necesitan intercambiar
-            instrucciones, datos y señales de control.
-        </p>
-
-        <p>
-            Para ello existe una infraestructura de interconexión interna.
-        </p>
-
-        <p>
-            En algunos dispositivos esta infraestructura está formada por uno o varios
-            buses. En otros puede utilizarse una estructura más compleja.
-        </p>
-
-        <p>
-            Por tanto, el término <strong>bus interno</strong> es útil para introducir
-            el concepto, pero no debe interpretarse como una implementación universal.
-        </p>
-
-        <pre>
-                   ┌───────────┐
-                   │    CPU    │
-                   └─────┬─────┘
-                         │
-                  Interconexión
-                      interna
-                         │
-        ┌────────────────┼────────────────┐
-        │                │                │
-        ▼                ▼                ▼
-     Memoria           GPIO           Timers
-        │                                 │
-        │                                 │
-        └──────────────┬──────────────────┘
-                       │
-                 Otros periféricos
-        </pre>
-
-        <p>
-            La arquitectura puede definir diferentes caminos para instrucciones,
-            datos y accesos a periféricos.
-        </p>
-
-        <p>
-            También pueden existir diferentes velocidades de operación o diferentes
-            niveles de interconexión.
-        </p>
-
-        <p>
-            Lo importante es comprender que
-            <strong>CPU, memoria y periféricos necesitan mecanismos de comunicación
-            internos para formar un sistema funcional</strong>.
-        </p>
-    </section>
-
-
-    <section>
-        <h2>9. LA ARQUITECTURA DEL PROCESADOR</h2>
-
-        <p>
-            Los conceptos anteriores son generales, pero su implementación concreta
-            depende de la arquitectura.
-        </p>
-
-        <p>
-            La arquitectura determina, entre otros aspectos:
-        </p>
-
-        <ul>
-            <li>el conjunto de instrucciones;</li>
-            <li>los registros disponibles;</li>
-            <li>la organización del PC;</li>
-            <li>la forma de acceder a memoria;</li>
-            <li>la organización de los datos;</li>
-            <li>la interconexión;</li>
-            <li>el mecanismo de interrupciones;</li>
-            <li>el funcionamiento de los periféricos;</li>
-            <li>las características de la unidad de ejecución.</li>
-        </ul>
-
-        <p>
-            Por ejemplo, un AVR, un PIC, un Cortex-M y un procesador RISC-V pueden
-            utilizar diferentes conjuntos de instrucciones y diferentes organizaciones
-            internas.
-        </p>
-
-        <p>
-            Sin embargo, todos pueden utilizar los conceptos generales de:
-        </p>
-
-        <p>
-            <strong>CPU + memoria + periféricos + interconexión.</strong>
-        </p>
-
-        <p>
-            Esta distinción es fundamental:
-        </p>
-
-        <blockquote>
-            <p>
-                <strong>Los conceptos de CPU, memoria y periféricos son generales;
-                su implementación concreta depende de la arquitectura y del dispositivo.</strong>
-            </p>
-        </blockquote>
-
-        <p>
-            Por esta razón, una característica encontrada en un microcontrolador
-            concreto no debe convertirse automáticamente en una propiedad universal
-            de todos los MCU.
-        </p>
-    </section>
-
-
-    <section>
-        <h2>10. MICROPROCESADOR FRENTE A MICROCONTROLADOR</h2>
+        <h2>6. MICROPROCESADOR FRENTE A MICROCONTROLADOR</h2>
 
         <table>
             <thead>
@@ -1190,7 +816,7 @@
 
 
     <section>
-        <h2>11. OPTIMIZACIÓN DEL MICROCONTROLADOR</h2>
+        <h2>7. OPTIMIZACIÓN DEL MICROCONTROLADOR</h2>
 
         <p>
             El diseño de un microcontrolador no busca simplemente obtener la máxima
@@ -1252,7 +878,7 @@
 
 
     <section>
-        <h2>12. EL MCU DENTRO DE UN SISTEMA EMBEBIDO</h2>
+        <h2>8. EL MCU DENTRO DE UN SISTEMA EMBEBIDO</h2>
 
         <p>
             Un microcontrolador puede constituir el núcleo de un sistema embebido,
@@ -1333,7 +959,7 @@
 
 
     <section>
-        <h2>13. EJEMPLO APLICADO A UN SISTEMA SENCILLO</h2>
+        <h2>9. EJEMPLO APLICADO A UN SISTEMA SENCILLO</h2>
 
         <p>
             Consideremos un sistema embebido que necesita leer un sensor y controlar
@@ -1421,7 +1047,7 @@
 
 
     <section>
-        <h2>14. LA DIFERENCIA FUNDAMENTAL ENTRE PROCESAMIENTO E INTEGRACIÓN</h2>
+        <h2>10. LA DIFERENCIA FUNDAMENTAL ENTRE PROCESAMIENTO E INTEGRACIÓN</h2>
 
         <p>
             La diferencia fundamental puede resumirse de la siguiente manera:
@@ -1497,7 +1123,7 @@
 
 
     <section>
-        <h2>15. RESUMEN TÉCNICO</h2>
+        <h2>11. RESUMEN TÉCNICO</h2>
 
         <p>
             La <strong>CPU</strong> es la unidad encargada de ejecutar las instrucciones
@@ -1607,7 +1233,7 @@ Sistema embebido
 
 
     <section>
-        <h2>16. CONCEPTOS GENERALES FRENTE A IMPLEMENTACIONES CONCRETAS</h2>
+        <h2>12. CONCEPTOS GENERALES FRENTE A IMPLEMENTACIONES CONCRETAS</h2>
 
         <p>
             Una de las ideas más importantes al estudiar sistemas embebidos es
@@ -1686,7 +1312,7 @@ Sistema embebido
 
 
     <section>
-        <h2>17. CIERRE</h2>
+        <h2>13. CIERRE</h2>
 
         <p>
             Comprender la diferencia entre CPU, microprocesador y microcontrolador

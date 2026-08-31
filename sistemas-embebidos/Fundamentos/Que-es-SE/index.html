@@ -43,6 +43,10 @@
                 Un sistema embebido (<em>embedded system</em>) es un sistema informático especializado diseñado para cumplir una función determinada dentro de un equipo, máquina o producto. Su hardware se construye alrededor de un dispositivo de procesamiento, que puede ser un microprocesador o un microcontrolador (MCU, <em>Microcontroller Unit</em>).
             </p>
 
+            <img src="img/SE-Concepto.jpeg"
+            alt="Concepto de Sistema Embebido"
+            class="imagen-centrada">
+
             <p>
                 A diferencia de un computador de propósito general, un sistema embebido no está pensado para ejecutar una amplia variedad de aplicaciones para un usuario. Su diseño está orientado a resolver una tarea concreta o un conjunto limitado de tareas. Puede, por ejemplo, medir una variable física, procesar esa información, tomar una decisión y controlar un actuador.
             </p>
@@ -111,18 +115,95 @@
 
                 <p>En aplicaciones automotrices también existe una restricción importante de espacio. La unidad electrónica debe integrarse en un vehículo donde el tamaño del dispositivo y sus condiciones de instalación son factores relevantes.</p>
             
-            <h2>2.5. Funcionamiento Autónomo</h2>
+            <h3>2.5. Funcionamiento Autónomo</h3>
 
                 <p>Muchos sistemas embebidos deben funcionar durante largos períodos sin intervención directa de un operador.</p>
 
                 <p>Esto introduce un requisito importante: el sistema debe ser capaz de manejar condiciones de fallo sin bloquearse o detener completamente su funcionamiento.</p>
 
                 <p>El software de un sistema embebido, por tanto, no solo debe contemplar el funcionamiento normal. También debe incluir mecanismos para detectar, gestionar y diagnosticar determinadas condiciones anómalas.</p>
+
+
             
             </section>
 
             <section>
-            <h2>3. PROCESAMIENTO EN TIEMPO REAL</h2>
+            <h2>3. EJEMPLO: SISTEMA EMBEBIDO DE UN HORNO DE MICROONDAS </h2>
+
+            <img src="img/SE-HM.jpeg"
+            alt="Concepto de Sistema Embebido"
+            class="imagen-centrada">
+
+            <p>
+                En un horno de microondas, el sistema embebido se encarga de procesar
+                la entrada del usuario y controlar los distintos componentes físicos
+                de forma segura y precisa.
+            </p>
+
+            <h3>Entradas (Sensado e Interacción)</h3>
+
+            <ul>
+                <li>
+                    <strong>Teclado / Panel táctil:</strong>
+                    recibe el tiempo de cocción, el nivel de potencia y los comandos
+                    de inicio y paro.
+                </li>
+
+                <li>
+                    <strong>Sensores de la puerta (Interlock switches):</strong>
+                    detectan si la puerta está correctamente cerrada para autorizar
+                    el encendido del magnetrón de forma segura.
+                </li>
+
+                <li>
+                    <strong>Sensor de temperatura / humedad:</strong>
+                    monitorea el estado de los alimentos durante los programas
+                    automáticos.
+                </li>
+            </ul>
+
+            <h3>Procesamiento (Microcontrolador / MCU)</h3>
+
+            <ul>
+                <li>
+                    <strong>Microcontrolador (MCU):</strong>
+                    ejecuta el firmware que gestiona el temporizador, interpreta las
+                    pulsaciones de los botones, controla las funciones de seguridad
+                    y coordina las salidas del sistema.
+                </li>
+            </ul>
+
+            <h3>Salidas (Actuadores e Indicadores)</h3>
+
+            <ul>
+                <li>
+                    <strong>Magnetrón (vía relé / Triac):</strong>
+                    genera la radiación de microondas utilizada para calentar el
+                    alimento.
+                </li>
+
+                <li>
+                    <strong>Motor del plato giratorio y ventilador:</strong>
+                    mantienen el movimiento de la comida y proporcionan la
+                    ventilación necesaria para el funcionamiento del sistema.
+                </li>
+
+                <li>
+                    <strong>Pantalla (LED / LCD):</strong>
+                    muestra el tiempo restante y las opciones seleccionadas por
+                    el usuario.
+                </li>
+
+                <li>
+                    <strong>Zumbador (Buzzer):</strong>
+                    emite una señal sonora de alerta cuando finaliza el tiempo
+                    establecido.
+                </li>
+            </ul>
+            </section>
+
+            <section>
+            <h2>4. PROCESAMIENTO EN TIEMPO REAL</h2>
 
             <p>Una característica especialmente importante de muchos sistemas embebidos es su relación con el tiempo real (<em>real-time</em>).</p>
 
@@ -140,7 +221,7 @@
             </ul>
 
             <p>Por ejemplo, la computadora para bicicleta es un sistema de tiempo real débil (<em>weak real-time system</em>). En este caso, el procesamiento debe realizarse entre dos impulsos del sensor de la rueda, pero los requisitos temporales no son comparables con los de sistemas de control más críticos.</p>
-            </section>
+            </section>           
 
         </article>
         
