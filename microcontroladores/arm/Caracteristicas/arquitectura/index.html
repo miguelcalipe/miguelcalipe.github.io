@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Arquitectura ARM y los Procesadores | MC Mundo Tech</title>
+    <meta name="description" content="La arquitectura define un conjunto de instrucciones que especifica cómo debe comportarse el hardware cuando se ejecutan determinadas instrucciones. Estas especificaciones permiten que un software desarrollado de acuerdo con ellas pueda ejecutarse en cualquier procesador que implemente esa arquitectura">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            
+<h1>LA ARQUITECTURA ARM Y PROCESADORES </h1>
+            
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   -->
+            
+           
+<section>
+    <h2>1. QUÉ ES LA ARQUITECTURA ARM</h2>
+
+    <p>La <strong>arquitectura Arm</strong> es una familia de arquitecturas de procesadores basadas en <strong>RISC</strong> (<em>Reduced Instruction Set Computer</em>, Computadora con Conjunto Reducido de Instrucciones). Es ampliamente conocida por su eficiencia energética y se utiliza en numerosos dispositivos móviles.</p>
+
+    <p>La arquitectura define un conjunto de instrucciones que especifica cómo debe comportarse el hardware cuando se ejecutan determinadas instrucciones. Estas especificaciones permiten que un software desarrollado de acuerdo con ellas pueda ejecutarse en cualquier procesador que implemente esa arquitectura.</p>
+
+    <p>Por tanto, es importante distinguir entre <strong>arquitectura</strong> y <strong>procesador</strong>. La arquitectura establece las reglas que debe cumplir el procesador, mientras que una implementación concreta de esa arquitectura puede ser diseñada y fabricada por diferentes empresas.</p>
+</section>
+
+<section>
+    <h2>2. ARM EN APLICACIONES IOT</h2>
+
+    <p>La arquitectura Arm es adecuada para una amplia variedad de aplicaciones de <strong>Internet de las Cosas (IoT)</strong> e incorpora características destinadas a satisfacer las demandas en constante evolución de nuevas funcionalidades, seguridad integrada, alto rendimiento y nuevos mercados.</p>
+
+    <p>Un ejemplo es la arquitectura <strong>Armv7-M</strong>, utilizada en el procesador <strong>Arm Cortex-M4</strong>. Esta arquitectura fue diseñada específicamente para sistemas embebidos y permite un diseño sencillo del <em>pipeline</em>, una ejecución con un bajo número de ciclos y una latencia mínima en la atención de interrupciones.</p>
+
+    <p>Estas características contribuyen a mejorar la velocidad de ejecución, la duración de la batería y la simplicidad de funcionamiento en un entorno de sistemas embebidos.</p>
+</section>
+
+<section>
+    <h2>3. LICENCIAMIENTO DE LA ARQUITECTURA ARM</h2>
+
+    <p>Algunas empresas obtienen una licencia de la arquitectura Arm y diseñan sus propias CPU basadas en ella, en lugar de utilizar una CPU diseñada directamente por Arm.</p>
+
+    <p>La <strong>arquitectura Arm</strong> constituye además la base de todos los procesadores Arm. Esto significa que la arquitectura proporciona las especificaciones fundamentales que deben respetar las distintas implementaciones compatibles.</p>
+</section>
+
+<section>
+    <h2>4. ARM Y LOS FABRICANTES DE PROCESADORES</h2>
+
+    <p>Aunque los procesadores Arm son ampliamente considerados un estándar de la industria, <strong>Arm no fabrica los procesadores</strong>. En cambio, Arm diseña los núcleos de procesador que forman parte de sus bibliotecas de hardware, licencia estos diseños a los fabricantes y proporciona un ecosistema de herramientas de desarrollo y documentación técnica.</p>
+
+    <p>Los fabricantes combinan estos diseños de procesador con su propia propiedad intelectual o con propiedad intelectual de terceros para crear un producto completo.</p>
+
+    <p>Esta separación entre el diseño de la arquitectura o del núcleo y la fabricación del dispositivo permite que diferentes fabricantes desarrollen productos basados en tecnologías Arm para distintos mercados y aplicaciones.</p>
+</section>
+
+<section>
+    <h2>5. PROCESADORES ARM PARA IOT</h2>
+
+    <p>La tecnología de procesadores Arm está diseñada y optimizada teniendo en cuenta las necesidades y restricciones de los dispositivos IoT, por lo que ofrece una mayor eficiencia energética.</p>
+
+    <p>Los procesadores Arm abarcan aplicaciones IoT que van desde <strong>sensores hasta servidores</strong>. Dentro de esta amplia gama existen diferentes familias de procesadores, cada una orientada a distintos requisitos de procesamiento.</p>
+</section>
+
+<section>
+    <h2>6. PROCESADORES ARM CORTEX-A</h2>
+
+    <p>Los procesadores <strong>Arm Cortex-A</strong> son procesadores de aplicaciones destinados a sistemas operativos con numerosas funcionalidades y a aplicaciones de terceros.</p>
+
+    <p>Entre sus aplicaciones se encuentran, por ejemplo:</p>
+
+    <ul>
+        <li>El aprendizaje automático en el borde (<em>edge computing</em>).</li>
+        <li>La toma autónoma de decisiones basada en el contexto.</li>
+        <li>La conexión segura de dispositivos IoT con la nube.</li>
+    </ul>
+</section>
+
+<section>
+    <h2>7. PROCESADORES ARM CORTEX-R</h2>
+
+    <p>Los procesadores <strong>Arm Cortex-R</strong> son procesadores embebidos destinados al procesamiento de señales en tiempo real y a aplicaciones de control.</p>
+
+    <p>Estos procesadores responden a la necesidad de obtener <strong>alto rendimiento, muy baja latencia y bajo consumo de energía</strong> en dispositivos como:</p>
+
+    <ul>
+        <li>Automóviles conectados.</li>
+        <li>Cámaras de alta gama.</li>
+        <li>Controladores de unidades de disco.</li>
+    </ul>
+</section>
+
+<section>
+    <h2>8. PROCESADORES ARM CORTEX-M</h2>
+
+    <p>Los procesadores <strong>Arm Cortex-M</strong> están orientados a aplicaciones de microcontroladores. Pueden ser específicos para una determinada aplicación o utilizarse como parte de un <strong>sistema en chip (SoC)</strong>.</p>
+
+    <p>Están optimizados para un bajo consumo de energía y para generar ejecutables de pequeño tamaño. Esto permite reducir el espacio físico y la cantidad de silicio necesarios, contribuyendo a disminuir el costo del dispositivo.</p>
+
+    <p><strong>Este curso se centra en los procesadores de la serie Cortex-M.</strong></p>
+</section>
+
+<section>
+    <h2>9. PROCESADORES CORTEX-M0 Y CORTEX-M0+</h2>
+
+    <p>Los procesadores <strong>Arm Cortex-M0</strong> y <strong>Cortex-M0+</strong> están diseñados para aplicaciones que requieren un costo, consumo de energía y área de silicio mínimos.</p>
+
+    <p>Estos procesadores están optimizados para tareas sencillas de <strong>detección mediante sensores y control</strong>, por lo que resultan adecuados para sistemas embebidos donde las restricciones de recursos son especialmente importantes.</p>
+</section>
+
+<section>
+    <h2>10. PROCESADORES CORTEX-M3, CORTEX-M4 Y CORTEX-M7</h2>
+
+    <p>Los procesadores <strong>Cortex-M3, Cortex-M4 y Cortex-M7</strong> están diseñados para operaciones intensivas en procesamiento de datos.</p>
+
+    <p>Estos procesadores incorporan:</p>
+
+    <ul>
+        <li>Arquitectura Harvard.</li>
+        <li>Multiplicadores de hardware dedicados de alta velocidad.</li>
+        <li>Funciones y bibliotecas orientadas a operaciones matemáticas.</li>
+    </ul>
+
+    <p>La combinación de estas características permite aumentar la capacidad de procesamiento para aplicaciones embebidas que requieren operaciones matemáticas y procesamiento de datos más exigentes.</p>
+</section>
+
+<section>
+    <h2>11. DSP Y PROCESAMIENTO DE PUNTO FLOTANTE</h2>
+
+    <p>Los procesadores <strong>Cortex-M4</strong> y <strong>Cortex-M7</strong> integran capacidades de <strong>Procesamiento Digital de Señales (DSP)</strong> y capacidades aceleradas de procesamiento de <strong>punto flotante</strong>.</p>
+
+    <p>Estas características permiten procesar algoritmos de forma rápida y con un consumo eficiente de energía, especialmente en aplicaciones de control digital de señales.</p>
+
+    <p>El procesamiento DSP resulta especialmente relevante cuando un sistema embebido necesita realizar operaciones repetitivas sobre datos, como las procedentes de sensores o señales digitales, mientras que el procesamiento de punto flotante facilita determinadas operaciones matemáticas que utilizan números reales.</p>
+</section>
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>

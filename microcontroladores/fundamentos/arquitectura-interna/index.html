@@ -548,8 +548,8 @@ evento </pre>
 </p>
 
 <ul>
-    <li>GPIO;</li>
-    <li>temporizadores;</li>
+    <li>GPIO: ambio de estado de un pin, flanco, nivel, etc.</li>
+    <li>temporizadores: desbordamiento, comparación, captura, etc.</li>
     <li>comunicaciones;</li>
     <li>periféricos analógicos;</li>
     <li>otros eventos internos o externos.</li>
@@ -558,6 +558,11 @@ evento </pre>
 <img src="img/Interrupcion.jpeg"
 alt="Concepto de Interrupcion"
 class=" imagen-centrada" >
+
+<p>
+    Una característica fundamental de una interrupción es que la CPU debe conservar información suficiente para poder continuar posteriormente. Dependiendo de la arquitectura, el hardware puede guardar automáticamente parte del estado y la ISR o el software puede guardar registros adicionales.          
+</p>
+
 <p>
     En un microcontrolador típico, cuando ocurre una interrupción:
 </p>
