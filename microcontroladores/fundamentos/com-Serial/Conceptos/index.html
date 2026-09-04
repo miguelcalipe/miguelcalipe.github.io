@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Niveles de abstracción del hardware | MC Mundo Tech</title>
+    <meta name="description" content="Con el paso del tiempo han aparecido distintos niveles de abstracción cuyo objetivo es simplificar el desarrollo de software. Mientras mayor es la abstracción, menor es la cantidad de detalles del hardware que el programador necesita conocer, a costa de perder algo de control y eficiencia ">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>COMUNICACIÓN SERIAL</h1>            
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   -->
+            
+            <section> 
+            
+            
+<h2>INTRODUCCIÓN</h2>
+<p>La comunicación entre dispositivos digitales consiste, en esencia, en intercambiar información representada mediante bits. Un microcontrolador necesita comunicarse con sensores, memorias, convertidores, otros microcontroladores, módulos de comunicación y numerosos periféricos. Para hacerlo existen diferentes técnicas de transmisión de datos, entre ellas la comunicación paralela y la comunicación serial.</p>
+
+<p>La comunicación serial ocupa un lugar especialmente importante en los sistemas embebidos porque permite intercambiar información utilizando un número reducido de conexiones físicas. Sin embargo, comprenderla correctamente requiere ir más allá de la idea simplificada de que «los bits se envían uno detrás de otro». Hay que entender cómo se almacenan y desplazan los bits, cómo se establece la sincronización temporal y cómo el receptor determina dónde comienza y termina una transmisión.</p>
+
+<p>En este artículo se desarrolla la comunicación serial desde sus fundamentos digitales hasta la distinción entre comunicación síncrona y asíncrona, conceptos que posteriormente permiten comprender interfaces como SPI y UART.</p>
+</section>  
+
+<section>
+<h2>1. COMUNICACIÓN SERIAL Y COMUNICACIÓN PARALELA</h2>
+
+<p>Una palabra digital está formada por un conjunto de bits. Por ejemplo, una palabra de ocho bits puede representarse como:</p>
+
+<pre>
+10110010
+</pre>
+
+<p>Cada posición tiene un peso binario diferente. En la representación convencional, el bit situado más a la izquierda es el <strong>MSB (Most Significant Bit)</strong>, mientras que el situado más a la derecha es el <strong>LSB (Least Significant Bit)</strong>:</p>
+
+<pre>
+MSB                         LSB
+ ↓                           ↓
+1   0   1   1   0   0   1   0
+</pre>
+
+<p>La comunicación paralela y la comunicación serial se diferencian principalmente en la forma en que esos bits son transferidos entre dispositivos.</p>
+
+<h3>1.1. Comunicación paralela</h3>
+
+<p>En una comunicación paralela, varios o todos los bits de una palabra se transmiten simultáneamente mediante líneas de datos independientes.</p>
+
+<p>Para transmitir una palabra de 8 bits se pueden utilizar ocho líneas:</p>
+
+<pre>
+D7 ─────────────────────────►
+D6 ─────────────────────────►
+D5 ─────────────────────────►
+D4 ─────────────────────────►
+D3 ─────────────────────────►
+D2 ─────────────────────────►
+D1 ─────────────────────────►
+D0 ─────────────────────────►
+</pre>
+
+<p>Si se desea transmitir una palabra de 32 bits mediante una interfaz paralela de 32 bits, serían necesarias 32 líneas de datos, además de las líneas que puedan ser necesarias para control, sincronización, alimentación y masa.</p>
+
+<p>Esto puede resultar ventajoso cuando se necesita transferir muchos bits simultáneamente y los dispositivos se encuentran muy próximos. Sin embargo, aumentar el número de líneas también aumenta la complejidad del circuito, del encapsulado, de la placa de circuito impreso y de las conexiones entre dispositivos.</p>
+
+<h3>1.2. Comunicación serial</h3>
+
+<p>En una comunicación serial, los bits se transfieren secuencialmente, es decir, uno después de otro.</p>
+
+<pre>
+1 → 0 → 1 → 1 → 0 → 0 → 1 → 0
+</pre>
+
+<p>En lugar de necesitar una línea independiente para cada bit, una misma línea de datos puede utilizarse para transferir sucesivamente los bits de la palabra.</p>
+
+<p>La ventaja evidente es la reducción del número de conexiones. Esta característica resulta especialmente útil en sistemas embebidos, donde el número de pines de un microcontrolador es limitado y donde el espacio disponible en la placa puede ser reducido.</p>
+
+<p>Sin embargo, reducir el número de líneas implica resolver otro problema: el receptor necesita saber <strong>cuándo debe interpretar la señal eléctrica como un bit</strong>. Esta cuestión conduce directamente al concepto de sincronización.</p>
+</section>
+
+<section>
+<h2>2. EL REGISTRO DE DESPLAZAMIENTO</h2>
+
+<p>Para comprender cómo se pueden mover bits de forma secuencial, es necesario conocer el <strong>registro de desplazamiento</strong> (<em>shift register</em>).</p>
+
+<p>Un registro de desplazamiento es un circuito digital secuencial formado por varios elementos capaces de almacenar un bit, normalmente <strong>flip-flops</strong>, conectados de manera que el contenido de una posición pueda transferirse a la siguiente mediante una señal de reloj.</p>
+
+<p>Esta definición es importante porque un registro de desplazamiento no es simplemente un conjunto de cables. Es un circuito con capacidad de <strong>almacenar bits y trasladarlos entre diferentes posiciones</strong>.</p>
+
+<h3>2.1. El flip-flop como elemento básico</h3>
+
+<p>Un flip-flop puede almacenar un solo bit. Su salida puede encontrarse en uno de dos estados lógicos:</p>
+
+<pre>
+Q = 0
+</pre>
+
+<p>o:</p>
+
+<pre>
+Q = 1
+</pre>
+
+<p>Por tanto, un flip-flop puede considerarse una pequeña celda de almacenamiento de un bit.</p>
+
+<p>Si conectamos ocho flip-flops de forma apropiada, podemos disponer de un circuito capaz de almacenar ocho bits:</p>
+
+<pre>
+┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐
+│ FF  │ │ FF  │ │ FF  │ │ FF  │
+│  1  │ │  0  │ │  1  │ │  1  │
+└─────┘ └─────┘ └─────┘ └─────┘
+
+┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐
+│ FF  │ │ FF  │ │ FF  │ │ FF  │
+│  0  │ │  0  │ │  1  │ │  0  │
+└─────┘ └─────┘ └─────┘ └─────┘
+</pre>
+
+<p>En conjunto tenemos ocho bits almacenados. La organización y las conexiones entre esos flip-flops determinan cómo puede utilizarse el circuito.</p>
+
+<h3>2.2. ¿Qué significa desplazar un bit?</h3>
+
+<p>Supongamos un registro de cuatro bits que contiene:</p>
+
+<pre>
+1 0 1 1
+</pre>
+
+<p>Si el registro está configurado para desplazar los bits hacia la derecha, cada posición recibe el contenido de la posición situada a su izquierda cuando se produce el evento de reloj correspondiente.</p>
+
+<pre>
+ANTES
+
+1   0   1   1
+│   │   │   │
+│   └──►│   │
+│       └──►│
+│           └──►
+</pre>
+
+<p>Después del desplazamiento, suponiendo que entra un nuevo cero por la izquierda:</p>
+
+<pre>
+DESPUÉS
+
+0   1   0   1
+</pre>
+
+<p>El bit que estaba en la primera posición pasó a la segunda; el segundo pasó a la tercera; el tercero pasó a la cuarta, y el último salió del registro.</p>
+
+<p>Eso es exactamente lo que significa <strong>desplazar</strong> un registro: trasladar los bits almacenados de una posición a otra siguiendo una dirección determinada.</p>
+
+<h3>2.3. La señal de reloj controla el desplazamiento</h3>
+
+<p>Los bits no se desplazan continuamente. El desplazamiento está controlado por una señal de reloj.</p>
+
+<pre>
+CLK
+
+     ┌───┐     ┌───┐     ┌───┐     ┌───┐
+─────┘   └─────┘   └─────┘   └─────┘   └──
+
+     ↑         ↑         ↑         ↑
+     │         │         │         │
+  desplaz.  desplaz.  desplaz.  desplaz.
+</pre>
+
+<p>Dependiendo del circuito, la transferencia puede producirse en el flanco ascendente o en el flanco descendente del reloj.</p>
+
+<p>Un <strong>flanco ascendente</strong> es la transición:</p>
+
+<pre>
+0 → 1
+</pre>
+
+<p>y un <strong>flanco descendente</strong> es:</p>
+
+<pre>
+1 → 0
+</pre>
+
+<p>Esta cuestión será especialmente importante en interfaces síncronas como SPI, donde la relación entre los flancos del reloj y el momento en que se actualizan o muestrean los datos forma parte de la configuración de la interfaz.</p>
+</section>
+
+<section>
+<h2>3. EL REGISTRO DE DESPLAZAMIENTO COMO CONVERSOR DE DATOS</h2>
+
+<p>Una de las características más importantes del registro de desplazamiento es que permite convertir datos entre una representación paralela y una representación serial.</p>
+
+<h3>3.1. Conversión paralelo-serie</h3>
+
+<p>Supongamos que tenemos almacenado el siguiente dato de ocho bits:</p>
+
+<pre>
+10110010
+</pre>
+
+<p>Todos los bits están disponibles simultáneamente dentro del registro. Si hacemos que el registro desplace los bits y utilizamos una de sus salidas para obtenerlos, podemos producir una secuencia serial:</p>
+
+<pre>
+1 → 0 → 1 → 1 → 0 → 0 → 1 → 0
+</pre>
+
+<p>Esta operación se denomina <strong>conversión paralelo-serie</strong> o <strong>PISO (Parallel-In, Serial-Out)</strong>.</p>
+
+<p>El registro recibe o carga varios bits simultáneamente y posteriormente los entrega uno a uno.</p>
+
+<h3>3.2. Conversión serie-paralelo</h3>
+
+<p>El proceso también puede realizarse en sentido contrario.</p>
+
+<p>Supongamos que los bits llegan individualmente:</p>
+
+<pre>
+1 → 0 → 1 → 1 → 0 → 0 → 1 → 0
+</pre>
+
+<p>Cada bit se introduce en el registro mediante la entrada serial. Con cada evento de reloj, los bits almacenados se desplazan y se incorpora el nuevo bit.</p>
+
+<p>Después de recibir los ocho bits, el registro contiene nuevamente la palabra completa:</p>
+
+<pre>
+10110010
+</pre>
+
+<p>Esta operación se denomina <strong>conversión serie-paralelo</strong> o <strong>SIPO (Serial-In, Parallel-Out)</strong>.</p>
+
+<h3>3.3. La importancia de esta función en los sistemas digitales</h3>
+
+<p>Esta capacidad explica por qué los registros de desplazamiento son tan importantes en electrónica digital. Permiten conectar un mundo en el que los datos están disponibles simultáneamente con otro en el que los datos deben transferirse secuencialmente.</p>
+
+<p>En términos conceptuales:</p>
+
+<pre>
+          REGISTRO DE DESPLAZAMIENTO
+                    │
+          ┌─────────┴─────────┐
+          │                   │
+   Paralelo → Serie     Serie → Paralelo
+          │                   │
+      Transmisión           Recepción
+</pre>
+
+<p>Los periféricos de comunicación de un microcontrolador son mucho más complejos que un simple registro de desplazamiento, pero este principio continúa siendo fundamental para entender cómo se realiza la transferencia serial de bits.</p>
+</section>
+
+<section>
+<h2>4. MSB, LSB Y ORDEN DE TRANSMISIÓN</h2>
+
+<p>Existe una distinción importante que debe hacerse desde el principio: <strong>el significado de un bit dentro de una palabra no es lo mismo que el orden en que ese bit se transmite</strong>.</p>
+
+<p>En la representación convencional de un número binario:</p>
+
+<pre>
+10110010
+↑      ↑
+MSB    LSB
+</pre>
+
+<p>El MSB es el bit de mayor peso y el LSB es el bit de menor peso.</p>
+
+<p>Sin embargo, cuando una palabra se transmite serialmente, existen diferentes posibilidades respecto al orden de transmisión.</p>
+
+<h3>4.1. MSB first</h3>
+
+<p>Si se transmite primero el bit más significativo, tenemos una transmisión <strong>MSB first</strong>:</p>
+
+<pre>
+10110010
+↑
+primero
+</pre>
+
+<p>El orden de transmisión será:</p>
+
+<pre>
+1 → 0 → 1 → 1 → 0 → 0 → 1 → 0
+</pre>
+
+<h3>4.2. LSB first</h3>
+
+<p>Si se transmite primero el bit menos significativo, tenemos una transmisión <strong>LSB first</strong>:</p>
+
+<pre>
+10110010
+       ↑
+     primero
+</pre>
+
+<p>En ese caso, el orden de transmisión será:</p>
+
+<pre>
+0 → 1 → 0 → 0 → 1 → 1 → 0 → 1
+</pre>
+
+<p>Por tanto, no debemos confundir:</p>
+
+<ul>
+<li><strong>MSB:</strong> bit de mayor peso.</li>
+<li><strong>LSB:</strong> bit de menor peso.</li>
+<li><strong>MSB first:</strong> primero se transmite el MSB.</li>
+<li><strong>LSB first:</strong> primero se transmite el LSB.</li>
+</ul>
+
+<p>La dirección física del desplazamiento dentro del registro y el orden de transmisión están relacionados con la implementación concreta, pero no debemos utilizar indistintamente estos conceptos.</p>
+</section>
+
+<section>
+<h2>5. EL PROBLEMA DE LA SINCRONIZACIÓN</h2>
+
+<p>Cuando los bits se transmiten uno detrás de otro, el receptor necesita conocer el instante apropiado para interpretar cada bit.</p>
+
+<p>Consideremos una secuencia eléctrica como:</p>
+
+<pre>
+10110010
+</pre>
+
+<p>El receptor necesita convertir esa señal física en ocho decisiones independientes:</p>
+
+<pre>
+1 | 0 | 1 | 1 | 0 | 0 | 1 | 0
+</pre>
+
+<p>Para hacerlo correctamente necesita conocer, entre otras cosas:</p>
+
+<ul>
+<li>cuándo comienza la transmisión;</li>
+<li>cuánto dura cada bit;</li>
+<li>cuándo debe muestrear la señal;</li>
+<li>cuándo termina una palabra o una trama.</li>
+</ul>
+
+<p>Por este motivo, una comunicación serial no consiste únicamente en conectar una línea entre dos dispositivos. También es necesario establecer un mecanismo que permita al receptor mantener una referencia temporal adecuada.</p>
+
+<p>Existen dos soluciones fundamentales:</p>
+
+<ul>
+<li><strong>comunicación serial síncrona;</strong></li>
+<li><strong>comunicación serial asíncrona.</strong></li>
+</ul>
+</section>
+
+<section>
+<h2>6. COMUNICACIÓN SERIAL SÍNCRONA</h2>
+
+<p>En una comunicación serial síncrona, el transmisor y el receptor comparten una señal de reloj utilizada como referencia temporal para la transferencia de datos.</p>
+
+<p>Conceptualmente:</p>
+
+<pre>
+                TRANSMISOR
+                    │
+             ┌──────┴──────┐
+             │             │
+            DATA          CLK
+             │             │
+             ▼             ▼
+        ┌─────────────────────┐
+        │       RECEPTOR      │
+        └─────────────────────┘
+</pre>
+
+<p>La señal de reloj indica cuándo debe producirse la transferencia o el muestreo de los datos, de acuerdo con las reglas específicas de la interfaz.</p>
+
+<h3>6.1. Ventaja de utilizar un reloj compartido</h3>
+
+<p>El receptor no necesita adivinar cuándo debe leer cada bit basándose únicamente en su propio reloj. Dispone de una señal externa que proporciona la referencia temporal de la transferencia.</p>
+
+<p>Esto simplifica la sincronización entre los dispositivos, aunque introduce la necesidad de utilizar una línea adicional para transportar el reloj.</p>
+
+<h3>6.2. SPI como ejemplo de comunicación síncrona</h3>
+
+<p><strong>SPI (Serial Peripheral Interface)</strong> es un ejemplo típico de comunicación serial síncrona.</p>
+
+<p>En una conexión SPI convencional encontramos señales como:</p>
+
+<pre>
+SCK  ─────────────► Reloj
+MOSI ─────────────► Datos hacia el receptor
+MISO ◄───────────── Datos hacia el transmisor
+CS   ─────────────► Selección del dispositivo
+</pre>
+
+<p>La señal SCK proporciona el reloj que permite coordinar la transferencia de bits.</p>
+
+<p>Más adelante, al estudiar SPI en detalle, será necesario analizar conceptos como <strong>CPOL, CPHA, flanco de muestreo, flanco de cambio, MSB first y LSB first</strong>.</p>
+</section>
+
+<section>
+<h2>7. COMUNICACIÓN SERIAL ASÍNCRONA</h2>
+
+<p>En una comunicación serial asíncrona no se transmite una señal de reloj independiente junto con los datos.</p>
+
+<p>El receptor debe utilizar su propio reloj para determinar cuándo debe muestrear la señal recibida.</p>
+
+<pre>
+TRANSMISOR                       RECEPTOR
+
+   TX ─────────────────────────► RX
+                                  │
+                                  │
+                            Reloj local
+</pre>
+
+<p>Para que esto sea posible, transmisor y receptor deben haber establecido previamente determinados parámetros temporales, especialmente la velocidad de transmisión.</p>
+
+<h3>7.1. El acuerdo temporal entre transmisor y receptor</h3>
+
+<p>Si el transmisor envía los bits a una determinada velocidad y el receptor utiliza una temporización incompatible, el receptor puede muestrear los datos demasiado pronto o demasiado tarde.</p>
+
+<p>El resultado puede ser una interpretación incorrecta de los bits.</p>
+
+<p>Por esta razón, en una comunicación asíncrona ambos extremos deben utilizar una configuración compatible.</p>
+
+<h3>7.2. Las tramas permiten identificar el comienzo y el final</h3>
+
+<p>Como no existe una línea de reloj compartida, la comunicación asíncrona necesita un mecanismo que permita al receptor identificar el comienzo de una transmisión.</p>
+
+<p>Para ello se utilizan <strong>bits de trama</strong> (<em>framing bits</em>).</p>
+
+<p>Una representación simplificada de una trama puede ser:</p>
+
+<pre>
+┌───────┬──────────────┬────────┐
+│ START │     DATOS    │  STOP  │
+└───────┴──────────────┴────────┘
+</pre>
+
+<p>El bit de inicio indica al receptor que está comenzando una nueva trama. A continuación se transmiten los bits de datos y finalmente se utilizan uno o varios bits de parada para indicar el final de la trama.</p>
+
+<p>Dependiendo de la interfaz y de su configuración, una trama puede incluir además otros elementos, como un bit de paridad.</p>
+
+<h3>7.3. UART como ejemplo de comunicación asíncrona</h3>
+
+<p><strong>UART (Universal Asynchronous Receiver/Transmitter)</strong> es uno de los ejemplos más conocidos de comunicación serial asíncrona.</p>
+
+<p>Una conexión UART básica puede representarse como:</p>
+
+<pre>
+TX ─────────────────────────► RX
+
+RX ◄───────────────────────── TX
+</pre>
+
+<p>En este caso no existe una línea de reloj compartida. Los dos dispositivos utilizan sus relojes internos y deben estar configurados de manera compatible.</p>
+</section>
+
+<section>
+<h2>8. COMPARACIÓN ENTRE COMUNICACIÓN SÍNCRONA Y ASÍNCRONA</h2>
+
+<table>
+<thead>
+<tr>
+<th>Característica</th>
+<th>Síncrona</th>
+<th>Asíncrona</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Reloj compartido</td>
+<td>Sí</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Referencia temporal</td>
+<td>Se proporciona mediante una señal de reloj</td>
+<td>Se obtiene mediante el reloj local del receptor</td>
+</tr>
+<tr>
+<td>Inicio de transmisión</td>
+<td>Determinado por el protocolo y la señal de control/reloj</td>
+<td>Se identifica mediante bits de trama</td>
+</tr>
+<tr>
+<td>Ejemplo</td>
+<td>SPI</td>
+<td>UART</td>
+</tr>
+</tbody>
+</table>
+
+<p>La diferencia fundamental puede resumirse de la siguiente manera:</p>
+
+<p><strong>Comunicación síncrona:</strong> el transmisor proporciona una referencia temporal mediante el reloj compartido.</p>
+
+<p><strong>Comunicación asíncrona:</strong> el transmisor no proporciona el reloj; transmisor y receptor acuerdan previamente la temporización y utilizan una estructura de trama para sincronizar la recepción.</p>
+</section>
+
+<section>
+<h2>9. QUÉ DEBEMOS ENTENDER ANTES DE ESTUDIAR SPI Y UART</h2>
+
+<p>La comunicación serial no debe entenderse simplemente como «enviar bits uno detrás de otro». Detrás de esa operación aparentemente sencilla existen varios conceptos relacionados.</p>
+
+<p>El primero es el <strong>almacenamiento de los bits</strong>. Un registro de desplazamiento permite almacenar varios bits y trasladarlos de una posición a otra mediante una señal de reloj.</p>
+
+<p>El segundo es la <strong>conversión entre formatos</strong>. Un registro puede recibir datos en paralelo y entregarlos serialmente, o recibirlos serialmente y proporcionar posteriormente una palabra paralela.</p>
+
+<p>El tercero es la <strong>temporización</strong>. El receptor necesita saber cuándo debe interpretar el nivel lógico de la línea como un bit válido.</p>
+
+<p>El cuarto es el <strong>orden de transmisión</strong>. Una palabra puede transmitirse comenzando por el MSB o por el LSB, dependiendo de las reglas de la interfaz.</p>
+
+<p>Finalmente está la <strong>sincronización</strong>. En una interfaz síncrona, como SPI, se utiliza una señal de reloj compartida. En una interfaz asíncrona, como UART, cada dispositivo utiliza su propio reloj y la sincronización se consigue mediante la temporización acordada y la estructura de las tramas.</p>
+
+<p>La cadena conceptual que conviene conservar es:</p>
+
+<pre>
+Flip-flop
+    ↓
+Almacenamiento de un bit
+    ↓
+Registro de desplazamiento
+    ↓
+Desplazamiento secuencial de bits
+    ↓
+Conversión serie ↔ paralelo
+    ↓
+Transferencia serial
+    ↓
+Sincronización temporal
+    ↓
+Comunicación síncrona / asíncrona
+    ↓
+SPI / UART
+</pre>
+
+<p>Con esta base resulta mucho más sencillo comprender cómo funcionan los periféricos de comunicación integrados en un microcontrolador. Estos periféricos incorporan registros, lógica de control, generadores de reloj, buffers y circuitos de sincronización, pero el principio fundamental de mover y almacenar bits sigue estando presente.</p>
+</section>
+
+<section>
+<h2>10. Conceptos fundamentales</h2>
+
+<ul>
+<li><strong>Comunicación paralela:</strong> transmite varios bits simultáneamente utilizando líneas independientes.</li>
+<li><strong>Comunicación serial:</strong> transmite los bits secuencialmente.</li>
+<li><strong>Flip-flop:</strong> elemento digital capaz de almacenar un bit.</li>
+<li><strong>Registro de desplazamiento:</strong> conjunto de elementos de almacenamiento conectados para transferir bits entre posiciones mediante una señal de reloj.</li>
+<li><strong>PISO:</strong> conversión de paralelo a serie.</li>
+<li><strong>SIPO:</strong> conversión de serie a paralelo.</li>
+<li><strong>MSB:</strong> bit de mayor peso.</li>
+<li><strong>LSB:</strong> bit de menor peso.</li>
+<li><strong>MSB first:</strong> el MSB se transmite primero.</li>
+<li><strong>LSB first:</strong> el LSB se transmite primero.</li>
+<li><strong>Comunicación síncrona:</strong> utiliza una referencia de reloj compartida entre los dispositivos.</li>
+<li><strong>Comunicación asíncrona:</strong> no utiliza una línea de reloj compartida y requiere una temporización previamente acordada.</li>
+<li><strong>Trama:</strong> estructura que organiza los bits transmitidos y permite al receptor identificar el comienzo y el final de una transmisión.</li>
+</ul>
+</section>
+
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>
