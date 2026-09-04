@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entradas y Salidas de Propósito General | MC Mundo Tech</title>
+    <meta name="description" content="Un GPIO (General Purpose Input/Output, entrada/salida de propósito general) es un pin de señal digital cuya función puede configurarse según las necesidades del sistema. No tiene una función fija: el programador o diseñador determina su utilización mediante la configuración del microcontrolador ">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>GPIOS </h1>            
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   -->
+
+
+<section>
+<h2>1. CONCEPTO Y ARQUITECTURA DE UN GPIO</h2>
+
+<p>Un <strong>GPIO</strong> (<em>General Purpose Input/Output</em>, entrada/salida de propósito general) es un pin de señal digital cuya función puede configurarse según las necesidades del sistema. No tiene una función fija: el programador o diseñador determina su utilización mediante la configuración del microcontrolador.</p>
+
+<p>El término <strong>propósito general</strong> hace referencia precisamente a esta flexibilidad. Un GPIO puede configurarse para trabajar con diferentes tipos de señales digitales y, dependiendo del microcontrolador, también puede estar asociado a funciones analógicas o a diferentes periféricos internos.</p>
+
+<h3>1.1. Estructura interna y selección de función</h3>
+
+<p>Cada pin de un puerto GPIO está conectado a un <strong>circuito interno de interfaz configurable</strong>. La conexión entre este circuito interno y el circuito externo se realiza mediante un <strong>pin</strong> o <strong>pad</strong>.</p>
+
+<p>El bloque denominado <strong>selección de función</strong> (<em>function select</em>) permite determinar qué función interna estará conectada al pin. De esta manera, un mismo pin físico puede utilizarse como GPIO o, si el microcontrolador lo permite, como conexión de diferentes periféricos.</p>
+
+<p>Entre las funciones que pueden encontrarse en un pin están:</p>
+
+<ul>
+<li>Entrada GPIO.</li>
+<li>Salida GPIO.</li>
+<li>Entrada analógica para un ADC.</li>
+<li>Señales de comunicación, como UART, SPI o I²C.</li>
+<li>Señales generadas por temporizadores o PWM.</li>
+</ul>
+
+<p>Las características del pin se configuran mediante <strong>registros de control</strong>. Estos registros permiten seleccionar la dirección del pin, su función y otras propiedades eléctricas disponibles en el microcontrolador.</p>
+
+<p>Este enfoque permite que un número relativamente pequeño de pines pueda desempeñar una amplia variedad de funciones. El resultado es un diseño más flexible y, en muchos casos, un menor número de conexiones físicas.</p>
+
+<h3>1.2. GPIO como entrada y como salida</h3>
+
+<p>Cuando un GPIO se configura como <strong>entrada</strong>, el circuito interno permite que el microcontrolador detecte el nivel de tensión presente en el pin. El programa puede leer ese estado e interpretarlo como un nivel lógico.</p>
+
+<p>Cuando se configura como <strong>salida</strong>, el programa puede establecer el estado lógico del pin. En una salida digital convencional existen dos estados:</p>
+
+<ul>
+<li><strong>0 lógico:</strong> nivel bajo.</li>
+<li><strong>1 lógico:</strong> nivel alto.</li>
+</ul>
+
+<p>Por tanto, un GPIO permite establecer una comunicación básica entre el software que se ejecuta en el microcontrolador y los circuitos externos conectados a sus pines.</p>
+
+<p>También pueden existir <strong>rutas analógicas</strong> asociadas a determinados pines. Estas permiten conectar una señal externa con bloques analógicos internos, como un convertidor analógico-digital (ADC), siempre que el microcontrolador disponga de esta función.</p>
+</section>
+
+<section>
+<h2>2. NIVELES LÓGICOS Y CARACTERÍSTICAS ELÉCTRICAS</h2>
+
+<p>En una aplicación real, un GPIO no solamente representa información mediante los valores 0 y 1. También trabaja con niveles de tensión y corriente que deben respetarse para garantizar el funcionamiento correcto y evitar daños en el microcontrolador.</p>
+
+<h3>2.1. VDD, niveles lógicos y conversión de tensión</h3>
+
+<p>Normalmente, un microcontrolador utiliza una tensión de alimentación fija denominada <strong>VDD</strong>. En una salida digital, el nivel bajo se encuentra próximo a <strong>0 V</strong>, mientras que el nivel alto está relacionado con la tensión de alimentación del circuito.</p>
+
+<p>Hasta hace algunos años era habitual encontrar microcontroladores alimentados con aproximadamente <strong>5 V</strong>. Sin embargo, los procesadores y microcontroladores actuales de bajo consumo pueden trabajar con tensiones mucho menores, llegando en determinados dispositivos hasta aproximadamente <strong>1,8 V</strong>.</p>
+
+<p>Esta reducción de la tensión de alimentación puede disminuir el consumo de energía, pero también puede provocar problemas de compatibilidad cuando se conectan dispositivos que trabajan con diferentes niveles lógicos.</p>
+
+<p>Por ejemplo, si un microcontrolador trabaja con lógica de 1,8 V y otro circuito necesita señales de 3,3 V, puede ser necesario utilizar un <strong>convertidor de niveles lógicos</strong> (<em>level converter</em>) para adaptar las señales.</p>
+
+<p>Por esta razón, no debe asumirse que un <strong>1 lógico equivale siempre a 5 V</strong>. Los niveles eléctricos exactos dependen del dispositivo y deben consultarse en su documentación técnica.</p>
+
+<h3>2.2. GPIO como controlador de circuitos externos</h3>
+
+<p>En aplicaciones reales, un GPIO puede utilizarse para controlar un interruptor electrónico, por ejemplo un <strong>transistor</strong>, que permita habilitar o deshabilitar la alimentación de otro componente.</p>
+
+<p>Esta solución es especialmente útil cuando la carga necesita más corriente de la que puede proporcionar directamente un GPIO. El pin controla la entrada del transistor y este se encarga de manejar la corriente de la carga.</p>
+
+<p>Es importante recordar que un GPIO tiene límites de corriente. La corriente máxima por pin y la corriente total permitida para el microcontrolador deben consultarse siempre en el <strong>datasheet</strong>.</p>
+
+<h3>2.3. Más de dos niveles: señales analógicas y PWM</h3>
+
+<p>Una salida GPIO digital convencional solo proporciona dos niveles lógicos. Si una aplicación necesita representar más de dos niveles, debe utilizarse otro mecanismo.</p>
+
+<p>Una posibilidad es utilizar una <strong>entrada o salida analógica</strong>, cuando el microcontrolador dispone de ella. Otra posibilidad es utilizar <strong>PWM</strong> (<em>Pulse Width Modulation</em>, modulación por ancho de pulso).</p>
+
+<p>En PWM, la señal sigue alternando entre nivel bajo y nivel alto, pero se modifica el tiempo durante el cual permanece en cada estado. El porcentaje de tiempo que permanece en nivel alto se denomina <strong>ciclo de trabajo</strong> (<em>duty cycle</em>).</p>
+
+<p>Por tanto, PWM no convierte directamente al GPIO en una salida analógica. Sigue siendo una señal digital, pero su comportamiento temporal permite obtener determinados valores medios cuando se utiliza con el circuito apropiado.</p>
+</section>
+
+<section>
+<h2>3. APLICACIÓN PRÁCTICA: CONTROLAR DOS LED MEDIANTE GPIO</h2>
+
+<p>Para comprender el funcionamiento de los GPIO podemos considerar un circuito en el que un interruptor determina cuál de dos LED debe encenderse.</p>
+
+<p>El circuito utiliza un GPIO como <strong>entrada</strong> para leer el interruptor y otros dos GPIO como <strong>salidas</strong> para controlar los LED rojo y azul.</p>
+
+<h3>3.1. Funcionamiento del circuito</h3>
+
+<p>El programa lee el estado de la entrada y determina si la señal corresponde a un <strong>0</strong> o a un <strong>1</strong>. Dependiendo del estado detectado, establece las salidas de los GPIO para encender uno u otro LED.</p>
+
+<p>El funcionamiento puede resumirse de la siguiente manera:</p>
+
+<p><strong>Interruptor → GPIO de entrada → programa → GPIO de salida → LED</strong></p>
+
+<p>En una posición del interruptor, el procesador enciende el LED rojo. En la otra posición, enciende el LED azul.</p>
+
+<p>Este ejemplo representa uno de los principios fundamentales de los sistemas embebidos: una condición física externa se convierte en una señal digital, el software procesa esa información y posteriormente genera una acción sobre el mundo físico.</p>
+
+<h3>3.2. Resistencias limitadoras y ley de Ohm</h3>
+
+<p>Los LED necesitan una resistencia en serie para limitar la corriente. El valor de esta resistencia puede calcularse mediante la ley de Ohm utilizando:</p>
+
+<p><strong>R = (VDD − VLED) / ILED</strong></p>
+
+<p>Donde:</p>
+
+<ul>
+<li><strong>R</strong> es el valor de la resistencia que se desea calcular.</li>
+<li><strong>VDD</strong> es la tensión de alimentación.</li>
+<li><strong>VLED</strong> es la tensión necesaria para el LED, denominada tensión directa.</li>
+<li><strong>ILED</strong> es la corriente que se desea hacer circular por el LED.</li>
+</ul>
+
+<p>Para este ejemplo se considera una alimentación de <strong>3 V</strong> y una corriente de <strong>4 mA</strong>, equivalente a <strong>0,004 A</strong>.</p>
+
+<h3>3.3. Cálculo de las resistencias para los LED</h3>
+
+<p>Para el <strong>LED rojo</strong> se considera una tensión directa aproximada de <strong>1,8 V</strong>:</p>
+
+<p><strong>R = (3 V − 1,8 V) / 0,004 A = 300 Ω</strong></p>
+
+<p>Por tanto, el valor calculado para el LED rojo es de <strong>300 Ω</strong>.</p>
+
+<p>Para el <strong>LED azul</strong> se considera una tensión directa aproximada de <strong>2,7 V</strong>:</p>
+
+<p><strong>R = (3 V − 2,7 V) / 0,004 A = 75 Ω</strong></p>
+
+<p>Por tanto, el valor calculado para el LED azul es de <strong>75 Ω</strong>.</p>
+
+<p>Los valores son diferentes porque los dos LED presentan diferentes tensiones directas. Aunque ambos se alimentan con 3 V y se desea una corriente de 4 mA, la tensión que debe absorber la resistencia no es la misma.</p>
+
+<p>Para el LED rojo:</p>
+
+<p><strong>3 V − 1,8 V = 1,2 V</strong></p>
+
+<p>Para el LED azul:</p>
+
+<p><strong>3 V − 2,7 V = 0,3 V</strong></p>
+
+<p>En un diseño real, los valores deben verificarse utilizando las características eléctricas reales del LED y del microcontrolador, además de las tolerancias de los componentes y los valores comerciales disponibles.</p>
+</section>
+
+<section>
+<h2>4. ENTRADAS GPIO Y RESISTENCIAS PULL-UP Y PULL-DOWN</h2>
+
+<p>Cuando se conecta un interruptor a una entrada GPIO es necesario garantizar que el pin tenga siempre un nivel lógico definido. De lo contrario, cuando el interruptor esté abierto, la entrada puede quedar en un estado denominado <strong>flotante</strong> (<em>floating</em>).</p>
+
+<h3>4.1. El problema de una entrada flotante</h3>
+
+<p>Una entrada flotante no está conectada de forma definida ni a VDD ni a GND. Debido a la alta impedancia de una entrada digital, pequeñas perturbaciones eléctricas o ruido pueden provocar que el circuito interprete el pin unas veces como un 0 y otras como un 1.</p>
+
+<p>En consecuencia, el programa no puede determinar de forma fiable el estado del interruptor.</p>
+
+<p>Las resistencias <strong>pull-up</strong> y <strong>pull-down</strong> solucionan este problema estableciendo un estado predeterminado conocido.</p>
+
+<h3>4.2. Pull-up y pull-down</h3>
+
+<p>Una resistencia <strong>pull-up</strong> conecta la entrada, a través de una resistencia, hacia <strong>VDD</strong>. Cuando el interruptor está abierto, la entrada queda normalmente en nivel alto.</p>
+
+<p>Una resistencia <strong>pull-down</strong> conecta la entrada, a través de una resistencia, hacia <strong>GND</strong>. Cuando el interruptor está abierto, la entrada queda normalmente en nivel bajo.</p>
+
+<p>La resistencia tiene además la función de limitar la corriente cuando el interruptor establece una conexión directa hacia el nivel contrario.</p>
+
+<h3>4.3. Funcionamiento de SW1 con configuración pull-up</h3>
+
+<p>En el circuito planteado, queremos que el interruptor <strong>SW1 (IN)</strong> lleve el pin de entrada a <strong>GND</strong> cuando se accione. Para ello utilizamos una configuración <strong>pull-up</strong>.</p>
+
+<p>Cuando SW1 está <strong>abierto</strong>, la resistencia mantiene la entrada conectada hacia VDD. El GPIO interpreta entonces un <strong>1 lógico</strong>.</p>
+
+<p>Cuando SW1 está <strong>cerrado</strong>, la entrada queda conectada a GND. El GPIO interpreta entonces un <strong>0 lógico</strong>.</p>
+
+<table>
+<thead>
+<tr>
+<th>Estado de SW1</th>
+<th>Nivel del GPIO</th>
+<th>Estado de la entrada</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Abierto</td>
+<td>1</td>
+<td>VDD mediante la resistencia pull-up</td>
+</tr>
+<tr>
+<td>Cerrado</td>
+<td>0</td>
+<td>Conectado a GND</td>
+</tr>
+</tbody>
+</table>
+
+<p>Esta configuración es muy utilizada con pulsadores e interruptores porque garantiza un nivel lógico conocido cuando el interruptor no está accionado.</p>
+</section>
+
+<section>
+<h2>5. CONSIDERACIONES PRÁCTICAS Y VISIÓN DE SISTEMA</h2>
+
+<p>El GPIO es uno de los mecanismos fundamentales mediante los cuales un microcontrolador interactúa con el mundo exterior. Sin embargo, utilizarlo correctamente requiere tener en cuenta tanto su configuración digital como sus características eléctricas.</p>
+
+<h3>5.1. Aspectos que deben comprobarse en un diseño</h3>
+
+<p>No todos los GPIO de un microcontrolador son necesariamente iguales. Algunos pueden disponer de funciones alternativas, ADC, PWM, interrupciones u otras características que no están disponibles en todos los pines.</p>
+
+<p>Por esta razón, antes de utilizar un pin debe consultarse el <strong>datasheet</strong> y, cuando sea necesario, el <strong>manual de referencia del microcontrolador</strong>.</p>
+
+<p>También deben comprobarse:</p>
+
+<ul>
+<li>La tensión de alimentación y los niveles lógicos.</li>
+<li>Los límites de corriente del pin.</li>
+<li>La corriente total permitida por el microcontrolador.</li>
+<li>Las funciones alternativas disponibles.</li>
+<li>La compatibilidad eléctrica con los dispositivos externos.</li>
+<li>La necesidad de resistencias pull-up o pull-down.</li>
+<li>La necesidad de un convertidor de niveles lógicos.</li>
+</ul>
+
+<h3>5.2. Del GPIO al sistema embebido</h3>
+
+<p>El ejemplo del interruptor y los LED permite observar el funcionamiento básico de un sistema embebido completo.</p>
+
+<p>Primero, un dispositivo físico genera una condición eléctrica. El GPIO configurado como entrada detecta esa condición y la convierte en información digital para el procesador. El programa interpreta esa información y toma una decisión. Finalmente, uno o varios GPIO de salida generan las señales necesarias para controlar otros componentes.</p>
+
+<p>El proceso puede resumirse como:</p>
+
+<p><strong>Entrada física → GPIO → procesamiento del software → GPIO → acción física</strong></p>
+
+<p>Este principio se mantiene incluso en sistemas mucho más complejos. Un GPIO puede utilizarse para leer un pulsador, detectar el estado de un dispositivo, habilitar o deshabilitar un circuito, controlar un transistor, activar una etapa de potencia o participar en la interfaz con un periférico.</p>
+
+<h3>5.3. Idea fundamental</h3>
+
+<p>Un GPIO no debe entenderse únicamente como un pin que puede ponerse a 0 o a 1. Es una <strong>interfaz configurable entre el microcontrolador y el circuito externo</strong>.</p>
+
+<p>Comprender su arquitectura, sus niveles eléctricos, sus límites de corriente, la selección de funciones y el uso correcto de resistencias de polarización constituye una base fundamental para trabajar con microcontroladores y diseñar sistemas embebidos fiables.</p>
+</section>
+            
+            
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>

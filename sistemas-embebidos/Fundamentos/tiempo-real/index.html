@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistemas Embebidos y Procesamiento en Tiempo Real | MC Mundo Tech</title>
+    <meta name="description" content="Un sistema embebido está diseñado para realizar una función determinada dentro de un equipo o sistema mayor. Para cumplir esa función no basta con que el procesador sea capaz de ejecutar instrucciones. En muchas aplicaciones, además, debe hacerlo dentro de determinados límites de tiempo. Esta característica introduce uno de los conceptos fundamentales de los sistemas embebidos: el procesamiento en tiempo real ">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>SISTEMAS EMBEBIDOS Y PROCESAMIENTO EN TIEMPO REAL</h1>
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   -->
+        
+            
+<section>
+<h2>INTRODUCCIÓN</h2>
+
+<p>Un sistema embebido está diseñado para realizar una función determinada dentro de un equipo o sistema mayor. Para cumplir esa función no basta con que el procesador sea capaz de ejecutar instrucciones. En muchas aplicaciones, además, debe hacerlo dentro de determinados límites de tiempo.</p>
+
+<p>Esta característica introduce uno de los conceptos fundamentales de los sistemas embebidos: <strong>el procesamiento en tiempo real</strong>.</p>
+
+<p>Un sistema de tiempo real es aquel cuyo funcionamiento depende no solo de producir un resultado correcto, sino también de producirlo dentro del intervalo de tiempo establecido por la aplicación. El sistema debe responder a eventos, procesar información y, cuando corresponda, controlar elementos externos dentro de los plazos requeridos.</p>
+
+<p>Los sistemas embebidos están frecuentemente sujetos a restricciones temporales y deben responder a secuencias y combinaciones de eventos. Además, una misma aplicación puede tener que realizar varias actividades, algunas periódicas y otras desencadenadas por eventos.</p>
+
+<p>En este artículo se desarrolla el concepto de tiempo real desde una perspectiva general, aplicable a sistemas embebidos basados en diferentes microcontroladores y arquitecturas.</p>
+</section>
+
+<section>
+<h2>1. EL PROCESAMIENTO EN TIEMPO REAL</h2>
+
+<h3>1.1. Resultado correcto y respuesta dentro del tiempo requerido</h3>
+
+<p>En un sistema convencional, normalmente interesa que una operación termine correctamente. En un sistema de tiempo real, además de obtener el resultado correcto, el resultado debe estar disponible dentro del tiempo establecido.</p>
+
+<p>Esta diferencia es fundamental.</p>
+
+<p>Supongamos que un sistema mide una variable y debe actuar sobre ella. Si el procesamiento tarda demasiado, el resultado puede llegar cuando ya no resulta útil para controlar el sistema.</p>
+
+<p>Por tanto, el funcionamiento correcto depende de dos condiciones:</p>
+
+<p><strong>Resultado correcto + respuesta dentro del tiempo requerido</strong></p>
+
+<p>La restricción temporal no significa necesariamente que el sistema tenga que ser extremadamente rápido. Significa que debe ser capaz de responder dentro del intervalo requerido por la aplicación.</p>
+
+<p>Esta distinción es importante:</p>
+
+<p><strong>Velocidad de procesamiento y tiempo real no son conceptos equivalentes.</strong></p>
+
+<p>Un procesador puede ser muy rápido y, sin embargo, formar parte de un sistema que no garantiza los tiempos requeridos. Del mismo modo, un microcontrolador relativamente sencillo puede satisfacer perfectamente las necesidades de una aplicación si su carga de trabajo y sus restricciones temporales son moderadas.</p>
+
+<h3>1.2. Restricciones temporales y plazo máximo</h3>
+
+<p>Una aplicación embebida puede establecer un tiempo máximo para completar una determinada operación. Este límite puede denominarse <strong>plazo o deadline</strong>.</p>
+
+<p>Por ejemplo, si un evento ocurre en un instante determinado, el sistema puede necesitar procesarlo antes de que ocurra el siguiente evento.</p>
+
+<p>Si el procesamiento termina dentro del intervalo requerido, el sistema cumple su restricción temporal.</p>
+
+<p>Si termina después, aunque el cálculo sea matemáticamente correcto, la respuesta puede dejar de ser válida para la aplicación.</p>
+
+<p>Esto es especialmente importante en sistemas de:</p>
+
+<ul>
+<li>control;</li>
+<li>adquisición de datos;</li>
+<li>comunicaciones;</li>
+<li>procesamiento de señales;</li>
+<li>supervisión;</li>
+<li>automatización.</li>
+</ul>
+
+<h3>1.3. Tiempo de respuesta y latencia</h3>
+
+<p>El <strong>tiempo de respuesta</strong> es el intervalo que transcurre entre la aparición de un evento y la producción de la respuesta correspondiente.</p>
+
+<pre>
+Evento
+  │
+  │ t0
+  ▼
+┌─────────────────────────────┐
+│        Procesamiento        │
+└─────────────────────────────┘
+  │
+  │ t1
+  ▼
+Respuesta
+</pre>
+
+<p>Por tanto:</p>
+
+<p><strong>Tiempo de respuesta = t1 − t0</strong></p>
+
+<p>En una implementación real, este tiempo puede incluir varias etapas: detección del evento, atención del periférico, entrada a una rutina de interrupción, procesamiento de datos y actualización de una salida.</p>
+
+<p>Por ello, también resulta importante el concepto de <strong>latencia</strong>, entendido como el tiempo que transcurre desde que ocurre un evento hasta que el sistema comienza a atenderlo o produce la respuesta correspondiente, según el contexto.</p>
+
+<p>El tiempo disponible puede depender de factores como:</p>
+
+<ul>
+<li>frecuencia de los eventos;</li>
+<li>cantidad de datos que deben procesarse;</li>
+<li>complejidad del algoritmo;</li>
+<li>frecuencia de reloj del procesador;</li>
+<li>actividades concurrentes;</li>
+<li>acceso a memoria;</li>
+<li>atención de interrupciones;</li>
+<li>operaciones de entrada y salida;</li>
+<li>comportamiento de los periféricos.</li>
+</ul>
+
+<p>No todos estos factores tienen el mismo peso en todos los sistemas. El análisis debe realizarse para la aplicación concreta.</p>
+
+</section>
+
+
+<section>
+<h2>2. EVENTOS, PERIODICIDAD Y ACTIVIDADES CONCURRENTES</h2>
+
+<h3>2.1. Eventos en un sistema embebido</h3>
+
+<p>Los sistemas embebidos suelen trabajar reaccionando a eventos.</p>
+
+<p>Un evento puede proceder de:</p>
+
+<ul>
+<li>un sensor;</li>
+<li>una entrada digital;</li>
+<li>un temporizador;</li>
+<li>una interfaz de comunicación;</li>
+<li>otro periférico;</li>
+<li>una condición interna del sistema.</li>
+</ul>
+
+<p>Los sistemas embebidos deben responder rápidamente a secuencias y combinaciones de eventos.</p>
+
+<pre>
+Sensor ───────┐
+              │
+Temporizador ─┼──► Sistema embebido ───► Respuesta
+              │
+Comunicación ─┘
+</pre>
+
+<p>El sistema recibe información de diferentes fuentes y debe procesarla de acuerdo con las reglas de la aplicación.</p>
+
+<h3>2.2. Procesamiento periódico</h3>
+
+<p>Una característica habitual de los sistemas embebidos es que algunas tareas se ejecutan periódicamente.</p>
+
+<p>Una tarea periódica se ejecuta a intervalos determinados.</p>
+
+<pre>
+T0       T1       T2       T3       T4
+│        │        │        │        │
+▼        ▼        ▼        ▼        ▼
+●        ●        ●        ●        ●
+</pre>
+
+<p>Cada punto representa una ejecución de la tarea.</p>
+
+<p>Un temporizador puede utilizarse para establecer estos intervalos. Por ejemplo, una tarea podría ejecutarse cada 1 ms, 10 ms o 100 ms, dependiendo de los requisitos de la aplicación.</p>
+
+<h3>2.3. Procesamiento por eventos</h3>
+
+<p>En otros casos, la tarea se ejecuta cuando ocurre una condición determinada:</p>
+
+<pre>
+───────────────┬───────────────────────┬──────► tiempo
+               │                       │
+             Evento                  Evento
+               │                       │
+               ▼                       ▼
+             Acción                  Acción
+</pre>
+
+<p>Un sistema real puede combinar ambos mecanismos.</p>
+
+<p>Por ejemplo, puede ejecutar una tarea de supervisión periódicamente y, al mismo tiempo, responder a la llegada de un dato mediante una interrupción.</p>
+
+<h3>2.4. Varias actividades dentro de un mismo sistema</h3>
+
+<p>Un sistema embebido puede tener que realizar varias actividades:</p>
+
+<pre>
+┌───────────────────────────────────────┐
+│ Sistema embebido                      │
+│                                       │
+│  Leer sensores                        │
+│  Procesar datos                       │
+│  Controlar salidas                    │
+│  Gestionar comunicaciones             │
+│  Supervisar el sistema                │
+│                                       │
+└───────────────────────────────────────┘
+</pre>
+
+<p>El material de Arm señala que los sistemas embebidos típicamente deben realizar múltiples actividades separadas al mismo tiempo.</p>
+
+<p>Aquí conviene precisar el significado de <strong>"al mismo tiempo"</strong>.</p>
+
+<p>En un microcontrolador con un único núcleo de CPU, las instrucciones no se ejecutan literalmente de forma simultánea. El procesador alterna entre diferentes actividades según la organización del software, las interrupciones y los eventos que recibe.</p>
+
+<p>Esto se denomina <strong>concurrencia</strong>: varias actividades pueden estar activas dentro del sistema y recibir atención durante determinados intervalos, aunque la CPU ejecute físicamente una secuencia de instrucciones.</p>
+
+<pre>
+Tiempo ─────────────────────────────────►
+
+Tarea A: ███       ███       ███
+
+Tarea B:    ██  ██    ██  ██
+
+Tarea C:       ███          ███
+</pre>
+
+<p>El resultado es un sistema que atiende varias funciones dentro de una misma aplicación.</p>
+
+<p>En procesadores multinúcleo, además, algunas actividades pueden ejecutarse realmente en paralelo en diferentes núcleos. Sin embargo, la concurrencia y la gestión temporal siguen siendo conceptos fundamentales.</p>
+
+</section>
+
+
+<section>
+<h2>3. TEMPORIZADORES E INTERUPCIONES COMO MECANISMOS DE TIEMPO REAL</h2>
+
+<h3>3.1. Temporizadores</h3>
+
+<p>Los temporizadores son periféricos especialmente importantes en sistemas embebidos porque permiten establecer referencias temporales y generar eventos periódicos.</p>
+
+<p>Pueden utilizarse, por ejemplo, para:</p>
+
+<ul>
+<li>ejecutar tareas periódicamente;</li>
+<li>medir intervalos de tiempo;</li>
+<li>generar señales;</li>
+<li>establecer tiempos de espera;</li>
+<li>controlar la frecuencia de determinadas operaciones.</li>
+</ul>
+
+<p>La utilización de un temporizador permite que el software no dependa exclusivamente de bucles de espera para controlar el tiempo.</p>
+
+<h3>3.2. Interrupciones como mecanismo de respuesta</h3>
+
+<p>Las interrupciones constituyen uno de los mecanismos fundamentales para responder a eventos.</p>
+
+<p>En lugar de que el programa tenga que comprobar continuamente el estado de cada dispositivo, un periférico puede generar una solicitud de interrupción cuando ocurre una condición determinada.</p>
+
+<p>Por ejemplo:</p>
+
+<pre>
+Temporizador
+     │
+     │ evento
+     ▼
+Interrupción
+     │
+     ▼
+   CPU
+     │
+     ▼
+Rutina de servicio
+     │
+     ▼
+Continuación del programa
+</pre>
+
+<p>Este mecanismo permite que el procesador responda a determinados acontecimientos sin mantener necesariamente una espera activa permanente.</p>
+
+<p>La utilización de interrupciones introduce, sin embargo, nuevas consideraciones temporales. La CPU puede estar ejecutando otra actividad cuando llega una interrupción y, por tanto, existe un tiempo de latencia antes de atenderla. Además, una rutina de servicio demasiado larga puede retrasar otras actividades.</p>
+
+<p>Por ello, el diseño de interrupciones debe considerar tanto la prioridad de los eventos como el tiempo necesario para atenderlos.</p>
+
+<h3>3.3. Relación entre temporizadores, interrupciones y CPU</h3>
+
+<p>Los conceptos anteriores pueden relacionarse de la siguiente manera:</p>
+
+<pre>
+            Temporizador
+                  │
+                  ▼
+                Evento
+                  │
+                  ▼
+             Interrupción
+                  │
+                  ▼
+                 CPU
+                  │
+          ┌───────┴────────┐
+          │                │
+          ▼                ▼
+       Procesar         Decidir
+          │                │
+          └───────┬────────┘
+                  ▼
+              Periférico
+                  │
+                  ▼
+               Actuador
+</pre>
+
+<p>Los GPIO y otros periféricos permiten recibir información del exterior y producir respuestas.</p>
+
+<p>Esta relación será especialmente importante cuando se estudie la programación de microcontroladores a nivel de registros, bibliotecas o frameworks.</p>
+
+</section>
+
+
+<section>
+<h2>4. DIFERENTES NIVELES DE EXIGENCIA EN TIEMPO REAL</h2>
+
+<h3>4.1. El tiempo real no significa solamente rapidez</h3>
+
+<p>Este es uno de los conceptos que más fácilmente puede confundirse.</p>
+
+<p>Un procesador rápido puede ejecutar muchas instrucciones en poco tiempo, pero eso no garantiza por sí mismo que un sistema cumpla sus restricciones de tiempo real.</p>
+
+<p>El requisito fundamental puede expresarse como:</p>
+
+<pre>
+Tiempo de respuesta del sistema
+              ≤
+Tiempo máximo permitido
+</pre>
+
+<p>Aumentar la velocidad del procesador puede ayudar, pero no es la única consideración.</p>
+
+<p>También importan:</p>
+
+<ul>
+<li>cantidad de trabajo que debe realizarse;</li>
+<li>organización del software;</li>
+<li>gestión de interrupciones;</li>
+<li>operaciones de entrada y salida;</li>
+<li>acceso a memoria;</li>
+<li>otras tareas que estén ejecutándose;</li>
+<li>comportamiento temporal de los periféricos.</li>
+</ul>
+
+<p>Por eso, el diseño de un sistema de tiempo real debe considerar el comportamiento temporal del sistema completo y no solamente la frecuencia de reloj de la CPU.</p>
+
+<h3>4.2. Una computadora para bicicleta</h3>
+
+<p>El material de Arm utiliza como ejemplo una computadora para bicicleta y la caracteriza como un sistema de tiempo real débil.</p>
+
+<p>El sistema mide la rotación de la rueda y calcula valores como:</p>
+
+<ul>
+<li>velocidad;</li>
+<li>distancia;</li>
+<li>tiempo.</li>
+</ul>
+
+<p>En este caso, el sistema debe procesar las señales provenientes del sensor con suficiente rapidez para mantener actualizados los valores mostrados.</p>
+
+<p>El material señala que el procesamiento de la entrada puede realizarse entre dos impulsos del sensor sin algoritmos complejos. Esto permite utilizar un microcontrolador sencillo y de bajo costo.</p>
+
+<p>El ejemplo permite observar una relación importante:</p>
+
+<pre>
+Requisito temporal
+        │
+        ▼
+Carga de procesamiento
+        │
+        ▼
+Capacidad necesaria del MCU
+</pre>
+
+<p>El microcontrolador debe seleccionarse en función de los requisitos reales de la aplicación.</p>
+
+<h3>4.3. Una unidad de control del motor</h3>
+
+<p>Existen aplicaciones en las que las restricciones temporales son mucho más exigentes.</p>
+
+<p>El material de Arm presenta como ejemplo una unidad de control del motor de un automóvil. En este caso, los tiempos de encendido e inyección de combustible deben calcularse en tiempo real para que el motor funcione correctamente.</p>
+
+<p>Cada cálculo debe terminar dentro de un instante definido.</p>
+
+<p>Además de las restricciones temporales, esta aplicación presenta otras exigencias:</p>
+
+<ul>
+<li>numerosos sensores;</li>
+<li>actuadores;</li>
+<li>comunicaciones con otros sistemas del vehículo;</li>
+<li>funcionamiento en condiciones ambientales exigentes;</li>
+<li>confiabilidad;</li>
+<li>limitaciones de espacio;</li>
+<li>necesidad de un costo razonable.</li>
+</ul>
+
+<p>Por esta razón, el material concluye que se necesita un microcontrolador potente, confiable y de alto rendimiento.</p>
+
+<h3>4.4. Comparación de los dos ejemplos</h3>
+
+<p>Los ejemplos de la computadora para bicicleta y la unidad de control del motor permiten observar que <strong>"tiempo real" no describe un único nivel de exigencia</strong>.</p>
+
+<table>
+<thead>
+<tr>
+<th>Característica</th>
+<th>Computadora para bicicleta</th>
+<th>Control del motor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Entrada principal</td>
+<td>Rotación de rueda</td>
+<td>Múltiples sensores</td>
+</tr>
+<tr>
+<td>Procesamiento</td>
+<td>Relativamente sencillo</td>
+<td>Más exigente</td>
+</tr>
+<tr>
+<td>Restricción temporal</td>
+<td>Menos estricta</td>
+<td>Estricta</td>
+</tr>
+<tr>
+<td>Cálculos</td>
+<td>Velocidad, distancia, tiempo</td>
+<td>Control del funcionamiento del motor</td>
+</tr>
+<tr>
+<td>Actuadores</td>
+<td>Aplicación sencilla</td>
+<td>Numerosos actuadores</td>
+</tr>
+<tr>
+<td>Confiabilidad</td>
+<td>Moderada</td>
+<td>Elevada</td>
+</tr>
+<tr>
+<td>MCU</td>
+<td>Sencillo</td>
+<td>Mayor capacidad</td>
+</tr>
+</tbody>
+</table>
+
+<p>La comparación procede de los ejemplos utilizados por Arm.</p>
+
+<p>Lo importante no es determinar cuál sistema es "mejor", sino comprender que <strong>los requisitos de la aplicación determinan las características que debe tener el sistema embebido</strong>.</p>
+
+</section>
+
+
+<section>
+<h2>5. SISTEMAS DE CONTROL Y FUNCIONAMIENTO AUTÓNOMO</h2>
+
+<h3>5.1. Sistemas de control de lazo cerrado</h3>
+
+<p>Los sistemas embebidos también pueden utilizarse como sistemas de control.</p>
+
+<p>Un sistema de control de lazo cerrado supervisa el estado de un proceso y modifica una salida para mantener una determinada referencia, como temperatura, velocidad o dirección.</p>
+
+<p>El principio puede representarse así:</p>
+
+<pre>
+                Referencia
+                     │
+                     ▼
+                 ┌───────┐
+                 │Control│
+                 └───┬───┘
+                     │
+                     ▼
+                  Salida
+                     │
+                     ▼
+                  Sistema
+                     │
+                     ▼
+                   Sensor
+                     │
+                     │ realimentación
+                     └──────────────► Control
+</pre>
+
+<p>El controlador recibe información del proceso, la procesa y modifica una salida.</p>
+
+<p>En este tipo de sistema, el tiempo puede ser una parte fundamental del funcionamiento. Si la medición o la acción de control se realizan demasiado tarde, el comportamiento del sistema puede verse afectado.</p>
+
+<p>Por tanto, el procesamiento temporal no es un aspecto independiente del control: forma parte de la capacidad del sistema para reaccionar adecuadamente ante los cambios del proceso.</p>
+
+<h3>5.2. Funcionamiento autónomo</h3>
+
+<p>Muchos sistemas embebidos están diseñados para funcionar durante largos períodos sin intervención directa de un operador.</p>
+
+<p>Esta autonomía implica que el sistema debe ser capaz de:</p>
+
+<ul>
+<li>ejecutar su programa;</li>
+<li>procesar entradas;</li>
+<li>controlar salidas;</li>
+<li>responder a eventos;</li>
+<li>detectar determinadas condiciones anormales;</li>
+<li>continuar funcionando dentro de sus condiciones previstas.</li>
+</ul>
+
+<p>Esto diferencia a muchos sistemas embebidos de aplicaciones en las que existe una interacción constante con una persona.</p>
+
+<p>Un sistema autónomo debe, por tanto, incorporar en su diseño no solamente las funciones normales, sino también mecanismos que permitan supervisar su propio funcionamiento.</p>
+
+</section>
+
+
+<section>
+<h2>6. GESTIÓN DE FALLOS Y DIAGNÓSTICO</h2>
+
+<h3>6.1. Gestión de fallos</h3>
+
+<p>Un sistema que debe funcionar durante largos períodos no puede depender exclusivamente de que todo funcione correctamente en todo momento.</p>
+
+<p>Arm señala que los sistemas embebidos deben poder manejar fallos sin bloquearse o colapsar y que, en determinados sistemas, el código destinado al manejo de fallos puede ser incluso más grande y complejo que el código correspondiente al funcionamiento normal.</p>
+
+<p>Esto tiene una consecuencia directa sobre el diseño del software.</p>
+
+<p>No basta con definir:</p>
+
+<pre>
+Funcionamiento normal
+        │
+        ▼
+      Acción
+</pre>
+
+<p>También es necesario considerar condiciones anormales:</p>
+
+<pre>
+                ┌── Funcionamiento normal ──► Acción
+                │
+Evento ─────────┤
+                │
+                └── Condición anormal ─────► Manejo del fallo
+</pre>
+
+<p>La respuesta concreta ante un fallo depende del sistema.</p>
+
+<p>Puede consistir en:</p>
+
+<ul>
+<li>registrar una condición;</li>
+<li>reiniciar una parte del sistema;</li>
+<li>pasar a un estado seguro;</li>
+<li>desactivar una función;</li>
+<li>informar del problema;</li>
+<li>continuar con las funciones que todavía sean posibles.</li>
+</ul>
+
+<p>No existe una estrategia universal. El comportamiento debe definirse según los requisitos de la aplicación.</p>
+
+<h3>6.2. Diagnóstico del sistema</h3>
+
+<p>El manejo de fallos está relacionado con otra función importante: el diagnóstico.</p>
+
+<p>Arm señala que los sistemas embebidos realizan funciones de diagnóstico para ayudar al personal de servicio a determinar rápidamente dónde se encuentra un problema.</p>
+
+<p>El diagnóstico permite obtener información sobre el estado del sistema.</p>
+
+<pre>
+                Sistema embebido
+                       │
+            ┌──────────┴──────────┐
+            │                     │
+      Funcionamiento          Diagnóstico
+         normal                  │
+                                 ▼
+                          Información de estado
+                                 │
+                                 ▼
+                           Mantenimiento
+</pre>
+
+<p>La información de diagnóstico puede ser especialmente importante cuando el sistema está instalado dentro de un equipo donde el acceso al hardware es difícil.</p>
+
+<p>Un diseño profesional debe considerar desde el principio cómo se detectarán, registrarán y comunicarán las condiciones anormales.</p>
+
+</section>
+
+
+<section>
+<h2>7. DISEÑO DE UN SISTEMA EMBEBIDO CON RESTRICCIONES TEMPORALES</h2>
+
+<h3>7.1. Identificación de los requisitos</h3>
+
+<p>Antes de seleccionar un microcontrolador, es necesario conocer qué debe hacer el sistema.</p>
+
+<p>Un procedimiento básico consiste en identificar:</p>
+
+<p><strong>Funciones</strong><br>
+Determinar qué operaciones debe realizar el sistema.</p>
+
+<p><strong>Entradas</strong><br>
+Determinar qué señales o datos recibirá.</p>
+
+<p><strong>Salidas</strong><br>
+Determinar qué elementos deberá controlar.</p>
+
+<p><strong>Eventos</strong><br>
+Identificar qué condiciones requieren una respuesta.</p>
+
+<p><strong>Tiempos</strong><br>
+Determinar cuánto tiempo existe disponible para responder.</p>
+
+<p><strong>Carga de procesamiento</strong><br>
+Estimar cuánto procesamiento requiere cada actividad.</p>
+
+<p><strong>Confiabilidad</strong><br>
+Determinar qué debe ocurrir cuando aparece una condición anormal.</p>
+
+<p><strong>Recursos</strong><br>
+Determinar la memoria, periféricos, interfaces y capacidad de procesamiento necesarias.</p>
+
+<h3>7.2. De los requisitos al microcontrolador</h3>
+
+<p>El proceso puede resumirse así:</p>
+
+<pre>
+Requisitos del sistema
+          │
+          ▼
+Funciones y eventos
+          │
+          ▼
+Restricciones temporales
+          │
+          ▼
+Carga de procesamiento
+          │
+          ▼
+Recursos hardware
+          │
+          ▼
+Microcontrolador adecuado
+</pre>
+
+<p>Este proceso evita seleccionar un dispositivo únicamente por su frecuencia de reloj o por la cantidad de bits de su CPU.</p>
+
+<p>La selección debe considerar el conjunto de requisitos: capacidad de procesamiento, memoria, periféricos, temporizadores, interrupciones, comunicaciones, consumo, costo, condiciones de funcionamiento y comportamiento temporal.</p>
+
+<h3>7.3. El tiempo real como característica del sistema completo</h3>
+
+<p>Un punto especialmente importante es que el comportamiento en tiempo real no depende exclusivamente del microcontrolador.</p>
+
+<p>El sistema completo puede incluir:</p>
+
+<ul>
+<li>hardware;</li>
+<li>sensores;</li>
+<li>actuadores;</li>
+<li>microcontrolador;</li>
+<li>memoria;</li>
+<li>periféricos;</li>
+<li>software;</li>
+<li>comunicaciones;</li>
+<li>alimentación;</li>
+<li>elementos mecánicos, cuando corresponda.</li>
+</ul>
+
+<p>Por tanto, el tiempo que transcurre entre un evento físico y una respuesta del sistema puede incluir diferentes etapas:</p>
+
+<pre>
+Evento físico
+     │
+     ▼
+Sensor
+     │
+     ▼
+Entrada del MCU
+     │
+     ▼
+Periférico
+     │
+     ▼
+CPU
+     │
+     ▼
+Software
+     │
+     ▼
+Periférico de salida
+     │
+     ▼
+Actuador
+     │
+     ▼
+Respuesta física
+</pre>
+
+<p>Cada etapa puede introducir un tiempo determinado.</p>
+
+<p>Por ello, afirmar que un microcontrolador es "rápido" no es suficiente para determinar si una aplicación cumple sus requisitos de tiempo real.</p>
+
+<h3>7.4. Verificación de los requisitos temporales</h3>
+
+<p>Una vez diseñado el sistema, los requisitos temporales deben comprobarse mediante análisis y mediciones.</p>
+
+<p>Por ejemplo, si una tarea debe terminar como máximo en 2 ms, no basta con suponer que el microcontrolador es suficientemente rápido. Es necesario analizar el peor caso razonable de ejecución y comprobar que el sistema mantiene el tiempo requerido incluso cuando existen otras actividades, interrupciones y operaciones de entrada y salida.</p>
+
+<p>Este enfoque lleva a una idea fundamental de la ingeniería de sistemas embebidos:</p>
+
+<p><strong>Los requisitos temporales deben especificarse, analizarse y verificarse; no deben suponerse.</strong></p>
+
+</section>
+
+
+<section>
+<h2>8. RESUMEN TÉCNICO</h2>
+
+<p>Un sistema embebido puede estar sujeto a restricciones de tiempo real, lo que significa que determinadas operaciones deben producir una respuesta dentro de un intervalo establecido.</p>
+
+<p>El tiempo real no significa simplemente ejecutar instrucciones rápidamente. Lo importante es que el sistema produzca la respuesta dentro del tiempo requerido por la aplicación.</p>
+
+<p>Los sistemas embebidos pueden:</p>
+
+<ul>
+<li>procesar tareas periódicas;</li>
+<li>responder a eventos;</li>
+<li>gestionar varias actividades concurrentes;</li>
+<li>utilizar temporizadores;</li>
+<li>utilizar interrupciones;</li>
+<li>controlar procesos;</li>
+<li>funcionar de forma autónoma;</li>
+<li>gestionar condiciones de fallo;</li>
+<li>realizar funciones de diagnóstico.</li>
+</ul>
+
+<p>Las exigencias temporales varían considerablemente entre aplicaciones.</p>
+
+<p>Una computadora para bicicleta puede funcionar con un microcontrolador sencillo porque sus requisitos de procesamiento y tiempo son relativamente modestos.</p>
+
+<p>Una unidad de control de motor necesita capacidades mucho mayores porque los cálculos relacionados con el control del motor deben completarse dentro de tiempos definidos y, además, debe gestionar numerosos sensores, actuadores y comunicaciones.</p>
+
+<p>La idea central puede resumirse de esta manera:</p>
+
+<p><strong>En un sistema embebido de tiempo real, una respuesta correcta no depende solamente de que el resultado sea correcto; también depende de que esté disponible dentro del intervalo de tiempo establecido.</strong></p>
+
+<p>Esta idea conecta directamente la arquitectura del microcontrolador estudiada en el artículo 03 con el diseño de sistemas embebidos.</p>
+
+<p>Los temporizadores proporcionan referencias temporales, las interrupciones permiten atender eventos, los periféricos permiten interactuar con el entorno y la CPU ejecuta el software que coordina estas funciones.</p>
+
+<p>El siguiente paso natural consiste en estudiar cómo estos mecanismos se implementan concretamente en un microcontrolador: registros, temporizadores, interrupciones, prioridades, periféricos y software de aplicación.</p>
+
+</section>
+            
+            
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>

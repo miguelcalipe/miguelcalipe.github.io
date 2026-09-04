@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Niveles de abstracción del hardware | MC Mundo Tech</title>
+    <meta name="description" content="Con el paso del tiempo han aparecido distintos niveles de abstracción cuyo objetivo es simplificar el desarrollo de software. Mientras mayor es la abstracción, menor es la cantidad de detalles del hardware que el programador necesita conocer, a costa de perder algo de control y eficiencia ">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>VOLTAJES Y VALORES LÓGICOS</h1>             
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   -->
+            
+            
+<h2>INTRODUCCIÓN</h2>
+<p>
+    La lógica digital trabaja fundamentalmente con dos valores: <strong>0</strong> y
+    <strong>1</strong>. Estos valores representan estados lógicos y, en un circuito
+    electrónico real, se corresponden con determinados niveles de tensión.
+    Sin embargo, un 0 lógico no significa necesariamente una tensión exactamente
+    igual a 0 V, ni un 1 lógico significa necesariamente una tensión exactamente
+    igual a la tensión de alimentación.
+</p>
+
+<section>
+<h2>1. VALORES LÓGICOS Y NIVELES DE TENSIÓN
+
+</h2>
+
+<p>
+    En un sistema digital, los valores <strong>0</strong> y <strong>1</strong>
+    representan normalmente los estados lógicos <strong>Low (bajo)</strong> y
+    <strong>High (alto)</strong>. Estos estados se implementan físicamente mediante
+    rangos de tensión eléctrica.
+</p>
+
+<p>
+    Es importante entender que los términos <strong>Low</strong> y
+    <strong>High</strong> no están asociados universalmente a un único valor de
+    tensión. Diferentes dispositivos y familias lógicas pueden utilizar diferentes
+    tensiones para representar los mismos estados lógicos.
+</p>
+
+<h3>1.1. Un mismo concepto lógico, diferentes tensiones</h3>
+
+<p>
+    Por ejemplo, un dispositivo puede utilizar una alimentación de
+    <strong>3,3 V</strong> y trabajar con señales comprendidas entre 0 V y 3,3 V.
+    Otro dispositivo puede funcionar con una tensión de alimentación diferente y
+    utilizar otros niveles de tensión para reconocer los estados lógicos.
+</p>
+
+<p>
+    Por tanto, no debemos interpretar directamente que:
+</p>
+
+<ul>
+    <li><strong>0 lógico = 0 V exactos</strong></li>
+    <li><strong>1 lógico = VDD exactamente</strong></li>
+</ul>
+
+<p>
+    En un circuito digital real, lo que importa es si la tensión de una señal se
+    encuentra dentro del <strong>rango que el dispositivo garantiza como válido</strong>
+    para un determinado estado lógico.
+</p>
+</section>
+
+<section>
+<h2>2. RANGOS DE TENSIÓN PARA RECONOCER UN NIVEL LÓGICO</h2>
+
+<p>
+    Una de las principales ventajas de los circuitos digitales frente a los
+    circuitos analógicos es su capacidad para tolerar cierta cantidad de
+    <strong>ruido</strong> y <strong>degradación de la señal</strong>.
+</p>
+
+<p>
+    En un circuito analógico, una variación de tensión puede modificar directamente
+    el valor que representa la señal. En cambio, en un circuito digital no siempre
+    es necesario conocer el valor exacto de la tensión. Basta con determinar si la
+    señal se encuentra dentro de un rango que pueda ser interpretado de forma
+    confiable como un 0 o como un 1.
+</p>
+
+<h3>2.1. Región Low, región indefinida y región High</h3>
+
+<p>
+    Por esta razón, las entradas digitales se especifican mediante
+    <strong>rangos de tensión</strong>. Entre el rango válido para un 0 lógico y el
+    rango válido para un 1 lógico existe una zona en la que el fabricante no
+    garantiza el comportamiento lógico de la entrada.
+</p>
+
+<p>
+    Esta zona se conoce como <strong>región indefinida</strong> o
+    <strong>undefined region</strong>.
+</p>
+
+<p>
+    En consecuencia, una señal digital puede encontrarse en tres situaciones:
+</p>
+
+<ul>
+    <li>Dentro del rango garantizado como <strong>Low</strong>.</li>
+    <li>Dentro del rango garantizado como <strong>High</strong>.</li>
+    <li>Dentro de la <strong>región indefinida</strong>, donde no se garantiza la interpretación.</li>
+</ul>
+
+<h3>2.2. Ejemplo con una alimentación de 3,3 V</h3>
+
+<p>
+    La mayor parte de los procesadores <strong>Arm Cortex-M</strong> utilizados en
+    sistemas embebidos trabajan habitualmente con una tensión de alimentación de
+    <strong>3,3 V</strong>. Si tomamos esta tensión como condición de funcionamiento,
+    podemos establecer los rangos de tensión de entrada que serán reconocidos de
+    forma confiable como niveles lógicos.
+</p>
+
+<p>
+    Para el ejemplo considerado:
+</p>
+
+<ul>
+    <li>
+        <strong>Lógica 0 (Low):</strong> de <strong>0,0 V a 1,1 V</strong>.
+    </li>
+    <li>
+        <strong>Región indefinida:</strong> de aproximadamente
+        <strong>1,1 V a 2,4 V</strong>.
+    </li>
+    <li>
+        <strong>Lógica 1 (High):</strong> de <strong>2,4 V a 3,3 V</strong>.
+    </li>
+</ul>
+
+<p>
+    Estos valores muestran claramente que el circuito no necesita recibir
+    exactamente 0 V para reconocer un 0 lógico, ni exactamente 3,3 V para
+    reconocer un 1 lógico.
+</p>
+</section>
+
+<section>
+<h2>3. LA REGIÓN INDEFINIDA Y LA CONFIABILIDAD DE UNA SEÑAL DIGITAL</h2>
+
+<p>
+    La región comprendida entre los niveles garantizados de Low y High debe
+    tratarse con especial cuidado. Una tensión situada en esta zona no puede
+    considerarse un 0 ni un 1 de manera confiable.
+</p>
+
+<h3>3.1. Ejemplo: una señal de 2,0 V</h3>
+
+<p>
+    Supongamos que una entrada digital de un microcontrolador alimentado con
+    3,3 V recibe una señal de <strong>2,0 V</strong>.
+</p>
+
+<p>
+    Como 2,0 V se encuentra entre 1,1 V y 2,4 V, la tensión está dentro de la
+    <strong>región indefinida</strong>. Por lo tanto, el dispositivo no puede
+    garantizar que esa señal sea interpretada correctamente como un 0 o como un 1.
+</p>
+
+<p>
+    Esto es especialmente importante en sistemas embebidos porque una entrada
+    digital situada durante un tiempo considerable en una región no definida
+    puede producir un comportamiento impredecible o provocar conmutaciones no
+    deseadas.
+</p>
+
+<h3>3.2. No confundir rango válido con valor nominal</h3>
+
+<p>
+    Cuando una hoja de datos especifica un rango de entrada, ese rango representa
+    las condiciones bajo las cuales el fabricante garantiza el reconocimiento
+    del nivel lógico. No debe confundirse con el valor nominal de la tensión de
+    alimentación.
+</p>
+
+<p>
+    Por ejemplo, que un microcontrolador funcione con una alimentación de
+    <strong>3,3 V</strong> no significa que cualquier tensión superior a la mitad
+    de 3,3 V deba ser interpretada automáticamente como un 1 lógico.
+</p>
+
+<p>
+    Los umbrales reales dependen de las características eléctricas especificadas
+    por el fabricante para cada dispositivo y cada tipo de entrada.
+</p>
+</section>
+
+<section>
+<h2>4. LÍMITES DE TENSIÓN Y PROTECCIÓN DEL MICROCONTROLADOR</h2>
+
+<p>
+    Además de los rangos utilizados para reconocer los niveles lógicos, debemos
+    considerar los límites eléctricos de las entradas del microcontrolador.
+</p>
+
+<p>
+    Una señal de entrada que se encuentre fuera de los límites de alimentación
+    del dispositivo puede provocar daños en el procesador.
+</p>
+
+<h3>4.1. Señales por encima de VDD o por debajo de GND</h3>
+
+<p>
+    Si el microcontrolador está alimentado con <strong>3,3 V</strong>, una señal
+    de entrada que supere significativamente <strong>VDD</strong> o que se
+    encuentre por debajo de <strong>GND</strong> puede superar los límites
+    eléctricos permitidos por el dispositivo.
+</p>
+
+<p>
+    En consecuencia, no debemos asumir que una entrada digital puede aceptar
+    cualquier tensión simplemente porque el circuito sea digital.
+</p>
+
+<p>
+    Las tensiones máximas y mínimas admisibles deben comprobarse siempre en la
+    <strong>hoja de datos (datasheet)</strong> del microcontrolador.
+</p>
+
+<h3>4.2. VDD y GND</h3>
+
+<p>
+    <strong>VDD</strong> representa la tensión positiva de alimentación del
+    dispositivo, mientras que <strong>GND</strong> representa la referencia de
+    tierra o potencial de referencia del circuito.
+</p>
+
+<p>
+    Para un microcontrolador alimentado con 3,3 V, estos valores son normalmente
+    aproximadamente:
+</p>
+
+<ul>
+    <li><strong>VDD = 3,3 V</strong></li>
+    <li><strong>GND = 0 V</strong></li>
+</ul>
+
+<p>
+    Los niveles de las señales digitales se definen tomando estos valores como
+    referencia.
+</p>
+</section>
+
+<section>
+<h2>5. NIVELES DE TENSIÓN EN LAS SALIDAS DIGITALES</h2>
+
+<p>
+    Hasta ahora hemos considerado principalmente las tensiones que recibe una
+    entrada. Ahora debemos analizar qué ocurre cuando un pin del microcontrolador
+    funciona como <strong>salida digital</strong>.
+</p>
+
+<p>
+    En condiciones normales, la tensión de una salida digital estará muy próxima
+    a uno de los dos extremos de alimentación:
+</p>
+
+<ul>
+    <li>
+        Para un <strong>0 lógico (Low)</strong>, la salida estará próxima a
+        <strong>GND</strong>.
+    </li>
+    <li>
+        Para un <strong>1 lógico (High)</strong>, la salida estará próxima a
+        <strong>VDD</strong>.
+    </li>
+</ul>
+
+<p>
+    En el comportamiento real existe una diferencia entre el valor ideal y el
+    valor que realmente aparece en el pin. El material de Arm indica que,
+    normalmente, las salidas se encuentran dentro de aproximadamente
+    <strong>0,5 V</strong> de VDD o GND, dependiendo de las condiciones de carga.
+</p>
+
+<h3>5.1. Una salida digital no es una fuente de tensión ideal</h3>
+
+<p>
+    Este punto es fundamental para comprender la electrónica de los
+    microcontroladores. Un GPIO no debe considerarse una fuente de tensión ideal
+    capaz de entregar cualquier cantidad de corriente manteniendo exactamente
+    el mismo voltaje.
+</p>
+
+<p>
+    Cuando conectamos una carga a una salida digital y hacemos que circule
+    corriente, la tensión disponible en el pin puede variar.
+</p>
+</section>
+
+<section>
+<h2>6. EFECTO DE LA CORRIENTE SOBRE UNA SALIDA DIGITAL</h2>
+
+<p>
+    Supongamos que utilizamos un GPIO para controlar un LED. Cuando la salida
+    suministra corriente al LED, el circuito de salida del microcontrolador
+    experimenta una carga eléctrica.
+</p>
+
+<p>
+    Al aumentar la corriente extraída de la salida, la tensión del pin puede
+    alejarse de su valor ideal.
+</p>
+
+<h3>6.1. Cuando una salida High suministra corriente</h3>
+
+<p>
+    Si una salida está en <strong>High</strong> y suministra corriente a una carga,
+    su tensión puede disminuir respecto de VDD.
+</p>
+
+<p>
+    Por ejemplo, aunque el microcontrolador esté alimentado con 3,3 V, una salida
+    que está entregando corriente puede no mantenerse exactamente en 3,3 V.
+    Cuanto mayor sea la corriente, mayor puede ser la caída de tensión en la
+    etapa de salida.
+</p>
+
+<h3>6.2. Cuando una salida Low absorbe corriente</h3>
+
+<p>
+    En el estado <strong>Low</strong> ocurre el fenómeno complementario. Si la
+    salida absorbe corriente procedente de una carga, la tensión del pin puede
+    aumentar respecto de GND.
+</p>
+
+<p>
+    Por tanto:
+</p>
+
+<ul>
+    <li>
+        Al aumentar la corriente de una salida <strong>High</strong>, su tensión
+        puede disminuir.
+    </li>
+    <li>
+        Al aumentar la corriente que una salida <strong>Low</strong> debe
+        absorber, su tensión puede aumentar.
+    </li>
+</ul>
+
+<p>
+    En ambos casos, el nivel de salida se desplaza hacia la
+    <strong>región indefinida</strong> si la carga supera lo que el circuito de
+    salida puede manejar correctamente.
+</p>
+</section>
+
+<section>
+<h2>7. CORRIENTE DE SALIDA Y CONEXIÓN DE CARGAS</h2>
+
+<p>
+    La capacidad de corriente de los GPIO es un aspecto fundamental al conectar
+    LEDs, sensores, transistores u otros dispositivos directamente a un
+    microcontrolador.
+</p>
+
+<p>
+    El material de Arm advierte que corrientes superiores a
+    <strong>unos pocos miliamperios</strong> pueden comprometer la integridad de
+    la señal. Este valor debe entenderse como una advertencia general y no como
+    un límite universal para todos los microcontroladores.
+</p>
+
+<h3>7.1. Consultar siempre la hoja de datos</h3>
+
+<p>
+    La corriente máxima permitida, la tensión de salida garantizada y las
+    condiciones de carga dependen del microcontrolador concreto.
+</p>
+
+<p>
+    Por ello, antes de conectar una carga a un GPIO debemos consultar en la
+    <strong>hoja de datos del fabricante</strong>, entre otros parámetros:
+</p>
+
+<ul>
+    <li>Corriente máxima que puede suministrar una salida.</li>
+    <li>Corriente máxima que puede absorber una salida.</li>
+    <li>VOH: tensión mínima garantizada para un High.</li>
+    <li>VOL: tensión máxima garantizada para un Low.</li>
+    <li>Corriente máxima total permitida por el puerto.</li>
+    <li>Corriente máxima total permitida por el dispositivo.</li>
+    <li>Límites absolutos de tensión y corriente.</li>
+</ul>
+
+<p>
+    Estos valores permiten determinar si una carga puede conectarse directamente
+    a un GPIO o si es necesario utilizar una etapa de interfaz, como un transistor
+    o un MOSFET.
+</p>
+</section>
+
+<section>
+<h2>8. RESUMEN: CÓMO INTERPRETAR CORRECTAMENTE UNA SEÑAL DIGITAL</h2>
+
+<p>
+    En un sistema embebido, una señal digital debe analizarse desde el punto de
+    vista de sus <strong>niveles eléctricos garantizados</strong>, no únicamente
+    desde los valores lógicos 0 y 1.
+</p>
+
+<p>
+    Para una alimentación de 3,3 V y tomando como referencia los valores del
+    ejemplo:
+</p>
+
+<ul>
+    <li>
+        Una tensión entre <strong>0,0 V y 1,1 V</strong> se reconoce de forma
+        confiable como <strong>Low (0)</strong>.
+    </li>
+    <li>
+        Una tensión entre <strong>1,1 V y 2,4 V</strong> se encuentra en una
+        <strong>región indefinida</strong>.
+    </li>
+    <li>
+        Una tensión entre <strong>2,4 V y 3,3 V</strong> se reconoce de forma
+        confiable como <strong>High (1)</strong>.
+    </li>
+    <li>
+        Una tensión que exceda los límites eléctricos del dispositivo puede
+        <strong>dañar la entrada</strong>.
+    </li>
+    <li>
+        Una corriente elevada en una salida puede provocar que el nivel de tensión
+        se aleje de su valor ideal y comprometer la integridad de la señal.
+    </li>
+</ul>
+
+<p>
+    La idea fundamental es sencilla: <strong>un nivel lógico es una decisión
+    digital, pero esa decisión está basada en una señal eléctrica real</strong>.
+    Por eso, al diseñar un sistema embebido no basta con saber si un GPIO está
+    configurado como entrada o salida; también debemos conocer sus niveles de
+    tensión, sus límites de corriente y las condiciones eléctricas especificadas
+    por el fabricante.
+</p>
+</section>
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>
