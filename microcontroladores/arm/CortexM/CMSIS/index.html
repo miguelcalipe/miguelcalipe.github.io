@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Niveles de abstracción del hardware | MC Mundo Tech</title>
+    <meta name="description" content="El <strong>Cortex Microcontroller Software Interface Standard (CMSIS)</strong> es una <strong>capa de abstracción de hardware (HAL)</strong> independiente del fabricante para la serie de procesadores <strong>Cortex-M</strong>. Esto significa que el desarrollador puede escribir código para una amplia variedad de plataformas sin tener que preocuparse demasiado por los detalles del hardware subyacente">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>EL ESTÁNDAR DE INTERFAZ DE SOFTWARE PARA MICROCONTROLADORES ARM CORTEX M (CMSIS)</h1>             
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   -->                 
+
+<section>
+    <h2>1. ¿Qué es CMSIS?</h2>
+
+    <p>El <strong>Cortex Microcontroller Software Interface Standard (CMSIS)</strong> es una <strong>capa de abstracción de hardware (HAL)</strong> independiente del fabricante para la serie de procesadores <strong>Cortex-M</strong>. Esto significa que el desarrollador puede escribir código para una amplia variedad de plataformas sin tener que preocuparse demasiado por los detalles del hardware subyacente.</p>
+</section>
+
+<section>
+    <h2>2. Características de programación estandarizadas por CMSIS</h2>
+
+    <p>CMSIS estandariza varias características de programación, entre ellas:</p>
+
+    <ul>
+        <li>Las funciones para acceder a componentes como el <strong>Controlador de Interrupciones Vectorizadas Anidadas (Nested Vectored Interrupt Controller, NVIC)</strong>, el <strong>Bloque de Control del Sistema (System Control Block, SCB)</strong> y el <strong>Temporizador de Ticks del Sistema (System Tick Timer o SysTick)</strong>.</li>
+
+        <li>El acceso a registros especiales, como el <strong>registro PRIMASK</strong>, y la posibilidad de configurar el <strong>registro CONTROL</strong>.</li>
+
+        <li>Funciones para acceder a instrucciones especiales del procesador.</li>
+
+        <li>Los nombres de las funciones de inicialización del sistema.</li>
+    </ul>
+</section>
+
+<section>
+    <h2>3. Beneficios del uso de CMSIS</h2>
+
+    <p>El uso de CMSIS ofrece numerosos beneficios. Facilita la <strong>portabilidad del código</strong> de una aplicación entre diferentes microcontroladores basados en Cortex-M. Esto reduce el tiempo necesario para adaptar el software a una nueva placa y permite reutilizar código entre distintos microcontroladores.</p>
+
+    <p>CMSIS también mejora la <strong>compatibilidad</strong> al integrar componentes de software de terceros, como aplicaciones, sistemas operativos embebidos (RTOS), middleware y otros, ya que todos pueden compartir la misma interfaz estándar de CMSIS.</p>
+
+    <p>Finalmente, proporciona <strong>mayor densidad de código</strong> y un <strong>menor consumo de memoria</strong>, debido a que el código de CMSIS ha sido optimizado y ampliamente probado.</p>
+</section>
+
+<section>
+    <h2>4. Componentes de CMSIS</h2>
+
+    <p>CMSIS está compuesto por los siguientes elementos:</p>
+
+    <ul>
+        <li>
+            <strong>CORE</strong>, que ofrece una API estandarizada para el núcleo del procesador Cortex-M y sus periféricos.
+        </li>
+
+        <li>
+            <strong>RTOS (Real-Time Operating System)</strong>, que proporciona una API común para sistemas operativos en tiempo real junto con una implementación de referencia. Esto permite desarrollar componentes de software compatibles con múltiples RTOS.
+        </li>
+
+        <li>
+            <strong>DSP (Digital Signal Processing)</strong>, una biblioteca con más de 60 funciones para procesamiento digital de señales, compatible con distintos tipos de datos, tanto de <strong>punto fijo</strong> como de <strong>punto flotante de precisión simple</strong>.
+        </li>
+
+        <li>
+            <strong>NN (Neural Network)</strong>, una colección de funciones (kernels) para redes neuronales desarrolladas para maximizar el rendimiento y minimizar el uso de memoria en procesadores Cortex-M.
+        </li>
+
+        <li>
+            <strong>DAP (Debug Access Port)</strong>, un firmware para una unidad de depuración que se comunica con el <strong>CoreSight Debug Access Port</strong>.
+        </li>
+    </ul>
+</section>
+
+<section>
+    <h2>5. Herramientas compatibles con CMSIS-DAP</h2>
+
+    <p>Diversas herramientas pueden utilizar <strong>CMSIS-DAP</strong>. Algunos ejemplos son:</p>
+
+    <ul>
+        <li><strong>pyOCD</strong>, un paquete de Python de código abierto para programar y depurar microcontroladores Arm Cortex-M.</li>
+
+        <li><strong>Keil MDK</strong>.</li>
+
+        <li><strong>IAR Embedded Workbench</strong>.</li>
+    </ul>
+</section>
+
+<section>
+    <h2>6. DAPLink y CMSIS-DAP</h2>
+
+    <p>CMSIS-DAP también puede utilizarse mediante <strong>DAPLink</strong>, un proyecto de código abierto que implementa el firmware embebido necesario para una sonda (probe) de depuración para procesadores Cortex.</p>
+</section>
+
+<section>
+    <h2>7. Conexión y funcionamiento de la sonda DAPLink</h2>
+
+    <p>La <strong>sonda de depuración DAPLink</strong> se conecta al ordenador anfitrión mediante <strong>USB</strong>. Su interfaz de <strong>Human Interface Device (HID)</strong> utiliza <strong>CMSIS-DAP</strong> para acceder al <strong>Cortex Debug Access Port</strong> de un microcontrolador Arm Cortex a través de USB.</p>
+
+    <p>Además, la sonda de depuración <strong>DAPLink</strong> admite la programación mediante <strong>arrastrar y soltar (USB drag-and-drop programming)</strong> y proporciona un <strong>puerto serie USB</strong>.</p>
+</section>
+            
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>
