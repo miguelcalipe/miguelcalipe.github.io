@@ -296,103 +296,7 @@
 </section>
 
 <section>
-<h2>8. CONEXIÓN DE UNA PROTOBOARD</h2>
-
-<p>Una de las primeras prácticas recomendables consiste en conectar un LED externo a uno de los GPIO de la NUCLEO-F446RE.</p>
-
-<p>Para ello se puede utilizar una <strong>protoboard</strong>, un LED, una resistencia limitadora de corriente y cables de conexión.</p>
-
-<p>La protoboard proporciona grupos de contactos eléctricamente conectados. En la zona central, normalmente cinco contactos de una misma fila están conectados internamente. Los rieles laterales suelen utilizarse para distribuir alimentación y tierra.</p>
-
-<p>Antes de realizar cualquier conexión es necesario consultar el <strong>pinout específico de la NUCLEO-F446RE</strong>. No debe suponerse que la numeración de una placa Arduino corresponde directamente a la numeración de los GPIO del STM32.</p>
-
-<p>Por ejemplo, si se desea utilizar D10, el pin correspondiente del microcontrolador es <strong>PB6</strong>, no PA10 ni PA5.</p>
-
-<p>Una conexión básica de un LED externo puede realizarse utilizando un GPIO configurado como salida, una resistencia limitadora de corriente y GND.</p>
-
-<p>La resistencia es necesaria para limitar la corriente que atraviesa el LED y proteger tanto el LED como el GPIO del microcontrolador.</p>
-</section>
-
-<section>
-<h2>9. EL CICLO BÁSICO DE DESARROLLO</h2>
-
-<p>Una práctica con la NUCLEO-F446RE debe entenderse como un ciclo de desarrollo y no simplemente como la acción de cargar un programa.</p>
-
-<p>El ciclo básico es:</p>
-
-<ol>
-<li>Escribir o modificar el código.</li>
-<li>Compilar el proyecto.</li>
-<li>Corregir los errores de compilación, si existen.</li>
-<li>Programar la memoria Flash del STM32.</li>
-<li>Ejecutar el programa.</li>
-<li>Observar el comportamiento del hardware.</li>
-<li>Depurar y corregir el programa cuando sea necesario.</li>
-<li>Repetir el proceso.</li>
-</ol>
-
-<p>Este ciclo constituye una parte fundamental del desarrollo de sistemas embebidos. El objetivo no es únicamente conseguir que el programa compile, sino comprobar que el software produce el comportamiento eléctrico esperado en el hardware.</p>
-</section>
-
-<section>
-<h2>10. PRIMER EJERCICIO: HACER PARPADEAR LD2</h2>
-
-<p>Un primer programa puede utilizar el LED LD2 como salida digital.</p>
-
-<p>En la NUCLEO-F446RE, LD2 está conectado a <strong>PA5</strong>. Por tanto, el programa debe configurar PA5 como salida GPIO y alternar periódicamente su estado lógico.</p>
-
-<p>Conceptualmente, el programa realiza la siguiente secuencia:</p>
-
-<ol>
-<li>Habilitar el reloj del puerto GPIO correspondiente.</li>
-<li>Configurar PA5 como salida.</li>
-<li>Escribir un nivel lógico alto en PA5.</li>
-<li>Esperar un intervalo de tiempo.</li>
-<li>Escribir un nivel lógico bajo en PA5.</li>
-<li>Esperar nuevamente.</li>
-<li>Repetir el proceso.</li>
-</ol>
-
-<p>Este ejercicio aparentemente sencillo permite introducir varios conceptos que posteriormente serán necesarios para trabajar con otros periféricos: habilitación de relojes, configuración de GPIO, escritura de registros, temporización y ejecución repetitiva.</p>
-</section>
-
-<section>
-<h2>11. SEGUNDO EJERCICIO: UTILIZAR EL BOTÓN USER</h2>
-
-<p>Una vez controlado el LED, puede incorporarse el botón USER B1.</p>
-
-<p>El botón B1 está conectado a <strong>PC13</strong>. El programa puede configurar este pin como entrada y utilizar su estado para decidir qué acción realizar sobre LD2.</p>
-
-<p>Por ejemplo, una práctica sencilla consiste en hacer que cada pulsación del botón cambie el estado del LED.</p>
-
-<p>Este ejercicio permite introducir el concepto de <strong>entrada digital</strong> y, posteriormente, el de <strong>interrupciones externas</strong>.</p>
-
-<p>También permite estudiar un problema práctico habitual: el rebote mecánico de los pulsadores. Una pulsación física no siempre produce una única transición eléctrica limpia, por lo que una aplicación real puede necesitar técnicas de eliminación de rebotes.</p>
-</section>
-
-<section>
-<h2>12. TERCER EJERCICIO: UTILIZAR UN GPIO EXTERNO</h2>
-
-<p>Después de trabajar con LD2 y B1, es conveniente conectar un LED externo a la protoboard.</p>
-
-<p>Este ejercicio permite comprender la diferencia entre controlar un dispositivo integrado en la placa y controlar una carga conectada físicamente a uno de los GPIO.</p>
-
-<p>Por ejemplo, se puede utilizar <strong>D10/PB6</strong> como salida para el LED externo. En este caso, el programa deberá configurar PB6 como GPIO de salida.</p>
-
-<p>La conexión básica será:</p>
-
-<ul>
-<li>PB6/D10 → resistencia limitadora → ánodo del LED.</li>
-<li>Cátodo del LED → GND.</li>
-</ul>
-
-<p>La resistencia debe seleccionarse de acuerdo con la corriente deseada y las características del LED y del GPIO.</p>
-
-<p>Una vez realizada la conexión, el programa puede hacer parpadear simultáneamente LD2 y el LED externo. De esta manera se verifica tanto el funcionamiento del software como la correcta conexión eléctrica.</p>
-</section>
-
-<section>
-<h2>13. FUNCIONES ALTERNATIVAS DE LOS PINES</h2>
+<h2>9. FUNCIONES ALTERNATIVAS DE LOS PINES</h2>
 
 <p>Una de las características que conviene estudiar desde el principio en el STM32F446RE es el sistema de <strong>funciones alternativas (Alternate Functions)</strong>.</p>
 
@@ -414,7 +318,7 @@
 </section>
 
 <section>
-<h2>14. ALIMENTACIÓN DE LA PLACA</h2>
+<h2>10. ALIMENTACIÓN DE LA PLACA</h2>
 
 <p>La NUCLEO-F446RE dispone de diferentes posibilidades de alimentación. Una de las más sencillas consiste en utilizar la alimentación proporcionada por USB a través del ST-LINK.</p>
 
@@ -426,7 +330,7 @@
 </section>
 
 <section>
-<h2>15. RELOJES Y OSCILADORES</h2>
+<h2>11. RELOJES Y OSCILADORES</h2>
 
 <p>El funcionamiento del STM32 depende de su sistema de generación y distribución de relojes.</p>
 
@@ -438,7 +342,7 @@
 </section>
 
 <section>
-<h2>16. HERRAMIENTAS DE DESARROLLO</h2>
+<h2>12. HERRAMIENTAS DE DESARROLLO</h2>
 
 <p>La NUCLEO-F446RE puede utilizarse con diferentes entornos de desarrollo compatibles con STM32.</p>
 
@@ -450,7 +354,7 @@
 </section>
 
 <section>
-<h2>17. DOCUMENTACIÓN QUE DEBE CONSULTARSE</h2>
+<h2>13. DOCUMENTACIÓN QUE DEBE CONSULTARSE</h2>
 
 <p>Cuando se trabaja con la NUCLEO-F446RE conviene acostumbrarse a consultar directamente la documentación técnica en lugar de depender exclusivamente de ejemplos de Internet.</p>
 
@@ -468,7 +372,7 @@
 </section>
 
 <section>
-<h2>18. DE LA PLACA DE DESARROLLO AL SISTEMA EMBEDED</h2>
+<h2>14. DE LA PLACA DE DESARROLLO AL SISTEMA EMBEDED</h2>
 
 <p>La NUCLEO-F446RE debe entenderse como una herramienta de desarrollo, no como el producto final.</p>
 
@@ -482,30 +386,7 @@
 </section>
 
 <section>
-<h2>19. PRÁCTICAS RECOMENDADAS</h2>
-
-<p>Una vez completado el primer programa, se pueden plantear ejercicios progresivos:</p>
-
-<ol>
-<li>Modificar la frecuencia de parpadeo de LD2.</li>
-<li>Generar secuencias de parpadeos largos y cortos.</li>
-<li>Utilizar el botón B1 para modificar el comportamiento del LED.</li>
-<li>Controlar un LED externo mediante un GPIO.</li>
-<li>Leer el estado de un pulsador externo.</li>
-<li>Generar una señal periódica utilizando un temporizador en lugar de una espera por software.</li>
-<li>Utilizar una interrupción externa para detectar el botón USER.</li>
-<li>Enviar información mediante USART.</li>
-<li>Utilizar SPI para comunicarse con un dispositivo externo.</li>
-<li>Utilizar I²C para comunicarse con un sensor.</li>
-<li>Leer una señal analógica mediante el ADC.</li>
-<li>Utilizar DMA para transferir datos sin intervención continua de la CPU.</li>
-</ol>
-
-<p>La progresión es deliberada: primero se trabaja con GPIO, después con temporización e interrupciones y finalmente con periféricos de comunicación y adquisición de datos. De esta forma, cada práctica introduce un concepto que será necesario en aplicaciones más complejas.</p>
-</section>
-
-<section>
-<h2>20. CONSIDERACIONES FINALES</h2>
+<h2>15. CONSIDERACIONES FINALES</h2>
 
 <p>La NUCLEO-F446RE constituye una plataforma muy adecuada para estudiar sistemas embebidos basados en Arm Cortex-M4. Su principal ventaja no reside únicamente en la potencia del STM32F446RE, sino en que integra los elementos necesarios para comenzar a desarrollar y depurar aplicaciones sin tener que construir previamente una placa electrónica completa.</p>
 
