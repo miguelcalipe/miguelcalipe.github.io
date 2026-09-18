@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escribir el Código fuente | MC Mundo Tech</title>
+    <meta name="description" content="Con el paso del tiempo han aparecido distintos niveles de abstracción cuyo objetivo es simplificar el desarrollo de software. Mientras mayor es la abstracción, menor es la cantidad de detalles del hardware que el programador necesita conocer, a costa de perder algo de control y eficiencia ">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>ABSTRACCIÓN DEL HARDWARE</h1>
+            
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   -->
+            
+            <section> 
+
+                <h2>INTRODUCCIÓN</h2>                
+                <p>
+                    Un ejemplo muy sencillo nos va apermitir comprender el proceso de compilación, programación y ejecución de un programa en un microcontrolador AVR. Vamos a configurar un pin de un dispositivo de la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> como salida digital y después vamos a colocar ese pin en nivel alto para encender un LED.
+                </p>
+            </section>
+
+            <section>
+                <h2>1. EL PROGRAMA EN C</h2>
+                <p>
+                    El ejemplo parece trivial desde el punto de vista del código C. Sin embargo, si seguimos lo que
+                    ocurre dentro del microcontrolador, podemos observar toda la cadena que existe entre una
+                    instrucción escrita por el programador y el cambio de tensión que finalmente aparece en una
+                    pata física del encapsulado.
+                </p>
+            
+                    El programa completo puede escribirse de la siguiente manera:
+                </p>
+
+<pre language="C"><code>#include &lt;avr/io.h&gt;
+
+int main(void) {
+    DDRB |= (1 << PB0);     // Configura PB0 como salida
+    PORTB |= (1 << PB0);    // Coloca PB0 en nivel alto
+
+    while (1) {
+        // Bucle infinito
+    }
+}</code></pre>
+
+                <p>
+                    El programa contiene dos operaciones importantes.
+                </p>
+
+                <p>
+                    La primera:
+                </p>
+
+                <pre><code>DDRB |= (1 &lt;&lt; PB0);</code></pre>
+
+                <p>
+                    configura PB0 como salida.
+                </p>
+
+                <p>
+                    La segunda:
+                </p>
+
+                <pre><code>PORTB |= (1 &lt;&lt; PB0);</code></pre>
+
+                <p>
+                    establece el valor lógico de salida de PB0 en uno.
+                </p>
+
+                <p>
+                    El bucle infinito:
+                </p>
+
+                <pre><code>while (1)
+            {
+            }</code></pre>
+
+                <p>
+                    evita que la función <code>main()</code> termine. Una vez configurado el pin y establecido su
+                    nivel lógico, no necesitamos ejecutar ninguna otra operación para mantener el LED encendido:
+                    el propio hardware del puerto conserva el estado de la salida.
+                </p>
+            </section>
+
+            <section>
+                <h3>El papel de avr/io.h</h3>
+
+                <p>
+                    La primera línea del programa es:
+                </p>
+
+                <pre><code>#include &lt;avr/io.h&gt;</code></pre>
+
+                <p>
+                    Este archivo forma parte de <strong>avr-libc</strong> y proporciona las definiciones
+                    necesarias para trabajar con los registros y bits específicos del microcontrolador
+                    seleccionado durante la compilación.
+                </p>
+
+                <p>
+                    Gracias a estas definiciones podemos escribir:
+                </p>
+
+                <pre><code>DDRB
+PORTB
+PB0</code></pre>
+
+                <p>
+                    en lugar de tener que escribir directamente las direcciones numéricas de los registros y
+                    los números de los bits.
+                </p>
+
+                <p>
+                    Por tanto, cuando el programador escribe <code>DDRB</code>, no está creando una variable
+                    convencional almacenada en la RAM. Está haciendo referencia a un registro de hardware
+                    asociado al puerto B del microcontrolador.
+                </p>
+
+                <p>
+                    Esta distinción es fundamental para entender la programación de AVR. Una expresión como
+                    <code>PORTB |= (1 &lt;&lt; PB0)</code> parece una operación ordinaria sobre una variable,
+                    pero en realidad provoca una operación sobre un circuito electrónico situado dentro del
+                    microcontrolador.
+                </p>
+            </section>
+
+            <section>
+                <h2>2. EL COMPILADOR TRADUCE EL C A INSTRUCCIONES DE LA CPU</h2>
+
+                <p>
+                    El procesador del ATmega168 no ejecuta directamente el código C. El código escrito por el
+                    programador debe pasar por el compilador, que lo transforma en instrucciones que la CPU del
+                    AVR puede ejecutar.
+                </p>
+
+                <p>
+                    Por ejemplo, esta expresión:
+                </p>
+
+                <pre><code>DDRB |= (1 &lt;&lt; PB0);</code></pre>
+
+                <p>
+                    implica conceptualmente tres operaciones:
+                </p>
+
+                <pre><code>Leer el valor actual de DDRB
+            Modificar el bit correspondiente a PB0
+            Escribir el nuevo valor en DDRB</code></pre>
+
+                <p>
+                    Las instrucciones exactas que produzca el compilador dependen de factores como el
+                    microcontrolador seleccionado y las opciones de optimización utilizadas. Por ello, no
+                    debemos interpretar esta secuencia como una traducción literal obligatoria a tres
+                    instrucciones máquina concretas.
+                </p>
+
+                <p>
+                    Lo importante para entender el funcionamiento del hardware es que, finalmente, la CPU ejecuta
+                    instrucciones que provocan una lectura o escritura sobre el registro de hardware
+                    correspondiente.
+                </p>
+
+                <p>
+                    En este punto desaparece el nivel de abstracción del lenguaje C. La CPU trabaja con
+                    instrucciones de la arquitectura AVR y con direcciones, datos y señales internas del
+                    microcontrolador.
+                </p>
+            </section>
+
+            <section>
+                <h3>DDRB determina si PB0 | FUNCIONA COMO ENTRADA O COMO SALIDA</h3>
+
+                <p>
+                    El puerto B dispone de un registro denominado <strong>DDRB</strong>, cuyo nombre procede de
+                    <em>Data Direction Register B</em>.
+                </p>
+
+                <p>
+                    Cada bit de DDRB está asociado a uno de los bits del puerto B:
+                </p>
+
+                <pre><code>DDRB
+
+            Bit7 Bit6 Bit5 Bit4 Bit3 Bit2 Bit1 Bit0
+            ?    ?    ?    ?    ?    ?    ?    1</code></pre>
+
+                <p>
+                    Para PB0 nos interesa específicamente el bit 0:
+                </p>
+
+                <pre><code>DDRB0 = 1</code></pre>
+
+                <p>
+                    En los puertos GPIO del dispositivo ATmega, un bit de DDR configurado en <strong>1</strong> establece el pin correspondiente como salida. Si estuviera configurado en <strong>0</strong>, el pin
+                    funcionaría como entrada.
+                </p>
+
+                <p>
+                    Por tanto, la instrucción:
+                <pre><code>DDRB |= (1 &lt;&lt; PB0);</code></pre>
+
+                <p>
+                    significa, en términos funcionales:
+                </p>
+
+                <pre><code>Conservar los demás bits de DDRB
+            y poner a 1 el bit DDRB0.</code></pre>
+
+                <p>
+                    El operador <code>|=</code> es importante porque permite modificar PB0 sin alterar
+                    accidentalmente la configuración de los demás pines del puerto B.
+                </p>
+            
+                <p>Al quedar:
+                </p>
+
+                <pre><code>DDRB0 = 1</code></pre>
+
+                <p>
+                    la lógica de control del puerto configura el circuito asociado a PB0 para trabajar como
+                    salida.
+                </p>
+
+                <p>
+                    Sin embargo, en este momento todavía no hemos ordenado al pin que adopte un nivel alto.
+                    Hemos definido únicamente su <strong>dirección</strong>.
+                </p>
+            </section>
+
+            <section>
+                <h3>PORTB determina el valor de la salida</h3>
+
+                <p>
+                    Una vez configurado PB0 como salida, debemos establecer qué nivel lógico queremos que
+                    aparezca en el pin.
+                </p>
+
+                <p>
+                    Para ello utilizamos el registro <strong>PORTB</strong>.
+                </p>
+
+                <p>
+                    La instrucción:
+                </p>
+
+                <pre><code>PORTB |= (1 &lt;&lt; PB0);</code></pre>
+
+                <p>
+                    coloca a uno el bit 0 de PORTB.
+                </p>
+
+                <p>
+                    Conceptualmente, después de la escritura tenemos:
+                </p>
+
+                <pre><code>PORTB
+
+            Bit7 Bit6 Bit5 Bit4 Bit3 Bit2 Bit1 Bit0
+            ?    ?    ?    ?    ?    ?    ?    1</code></pre>
+
+                <p>
+                    El significado de los demás bits dependerá de cómo estén configurados y utilizados los
+                    otros pines del puerto. Para nuestro ejemplo solo nos interesa <code>PORTB0</code>.
+                </p>
+
+                
+                <p>
+                    Por tanto:
+                </p>
+
+                <pre><code>DDRB0 = 1
+            PORTB0 = 1</code></pre>
+
+                <p>
+                    representa, funcionalmente:
+                </p>
+
+                <pre><code>PB0 configurado como salida
+            PB0 conducido a nivel alto</code></pre>
+            </section>
+
+            <section>
+                <h2>3. PORTB Y EL LATCH DE SALIDA</h2>
+
+                <p>
+                    Para comprender qué sucede a continuación es útil introducir el concepto de
+                    <strong>latch</strong>.
+                </p>
+
+                <p>
+                    El circuito de salida necesita conservar el valor lógico que se ha escrito aunque la CPU
+                    continúe ejecutando otras instrucciones. No sería necesario que la CPU estuviera escribiendo
+                    continuamente unos y ceros para mantener el pin en el estado seleccionado.
+                </p>
+
+                <p>
+                    El hardware dispone para ello de un elemento de almacenamiento asociado a la salida del
+                    puerto. De manera simplificada podemos representarlo así:
+                </p>
+
+                <pre><code>CPU
+            │
+            ▼
+            Registro PORTB
+            │
+            ▼
+            Latch de salida
+            │
+            ▼
+            Driver de salida
+            │
+            ▼
+            PB0</code></pre>
+
+                <p>
+                    Cuando el programa escribe un uno en el bit correspondiente, la lógica de salida conserva
+                    ese estado y el driver mantiene el pin en el nivel correspondiente mientras la configuración
+                    no cambie.
+                </p>
+
+                <p>
+                    Aquí conviene hacer una precisión terminológica. Desde el punto de vista del programador,
+                    hablamos de <strong>PORTB</strong> como un registro. Desde el punto de vista del circuito
+                    interno, la implementación del puerto contiene elementos de almacenamiento y lógica que
+                    permiten conservar y utilizar ese valor. 
+                </p>
+
+                <p>
+                    El diagrama anterior es una representación didáctica del recorrido de la información, no un
+                    esquema transistor a transistor del diseño interno del ATmega168.
+                </p>
+            </section>
+
+            <section>
+                <h2>4. EL DRIVER CMOS CONTROLA EL PIN FISICO</h2>
+
+                <p>
+                    El valor lógico conservado por la lógica de salida controla el circuito electrónico que
+                    finalmente conduce el pin.
+                </p>
+
+                <p>
+                    En un puerto digital CMOS, este circuito utiliza transistores MOS para poder llevar el pin
+                    hacia la alimentación o hacia tierra.
+                </p>
+
+                <p>
+                    De forma muy simplificada podemos representar el comportamiento de una salida CMOS mediante
+                    un transistor del lado superior y otro del lado inferior:
+                </p>
+
+                <pre><code>             VCC
+                        │
+                        [PMOS]
+                        │
+                        ├────────── PB0
+                        │
+                        [NMOS]
+                        │
+                        GND</code></pre>
+
+                <p>
+                    Esta representación es deliberadamente simplificada. El circuito real de un pin del
+                    microcontrolador contiene más elementos y también debe tener en cuenta las estructuras de
+                    entrada, protección y otras funciones del pin.
+                </p>
+
+                <p>
+                    Cuando la lógica de salida solicita un nivel alto, el circuito de salida conduce el pin hacia
+                    VCC. Cuando solicita un nivel bajo, lo conduce hacia GND.
+                </p>
+
+                <p>
+                    En nuestro caso:
+                </p>
+
+                <pre><code>PORTB0 = 1
+                    ↓
+            Driver de salida
+                    ↓
+            PB0 ≈ VCC</code></pre>
+
+                <p>
+                    Si el microcontrolador está alimentado a 5 V, el pin tenderá a presentar un nivel cercano a
+                    VCC cuando está en estado alto. Esto no significa que el pin sea una fuente ideal de 5 V:
+                    la tensión real depende de la corriente que esté entregando y de las características
+                    eléctricas especificadas por el fabricante.
+                </p>
+            </section>
+
+            <section>
+                <h2>5. EL NIVEL LÓGICO SE CONVIERTE EN UNA TENSIÓN ELÉCTRICA</h2>
+
+                <p>
+                    Hasta este momento hemos hablado principalmente en términos de bits y niveles lógicos.
+                    Ahora llegamos al punto en el que esa información se convierte en una magnitud eléctrica
+                    observable con un instrumento de medida.
+                </p>
+
+                <p>
+                    Si PB0 está configurado como salida y su valor lógico es uno, el driver de salida lleva el
+                    pin hacia VCC.
+                </p>
+
+                <pre><code>PORTB0 = 1
+                │
+                ▼
+            Driver de salida
+                │
+                ▼
+            PB0 → nivel alto</code></pre>
+
+                <p>
+                    Si medimos entre PB0 y GND con un multímetro, podremos observar una tensión próxima a la
+                    tensión de alimentación del microcontrolador, siempre dentro de las condiciones de carga
+                    especificadas para el pin.
+                </p>
+
+            
+            </section>
+
+            <section>
+                <h3>La Corriente Circula por el Led</h3>
+
+                <p>
+                    Ahora podemos completar el recorrido conectando el pin con el circuito externo.
+                </p>
+
+                <pre><code>PB0
+            │
+            ▼
+            [220 Ω]
+            │
+            ▼
+            LED
+            │
+            ▼
+            GND</code></pre>
+
+                <p>
+                    Cuando PB0 se encuentra en nivel alto, existe una diferencia de potencial entre el pin y
+                    tierra.
+                </p>
+
+                <p>
+                    Esa diferencia de potencial produce una corriente que circula aproximadamente por el
+                    siguiente camino:
+                </p>
+
+                <pre><code>VCC del microcontrolador
+                    │
+                    ▼
+            Circuito de salida de PB0
+                    │
+                    ▼
+            Pin PB0
+                    │
+                    ▼
+            Resistencia
+                    │
+                    ▼
+            LED
+                    │
+                    ▼
+            GND</code></pre>
+
+                <p>
+                    La resistencia limita la corriente y el LED convierte parte de la energía eléctrica en
+                    radiación luminosa.
+                </p>
+
+                <p>
+                    El LED se enciende, pero el proceso que acabamos de describir comenzó mucho antes de que
+                    apareciera corriente en el circuito externo. Comenzó con una instrucción escrita en C.
+                </p>
+            </section>
+
+            <section>
+                <h2>6. EL RECORRIDO COMPLETO DESDE EL CÓDIGO HASTA EL PIN</h2>
+
+                <p>
+                    Podemos reunir ahora todos los niveles que hemos estudiado.
+                </p>
+
+                <h3>6.1. Desde el código fuente hasta la CPU</h3>
+
+                <pre><code>DDRB |= (1 &lt;&lt; PB0);
+            PORTB |= (1 &lt;&lt; PB0);</code></pre>
+
+                <p>
+                    El código C es procesado por el compilador y transformado en instrucciones de la arquitectura
+                    AVR. Esas instrucciones son almacenadas en el programa del microcontrolador y posteriormente
+                    ejecutadas por la CPU.
+                </p>
+
+                <h3>6.2. Desde la CPU hasta DDRB</h3>
+
+                <p>
+                    La CPU ejecuta las instrucciones correspondientes y accede al registro DDRB. Al quedar
+                    <code>DDRB0 = 1</code>, la lógica del puerto configura PB0 como salida.
+                </p>
+
+                <h3>6.3. Desde la CPU hasta PORTB</h3>
+
+                <p>
+                    Posteriormente la CPU escribe un uno en <code>PORTB0</code>. Ese valor pasa a la lógica de
+                    almacenamiento y control de la salida.
+                </p>
+
+                <h3>6.4. Desde PORTB hasta el driver</h3>
+
+                <p>
+                    El valor de salida es conservado por la lógica correspondiente y utilizado por el circuito
+                    de salida del puerto. El driver CMOS recibe la orden de establecer un nivel alto.
+                </p>
+
+                <h3>6.5. Desde el driver hasta el pin físico</h3>
+
+                <p>
+                    El driver conduce PB0 hacia VCC. El resultado puede medirse directamente en la pata física
+                    del encapsulado.
+                </p>
+
+                <h3>6.6. Desde el pin hasta el LED</h3>
+
+                <p>
+                    Finalmente, la tensión presente en PB0 provoca una corriente a través de la resistencia y
+                    del LED conectado a tierra. El LED emite luz.
+                </p>
+            </section>
+
+            <section>
+                <h2>7. RESUMEN DEL FUNCIONAMIENTO</h2>
+
+                <p>
+                    Todo el proceso puede resumirse en la siguiente secuencia:
+                </p>
+
+                <pre><code>Programa en C
+
+            DDRB |= (1 &lt;&lt; PB0);
+            PORTB |= (1 &lt;&lt; PB0);
+
+                    │
+                    ▼
+
+            Compilador
+
+                    │
+                    ▼
+
+            Instrucciones máquina
+
+                    │
+                    ▼
+
+            CPU
+
+                    │
+                    ▼
+
+            DDRB0 = 1
+            PB0 configurado como salida
+
+                    │
+                    ▼
+
+            PORTB0 = 1
+            Nivel lógico de salida = 1
+
+                    │
+                    ▼
+
+            Lógica de almacenamiento
+            y control de salida
+
+                    │
+                    ▼
+
+            Driver CMOS
+
+                    │
+                    ▼
+
+            Pin físico PB0
+            ≈ VCC
+
+                    │
+                    ▼
+
+            Resistencia + LED
+
+                    │
+                    ▼
+
+            Corriente eléctrica
+
+                    │
+                    ▼
+
+            LED encendido</code></pre>
+
+                <p>
+                    Este recorrido permite relacionar conceptos que a menudo se estudian por separado. El
+                    registro <code>DDRB</code> ya no aparece como una simple posición de memoria; podemos verlo
+                    como parte de la lógica que determina el funcionamiento del pin. Del mismo modo,
+                    <code>PORTB</code> deja de ser simplemente un nombre utilizado en un programa y pasa a
+                    entenderse como la interfaz de control mediante la cual el software determina el estado de
+                    la salida.
+                </p>
+            </section>
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>

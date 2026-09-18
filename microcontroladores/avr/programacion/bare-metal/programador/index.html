@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Niveles de abstracción del hardware | MC Mundo Tech</title>
+    <meta name="description" content="Con el paso del tiempo han aparecido distintos niveles de abstracción cuyo objetivo es simplificar el desarrollo de software. Mientras mayor es la abstracción, menor es la cantidad de detalles del hardware que el programador necesita conocer, a costa de perder algo de control y eficiencia ">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>CONEXiÓN DEL PROGRAMADOR ISP USBasp</h1>
+            
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   -->
+            
+            <section> 
+            
+            <H2>INTRODUCCIÓN</H2>
+                <p>La carga del firmaware en el microcontrolador y la depuración la haremos a través del programador ISP <a href="https://www.fischl.de/usbasp/" target="_blank">USBasp</a>. </p>
+                    
+                <p> 
+                    USBasp es un programador de hardware libre y de bajo costo para microcontroladores Atmel AVR. Consta simplemente de un ATMega88 o un ATMega8 y un par de componentes pasivos. El programador utiliza un controlador USB basado únicamente en firmware; para Linux y Mac Os no se necesita ningún controlador USB especial.
+                </p>
+                    USBasp se conecta a la estación de trabajo por USB y al microcontrolador por el bus de comunicación serial SPI (interfaz perifericos serial). El Bus SPI (del inglés Serial Peripheral Interface) es un estándar de comunicaciones, usado principalmente para la transferencia de información entre circuitos integrados. El bus SPI es un bus de comunicación en serie, lo que significa que los datos se transfieren bit a bit a través de un único canal de comunicación.                    
+                </p>
+
+                <p>El software de programación o flasheo AVRDUDE, que utilizamos en este sitio, es compatible con USBasp desde la versión 5.2.</p>
+                
+            <h2>1. CONEXIÓN DEL USBasp a la PC </h2>
+
+                <p>
+                    El ATmega puede programarse mediante ISP (In-System Programming), es decir sin necesidad de retirar el microcontrolador del circuito. El USBasp permite realizar esta operación desde la estación de trabajo. 
+                </p>
+
+                <p>
+                    Después de conectar el USBasp al puerto USB de la Raspberry pi 5 podemos comprobar que el sistema lo reconoce con el comando lsusb:                    
+                </p>
+                <pre><code>lsusb
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 001 Device 002: ID 16c0:05dc Van Ooijen Technische Informatica shared ID for use with libusb
+Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+Bus 003 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 003 Device 002: ID 1ea7:0066 SHARKOON Technologies GmbH [Mediatrack Edge Mini Keyboard]
+Bus 004 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+
+                </code></pre>
+
+                <p>La salida muestra los 4 puertos USB disponibles en la estación de trabajo, 2 puertos 2.0 y 2 puertos 3.0:</p>
+                    <ul>
+                        <li>Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub </li>
+                        <li>Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub </li>    
+                        <li>Bus 003 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub </li>
+                        <li>Bus 004 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub </li>    
+                    </ul>
+                <p> Además muestra que el sistema reconoce 2 dispositivos conectados por USB</p>
+                    <ul> </ul>
+                        <li>Bus 001 Device 002: ID 16c0:05dc Van Ooijen Technische Informatica shared ID for use with libusb
+                        <li>Bus 003 Device 002: ID 1ea7:0066 SHARKOON Technologies GmbH [Mediatrack Edge Mini Keyboard]</li>
+                    </ul>
+                <p>
+                    La segunda etiqueta corresponde a un teclado inalámbrico y la primera etiqueta corresponde al USBasp. 
+                </p>
+                <p>
+                    La identificación del USBasp es 16c0:05dc, que corresponde a Van Ooijen Technische Informatica shared ID for use with libusb. Esto ocurre porque el creador del USBasp utilizó el identificador de fabricante (Vendor ID) sublicenciado gratuitamente por el ingeniero holandés Wouter van Ooijen para apoyar proyectos de código abierto y evitar los costosos pagos de registro ante la USB-IF. De este modo, la base de datos de Linux lee dicho código asignado y reconoce la firma del licenciante, confirmando así que el programador está correctamente reconocido por el sistema operativo y listo para interactuar con herramientas como AVRDUDE.
+                </p>
+
+                <p>
+                    Podemos comprobar que el USBasp está correctamente conectado y reconocido por el sistema operativo con el siguiente comando, ponemos también a contnuación la salida del comando:
+                </p>
+<pre><code>
+avrdude -c usbasp -p m88p
+
+avrdude: AVR device initialized and ready to accept instructions
+avrdude: device signature = 0x1e940b (probably m168p)
+
+avrdude done.  Thank you.
+</code></pre>
+            
+                <h2>2. CONEXIÓN DEL USBasp CON EL MICROCONTROLADOR</h2>
+                <p>
+                    La conexión del USBasp con el microcontrolador se realiza a través de un conector de 10 pines, que se conecta a los respectivos pines del microcontrolador. La conexión utiliza principalmente seis señales: MISO, MOSI, SCK, RESET, VCC y GND.
+                </p>
+                <p>                    
+                   Para programar un dispositivo de la serie ATmega48A/PA/88A/PA/168A/PA/328/P, mediante la interfaz ISP (In-System Programming) utilizando un USBasp, debes conectar seis señales entre el programador y el microcontrolador.
+
+                </p>
+<div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Señal ISP</th>
+                                <th>Pin del ATmega48A/PA/88A/PA/168A/PA/328/P </th>
+                                <th>Descripción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>MOSI</td>
+                                <td>17 (PB3)</td>
+                                <td>Datos del programador hacia el microcontrolador.</td>
+                            </tr>
+                            <tr>
+                                <td>MISO</td>
+                                <td>18 (PB4)</td>
+                                <td>Datos del microcontrolador hacia el programador.</td>
+                            </tr>
+                            <tr>
+                                <td>SCK</td>
+                                <td>19 (PB5)</td>
+                                <td>Señal de reloj de la programación SPI.</td>
+                            </tr>
+                            <tr>
+                                <td>RESET</td>
+                                <td>1 (PC6/RESET)</td>
+                                <td>Coloca el microcontrolador en modo de programación.</td>
+                            </tr>
+                            <tr>
+                                <td>VCC</td>
+                                <td>7 y 20</td>
+                                <td>Alimentación (+5 V o +3.3 V, según el sistema).</td>
+                            </tr>
+                            <tr>    
+                                <td>GND</td>
+                                <td>8 y 22</td>
+                                <td>Tierra (masa).</td>
+                            </tr>               
+                        </tbody>
+                    </table>
+                </div>
+            
+            <h3>Conector ISP de 10 pines del USBasp</h3>    
+            <p>
+                La mayoría de los programadores USBasp utilizan el siguiente orden de señales:
+            </p>    
+            
+            <img src="/microcontroladores/avr/programacion/bare-metal/programador/img/PinoutUSBasp.jpeg" alt="Pinout del USBasp" width="300" class="imagen-centrada">
+               
+
+        
+
+                
+            </section>
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>

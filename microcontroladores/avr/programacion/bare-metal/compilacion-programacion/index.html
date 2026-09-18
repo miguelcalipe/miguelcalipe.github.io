@@ -46,114 +46,19 @@
                 </p>
             
                 <p>
-                    En este artículo se muestra el proceso completo para compilar un programa escrito en lenguaje C, generar el archivo ejecutable para el microcontrolador y grabarlo en la memoria Flash utilizando un programador USBasp.
+                    En este artículo se muestra el proceso completo para compilar un programa escrito en lenguaje C, generar el archivo ejecutable para un microcontrolador de la serie ATmega48A/PA/88A/PA/168A/PA/328/P y grabarlo en la memoria Flash utilizando un programador USBasp, esde la línea de comandos. Se asume que el lector tiene conocimientos básicos de programación en C y está familiarizado con el uso de la terminal en GNU/Linux.
                 </p>
             </section>
 
+             
             <section>
-                <h2>1. ESCRIBIR EL PROGRAMA</h2>
+                <h2>1. COMPILAR EL PROGRAMA</h2>
 
                 <p>
-                    El primer paso consiste en escribir el programa que ejecutará el microcontrolador. En este
-                    artículo utilizaremos el lenguaje <strong>C</strong>, ya que es el lenguaje más utilizado para
-                    desarrollar aplicaciones sobre microcontroladores AVR. Aunque existen otros lenguajes y
-                    herramientas que permiten programarlos, prácticamente toda la documentación, ejemplos y
-                    bibliotecas oficiales están pensadas para C.
-                </p>
-
-                <p>
-                    El programa lo guardaremos en un <strong>archivo de código fuente</strong> cuya extensión es
-                    <code>.c</code>. Este archivo no contiene instrucciones que el microcontrolador pueda ejecutar
-                    directamente; únicamente almacena el código escrito por el programador en un formato de texto
-                    plano. Dicho de otra manera, es un archivo legible por una persona, pero todavía incomprensible
-                    para el microcontrolador. Más adelante será el compilador quien se encargue de traducirlo al
-                    lenguaje máquina.
-                </p>
-
-                <p>
-                    Para escribir el programa puedes utilizar cualquier editor de texto. En GNU/Linux existen muchas
-                    alternativas, como <code>nano</code>, <code>vim</code>, <code>emacs</code>, Visual Studio Code,
-                    Geany o incluso un editor gráfico sencillo como Gedit. En este artículo utilizaremos
-                    <code>nano</code>, ya que está instalado por defecto en la mayoría de distribuciones y resulta
-                    muy fácil de usar desde la línea de comandos.
-                </p>
-
-                <p>
-                    Antes de crear el archivo conviene abrir una terminal y situarse en la carpeta donde deseamos
-                    guardar el proyecto. Puedes crear una carpeta específica para tus programas AVR o utilizar
-                    cualquier directorio de trabajo. Por ejemplo:
-                </p>
-
-                <pre><code class="language-bash">mkdir avr
-cd avr</code></pre>
-
-                <p>
-                    Todos los archivos que vayamos creando durante el desarrollo (código fuente, archivos objeto,
-                    ejecutables y archivos para programar el microcontrolador) se generarán dentro de esta carpeta que hemos denominado avr (puede ser cualquier otro nombre). Esto permite mantener todos los archivos relacionados con el proyecto en un solo lugar, lo que facilita mantener organizado el proyecto.
-                </p>
-
-                <p>
-                    Una vez dentro del directorio de trabajo, creamos un nuevo archivo llamado
-                    <code>blink.c</code> ejecutando:
-                </p>
-
-                <pre><code class="language-bash">nano blink.c</code></pre>
-
-                <p>
-                    Al hacerlo, <code>nano</code> abrirá un archivo nuevo. Si el archivo ya existía, simplemente lo
-                    abrirá para editarlo.
-                </p>
-
-                <p>
-                    Escribimos entonces el siguiente programa:
-                </p>
-
-                <pre><code class="language-c">
-    #include &lt;avr/io.h&gt;
-    #include &lt;util/delay.h&gt;
-
-    int main(void)
-    {
-        DDRB |= (1 &lt;&lt; DDB1);      // PB1 como salida
-
-        while (1)
-        {
-            PORTB ^= (1 &lt;&lt; PORTB1);
-            _delay_ms(300);
-        }
-    }</code></pre>
-
-                <p>
-                    Una vez terminado, debemos guardar el archivo. En <code>nano</code> se hace presionando
-                    <kbd>Ctrl</kbd> + <kbd>O</kbd> (de <em>Write Out</em>). El editor mostrará el nombre del archivo,
-                    en este caso <code>blink.c</code>. Simplemente presionamos <kbd>Enter</kbd> para confirmar.
-                    Después salimos del editor con <kbd>Ctrl</kbd> + <kbd>X</kbd>.
-                </p>
-
-                <p>
-                    El nombre del archivo puede ser cualquiera siempre que termine con la extensión
-                    <code>.c</code>. Por ejemplo, <code>led.c</code>, <code>contador.c</code>,
-                    <code>prueba.c</code> o <code>main.c</code>. En este artículo utilizaremos el nombre
-                    <code>blink.c</code> porque el programa hace parpadear un LED.
-                </p>
-                
-                <p>
-                    En este punto únicamente hemos creado el <strong>código fuente</strong>. Es decir, un archivo de
-                    texto que contiene instrucciones escritas en lenguaje C. Todavía no existe un programa que el
-                    microcontrolador pueda ejecutar. En el siguiente paso utilizaremos el compilador
-                    <code>avr-gcc</code>, que traducirá este código fuente a lenguaje máquina para el
-                    ATmega328P.
-                </p>
-            </section>
-           
-            <section>
-                <h2>2. COMPILAR EL PROGRAMA</h2>
-
-                <p>
-                    En este ejemplo trabajaremos con un <strong>ATmega328P</strong>, el mismo microcontrolador que incorpora la placa Arduino Uno. Si utilizas otro AVR, no hay ningún problema: el procedimiento será exactamente el mismo. Lo único que cambiará será el modelo de microcontrolador que indicaremos al compilador y al programa de grabación.
+                    Debemos escoger un dispositivo de la serie ATmega48A/PA/88A/PA/168A/PA/328/P. En este ejemplo trabajaremos con un <strong>ATmega328P</strong>, el mismo microcontrolador que incorpora la placa Arduino Uno. Si utilizas otro AVR, no hay ningún problema: el procedimiento será exactamente el mismo. Lo único que cambiará será el modelo de microcontrolador que indicaremos al compilador y al programa de grabación.
                 </p>
             
-    <pre><code class="language-bash">avr-gcc -mmcu=atmega328p -DF_CPU=16000000UL -Os blink.c -o blink.elf</code></pre>
+    <pre><code class="language-bash">avr-gcc -mmcu=atmega328p -DF_CPU=1000000UL -Os blink.c -o blink.elf</code></pre>
                 <p>
                     Este es el comando que transforma el archivo <code>blink.c</code> en un programa ejecutable para un microcontrolador AVR. Aunque solemos decir que <code>avr-gcc</code> compila el programa, en realidad hace bastante más. 
                 </p>
@@ -183,59 +88,40 @@ cd avr</code></pre>
                         </p>
 
                         <p>
-                            Si no conoces el modelo exacto de tu microcontrolador, puedes encontrarlo impreso sobre el encapsulado. Por ejemplo:
-                        </p>
-
-                        <ul>
-                            <li><code>ATmega328P-PU</code></li>
-                            <li><code>ATmega88PA-PU</code></li>
-                            <li><code>ATtiny85</code></li>
-                            <li><code>ATmega16A</code></li>
-                        </ul>
-
-                        <p>
-                            Ese nombre comercial también determina el identificador que utilizaremos  con <code>avr-gcc</code>. 
-                        </p>
-
-                        <p>
                             Si usamos otro microcontrolador como el ATmega88PA, el parámetro sería <code>-mmcu=atmega88pa</code>. Es importante escribirlo exactamente como corresponde al modelo del microcontrolador, ya que el compilador distingue entre mayúsculas y minúsculas y requiere la forma correcta para generar el código adecuado.
                         </p>
 
-                        <p>Para saber el identificador del microcontrolador que usamos, podemos listar todos los micros soportados por avrdude escribiendo en una terminal:</p>
+                        <p>
+                            Si no conoces el modelo exacto de tu microcontrolador, puedes encontrarlo impreso sobre el encapsulado. Ese nombre comercial también determina el identificador que utilizaremos  con <code>avr-gcc</code>. Ignora las letras que van después del guion (como -PU o -AU), ya que solo indican el tipo de encapsulado y no afectan al compilador.Por ejemplo:
+                        </p>
 
-                        <pre><code class="language-bash"></code>avrdude -p ?</code></pre>
+                        <ul>
+                            <li><code>ATmega328P-PU, tu código es atmega328p</code></li>
+                            <li><code>ATmega88PA-PU, tu código es atmega88pa</code></li>
+                            <li><code>ATtiny85, tu código es attiny85</code></li>
+                            <li><code>ATmega16A, tu código es atmega16a</code></li>
+                        </ul>
 
-                        <p>Y nos dará un extenso listado con los códigos de los micros soportados por el grabador</p>
 
-<pre><code>
-Valid parts are:
-uc3a0512   = AT32UC3A0512
-c128       = AT90CAN128
-...
-m168       = ATmega168
-m168a      = ATmega168A
-m168p      = ATmega168P
-m168pa     = ATmega168PA
-m168pb     = ATmega168PB
-...
-m8         = ATmega8
-...
-t13        = ATtiny13
-t13a       = ATtiny13A
-...
-</code></pre>
+                        <p>Para saber exactamente cómo escribir el nombre del chip en el comando, podemos pedirle al propio compilador que muestre todos los modelos que reconoce. Ejecutamos este comando en la  terminal:</p>
 
-                    <h3>Parámetro <code>-DF_CPU=16000000UL</code></h3>
+                        <pre><code class="language-bash"></code>avr-gcc --target-help </code></pre>
+
+                        <p>Líneas abajo en la misma salida veremos una sección llamada <code>Nombres MCU conocidos:</code>. Si tu sistema aún está en inglés, aparecerá como <code>Known MCU names:</code>. Allí se listan todos los microcontroladores que el compilador reconoce y para los cuales puede generar código.</p>     
+</p>
+
+
+                    <h3>Parámetro <code>-DF_CPU=1000000UL</code></h3>
 
                         <p>
                             Este parámetro define la constante <code>F_CPU</code>, que representa la
-                            <strong>frecuencia de funcionamiento del microcontrolador expresada en hercios (Hz) </strong>. En este caso son 16 millones de HZ.
+                            <strong>frecuencia de funcionamiento del microcontrolador expresada en hercios (Hz) </strong>. En este caso son 1 millones de HZ.
                         </p>
 
                         <p>
-                            En este ejemplo, <code>16000000</code> significa que el microcontrolador funciona a
-                            <strong>16&nbsp;000&nbsp;000 ciclos por segundo</strong>, es decir,
-                            <strong>16&nbsp;MHz</strong>.
+                            En este ejemplo, <code>1000000</code> significa que el microcontrolador funciona a
+                            <strong>1&nbsp;000&nbsp;000 ciclos por segundo</strong>, es decir,
+                            <strong>1&nbsp;MHz</strong>.
                         </p>
 
                         <p>
@@ -245,8 +131,7 @@ t13a       = ATtiny13A
                         <p>
                             Muchas bibliotecas de AVR utilizan esta constante. Un ejemplo muy conocido es
                             <code>&lt;util/delay.h&gt;</code>, donde funciones como <code>_delay_ms()</code> y
-                            <code>_delay_us()</code> calculan el número de ciclos de reloj necesarios para producir el retardo
-                            solicitado.
+                            <code>_delay_us()</code> calculan el número de ciclos de reloj necesarios para producir el retardo                             solicitado.
                         </p>
 
                         <p>
@@ -264,7 +149,7 @@ t13a       = ATtiny13A
                         </p>
 
                         <p>
-                            Puede definirse tanto en el código fuente como en la línea de comandos. Ambas opciones son válidas, pero definirla desde la línea de comandos presenta una ventaja importante: el mismo archivo <code>blink.c</code> puede compilarse para distintas frecuencias sin modificar una sola línea del código.   Basta con cambiar el valor del parámetro durante la compilación.
+                            Las frecuencia del reloj puede definirse tanto en el código fuente como en la línea de comandos. Ambas opciones son válidas, pero definirla desde la línea de comandos presenta una ventaja importante: el mismo archivo <code>blink.c</code> puede compilarse para distintas frecuencias sin modificar una sola línea del código.   Basta con cambiar el valor del parámetro durante la compilación.
                         </p>
 
                         <p>
@@ -276,7 +161,7 @@ t13a       = ATtiny13A
                         <pre><code class="language-bash">avr-gcc -mmcu=atmega328p -DF_CPU=16000000UL ...</code></pre>
 
                         <p>
-                            Esto resulta especialmente útil cuando un mismo programa debe ejecutarse en placas diferentes, algunas con el oscilador interno de 8&nbsp;MHz y otras con un cristal externo de 16&nbsp;MHz.
+                            Esto resulta especialmente útil cuando un mismo programa debe ejecutarse en placas diferentes, algunas con la configuración de fábrica de 1 Mhz (con el oscilador interno dividido por 8), otras con el oscilador interno  de 8&nbsp;MHz y otras con un cristal externo de 16&nbsp;MHz.
                         </p>
 
                         <p>
@@ -289,23 +174,22 @@ t13a       = ATtiny13A
                         </ul>
 
                         <p>
-                            En consecuencia, <code>16000000UL</code> indica al compilador que el número
-                            <code>16000000</code> debe tratarse como una constante de tipo
-                            <code>unsigned long</code>. Esto evita problemas de desbordamiento y asegura que los cálculos
-                            realizados por las bibliotecas sean correctos.
+                            En consecuencia, <code>1000000UL</code> indica al compilador que el número
+                            <code>1000000</code> debe tratarse como una constante de tipo
+                            <code>unsigned long</code>. Esto evita problemas de desbordamiento y asegura que los cálculos realizados por las bibliotecas sean correctos.
                         </p>
 
                         <p>
                             Los sufijos pueden escribirse tanto en mayúsculas como en minúsculas. Por ejemplo,
-                            <code>16000000UL</code>, <code>16000000Ul</code>, <code>16000000uL</code> y
-                            <code>16000000ul</code> son equivalentes para el compilador. Sin embargo, por legibilidad y porque es la forma utilizada en la documentación de AVR-LibC y en la mayoría de los ejemplos, es recomendable escribir siempre <code>16000000UL</code>.
+                            <code>1000000UL</code>, <code>1000000Ul</code>, <code>1000000uL</code> y
+                            <code>1000000ul</code> son equivalentes para el compilador. Sin embargo, por legibilidad y porque es la forma utilizada en la documentación de AVR-LibC y en la mayoría de los ejemplos, es recomendable escribir siempre <code>1000000UL</code>.
                         </p>
 
                         <p>
-                            En cambio, expresiones como <code>16MHz</code>, <code>16Mhz</code>,
-                            <code>16mhz</code>, <code>16MHZ</code> o cualquier otra variante similar
+                            En cambio, expresiones como <code>1MHz</code>, <code>1Mhz</code>,
+                            <code>1mhz</code>, <code>1MHZ</code> o cualquier otra variante similar
                             <strong>no son válidas</strong>. El compilador espera un valor numérico que represente la frecuencia en hercios, no un texto con unidades. La forma correcta de expresar 16&nbsp;MHz es
-                            <code>16000000UL</code>.
+                            <code>1000000UL</code>.
                         </p>
 
                     <h3>Parámetro <code>-Os</code></h3>
@@ -351,7 +235,7 @@ t13a       = ATtiny13A
             </section>
             
             <section>
-                <h2>GENERAR EL ARCHIVO HEX</h2>
+                <h2>3. GENERAR EL ARCHIVO HEX</h2>
 
                 <pre><code class="language-bash">avr-objcopy -O ihex blink.elf blink.hex</code></pre>
 
@@ -452,7 +336,19 @@ t13a       = ATtiny13A
             </section>
 
             <section>
-                <h2>4. PROGRAMAR EL MICROCONTROLADOR</h2>
+                
+
+                <h2>4. COMPROBAR EL TAMAÑO DEL PROGRAMA</h2>
+                <pre><code class="language-bash">avr-size blink.elf</code></pre>
+
+                <pre><code>text    data    bss    dec    hex
+                156       0      0     156     9c</code></pre>
+
+                    <p>Esta información permite comprobar cuánta memoria Flash y SRAM utiliza el programa, algo muy importante cuando se trabaja con microcontroladores de recursos limitados.</p>
+            </section>
+
+            <section>
+                <h2>5. PROGRAMAR EL MICROCONTROLADOR</h2>
                     <pre><code class="language-bash">avrdude -c usbasp -p m328p -U flash:w:blink.hex</code></pre>
 
                     <p><code>avrdude</code> es la utilidad encargada de comunicarse con el programador y, a través de él, con el microcontrolador. Además de escribir la memoria Flash, también puede leer la EEPROM, consultar la firma del dispositivo y modificar los fusibles.</p>
@@ -470,7 +366,42 @@ t13a       = ATtiny13A
                                 <li><strong>blink.hex</strong>: es el archivo que contiene el programa que será grabado en la memoria Flash. En el paso anterior generamos este archivo a partir de <code>blink.elf</code> mediante <code>avr-objcopy</code>. Durante la programación, <code>avrdude</code> lee su contenido y lo transfiere, a través del programador USBasp, a la memoria Flash del ATmega328P.</li>
                             </ul>
                         </ul>
+                        <h4>Qué código usar para otros microcontroladores</h4>
+                        <p>Si se utiliza un microcontrolador diferente al ATmega328P, debes reemplazar el parámetro <code>-p m328p</code> por el código correspondiente a tu dispositivo.  Para conocer todos los códigos válidos, puedes ejecutar el siguiente comando en la terminal:</p>
+<pre><code>
+avrdude -p ?
 
+Valid parts are:
+...
+
+m168       = ATmega168
+m168a      = ATmega168A
+m168p      = ATmega168P
+m168pa     = ATmega168PA
+m168pb     = ATmega168PB
+...
+m328       = ATmega328
+m328p      = ATmega328P
+m328pb     = ATmega328PB
+...
+m48        = ATmega48
+m48a       = ATmega48A
+m48p       = ATmega48P
+m48pa      = ATmega48PA
+m48pb      = ATmega48PB
+...
+m8         = ATmega8
+m8a        = ATmega8A
+m88        = ATmega88
+m88a       = ATmega88A
+m88p       = ATmega88P
+m88pa      = ATmega88PA
+m88pb      = ATmega88PB
+...
+t13        = ATtiny13
+t13a       = ATtiny13A
+...
+</code></pre>
                         <p>
                             Una vez finalizada la grabación, el microcontrolador conserva el programa en su memoria Flash incluso aunque se desconecte la alimentación. Cuando vuelva a encenderse o se reinicie, comenzará a ejecutar el programa almacenado desde la dirección inicial de la memoria.
                         </p>
@@ -478,7 +409,7 @@ t13a       = ATtiny13A
             </section>
             
             <section>
-                <h2>4. INTERPRETANDO LA SALIDA DE AVRDUDE</h2>
+                <h2>6. INTERPRETANDO LA SALIDA DE AVRDUDE</h2>
                 <pre><code>avrdude: AVR device initialized and ready to accept instructions
 avrdude: device signature = 0x1e950f (probably m328p)
 avrdude: erasing chip
@@ -490,18 +421,7 @@ avrdude done. Thank you.</code></pre>
                     <p>Estos mensajes indican que la comunicación fue correcta, la firma del microcontrolador coincide con la esperada, la memoria Flash fue borrada, el programa se grabó correctamente y la verificación confirmó que los datos escritos coinciden exactamente con el archivo HEX.</p>
             </section>
             
-            <section>
-                <h2>5. EL AVISO «cannot set sck period»</h2>
-                    <p>Algunos USBasp antiguos muestran el mensaje <code>cannot set sck period</code>. Aunque aparece la palabra «error», normalmente solo indica que el firmware del programador no soporta el ajuste dinámico de la frecuencia SCK. Si posteriormente la memoria se escribe y verifica correctamente, el aviso puede ignorarse.</p>
-
-                <h2>6. COMPROBAR EL TAMAÑO DEL PROGRAMA</h2>
-                <pre><code class="language-bash">avr-size blink.elf</code></pre>
-
-                <pre><code>text    data    bss    dec    hex
-                156       0      0     156     9c</code></pre>
-
-                    <p>Esta información permite comprobar cuánta memoria Flash y SRAM utiliza el programa, algo muy importante cuando se trabaja con microcontroladores de recursos limitados.</p>
-            </section>
+            
 
             <section>
                 <h2>RESUMEN</h2>

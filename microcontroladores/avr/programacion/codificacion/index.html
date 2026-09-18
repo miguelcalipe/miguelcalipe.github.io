@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Como Escribir Firmware para Microcontroladores AVR. Lenguaje C | MC Mundo Tech</title>
+    <meta name="description" content="El primer paso consiste en escribir el programa que ejecutará el microcontrolador. En este artículo utilizaremos el lenguaje <strong>C</strong>, ya que es el lenguaje más utilizado para desarrollar aplicaciones sobre microcontroladores AVR. Aunque existen otros lenguajes y herramientas que permiten programarlos, prácticamente toda la documentación, ejemplos y bibliotecas oficiales están pensadas para C. ">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>FIRMWARE PARA MICROCONTROLADORES AVR</h1>
+            
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   -->
+            
+            <section> 
+            
+            <section>
+                <h2>1. ESCRIBIR EL PROGRAMA</h2>
+
+                <p>
+                    El primer paso consiste en escribir el programa que ejecutará el microcontrolador. En este
+                    artículo utilizaremos el lenguaje <strong>C</strong>, ya que es el lenguaje más utilizado para
+                    desarrollar aplicaciones sobre microcontroladores AVR. Aunque existen otros lenguajes y
+                    herramientas que permiten programarlos, prácticamente toda la documentación, ejemplos y
+                    bibliotecas oficiales están pensadas para C.
+                </p>
+
+                <p>
+                    El programa lo guardaremos en un <strong>archivo de código fuente</strong> cuya extensión es
+                    <code>.c</code>. Este archivo almacena el código escrito por el programador en un formato de texto
+                    plano. Dicho de otra manera, es un archivo legible por una persona, pero todavía incomprensible
+                    para el microcontrolador. Más adelante será el compilador quien se encargue de traducirlo al
+                    lenguaje máquina.
+                </p>
+
+                <p>
+                    Para escribir el programa puedes utilizar cualquier editor de texto. En GNU/Linux existen muchas
+                    alternativas, como <code>nano</code>, <code>vim</code>, <code>emacs</code>, Visual Studio Code,
+                    Geany o incluso un editor gráfico sencillo como Gedit. En este artículo utilizaremos
+                    <code>nano</code>, ya que está instalado por defecto en la mayoría de distribuciones y resulta
+                    muy fácil de usar desde la línea de comandos.
+                </p>
+
+                <p>
+                    Antes de crear el archivo conviene abrir una terminal y situarse en la carpeta donde deseamos
+                    guardar el proyecto. Puedes crear una carpeta específica para tus programas AVR o utilizar
+                    cualquier directorio de trabajo. Por ejemplo:
+                </p>
+
+                <pre><code class="language-bash">mkdir avr && cd avr</code></pre>
+
+                <p>
+                    Todos los archivos que vayamos creando durante el desarrollo (código fuente, archivos objeto,
+                    ejecutables y archivos para programar el microcontrolador) se generarán dentro de esta carpeta que hemos denominado avr (puede ser cualquier otro nombre). Esto permite mantener todos los archivos relacionados con el proyecto en un solo lugar, lo que facilita mantener organizado el proyecto.
+                </p>
+
+                <p>
+                    Una vez dentro del directorio de trabajo, creamos un nuevo archivo llamado
+                    <code>blink.c</code> ejecutando:
+                </p>
+
+                <pre><code class="language-bash">nano blink.c</code></pre>
+
+                <p>
+                    Al hacerlo, <code>nano</code> abrirá un archivo nuevo. Si el archivo ya existía, simplemente lo
+                    abrirá para editarlo.
+                </p>
+
+                <p>
+                    Escribimos entonces el siguiente programa:
+                </p>
+
+                <pre><code class="language-c">
+    #include &lt;avr/io.h&gt;
+    #include &lt;util/delay.h&gt;
+
+    int main(void)
+    {
+        DDRB |= (1 &lt;&lt; DDB1);      // PB1 como salida
+
+        while (1)
+        {
+            PORTB ^= (1 &lt;&lt; PORTB1);
+            _delay_ms(300);
+        }
+    }</code></pre>
+
+                <p>
+                    Una vez terminado, debemos guardar el archivo. En <code>nano</code> se hace presionando
+                    <kbd>Ctrl</kbd> + <kbd>O</kbd> (de <em>Write Out</em>). El editor mostrará el nombre del archivo,
+                    en este caso <code>blink.c</code>. Simplemente presionamos <kbd>Enter</kbd> para confirmar.
+                    Después salimos del editor con <kbd>Ctrl</kbd> + <kbd>X</kbd>.
+                </p>
+
+                <p>
+                    El nombre del archivo puede ser cualquiera siempre que termine con la extensión
+                    <code>.c</code>. Por ejemplo, <code>led.c</code>, <code>contador.c</code>,
+                    <code>prueba.c</code> o <code>main.c</code>. En este artículo utilizaremos el nombre
+                    <code>blink.c</code> porque el programa hace parpadear un LED.
+                </p>
+                
+                <p>
+                    En este punto únicamente hemos creado el <strong>código fuente</strong>. Es decir, un archivo de
+                    texto que contiene instrucciones escritas en lenguaje C. Todavía no existe un programa que el
+                    microcontrolador pueda ejecutar. En el siguiente paso utilizaremos el compilador
+                    <code>avr-gcc</code>, que traducirá este código fuente a lenguaje máquina para el
+                    un dispositivo de la serie .
+                </p>
+            </section>
+          
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>

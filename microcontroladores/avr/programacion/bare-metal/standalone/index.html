@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circuito Mínimo. μMC Standalone | MC Mundo Tech</title>
+    <meta name="description" content="Este artículo muestra como hacer las conecciones del microcontrolador AVR con un circuito mínimo para que pueda funciona independientemente, <em>standalone</em>, fuera de cualquier placa de desarrollo.">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>CIRCUITO MÍNIMO. μMC STANDALONE</h1>
+            
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   -->
+            
+            <section>   
+            <h2>INTRODUCCIÓN</h2>
+                <p>
+                    Este artículo muestra directamente como hacer las conexiones de los microcontrolador AVR de la serie ATmega48A/PA/88A/PA/168A/PA/328/P, con un circuito mínimo para que pueda funcionar independientemente, <em>standalone</em> es decir, fuera de cualquier placa de desarrollo.
+                </p>   
+
+               
+
+                <p>
+                    El recorrido que estudiaremos es:
+                </p>
+                <img src="/microcontroladores/avr/programacion/bare-metal/standalone/img/ejemplo.jpeg"
+                    alt="Ejemplo Bare metal para encender un LED" 
+                    title="Diagrama de flujo del ejemplo de encendido de un LED en un ATmega168"
+                    class="imagen-centrada">                       
+            </section>
+            
+            <section>
+                <h2>1. LA SERIE ATmega48A/PA/88A/PA/168A/PA/328/P</h2>
+                <p>
+                    Para el diseño o prueba de un proyecto electrónico podemos utilizar una placa de desarrollo, pero en su prototipado o implementación no podemos dejar una tarjeta de desarrollo como Arduino Uno o Arduino Nano como parte del circuito porque haría caro el proyecto y demasiado voluminoso. Para ello debemos montarlo en un circuito con los componentes mínimos necesarios para que el microcontrolador funcione de forma independiente, <em>standalone</em>.
+                </p>
+                <p>
+                    En este proyecto utilizaremos un microcontrolador ATmega168P. Como  hemos visto anteriormente, los microcontroladores de la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> tienen características similares y difieren sólo en el tamaño se la memoria, soporte de bootloader, y el tamaño de los vectores de interrupción. La siguiente tabla resume estas características.</strong>. </p>
+                </p>
+                
+                <div class="table-container">
+                    <table>
+  <thead>
+    <tr style="background-color: #f2f2f2;">
+      <th>Microcontrolador</th>
+      <th>Memoria Flash</th>
+      <th>SRAM</th>
+      <th>EEPROM</th>
+      <th>Soporte Bootloader</th>
+      <th>Firma Digital (Signature)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>ATmega48P</strong></td>
+      <td>4 KB</td>
+      <td>512 B</td>
+      <td>256 B</td>
+      <td>No (Solo ISP)</td>
+      <td><code>0x1E 0x92 0x0A</code></td>
+    </tr>
+    <tr>
+      <td><strong>ATmega88P</strong></td>
+      <td>8 KB</td>
+      <td>1 KB</td>
+      <td>512 B</td>
+      <td>Sí</td>
+      <td><code>0x1E 0x93 0x0F</code></td>
+    </tr>
+    <tr>
+      <td><strong>ATmega168P</strong></td>
+      <td>16 KB</td>
+      <td>1 KB</td>
+      <td>512 B</td>
+      <td>Sí</td>
+      <td><code>0x1E 0x94 0x0B</code></td>
+    </tr>
+    <tr>
+      <td><strong>ATmega328P</strong></td>
+      <td>32 KB</td>
+      <td>2 KB</td>
+      <td>1 KB</td>
+      <td>Sí</td>
+      <td><code>0x1E 0x95 0x0F</code></td>
+    </tr>
+  </tbody>
+</table>
+                </div>
+            <h2>2. COMPRENSION DEL PINOUT DE LA SERIE  ATmega48A/PA/88A/PA/168A/PA/328/P </h2>
+                <p>
+                El pinout o patillaje del dispositivo lo podemos ver en la siguiente imagen del datasheet de la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> que brinda Microchip
+            </p>
+
+            <img src="/microcontroladores/avr/programacion/bare-metal/standalone/img/pinout.png"
+            alt="Pinout de la serie ATmega48A/PA/88A/PA/168A/PA/328/P"
+            title="Pinout de los microcontroladores de la serie ATmega48A/PA/88A/PA/168A/PA/328/P"
+            class="imagen-centrada"> 
+
+            <p>
+                Para un ATmega de esta serie utilizado de forma independiente, hay que identificar como mínimo:
+            </p>
+
+            <ul>
+                <li> VCC ────► Pin 7 </li>
+                <li> GND ────► Pin 8 y pin 22</li>
+                <li> AVCC ────► Pin 20 </li>
+                <li> AREF ────► Pin 21 </li>
+                <li> RESET ────► Pin 1 </li>
+                <li> XTAL1 ◄──► Pin 9 </li>
+                <li> XTAL2 ◄──► Pin 10 </li>
+            </ul>
+
+            <p>
+                Una vez conocido el pinout, podemos montar el microcontrolador directamente en una placa de pruebas o en una PCB. Esto es lo que normalmente se denomina una configuración standalone: el ATmega funciona como el microcontrolador principal del circuito y no depende de una placa Arduino para ejecutar el programa.
+
+            </p>
+
+                <h2>3. ALIMENTACIÓN DEL MICROCONTROLADOR</h2>
+
+                    <p>El primer paso consiste en conectar correctamente la alimentación del microcontrolador:</p>
+
+                    <p>
+                        VCC y AVCC deben conectarse a la tensión de alimentación correspondiente y GND a la referencia del circuito. La familia ATmega48A/88A/168A/328P admite, según las condiciones especificadas en la hoja de datos, un rango amplio de alimentación especificado entre 1,8 V y 5,5 V.
+
+                    </p>
+
+                    <ul>
+                        <li><strong>VCC (pin 7)</strong> → positivo de la alimentación.</li>
+                        <li><strong>AVCC (pin 20)</strong> → positivo de la alimentación.</li>
+                        <li><strong>GND (pin 8)</strong> → tierra.</li>
+                        <li><strong>GND (pin 22)</strong> → tierra.</li>
+                    </ul>
+
+                    <p>AVCC debe conectarse a VCC incluso si el programa no utiliza el convertidor analógico-digital (ADC), ya que este pin también está relacionado con la alimentación del puerto C.</p>
+
+
+                        <img src="/microcontroladores/avr/programacion/bare-metal/standalone/img/alimentacion-atmega168.jpeg"
+                            alt="Alimentación del ATmega168 en protoboard"
+                            title="Conexión de VCC, AVCC y GND del ATmega168"
+                            class="imagen-centrada">
+
+                <h2>4. CONDENSADORES DE DESACOPL0</h2>
+
+                    <p>Se recomienda colocar dos condensadores cerámicos de <strong>100 nF</strong> entre VCC y GND y entre AVCC y GND, situados lo más cerca posible del microcontrolador. Su función es reducir las pequeñas perturbaciones de la tensión de alimentación producidas por los cambios de corriente internos del microcontrolador.</p>
+
+                        <img src="/microcontroladores/avr/programacion/bare-metal/standalone/img/2-Atemega168_bb.png"
+                            alt="Condensador de desacoplo del ATmega168"
+                            title="Condensador cerámico de 100 nF entre VCC y GND"
+                            class="imagen-centrada">
+
+                <h2>5. CONEXIÓN DEL RESET</h2>
+
+                    <p>El pin <strong>RESET (pin 1)</strong> debe mantenerse normalmente en nivel alto para que el microcontrolador pueda ejecutar el programa. Para ello, se conecta una resistencia de aproximadamente <strong>10 kΩ entre RESET y VCC</strong>.</p>
+
+                    <p>La resistencia actúa como <em>pull-up</em> y evita que el pin RESET quede flotante, reduciendo la posibilidad de reinicios provocados por perturbaciones eléctricas.</p>
+
+                    <div class="imagen-centrada">
+                        <img src="/microcontroladores/avr/programacion/bare-metal/standalone/img/reset-atmega168.png"
+                            alt="Resistencia pull-up de 10 kΩ en el pin RESET del ATmega168"
+                            title="Resistencia de 10 kΩ entre RESET y VCC"
+                            class="imagen-centrada">
+                    </div>
+                <h2>6. ESTABLECER EL ORIGEN DE LA SEÑAL DE RELOJ DEL MICROCONTROLADOR</h2>
+                <p>
+                    El reloj es la referencia temporal utilizada por el núcleo AVR y por muchos de sus periféricos. Determina la velocidad de ejecución de las instrucciones y la frecuencia de funcionamiento de los temporizadores, el ADC y otros periféricos. El reloj puede provenir de un oscilador interno o de un cristal externo.
+                </p>
+                 <p>
+                    A partir de aquí aparecen dos posibilidades:
+                </p>
+                    <ul>
+                        <li>Utilizar el reloj interno, reduciendo el circuito externo.</li>
+                        <li>Utilizar un cristal o resonador externo, conectándolo a XTAL1 y XTAL2 según las condiciones de la hoja de datos.</li>
+                    </ul>
+
+                    <p>
+                        Elegir entre oscilador interno o externo es la decisión central para establecer la señal de reloj de un microcontrolador. Al seleccionar el tipo de oscilador, estás definiendo cuál será el origen físico que generará los impulsos eléctricos (latidos) que marcan el ritmo de trabajo de la CPU y los periféricos del chip.
+                    </p>
+                    <p>
+                        De fábrica, los microcontroladores de la serie ATmega48A/PA/88A/PA/168A/PA/328/P vienen configurados para priorizar la compatibilidad y la seguridad en la primera conexión. El chip arranca utilizando su oscilador RC interno calibrado a 8.0 MHz, pero con el fusible de división por ocho (CKDIV8) activado por defecto. Esto reduce la frecuencia real del reloj del sistema a 1.0 MHz. El fabricante elige esta velocidad tan baja deliberadamente para garantizar que cualquier programador de bajo costo (como un USBasp o un Arduino como ISP) pueda comunicarse con el dispositivo nada más sacarlo de la caja, sin riesgo de fallos por desincronización. Una vez que establezcas la comunicación inicial, puedes reprogramar los fusibles CKSEL y CKDIV8 para desactivar este divisor o para conmutar a un cristal de cuarzo externo si tu aplicación requiere mayor velocidad o precisión en el tiempo. 
+                    </p>
+
+                   
+                    <p>
+                        Para que el microcontrolador funcione a 8 MHz, es necesario reconfigurar los fuses para desactivar la división por 8. Esto se puede hacer mediante un programador ISP como el USBasp y el software AVRDUDE, que permite modificar los fuses del microcontrolador. Para hacerlo puedes consultar la sección de programación de fuses en este sitio.
+                    </p>
+                    <p>
+                        Si deseamos utilizar un cristal externo para obtener una mayor precisión en la frecuencia del reloj, entonces sí será necesario conectar el cristal y sus condensadores asociados. O si el microcontrolador ya ha sido configurado previamente para usar un cristal externo, entonces también será necesario conectar el cristal y sus dos capacitores de 22 pF para que el microcontrolador pueda arrancar correctamente.
+                    </p>
+                      
+                    <p>
+                        Si el circuito embebido requiere una alimentación externa, el USBasp y el circuito deben compartir la misma referencia de tierra (GND).
+                    </p>
+
+                    <h2>4. CONEXIÓN DEL CIRCUITO EMBEBIDO</h2>
+
+                    <p>
+                        Una vez establecidas las conexiones básicas del microcontrolador y conectado el programadoer USBasp, podemos conectar el ciruito del proyecto, en este caso el LED que utilizaremos para comprobar el funcionamiento del programa.
+                    </p>
+
+                    <p>El LED no debe conectarse directamente al pin PB0 sin una resistencia. La resistencia limita la corriente que circula por el LED y protege tanto al LED como al circuito de salida del microcontrolador.</p>
+
+                    <p>Una conexión sencilla es:</p>
+
+                    <p><strong>PB0 (pin 14) → resistencia de 220 Ω → LED → GND</strong></p>
+
+                    <p>Cuando PB0 se encuentra en nivel alto, existe una diferencia de potencial entre el pin y GND. Esta diferencia de potencial hace que circule corriente a través de la resistencia y del LED, provocando que el LED emita luz.</p>
+
+                    <div class="imagen-centrada">
+                        <img src="/microcontroladores/avr/programacion/bare-metal/standalone/img/LedAtmega168_bb.png"
+                            alt="LED conectado al pin PB0 del ATmega168"
+                            title="LED conectado a PB0 mediante una resistencia de 220 ohmios"
+                            class="imagen-centrada">
+                    </div>
+
+                    <p>La resistencia de <strong>220 Ω</strong> es solamente un valor de ejemplo. El valor adecuado depende de la tensión de alimentación, de la caída de tensión del LED y de la corriente que se quiera hacer circular. En todos los casos deben respetarse las especificaciones eléctricas del microcontrolador, especialmente los límites de corriente de sus pines.</p>
+
+                    <p>Al integrar las conexiones anteriores obtenemos el circuito mínimo del ATmega168 para este ejemplo: alimentación, desacoplo, resistencia de <em>pull-up</em> en RESET y LED conectado a PB0. El microcontrolador puede funcionar de forma independiente en la protoboard utilizando su oscilador interno.</p>
+
+                        <img src="/microcontroladores/avr/programacion/bare-metal/standalone/img/completoAtemega168_bb.png"
+                            alt="Circuito completo del ATmega168 standalone en protoboard"
+                            title="Circuito mínimo del ATmega168 standalone con LED en PB0"
+                            class="imagen-centrada">       
+            </section>
+            
+            
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>
