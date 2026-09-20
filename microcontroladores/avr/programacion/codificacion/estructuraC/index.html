@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estructura de un programa en C para AVR | MC Mundo Tech</title>
+    <meta name="description" content="Lo importante es comprender qué papel cumple cada parte: el código situado antes de <code>main()</code> prepara las declaraciones y definiciones que utilizará el programa; <code>main()</code> organiza la ejecución de la aplicación; y el <code>while(1)</code> mantiene funcionando continuamente la lógica principal del sistema embebido. ">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+             <h1>ESTRUCTURA DE UN PROGRAMA EN C PARA AVR</h1>
+            
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   -->
+
+<section>
+<h2>INTRODUCCIÓN</h2>
+
+<p>
+En este artículo vamos a comprender cómo se organiza un programa para un microcontrolador AVRescrito en lenguaje C.
+</p>
+<p> 
+Cuando se trabaja con un AVR mediante <code>avr-gcc</code>, el programa no se estructura exactamente igual que una aplicación convencional para un computador. En un microcontrolador el código escrito en C, termina formando parte de una aplicación <i>freestanding</i>, es decir, un programa que normalmente se ejecuta sin un sistema operativo que proporcione servicios como procesos, consola, archivos o gestión de memoria.
+</p>
+
+<p>
+Aun así, el lenguaje C mantiene su estructura fundamental: existen archivos de cabecera, definiciones, declaraciones, funciones, variables y una función <code>main()</code> desde la que comienza la ejecución de la aplicación.
+</p>
+<img src="img/estructuraC.jpeg" alt="Estructura conceptual de un programa en C para AVR" class="imagen-centrada">
+
+</section>
+
+
+<section>
+<h2>1. EL ENCABEZADO DEL PROGRAMA</h2>
+
+<p>
+Un encabezado profesional incluye el nombre del proyecto, autor  una descripción del programa, siguiendo un estilo de documentación técnica seria. No forma parte del lenguaje C y se incluyen como bloques de comentario.
+</p>
+
+<pre><code>/*
+ * ============================================================
+ * Proyecto : C. Programación AVR – Secuencia de LEDs con barrido
+ * Archivo  : led_sequence.c
+ * Autor    : Miguel Calisaya
+ * Fecha    : 2026
+ *
+ * Descripción:
+ * Programa en lenguaje C para microcontroladores AVR que
+ * configura el puerto D como salida y genera una secuencia
+ * de encendido de LEDs activos en nivel bajo, realizando un
+ * barrido ascendente y descendente mediante operaciones
+ * de manipulación de bits.
+ *
+ * Microcontrolador objetivo:
+ * - AVR de 8 bits (ej. ATmega88PA, ATmega328P)
+ *
+ * Compilador:
+ * - avr-gcc
+ *
+ * ============================================================
+ */</code></pre>
+</section>
+
+
+<section>
+<h2>2. ESTRUCTURA CONCEPTUAL DE UN PROGRAMA AVR</h2>
+
+<p>
+Para trabajar con microcontroladores AVR no es necesario memorizar esta estructura como si fuera una plantilla rígida; no es una sintaxis obligatoria de C. Pero si nos ofrece un esquema de como se organiza un programa coodificado en lenguaje C. 
+</p>
+
+<p>
+Lo importante es comprender qué papel cumple cada parte: el código situado antes de <code>main()</code> prepara las declaraciones y definiciones que utilizará el programa; <code>main()</code> organiza la ejecución de la aplicación; y el <code>while(1)</code> mantiene funcionando continuamente la lógica principal del sistema embebido.
+</p>
+
+<p>
+Una estructura conceptual habitual puede representarse así:
+</p>
+
+<pre><code>[preambulo]
+
+[directivas de inclusión]
+[definiciones y constantes]
+[declaración de tipos]
+[variables globales]
+[declaración de funciones]
+
+int main(void)
+{
+    [declaración de variables locales]
+
+    [inicialización]
+
+    [configuración del microcontrolador]
+
+    while (1)
+    {
+        [código que se ejecuta continuamente]
+    }
+
+    [finalización]
+
+    return (0);
+}
+
+[definición de funciones]</code></pre>
+
+<p>
+Esta estructura no es una obligación sintáctica de C. Es una forma ordenada de organizar un programa, especialmente útil cuando el código comienza a crecer.
+</p>
+</section>
+
+<section>
+<h2>3. EL PREÁMBULO DEL PROGRAMA</h2>
+
+<p>
+En muchos ejemplos de programación se denomina preámbulo a la parte situada antes de <code>main()</code>. Es una denominación útil desde el punto de vista didáctico. 
+</p>
+
+<p>
+En esa zona pueden aparecer diferentes elementos:
+</p>
+
+<pre><code>Programa C
+│
+├── Inclusión de cabeceras
+├── Definiciones y constantes
+├── Declaración de tipos
+├── Variables globales
+└── Declaración de funciones</code></pre>
+
+<p>
+Cada uno cumple una función diferente.
+</p>
+
+<h3>3.1. Inclusión de archivos de cabecera: <code>#include</code></h3>
+
+<p>
+La directiva:
+</p>
+
+<pre><code>#include</code></pre>
+
+<p>
+indica al preprocesador de C que debe incorporar el contenido de un archivo de cabecera en ese punto del código fuente.
+</p>
+
+<p>
+En un programa AVR aparecen con frecuencia:
+</p>
+
+<pre><code>#include &lt;avr/io.h&gt;
+#include &lt;util/delay.h&gt;</code></pre>
+
+<h4>3.1.1. avr/io.h</h4>
+
+<pre><code>#include &lt;avr/io.h&gt;</code></pre>
+
+<p>
+Es una de las cabeceras fundamentales cuando se programa un AVR utilizando <code>avr-gcc</code>.
+</p>
+
+<p>
+Proporciona las definiciones específicas del dispositivo seleccionado para la compilación.
+</p>
+
+<p>
+Entre otras cosas, permite utilizar nombres simbólicos correspondientes a registros y bits del microcontrolador.
+</p>
+
+<p>
+Por ejemplo:
+</p>
+
+<pre><code>DDRD
+PORTD
+PIND
+PD0
+PD1</code></pre>
+
+<p>
+En lugar de tener que trabajar directamente con direcciones numéricas.
+</p>
+
+<p>
+El contenido concreto que proporciona <code>avr/io.h</code> depende del dispositivo AVR seleccionado mediante las opciones de compilación.
+</p>
+
+<p>
+Por eso no debe pensarse en <code>avr/io.h</code> como una tabla universal idéntica para todos los AVR. La cabecera incluye las definiciones correspondientes al microcontrolador que se está compilando.
+</p>
+
+<h4>3.1.2. util/delay.h</h4>
+
+<pre><code>#include &lt;util/delay.h&gt;</code></pre>
+
+<p>
+Proporciona funciones de retardo como:
+</p>
+
+<pre><code>_delay_ms()</code></pre>
+
+<p>
+y:
+</p>
+
+<pre><code>_delay_us()</code></pre>
+
+<p>
+Por ejemplo:
+</p>
+
+<pre><code>_delay_ms(100);</code></pre>
+
+<p>
+solicita un retardo de aproximadamente 100 ms.
+</p>
+
+<p>
+Estas funciones son especialmente útiles en programas de aprendizaje y en aplicaciones sencillas.
+</p>
+
+<p>
+Sin embargo, es importante comprender que se trata de retardos bloqueantes. Mientras se ejecuta el retardo, el flujo normal del programa permanece dentro de esa función y no continúa con las instrucciones siguientes.
+</p>
+
+<p>
+Además, el funcionamiento de estos retardos depende de que la frecuencia de reloj utilizada por el compilador esté correctamente definida.
+</p>
+
+<h3>3.2. Definiciones y constantes</h3>
+
+<p>
+Después de las cabeceras pueden aparecer definiciones mediante el preprocesador.
+</p>
+
+<p>
+Por ejemplo:
+</p>
+
+<pre><code>#define LED_DELAY 100</code></pre>
+
+<p>
+Esto permite utilizar un nombre simbólico en lugar de repetir directamente un valor:
+</p>
+
+<pre><code>_delay_ms(LED_DELAY);</code></pre>
+
+<p>
+También pueden definirse máscaras de bits:
+</p>
+
+<pre><code>#define LED_PIN PB0</code></pre>
+
+<p>
+El uso de nombres simbólicos mejora la legibilidad y facilita modificar posteriormente determinados valores.
+</p>
+
+<p>
+Debe distinguirse una macro definida mediante <code>#define</code> de una variable de C. Una macro es procesada por el preprocesador antes de que el compilador analice el programa.
+</p>
+
+<h3>3.3. Declaración de tipos</h3>
+
+<p>
+Un programa puede necesitar declarar tipos propios mediante mecanismos como:
+</p>
+
+<pre><code>typedef</code></pre>
+
+<p>
+o:
+</p>
+
+<pre><code>struct</code></pre>
+
+<p>
+Por ejemplo:
+</p>
+
+<pre><code>typedef struct
+{
+    uint8_t estado;
+    uint8_t contador;
+} dispositivo_t;</code></pre>
+
+<p>
+En programas pequeños para AVR probablemente esta sección no aparezca. En aplicaciones mayores puede ser útil para organizar estructuras de datos y representar estados de periféricos o módulos del sistema.
+</p>
+
+<h3>3.4. Variables globales</h3>
+
+<p>
+También pueden declararse variables fuera de cualquier función:
+</p>
+
+<pre><code>uint8_t contador;</code></pre>
+
+<p>
+Una variable declarada en este ámbito tiene duración de almacenamiento estática y puede ser utilizada por las funciones que tengan acceso a ella.
+</p>
+
+<p>
+En sistemas embebidos las variables globales pueden ser útiles, pero deben utilizarse con criterio. Un exceso de variables globales puede dificultar comprender qué parte del programa modifica cada dato.
+</p>
+
+<p>
+Cuando una variable solamente se necesita dentro de <code>main()</code> o dentro de una función determinada, se llama variable local y normalmente es preferible declararla en ese ámbito.
+</p>
+
+<h3>3.5. Declaración de funciones</h3>
+
+<p>
+Antes de <code>main()</code> también pueden aparecer los prototipos de funciones.
+</p>
+
+<p>
+Por ejemplo:
+</p>
+
+<pre><code>void configurar_puerto(void);
+void encender_led(uint8_t pin);</code></pre>
+
+<p>
+Un prototipo informa al compilador de que existe una función, indicando:
+</p>
+
+<ul>
+    <li>su nombre;</li>
+    <li>el tipo de dato que devuelve;</li>
+    <li>los parámetros que recibe.</li>
+</ul>
+
+<p>
+La definición completa puede aparecer posteriormente:
+</p>
+
+<pre><code>void configurar_puerto(void)
+{
+    /* Código */
+}</code></pre>
+
+<p>
+Esto permite que <code>main()</code> pueda utilizar una función cuya implementación aparece más adelante en el archivo.
+</p>
+
+<p>
+Por ejemplo:
+</p>
+
+<pre><code>void configurar_puerto(void);
+
+int main(void)
+{
+    configurar_puerto();
+
+    while (1)
+    {
+    }
+
+    return 0;
+}
+
+void configurar_puerto(void)
+{
+    /* Configuración */
+}</code></pre>
+</section>
+
+
+<section>
+<h2>4. LA FUNCIÓN MAIN()</h2>
+
+<p>
+La función:
+</p>
+
+<pre><code>int main(void)</code></pre>
+
+<p>
+En muchos manuales se dice que la función <code>main()</code> es el punto de entrada de la aplicación escrita en C; esto es así pero sólo desde la perspectiva del programa en C.
+</p>
+
+<p>
+Lo cierto es que, después de un reset, existe una secuencia de código de arranque (<i>startup code</i>) que forma parte del entorno de ejecución y prepara determinadas condiciones necesarias antes de transferir el control a <code>main()</code>.
+</p>
+
+<p>
+Una forma habitual de estructurarla es:
+</p>
+
+<pre><code>int main(void)
+{
+    [inicialización]
+
+    [configuración]
+
+    while (1)
+    {
+        [funcionamiento normal]
+    }
+
+    return 0;
+}</code></pre>
+
+
+<h3>4.1. Declaración de variables locales</h3>
+
+<p>
+Las variables que solamente necesita <code>main()</code> pueden declararse dentro de la propia función:
+</p>
+
+<pre><code>int main(void)
+{
+    uint8_t contador;
+    ...
+}</code></pre>
+
+<p>
+Estas son variables locales de <code>main()</code>.
+</p>
+
+<p>
+Su ámbito está limitado a esa función.
+</p>
+
+<p>
+Esto permite separar claramente los datos que necesita una función de aquellos que deben ser accesibles desde diferentes partes del programa.
+</p>
+
+<h3>4.2. Inicialización del microcontrolador</h3>
+
+<p>
+Una vez declaradas las variables locales, normalmente se realiza la inicialización necesaria para comenzar a trabajar.
+</p>
+
+<p>
+En un programa AVR puede incluir, dependiendo de la aplicación:
+</p>
+
+<ul>
+    <li>configuración de puertos GPIO;</li>
+    <li>configuración de temporizadores;</li>
+    <li>configuración de interrupciones;</li>
+    <li>configuración de interfaces seriales;</li>
+    <li>configuración del ADC;</li>
+    <li>configuración de otros periféricos.</li>
+</ul>
+
+<p>
+Por ejemplo:
+</p>
+
+<pre><code>DDRB |= (1 &lt;&lt; PB0);</code></pre>
+
+<p>
+configura <code>PB0</code> como salida.
+</p>
+
+<p>
+La inicialización debe realizarse antes de utilizar el periférico correspondiente.
+</p>
+
+<p>
+Es importante distinguir esta inicialización realizada por nuestro programa de la inicialización realizada previamente por el código de arranque del entorno AVR.
+</p>
+
+<h3>4.3. Configuración</h3>
+
+<p>
+En programas sencillos, la inicialización y la configuración pueden parecer una misma cosa.
+</p>
+
+<p>
+Por ejemplo:
+</p>
+
+<pre><code>DDRB |= (1 &lt;&lt; PB0);</code></pre>
+
+<p>
+es simultáneamente una configuración del hardware y una operación que forma parte de la inicialización de nuestra aplicación.
+</p>
+
+<p>
+En programas más grandes puede ser útil separar conceptualmente:
+</p>
+
+<pre><code>Inicialización
+│
+├── Variables
+├── Estado inicial
+└── Hardware básico
+
+Configuración
+│
+├── GPIO
+├── Timer
+├── UART
+├── ADC
+└── Interrupciones</code></pre>
+
+<p>
+No son categorías obligatorias del lenguaje C. Son una forma de organizar el programa para hacerlo más comprensible.
+</p>
+</section>
+
+
+<section>
+<h2>5. EL BUCLE PRINCIPAL</h2>
+
+<p>
+Una característica habitual de los sistemas embebidos es que el programa debe permanecer funcionando continuamente.
+</p>
+
+<p>
+Por ello es frecuente encontrar:
+</p>
+
+<pre><code>while (1)
+{
+    /* Código principal */
+}</code></pre>
+
+<p>
+La expresión:
+</p>
+
+<pre><code>1</code></pre>
+
+<p>
+es una constante entera cuyo valor es distinto de cero.
+</p>
+
+<p>
+En una condición de C:
+</p>
+
+<pre><code>0       → falso
+≠ 0     → verdadero</code></pre>
+
+<p>
+Por tanto:
+</p>
+
+<pre><code>while (1)</code></pre>
+
+<p>
+equivale conceptualmente a decir:
+</p>
+
+<p>
+Mientras la condición sea verdadera, continúa ejecutando el bloque.
+</p>
+
+<p>
+Como <code>1</code> siempre es verdadero, el bucle no termina por sí mismo.
+</p>
+
+<h3>5.1. ¿Qué ocurre dentro del while(1)?</h3>
+
+<p>
+Aquí se encuentra normalmente el funcionamiento principal de la aplicación.
+</p>
+
+<p>
+Por ejemplo:
+</p>
+
+<pre><code>while (1)
+{
+    leer_entradas();
+    procesar_datos();
+    actualizar_salidas();
+}</code></pre>
+
+<p>
+El microcontrolador ejecuta estas operaciones una y otra vez:
+</p>
+
+<pre><code>leer entradas
+     ↓
+procesar
+     ↓
+actualizar salidas
+     ↓
+leer entradas
+     ↓
+procesar
+     ↓
+actualizar salidas
+     ↓
+...</code></pre>
+
+<p>
+Este modelo se conoce habitualmente como <i>superloop</i> o bucle principal.
+</p>
+
+<p>
+No es obligatorio utilizar este modelo en todos los programas AVR. Una aplicación puede depender fuertemente de interrupciones, temporizadores u otras técnicas. Sin embargo, el <code>while(1)</code> es una estructura fundamental en muchos programas embebidos sencillos y en numerosos ejemplos de aprendizaje.
+</p>
+
+<h3>5.2. return (0) al final de main()</h3>
+
+<p>
+La función <code>main()</code> está declarada como:
+</p>
+
+<pre><code>int main(void)</code></pre>
+
+<p>
+El tipo <code>int</code> indica que <code>main()</code> devuelve un valor entero.
+</p>
+
+<p>
+Por eso es posible encontrar:
+</p>
+
+<pre><code>return (0);</code></pre>
+
+<p>
+El valor <code>0</code> se utiliza convencionalmente para indicar una terminación normal de <code>main()</code> en programas donde ese valor tiene un receptor que lo utiliza.
+</p>
+
+<p>
+En un programa típico ejecutado bajo un sistema operativo, el proceso que ejecuta el programa puede devolver ese valor al sistema operativo.
+</p>
+
+<p>
+En un AVR utilizado como sistema embebido independiente, normalmente no existe un sistema operativo que vaya a recibir y utilizar ese valor como código de salida.
+</p>
+
+<p>
+Además, si el programa está estructurado de esta manera:
+</p>
+
+<pre><code>while (1)
+{
+    /* Código */
+}
+
+return (0);</code></pre>
+
+<p>
+la instrucción:
+</p>
+
+<pre><code>return (0);</code></pre>
+
+<p>
+no se alcanza durante la ejecución normal, porque el flujo permanece indefinidamente dentro del <code>while(1)</code>.
+</p>
+
+<p>
+Por tanto, en este tipo de programa su presencia tiene principalmente un valor relacionado con la estructura de la función <code>main()</code> y con las convenciones del código C utilizado.
+</p>
+
+<p>
+En una aplicación embebida típica, se espera que la aplicación permanezca ejecutándose indefinidamente.
+</p>
+
+<p>
+El hecho de que <code>main()</code> tenga un <code>return</code> no significa que el programa vaya a llegar necesariamente hasta él.
+</p>
+</section>
+
+
+<section>
+<h2>6. ESTRUCTURA COMPLETA DE REFERENCIA</h2>
+
+<p>
+Reuniendo todos los elementos anteriores, podemos utilizar el siguiente esqueleto como referencia para los programas AVR, en el que vamos a incluir un encabezado:
+</p>
+
+<pre><code>/*
+ * ============================================================
+ * ENCABEZADO DEL PROGRAMA
+ * ============================================================
+ */
+
+
+/* ============================================================
+ * INCLUSIÓN DE CABECERAS
+ * ============================================================
+ */
+
+#include &lt;...&gt;
+
+
+/* ============================================================
+ * DEFINICIONES Y CONSTANTES
+ * ============================================================
+ */
+
+#define ...
+
+
+/* ============================================================
+ * DECLARACIÓN DE TIPOS
+ * ============================================================
+ */
+
+
+/* ============================================================
+ * VARIABLES GLOBALES
+ * ============================================================
+ */
+
+
+/* ============================================================
+ * PROTOTIPOS DE FUNCIONES
+ * ============================================================
+ */
+
+tipo funcion1(tipo parametro);
+tipo funcion2(tipo parametro);
+
+
+/* ============================================================
+ * FUNCIÓN PRINCIPAL
+ * ============================================================
+ */
+
+int main(void)
+{
+    /* --------------------------------------------------------
+     * Variables locales
+     * --------------------------------------------------------
+     */
+
+
+    /* --------------------------------------------------------
+     * Inicialización
+     * --------------------------------------------------------
+     */
+
+
+    /* --------------------------------------------------------
+     * Configuración del hardware
+     * --------------------------------------------------------
+     */
+
+
+    /* --------------------------------------------------------
+     * Bucle principal
+     * --------------------------------------------------------
+     */
+
+    while (1)
+    {
+        /* Código que se ejecuta continuamente */
+    }
+
+
+    /* --------------------------------------------------------
+     * Finalización
+     * --------------------------------------------------------
+     */
+
+    return 0;
+}
+
+
+/* ============================================================
+ * DEFINICIÓN DE FUNCIONES
+ * ============================================================
+ */
+
+tipo funcion1(tipo parametro)
+{
+    /* Código de la función */
+}
+
+
+tipo funcion2(tipo parametro)
+{
+    /* Código de la función */
+}</code></pre>
+</section>
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>
