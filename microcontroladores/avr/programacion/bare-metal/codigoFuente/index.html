@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Escribir el Código fuente | MC Mundo Tech</title>
-    <meta name="description" content="Con el paso del tiempo han aparecido distintos niveles de abstracción cuyo objetivo es simplificar el desarrollo de software. Mientras mayor es la abstracción, menor es la cantidad de detalles del hardware que el programador necesita conocer, a costa de perder algo de control y eficiencia ">
+    <title> Del Código C al hardware: Control de una salida digital en AVR | MC Mundo Tech</title>
+    <meta name="description" content="Explica cómo un AVR transforma código C en una señal eléctrica en un pin de salida mediante instrucciones, registros y lógica digital.">
     <link rel="stylesheet" href="/assets/css/principal.css">
     <link rel="stylesheet" href="/assets/css/articulo.css">
     
@@ -30,7 +30,7 @@
     <main>        
         <article>            
             <header class="article-header">
-            <h1>ABSTRACCIÓN DEL HARDWARE</h1>
+            <h1>DEL CÓDIGO C AL HARDWARE: CONTROL DE UNA SALIDA DIGITAL EN AVR</h1>
             
             </header>
                         
@@ -41,8 +41,20 @@
 
                 <h2>INTRODUCCIÓN</h2>                
                 <p>
-                    Un ejemplo muy sencillo nos va apermitir comprender el proceso de compilación, programación y ejecución de un programa en un microcontrolador AVR. Vamos a configurar un pin de un dispositivo de la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> como salida digital y después vamos a colocar ese pin en nivel alto para encender un LED.
-                </p>
+                    Mediante un ejemplo sencillo de programación <em>Bare-Metal</em>,
+    veremos cómo un programa escrito en lenguaje C se transforma en
+    instrucciones que un microcontrolador AVR puede ejecutar. Para ello,
+    configuraremos un pin de la serie <strong>ATmega48A/PA, ATmega88A/PA, ATmega168A/PA o ATmega328/P</strong>
+    como salida digital y estableceremos su nivel lógico en alto para
+    encender un LED.
+</p>
+
+<p>
+    A lo largo del ejemplo, seguiremos el recorrido desde el código fuente
+    hasta el pin físico del microcontrolador, relacionando el programa en C
+    con los registros de configuración, las instrucciones del procesador
+    y el funcionamiento eléctrico de la salida digital.
+</p>
             </section>
 
             <section>
