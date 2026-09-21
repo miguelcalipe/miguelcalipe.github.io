@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proceso y Herramientas para la Zompilación y Programación de Microcontroladores AVR | MC Mundo Tech</title>
-    <meta name="description" content=" xxxxxx ">
+    <title>Proceso de Compilación y Programación de Microcontroladores AVR | MC Mundo Tech</title>
+    <meta name="description" content="Explica el proceso completo para transformar un programa en C en firmware para un microcontrolador AVR: preprocesamiento, compilación, ensamblado, enlazado, generación del archivo HEX y programación mediante AVRDUDE.">
     <link rel="stylesheet" href="/assets/css/principal.css">
     <link rel="stylesheet" href="/assets/css/articulo.css">
     
@@ -31,692 +31,805 @@
         <article>            
             <header class="article-header">
             <h1>PROCESO DE COMPILACIÓN Y PROGRAMACIÓN DE MICROCONTROLADORES AVR</h1>
-            </header>
-            
-            <aside id="indice"></aside>     
-            <!-- CONTENIDO DEL ARTÍCULO   -->
-            
-            <section>
-                <h2>1. INTRODUCCIÓN</h2>
-
-                <p>
-                    En este artículo describiremos los procesos que ocurren al compilar y programar microcontroladores AVR.
-                </p>
-
-                <p>
-                    A lo largo del artículo, se explicarán los pasos necesarios para compilar el código fuente, generar el archivo binario y programar el microcontrolador utilizando herramientas de línea de comandos.
-                </p>
-            <p>
-                El programa completo puede escribirse de la siguiente manera:
-            </p>
-
-                <pre><code>#include &lt;avr/io.h&gt;
-
-            int main(void)
-            {
-                DDRB |= (1 &lt;&lt; PB0);     // Configura PB0 como salida
-                PORTB |= (1 &lt;&lt; PB0);    // Coloca PB0 en nivel alto
-
-                while (1)
-                {
-                }
-            }</code></pre>
-
-                <p>
-                    El programa contiene dos operaciones importantes.
-                </p>
-
-                <p>
-                    La primera:
-                </p>
-
-                <pre><code>DDRB |= (1 &lt;&lt; PB0);</code></pre>
-
-                <p>
-                    configura PB0 como salida.
-                </p>
-
-                <p>
-                    La segunda:
-                </p>
-
-                <pre><code>PORTB |= (1 &lt;&lt; PB0);</code></pre>
-
-                <p>
-                    establece el valor lógico de salida de PB0 en uno.
-                </p>
-
-                <p>
-                    El bucle infinito:
-                </p>
-
-                <pre><code>while (1)
-            {
-            }</code></pre>
-
-                <p>
-                    evita que la función <code>main()</code> termine. Una vez configurado el pin y establecido su
-                    nivel lógico, no necesitamos ejecutar ninguna otra operación para mantener el LED encendido:
-                    el propio hardware del puerto conserva el estado de la salida.
-                </p>
-            </section>
-
-            <section>
-                <h2>3. EL PAPEL DE AVR/IO.H</h2>
-
-                <p>
-                    La primera línea del programa es:
-                </p>
-
-                <pre><code>#include &lt;avr/io.h&gt;</code></pre>
-
-                <p>
-                    Este archivo forma parte de <strong>avr-libc</strong> y proporciona las definiciones
-                    necesarias para trabajar con los registros y bits específicos del microcontrolador
-                    seleccionado durante la compilación.
-                </p>
-
-                <p>
-                    Gracias a estas definiciones podemos escribir:
-                </p>
-
-                <pre><code>DDRB
-            PORTB
-            PB0</code></pre>
-
-                <p>
-                    en lugar de tener que escribir directamente las direcciones numéricas de los registros y
-                    los números de los bits.
-                </p>
-
-                <p>
-                    Por tanto, cuando el programador escribe <code>DDRB</code>, no está creando una variable
-                    convencional almacenada en la RAM. Está haciendo referencia a un registro de hardware
-                    asociado al puerto B del microcontrolador.
-                </p>
-
-                <p>
-                    Esta distinción es fundamental para entender la programación de AVR. Una expresión como
-                    <code>PORTB |= (1 &lt;&lt; PB0)</code> parece una operación ordinaria sobre una variable,
-                    pero en realidad provoca una operación sobre un circuito electrónico situado dentro del
-                    microcontrolador.
-                </p>
-            </section>
-
-            <section>
-                <h2>4. EL COMPILADOR TRADUCE EL C A INSTRUCCIONES DE LA CPU</h2>
-
-                <p>
-                    El procesador del ATmega168 no ejecuta directamente el código C. El código escrito por el
-                    programador debe pasar por el compilador, que lo transforma en instrucciones que la CPU del
-                    AVR puede ejecutar.
-                </p>
-
-                <p>
-                    Por ejemplo, esta expresión:
-                </p>
-
-                <pre><code>DDRB |= (1 &lt;&lt; PB0);</code></pre>
-
-                <p>
-                    implica conceptualmente tres operaciones:
-                </p>
-
-                <pre><code>Leer el valor actual de DDRB
-            Modificar el bit correspondiente a PB0
-            Escribir el nuevo valor en DDRB</code></pre>
-
-                <p>
-                    Las instrucciones exactas que produzca el compilador dependen de factores como el
-                    microcontrolador seleccionado y las opciones de optimización utilizadas. Por ello, no
-                    debemos interpretar esta secuencia como una traducción literal obligatoria a tres
-                    instrucciones máquina concretas.
-                </p>
-
-                <p>
-                    Lo importante para entender el funcionamiento del hardware es que, finalmente, la CPU ejecuta
-                    instrucciones que provocan una lectura o escritura sobre el registro de hardware
-                    correspondiente.
-                </p>
-
-                <p>
-                    En este punto desaparece el nivel de abstracción del lenguaje C. La CPU trabaja con
-                    instrucciones de la arquitectura AVR y con direcciones, datos y señales internas del
-                    microcontrolador.
-                </p>
-            </section>
-
-            <section>
-                <h2>5. DDRB DETERMINA SI PB0 FUNCIONA COMO ENTRADA O COMO SALIDA</h2>
-
-                <p>
-                    El puerto B dispone de un registro denominado <strong>DDRB</strong>, cuyo nombre procede de
-                    <em>Data Direction Register B</em>.
-                </p>
-
-                <p>
-                    Cada bit de DDRB está asociado a uno de los bits del puerto B:
-                </p>
-
-                <pre><code>DDRB
-
-            Bit7 Bit6 Bit5 Bit4 Bit3 Bit2 Bit1 Bit0
-            ?    ?    ?    ?    ?    ?    ?    1</code></pre>
-
-                <p>
-                    Para PB0 nos interesa específicamente el bit 0:
-                </p>
-
-                <pre><code>DDRB0 = 1</code></pre>
-
-                <p>
-                    En los puertos GPIO del ATmega168, un bit de DDR configurado en <strong>1</strong> establece
-                    el pin correspondiente como salida. Si estuviera configurado en <strong>0</strong>, el pin
-                    funcionaría como entrada.
-                </p>
-
-                <p>
-                    Por eso:
-                </p>
-
-                <pre><code>DDRB |= (1 &lt;&lt; PB0);</code></pre>
-
-                <p>
-                    significa, en términos funcionales:
-                </p>
-
-                <pre><code>Conservar los demás bits de DDRB
-            y poner a 1 el bit DDRB0.</code></pre>
-
-                <p>
-                    El operador <code>|=</code> es importante porque permite modificar PB0 sin alterar
-                    accidentalmente la configuración de los demás pines del puerto B.
-                </p>
-            </section>
-
-            <section>
-                <h2>6. LA ESCRITURA EN DDRB LLEGA AL CIRCUITO DEL PUERTO</h2>
-
-                <p>
-                    Cuando la CPU escribe un nuevo valor en DDRB, ese valor no queda simplemente almacenado para
-                    ser utilizado posteriormente por el software. El contenido del registro está conectado
-                    funcionalmente con la lógica interna del puerto.
-                </p>
-
-                <p>
-                    Al quedar:
-                </p>
-
-                <pre><code>DDRB0 = 1</code></pre>
-
-                <p>
-                    la lógica de control del puerto configura el circuito asociado a PB0 para trabajar como
-                    salida.
-                </p>
-
-                <p>
-                    Es importante expresar correctamente qué significa esto. No se trata simplemente de que un
-                    interruptor interno "desconecte una entrada y conecte una salida". El circuito de cada pin
-                    dispone de lógica de entrada, lógica de salida y circuitos de control que determinan cómo se
-                    conecta funcionalmente el pin con esas estructuras internas.
-                </p>
-
-                <p>
-                    Para nuestro ejemplo, el resultado práctico es que el circuito de salida de PB0 queda
-                    habilitado.
-                </p>
-
-                <p>
-                    Sin embargo, en este momento todavía no hemos ordenado al pin que adopte un nivel alto.
-                    Hemos definido únicamente su <strong>dirección</strong>.
-                </p>
-            </section>
-
-            <section>
-                <h2>7. PORTB DETERMINA EL VALOR DE LA SALIDA</h2>
-
-                <p>
-                    Una vez configurado PB0 como salida, debemos establecer qué nivel lógico queremos que
-                    aparezca en el pin.
-                </p>
-
-                <p>
-                    Para ello utilizamos el registro <strong>PORTB</strong>.
-                </p>
-
-                <p>
-                    La instrucción:
-                </p>
-
-                <pre><code>PORTB |= (1 &lt;&lt; PB0);</code></pre>
-
-                <p>
-                    coloca a uno el bit 0 de PORTB.
-                </p>
-
-                <p>
-                    Conceptualmente, después de la escritura tenemos:
-                </p>
-
-                <pre><code>PORTB
-
-            Bit7 Bit6 Bit5 Bit4 Bit3 Bit2 Bit1 Bit0
-            ?    ?    ?    ?    ?    ?    ?    1</code></pre>
-
-                <p>
-                    El significado de los demás bits dependerá de cómo estén configurados y utilizados los
-                    otros pines del puerto. Para nuestro ejemplo solo nos interesa <code>PORTB0</code>.
-                </p>
-
-                <p>
-                    Cuando PB0 está configurado como salida, el valor almacenado en el bit correspondiente de
-                    PORTB determina el nivel que el circuito de salida intenta establecer en el pin.
-                </p>
-
-                <p>
-                    Por tanto:
-                </p>
-
-                <pre><code>DDRB0 = 1
-            PORTB0 = 1</code></pre>
-
-                <p>
-                    representa, funcionalmente:
-                </p>
-
-                <pre><code>PB0 configurado como salida
-            PB0 conducido a nivel alto</code></pre>
-            </section>
-
-            <section>
-                <h2>8. PORTB Y EL LATCH DE SALIDA</h2>
-
-                <p>
-                    Para comprender qué sucede a continuación es útil introducir el concepto de
-                    <strong>latch</strong>.
-                </p>
-
-                <p>
-                    El circuito de salida necesita conservar el valor lógico que se ha escrito aunque la CPU
-                    continúe ejecutando otras instrucciones. No sería necesario que la CPU estuviera escribiendo
-                    continuamente unos y ceros para mantener el pin en el estado seleccionado.
-                </p>
-
-                <p>
-                    El hardware dispone para ello de un elemento de almacenamiento asociado a la salida del
-                    puerto. De manera simplificada podemos representarlo así:
-                </p>
-
-                <pre><code>CPU
-            │
-            ▼
-            Registro PORTB
-            │
-            ▼
-            Latch de salida
-            │
-            ▼
-            Driver de salida
-            │
-            ▼
-            PB0</code></pre>
-
-                <p>
-                    Cuando el programa escribe un uno en el bit correspondiente, la lógica de salida conserva
-                    ese estado y el driver mantiene el pin en el nivel correspondiente mientras la configuración
-                    no cambie.
-                </p>
-
-                <p>
-                    Aquí conviene hacer una precisión terminológica. Desde el punto de vista del programador,
-                    hablamos de <strong>PORTB</strong> como un registro. Desde el punto de vista del circuito
-                    interno, la implementación del puerto contiene elementos de almacenamiento y lógica que
-                    permiten conservar y utilizar ese valor. No debemos imaginar necesariamente que existe una
-                    sucesión de bloques independientes llamados "registro PORTB", "latch" y "driver" exactamente
-                    como aparecerían en un diagrama conceptual.
-                </p>
-
-                <p>
-                    El diagrama anterior es una representación didáctica del recorrido de la información, no un
-                    esquema transistor a transistor del diseño interno del ATmega168.
-                </p>
-            </section>
-
-            <section>
-                <h2>9. EL DRIVER CMOS CONTROLA EL PIN FÍSICO</h2>
-
-                <p>
-                    El valor lógico conservado por la lógica de salida controla el circuito electrónico que
-                    finalmente conduce el pin.
-                </p>
-
-                <p>
-                    En un puerto digital CMOS, este circuito utiliza transistores MOS para poder llevar el pin
-                    hacia la alimentación o hacia tierra.
-                </p>
-
-                <p>
-                    De forma muy simplificada podemos representar el comportamiento de una salida CMOS mediante
-                    un transistor del lado superior y otro del lado inferior:
-                </p>
-
-                <pre><code>             VCC
-                        │
-                        [PMOS]
-                        │
-                        ├────────── PB0
-                        │
-                        [NMOS]
-                        │
-                        GND</code></pre>
-
-                <p>
-                    Esta representación es deliberadamente simplificada. El circuito real de un pin del
-                    microcontrolador contiene más elementos y también debe tener en cuenta las estructuras de
-                    entrada, protección y otras funciones del pin.
-                </p>
-
-                <p>
-                    Cuando la lógica de salida solicita un nivel alto, el circuito de salida conduce el pin hacia
-                    VCC. Cuando solicita un nivel bajo, lo conduce hacia GND.
-                </p>
-
-                <p>
-                    En nuestro caso:
-                </p>
-
-                <pre><code>PORTB0 = 1
-                    ↓
-            Driver de salida
-                    ↓
-            PB0 ≈ VCC</code></pre>
-
-                <p>
-                    Si el microcontrolador está alimentado a 5 V, el pin tenderá a presentar un nivel cercano a
-                    VCC cuando está en estado alto. Esto no significa que el pin sea una fuente ideal de 5 V:
-                    la tensión real depende de la corriente que esté entregando y de las características
-                    eléctricas especificadas por el fabricante.
-                </p>
-            </section>
-
-            <section>
-                <h2>10. EL NIVEL LÓGICO SE CONVIERTE EN UNA TENSIÓN ELÉCTRICA</h2>
-
-                <p>
-                    Hasta este momento hemos hablado principalmente en términos de bits y niveles lógicos.
-                    Ahora llegamos al punto en el que esa información se convierte en una magnitud eléctrica
-                    observable con un instrumento de medida.
-                </p>
-
-                <p>
-                    Si PB0 está configurado como salida y su valor lógico es uno, el driver de salida lleva el
-                    pin hacia VCC.
-                </p>
-
-                <pre><code>PORTB0 = 1
-                │
-                ▼
-            Driver de salida
-                │
-                ▼
-            PB0 → nivel alto</code></pre>
-
-                <p>
-                    Si medimos entre PB0 y GND con un multímetro, podremos observar una tensión próxima a la
-                    tensión de alimentación del microcontrolador, siempre dentro de las condiciones de carga
-                    especificadas para el pin.
-                </p>
-
-                <p>
-                    Por tanto, el "1 lógico" que aparece en el programa no es una abstracción que desaparece
-                    dentro del microcontrolador. Termina produciendo un estado eléctrico concreto en el pin
-                    físico.
-                </p>
-            </section>
-
-            <section>
-                <h2>11. LA CORRIENTE CIRCULA POR EL LED</h2>
-
-                <p>
-                    Ahora podemos completar el recorrido conectando el pin con el circuito externo.
-                </p>
-
-                <pre><code>PB0
-            │
-            ▼
-            [220 Ω]
-            │
-            ▼
-            LED
-            │
-            ▼
-            GND</code></pre>
-
-                <p>
-                    Cuando PB0 se encuentra en nivel alto, existe una diferencia de potencial entre el pin y
-                    tierra.
-                </p>
-
-                <p>
-                    Esa diferencia de potencial produce una corriente que circula aproximadamente por el
-                    siguiente camino:
-                </p>
-
-                <pre><code>VCC del microcontrolador
-                    │
-                    ▼
-            Circuito de salida de PB0
-                    │
-                    ▼
-            Pin PB0
-                    │
-                    ▼
-            Resistencia
-                    │
-                    ▼
-            LED
-                    │
-                    ▼
-            GND</code></pre>
-
-                <p>
-                    La resistencia limita la corriente y el LED convierte parte de la energía eléctrica en
-                    radiación luminosa.
-                </p>
-
-                <p>
-                    El LED se enciende, pero el proceso que acabamos de describir comenzó mucho antes de que
-                    apareciera corriente en el circuito externo. Comenzó con una instrucción escrita en C.
-                </p>
-            </section>
-
-            <section>
-                <h2>12. EL RECORRIDO COMPLETO DESDE EL CÓDIGO HASTA EL PIN</h2>
-
-                <p>
-                    Podemos reunir ahora todos los niveles que hemos estudiado.
-                </p>
-
-                <h3>12.1. Desde el código fuente hasta la CPU</h3>
-
-                <pre><code>DDRB |= (1 &lt;&lt; PB0);
-            PORTB |= (1 &lt;&lt; PB0);</code></pre>
-
-                <p>
-                    El código C es procesado por el compilador y transformado en instrucciones de la arquitectura
-                    AVR. Esas instrucciones son almacenadas en el programa del microcontrolador y posteriormente
-                    ejecutadas por la CPU.
-                </p>
-
-                <h3>12.2. Desde la CPU hasta DDRB</h3>
-
-                <p>
-                    La CPU ejecuta las instrucciones correspondientes y accede al registro DDRB. Al quedar
-                    <code>DDRB0 = 1</code>, la lógica del puerto configura PB0 como salida.
-                </p>
-
-                <h3>12.3. Desde la CPU hasta PORTB</h3>
-
-                <p>
-                    Posteriormente la CPU escribe un uno en <code>PORTB0</code>. Ese valor pasa a la lógica de
-                    almacenamiento y control de la salida.
-                </p>
-
-                <h3>12.4. Desde PORTB hasta el driver</h3>
-
-                <p>
-                    El valor de salida es conservado por la lógica correspondiente y utilizado por el circuito
-                    de salida del puerto. El driver CMOS recibe la orden de establecer un nivel alto.
-                </p>
-
-                <h3>12.5. Desde el driver hasta el pin físico</h3>
-
-                <p>
-                    El driver conduce PB0 hacia VCC. El resultado puede medirse directamente en la pata física
-                    del encapsulado.
-                </p>
-
-                <h3>12.6. Desde el pin hasta el LED</h3>
-
-                <p>
-                    Finalmente, la tensión presente en PB0 provoca una corriente a través de la resistencia y
-                    del LED conectado a tierra. El LED emite luz.
-                </p>
-            </section>
-
-            <section>
-                <h2>13. RESUMEN DEL FUNCIONAMIENTO</h2>
-
-                <p>
-                    Todo el proceso puede resumirse en la siguiente secuencia:
-                </p>
-
-                <pre><code>Programa en C
-
-            DDRB |= (1 &lt;&lt; PB0);
-            PORTB |= (1 &lt;&lt; PB0);
-
-                    │
-                    ▼
-
-            Compilador
-
-                    │
-                    ▼
-
-            Instrucciones máquina
-
-                    │
-                    ▼
-
-            CPU
-
-                    │
-                    ▼
-
-            DDRB0 = 1
-            PB0 configurado como salida
-
-                    │
-                    ▼
-
-            PORTB0 = 1
-            Nivel lógico de salida = 1
-
-                    │
-                    ▼
-
-            Lógica de almacenamiento
-            y control de salida
-
-                    │
-                    ▼
-
-            Driver CMOS
-
-                    │
-                    ▼
-
-            Pin físico PB0
-            ≈ VCC
-
-                    │
-                    ▼
-
-            Resistencia + LED
-
-                    │
-                    ▼
-
-            Corriente eléctrica
-
-                    │
-                    ▼
-
-            LED encendido</code></pre>
-
-                <p>
-                    Este recorrido permite relacionar conceptos que a menudo se estudian por separado. El
-                    registro <code>DDRB</code> ya no aparece como una simple posición de memoria; podemos verlo
-                    como parte de la lógica que determina el funcionamiento del pin. Del mismo modo,
-                    <code>PORTB</code> deja de ser simplemente un nombre utilizado en un programa y pasa a
-                    entenderse como la interfaz de control mediante la cual el software determina el estado de
-                    la salida.
-                </p>
-            </section>
-
-            <section>
-                <h2>14. REFLEXIÓN FINAL</h2>
-
-                <p>
-                    Este sencillo ejemplo muestra por qué la programación de un microcontrolador no consiste
-                    únicamente en escribir instrucciones en C. Entre el código fuente y el componente conectado
-                    al pin existe una cadena completa de hardware y software que debe funcionar de forma
-                    coordinada.
-                </p>
-
-                <p>
-                    Cuando el programador escribe:
-                </p>
-
-                <pre><code>DDRB |= (1 &lt;&lt; PB0);
-            PORTB |= (1 &lt;&lt; PB0);</code></pre>
-
-                <p>
-                    no está enviando directamente una orden al LED. Primero está configurando un registro de
-                    hardware y después está escribiendo un valor en otro registro. La CPU ejecuta las
-                    instrucciones generadas por el compilador, la lógica del puerto interpreta esos valores y
-                    finalmente el circuito de salida establece una tensión eléctrica en PB0.
-                </p>
-
-                <p>
-                    Solo después de todo ese recorrido aparece el efecto observable fuera del microcontrolador:
-                    la corriente circula por el circuito externo y el LED se enciende.
-                </p>
-
-                <p>
-                    Esta relación entre software y hardware es uno de los conceptos fundamentales de los sistemas
-                    embebidos. Un registro de E/S no es simplemente una variable especial del lenguaje C. Es la
-                    interfaz mediante la cual el software puede controlar circuitos electrónicos reales dentro
-                    del microcontrolador.
-                </p>
-
-                <p>
-                    Comprender este recorrido resulta especialmente importante cuando se programa un AVR
-                    directamente mediante sus registros, sin utilizar una capa de abstracción como la que
-                    proporcionan determinados entornos de desarrollo. En ese contexto, expresiones como
-                    <code>DDRB</code> y <code>PORTB</code> dejan de ser nombres aislados y pasan a representar
-                    la relación concreta entre las instrucciones de la CPU y la electrónica que existe detrás
-                    de cada pin.
-                </p>
-
-                <p>
-                    El ejemplo del LED es elemental, pero el principio es el mismo cuando el pin controla una
-                    señal de habilitación, una entrada de otro circuito digital, una línea de comunicación o
-                    cualquier otra interfaz eléctrica. Cambia la aplicación; la relación fundamental entre
-                    software, registros, lógica interna del puerto y señal eléctrica permanece.
-                </p>
-            </section>
+
+<header>
+    <aside id="indice"></aside>
+</header>
+
+<!-- CONTENIDO DEL ARTÍCULO -->
+
+<section>
+    <h2>1. Introducción</h2>
+
+<p>
+    Para que un microcontrolador AVR pueda ejecutar un programa escrito en lenguaje C,
+    el código fuente debe pasar por una serie de etapas antes de llegar a la memoria
+    del dispositivo. El archivo que escribe el programador no es directamente ejecutable
+    por la CPU del AVR.
+</p>
+
+<p>
+    En un entorno de programación <em>Bare-Metal</em>, este proceso se realiza mediante
+    una cadena de herramientas (<em>toolchain</em>) que incluye el preprocesador, el
+    compilador, el ensamblador, el enlazador y otras utilidades destinadas a generar
+    el archivo que finalmente será programado en la memoria Flash.
+</p>
+
+<p>
+    En este artículo seguiremos el recorrido desde el código fuente en C hasta la
+    programación del microcontrolador mediante herramientas de línea de comandos.
+    El objetivo es comprender qué función cumple cada etapa y qué archivos se generan
+    durante el proceso.
+</p>
+
+<p>
+    Como ejemplo utilizaremos un programa sencillo para un microcontrolador de la
+    familia AVR:
+</p>
+
+<pre><code>#include &lt;avr/io.h&gt;
+
+int main(void)
+{
+DDRB |= (1 << PB0);
+PORTB |= (1 << PB0);
+
+while (1)
+{
+}
+
+}</code></pre>
+
+
+<p>
+    El programa configura el pin PB0 como salida y establece su nivel lógico en alto.
+    El funcionamiento de los registros y del circuito de salida del pin se explica
+    con mayor detalle en el artículo
+    <strong>Del código C al pin físico: cómo un AVR controla una salida digital</strong>.
+    Aquí nos concentraremos en el proceso necesario para transformar este código fuente
+    en un firmware que pueda ser almacenado y ejecutado por el microcontrolador.
+</p>
+
+</section>
+
+<section>
+    <h2>2. Del código fuente al firmware</h2>
+
+<p>
+    El punto de partida es un archivo de código fuente, normalmente identificado
+    con la extensión <code>.c</code>. Este archivo contiene instrucciones y
+    declaraciones escritas en lenguaje C y puede incluir archivos de cabecera
+    mediante directivas del preprocesador.
+</p>
+
+<h3>2.1. El archivo fuente en C</h3>
+
+<p>
+    Podemos guardar nuestro programa, por ejemplo, en:
+</p>
+
+<pre><code>main.c</code></pre>
+
+<p>
+    En nuestro ejemplo aparece:
+</p>
+
+<pre><code>#include &lt;avr/io.h&gt;</code></pre>
+
+<p>
+    El archivo <code>avr/io.h</code> forma parte de <strong>avr-libc</strong> y
+    proporciona las definiciones necesarias para trabajar con los registros y bits
+    correspondientes al microcontrolador seleccionado.
+</p>
+
+<p>
+    De esta manera podemos utilizar nombres como:
+</p>
+
+<pre><code>DDRB
+
+PORTB
+PB0</code></pre>
+
+<p>
+    sin tener que escribir directamente en el programa las direcciones numéricas
+    asociadas a los registros de hardware.
+</p>
+
+<p>
+    Estas definiciones son utilizadas durante la construcción del programa y no
+    significan que la CPU del AVR ejecute directamente los nombres escritos en C.
+    Durante las siguientes etapas, el código será transformado en instrucciones
+    correspondientes a la arquitectura del dispositivo.
+</p>
+
+<h3>2.2. El preprocesador</h3>
+
+<p>
+    Antes de que el compilador analice propiamente el lenguaje C, interviene el
+    preprocesador.
+</p>
+
+<p>
+    El preprocesador procesa las directivas que comienzan con el carácter
+    <code>#</code>, entre ellas <code>#include</code>, <code>#define</code> y
+    determinadas estructuras condicionales.
+</p>
+
+<p>
+    En nuestro ejemplo:
+</p>
+
+<pre><code>#include &lt;avr/io.h&gt;</code></pre>
+
+<p>
+    Esta directiva hace que el contenido correspondiente del archivo de cabecera
+    sea incorporado al resultado del preprocesamiento.
+</p>
+
+<p>
+    El resultado de esta etapa sigue siendo código fuente en C, pero con las
+    directivas del preprocesador ya resueltas.
+</p>
+
+<pre><code>main.c
+
+│
+▼
+Preprocesador
+│
+▼
+Código C preprocesado</code></pre>
+
+<p>
+    En muchos casos el programador no necesita conservar este archivo intermedio,
+    ya que las herramientas posteriores pueden recibirlo directamente como parte
+    del proceso de compilación.
+</p>
+
+<h3>2.3. Compilación del código</h3>
+
+<p>
+    El compilador analiza el código C y lo transforma en una representación que
+    posteriormente podrá convertirse en instrucciones de la arquitectura AVR.
+</p>
+
+<p>
+    Cuando utilizamos la GNU AVR Toolchain, el compilador correspondiente a la
+    arquitectura AVR es <code>avr-gcc</code>.
+</p>
+
+<p>
+    Un ejemplo de una orden de compilación es:
+</p>
+
+<pre><code>avr-gcc -mmcu=atmega168 -Os -c main.c -o main.o</code></pre>
+
+<p>
+    La opción <code>-mmcu=atmega168</code> indica al compilador que el programa
+    está destinado a un <strong>ATmega168</strong>.
+</p>
+
+<p>
+    Esta información es importante porque diferentes dispositivos AVR pueden
+    disponer de distintas cantidades de memoria, periféricos, registros y
+    características de arquitectura. La selección del dispositivo también permite
+    que las definiciones proporcionadas por <code>avr/io.h</code> correspondan al
+    microcontrolador seleccionado.
+</p>
+
+<p>
+    La opción <code>-Os</code> solicita al compilador optimizar el programa
+    teniendo como objetivo reducir el tamaño del código generado. En
+    microcontroladores con memoria de programa limitada, reducir el tamaño del
+    firmware puede ser especialmente importante.
+</p>
+
+<p>
+    La optimización también puede modificar la forma en que el compilador genera
+    las instrucciones. Por esta razón, el código máquina resultante no debe
+    interpretarse como una traducción literal línea por línea del código C.
+</p>
+
+<p>
+    La opción <code>-c</code> indica que se debe compilar el archivo fuente y
+    generar un archivo objeto, pero sin realizar todavía el enlazado final.
+</p>
+
+<p>
+    Finalmente, <code>-o main.o</code> especifica el nombre del archivo de salida.
+</p>
+
+<pre><code>main.c
+
+│
+▼
+avr-gcc
+│
+▼
+main.o</code></pre>
+
+<h3>2.4. Código ensamblador</h3>
+
+<p>
+    El procesador del microcontrolador no ejecuta directamente el código C.
+    Durante la compilación, el compilador genera instrucciones correspondientes
+    a la arquitectura AVR.
+</p>
+
+<p>
+    Para estudiar el resultado de la compilación podemos solicitar al compilador
+    que genere código ensamblador:
+</p>
+
+<pre><code>avr-gcc -mmcu=atmega168 -Os -S main.c -o main.s</code></pre>
+
+<p>
+    La opción <code>-S</code> hace que el proceso se detenga después de la
+    generación del código ensamblador.
+</p>
+
+<p>
+    El archivo obtenido será:
+</p>
+
+<pre><code>main.s</code></pre>
+
+<p>
+    Este archivo permite observar de forma más cercana las instrucciones que
+    posteriormente serán convertidas en código máquina.
+</p>
+
+<p>
+    Las instrucciones exactas pueden variar dependiendo del microcontrolador
+    seleccionado, del compilador y de las opciones de optimización utilizadas.
+</p>
+
+<p>
+    Por ello, una expresión de C como:
+</p>
+
+<pre><code>DDRB |= (1 &lt;&lt; PB0);</code></pre>
+
+<p>
+    no debe entenderse como una traducción obligatoria a una secuencia fija de
+    instrucciones. El compilador puede utilizar diferentes estrategias para
+    obtener el resultado funcional requerido.
+</p>
+
+<h3>2.5. Ensamblado y archivos objeto</h3>
+
+<p>
+    El código ensamblador debe transformarse en código máquina. Esta tarea la
+    realiza el ensamblador.
+</p>
+
+<p>
+    Dentro de la GNU AVR Toolchain, esta función forma parte de las herramientas
+    utilizadas por <code>avr-gcc</code>.
+</p>
+
+<p>
+    El resultado es un archivo objeto, normalmente con extensión <code>.o</code>.
+    Por ejemplo:
+</p>
+
+<pre><code>main.o</code></pre>
+
+<p>
+    Un archivo objeto contiene código máquina y otra información necesaria para
+    completar posteriormente el programa durante la etapa de enlazado.
+</p>
+
+<p>
+    En un proyecto sencillo puede existir un único archivo objeto. En proyectos
+    más grandes pueden existir varios:
+</p>
+
+<pre><code>main.o
+gpio.o
+uart.o
+timer.o</code></pre>
+
+
+<p>
+    Estos archivos deben reunirse posteriormente para construir el programa
+    completo.
+</p>
+
+<h3>2.6. Enlazado y archivo ELF</h3>
+
+<p>
+    El enlazador (<em>linker</em>) combina los diferentes archivos objeto y
+    determina cómo quedarán organizados dentro del espacio de memoria del
+    microcontrolador.
+</p>
+
+<p>
+    En un proyecto sencillo podemos tener:
+</p>
+
+<pre><code>main.o</code></pre>
+
+<p>
+    mientras que un proyecto más complejo puede incluir varios archivos objeto
+    y bibliotecas.
+</p>
+
+<p>
+    El enlazado produce normalmente un archivo en formato
+    <strong>ELF (Executable and Linkable Format)</strong>.
+</p>
+
+<pre><code>main.elf</code></pre>
+
+<p>
+    El archivo ELF contiene información mucho más completa que la necesaria para
+    programar directamente la memoria Flash. Puede incluir las diferentes
+    secciones del programa, direcciones, símbolos y otra información utilizada
+    por las herramientas de desarrollo.
+</p>
+
+<p>
+    Una parte importante del trabajo del enlazador consiste en colocar las
+    diferentes secciones del programa en las regiones de memoria correspondientes
+    al dispositivo seleccionado.
+</p>
+
+<h3>2.7. Las secciones del programa</h3>
+
+<p>
+    El programa final no consiste simplemente en una secuencia indiferenciada de
+    bytes. El firmware contiene diferentes tipos de información que deben ubicarse
+    en las regiones de memoria correspondientes.
+</p>
+
+<h4>2.7.1. Sección de código</h4>
+
+<p>
+    La sección <code>.text</code> contiene principalmente las instrucciones que
+    ejecutará la CPU. En un AVR, estas instrucciones se almacenan normalmente
+    en la memoria Flash.
+</p>
+
+<h4>2.7.2. Datos inicializados</h4>
+
+<p>
+    La sección <code>.data</code> contiene variables que tienen un valor inicial
+    explícito y que requieren una organización particular durante el arranque
+    del programa.
+</p>
+
+<h4>2.7.3. Datos no inicializados</h4>
+
+<p>
+    La sección <code>.bss</code> se utiliza para variables que no necesitan tener
+    un valor inicial almacenado en la imagen de programa.
+</p>
+
+<p>
+    La organización exacta de estas secciones depende de la arquitectura y de
+    las reglas de enlace utilizadas por la toolchain.
+</p>
+
+
+</section>
+
+<section>
+    <h2>3. Generación del archivo de programación</h2>
+
+
+<h3>3.1. El archivo ELF</h3>
+
+<p>
+    Una vez completado el enlazado, el archivo ELF contiene el programa preparado
+    según el mapa de memoria del microcontrolador.
+</p>
+
+<p>
+    En esta etapa es posible utilizar herramientas como <code>avr-size</code>
+    para conocer cuánto espacio ocupa el programa:
+</p>
+
+<pre><code>avr-size main.elf</code></pre>
+
+<p>
+    Esta información resulta especialmente útil cuando se trabaja con
+    microcontroladores que disponen de una cantidad limitada de memoria Flash
+    y RAM.
+</p>
+
+<p>
+    El archivo ELF también resulta útil durante la depuración, ya que conserva
+    información que puede ser utilizada para relacionar direcciones de memoria
+    con símbolos y partes del programa.
+</p>
+
+<h3>3.2. Generación del archivo HEX</h3>
+
+<p>
+    El archivo ELF contiene información que no es necesaria para programar
+    directamente la memoria Flash. Por ello se genera normalmente un archivo
+    en un formato adecuado para la programación.
+</p>
+
+<p>
+    Una de las herramientas utilizadas para este propósito es
+    <code>avr-objcopy</code>.
+</p>
+
+<p>
+    Un ejemplo es:
+</p>
+
+<pre><code>avr-objcopy -O ihex -R .eeprom main.elf main.hex</code></pre>
+
+<p>
+    En esta orden, <code>-O ihex</code> indica que el formato de salida será
+    Intel HEX.
+</p>
+
+<p>
+    La opción <code>-R .eeprom</code> excluye la sección de EEPROM de este
+    archivo HEX concreto. Esto permite generar una imagen destinada
+    específicamente a la memoria de programa.
+</p>
+
+<p>
+    Como resultado obtenemos:
+</p>
+
+<pre><code>main.hex</code></pre>
+
+<p>
+    El archivo HEX contiene los datos y las direcciones necesarias para que una
+    herramienta de programación pueda escribir el contenido correspondiente
+    en la memoria del microcontrolador.
+</p>
+
+</section>
+
+<section>
+    <h2>4. Programación del microcontrolador</h2>
+<p>
+    Una vez generado el archivo HEX, todavía falta transferirlo al
+    microcontrolador.
+</p>
+
+<p>
+    Para ello podemos utilizar un programador compatible con el AVR y una
+    herramienta de programación como <strong>AVRDUDE</strong>.
+</p>
+
+<p>
+    AVRDUDE permite comunicarse con diferentes programadores y dispositivos AVR
+    y realizar operaciones sobre sus memorias y registros de programación.
+</p>
+
+<p>
+    Por ejemplo, utilizando un programador USBasp:
+</p>
+
+<pre><code>avrdude -c usbasp -p m168 -U flash:w:main.hex:i</code></pre>
+
+<h3>4.1. Selección del programador</h3>
+
+<pre><code>-c usbasp</code></pre>
+
+<p>
+    indica que se utilizará un programador compatible con USBasp.
+</p>
+
+<h3>4.2. Selección del microcontrolador</h3>
+
+<pre><code>-p m168</code></pre>
+
+<p>
+    indica el dispositivo AVR que será programado.
+</p>
+
+<p>
+    El código utilizado por AVRDUDE debe corresponder al microcontrolador real
+    conectado al programador.
+</p>
+
+<h3>4.3. Escritura de la memoria Flash</h3>
+
+<pre><code>-U flash:w:main.hex:i</code></pre>
+
+<p>
+    indica una operación sobre la memoria Flash.
+</p>
+
+<p>
+    La letra <code>w</code> especifica que se realizará una escritura
+    (<em>write</em>), mientras que <code>main.hex</code> identifica el archivo
+    que contiene los datos que serán programados.
+</p>
+
+<p>
+    La letra <code>i</code> indica que el archivo está en formato Intel HEX.
+</p>
+
+<h3>4.4. Verificación de la programación</h3>
+
+<p>
+    Después de escribir el firmware en la memoria Flash, es importante verificar
+    que los datos almacenados en el microcontrolador coincidan con los datos
+    que se pretendían programar.
+</p>
+
+<p>
+    AVRDUDE puede realizar esta comprobación como parte del proceso de
+    programación.
+</p>
+
+<p>
+    La verificación permite detectar problemas de comunicación entre el
+    programador y el microcontrolador o errores durante la transferencia de
+    los datos.
+</p>
+
+<p>
+    Por tanto, el proceso no debe entenderse simplemente como:
+</p>
+
+<pre><code>archivo HEX → memoria Flash</code></pre>
+
+<p>
+    sino como una operación de programación en la que también podemos comprobar
+    que el contenido almacenado corresponde con la imagen que se pretendía
+    escribir.
+</p>
+
+
+</section>
+
+<section>
+    <h2>5. Ejecución del firmware</h2>
+
+
+<p>
+    Una vez que el programa se encuentra almacenado en la memoria Flash, el
+    microcontrolador puede comenzar a ejecutar las instrucciones.
+</p>
+
+<p>
+    En condiciones normales de funcionamiento, después de un <em>reset</em>,
+    el AVR inicia la secuencia de arranque y comienza la ejecución del programa
+    desde la dirección correspondiente.
+</p>
+
+<p>
+    El código que originalmente escribimos en C ya no existe en la Flash como
+    instrucciones de C. Lo que se encuentra almacenado son los datos que
+    representan las instrucciones y demás información necesaria para ejecutar
+    el firmware.
+</p>
+
+<p>
+    Cuando la CPU ejecuta las instrucciones generadas a partir del programa,
+    estas pueden modificar los registros de los periféricos y controlar el
+    hardware interno del microcontrolador.
+</p>
+
+<p>
+    En nuestro ejemplo, la ejecución de las instrucciones relacionadas con
+    <code>DDRB</code> y <code>PORTB</code> termina produciendo el comportamiento
+    eléctrico correspondiente en PB0. Este recorrido desde las instrucciones
+    hasta el pin físico se desarrolla en detalle en el artículo
+    <strong>Del código C al pin físico: cómo un AVR controla una salida digital</strong>.
+</p>
+
+
+</section>
+
+<section>
+    <h2>6. Herramientas de la GNU AVR Toolchain</h2>
+
+<p>
+    Aunque habitualmente utilizamos <code>avr-gcc</code> como punto de entrada
+    para construir un programa, detrás de esta herramienta existe una cadena
+    de programas que participan en las diferentes etapas.
+</p>
+
+<pre><code>avr-gcc
+
+│
+├── Preprocesador
+│
+├── Compilador
+│
+├── Ensamblador
+│
+└── Enlazador</code></pre>
+
+
+<p>
+    Además, otras herramientas permiten inspeccionar y transformar los archivos
+    generados:
+</p>
+
+<pre><code>avr-size       → información sobre el tamaño del programa
+
+
+avr-objcopy     → conversión de formatos
+avr-objdump     → inspección del contenido del programa
+avr-nm          → información sobre símbolos</code></pre>
+
+<p>
+    Finalmente, <strong>AVRDUDE</strong> cumple una función diferente. No forma
+    parte de la transformación del código C en instrucciones, sino que permite
+    comunicarse con el programador y transferir el firmware al microcontrolador.
+</p>
+</section>
+
+<section>
+    <h2>7. Compilar y programar: dos procesos diferentes</h2>
+<p>
+    Es importante distinguir dos procesos que con frecuencia se confunden:
+    <strong>compilar</strong> y <strong>programar</strong>.
+</p>
+
+<p>
+    Compilar significa transformar el código fuente y construir el programa
+    ejecutable para la arquitectura del microcontrolador.
+</p>
+
+<p>
+    Programar el microcontrolador significa transferir ese programa a la
+    memoria del dispositivo mediante una interfaz y un programador adecuados.
+</p>
+
+<p>
+    Por ejemplo:
+</p>
+
+<pre><code>main.c
+
+│
+▼
+Compilación y enlace
+│
+▼
+main.elf
+│
+▼
+Generación del HEX
+│
+▼
+main.hex</code></pre>
+
+
+<p>
+    Hasta este punto hemos construido el firmware, pero todavía no necesariamente
+    lo hemos almacenado en el microcontrolador.
+</p>
+
+<p>
+    La siguiente etapa es:
+</p>
+
+<pre><code>main.hex
+
+
+│
+▼
+AVRDUDE
+│
+▼
+Programador
+│
+▼
+AVR
+│
+▼
+Memoria Flash</code></pre>
+
+<p>
+    Esta distinción es fundamental cuando se trabaja directamente desde la
+    línea de comandos, porque permite identificar con precisión en qué etapa
+    se encuentra un problema.
+</p>
+
+</section>
+
+<section>
+    <h2>8. Recorrido completo del proceso</h2>
+
+<h3>8.1. Código fuente</h3>
+
+<p>
+    El programador escribe el firmware en lenguaje C en uno o varios archivos
+    fuente.
+</p>
+
+<h3>8.2. Construcción del programa</h3>
+
+<p>
+    La toolchain procesa el código mediante el preprocesador, el compilador,
+    el ensamblador y el enlazador, produciendo un archivo ELF.
+</p>
+
+<h3>8.3. Generación de la imagen de programación</h3>
+
+<p>
+    Las herramientas de la GNU AVR Toolchain pueden convertir el contenido
+    necesario del ELF en un archivo Intel HEX.
+</p>
+
+<h3>8.4. Programación</h3>
+
+<p>
+    AVRDUDE utiliza el programador conectado al AVR para transferir el contenido
+    del archivo HEX a la memoria Flash.
+</p>
+
+<h3>8.5. Ejecución</h3>
+
+<p>
+    Una vez programado y puesto en funcionamiento el microcontrolador, la CPU
+    ejecuta las instrucciones almacenadas en la memoria de programa.
+</p>
+
+<h3>8.6. Relación con el hardware</h3>
+
+<p>
+    A partir de la ejecución del firmware comienza la interacción entre la CPU,
+    los registros y los periféricos del microcontrolador. Las instrucciones
+    pueden modificar registros de entrada y salida y producir cambios en el
+    comportamiento eléctrico de los circuitos internos y de los pines.
+</p>
+
+<p>
+    El recorrido desde las instrucciones ejecutadas hasta la señal eléctrica
+    presente en un pin se desarrolla en el artículo
+    <strong>Del código C al pin físico: cómo un AVR controla una salida digital</strong>.
+</p>
+
+</section>
+
+<section>
+    <h2>9. Conclusión</h2>
+<p>
+    Un programa escrito en C no pasa directamente desde el editor hasta la CPU
+    del microcontrolador. Antes de ejecutarse debe atravesar una cadena de
+    transformación en la que intervienen diferentes herramientas y formatos.
+</p>
+
+<p>
+    El proceso comienza con el archivo fuente y continúa con el preprocesamiento,
+    la compilación, el ensamblado y el enlazado. El resultado es un archivo ELF
+    que contiene el programa organizado de acuerdo con el dispositivo seleccionado.
+</p>
+
+<p>
+    Posteriormente, una herramienta como <code>avr-objcopy</code> permite generar
+    una imagen en formato Intel HEX, que puede ser transferida al microcontrolador
+    mediante AVRDUDE y el programador correspondiente.
+</p>
+
+<p>
+    Finalmente, el AVR ejecuta las instrucciones almacenadas en su memoria de
+    programa. A partir de ese momento comienza la interacción entre la CPU,
+    los registros y los periféricos del microcontrolador.
+</p>
+
+<p>
+    Comprender esta cadena resulta especialmente importante en la programación
+    <em>Bare-Metal</em>, porque permite saber exactamente qué ocurre entre el
+    momento en que se escribe una instrucción en C y el momento en que el
+    microcontrolador comienza a ejecutarla.
+</p>
+
+<p>
+    El siguiente nivel de análisis consiste en estudiar qué ocurre dentro del
+    AVR cuando esas instrucciones modifican directamente los registros de
+    entrada y salida. Ese recorrido permite relacionar las instrucciones
+    ejecutadas por la CPU con la lógica interna de los periféricos y, finalmente,
+    con las señales eléctricas presentes en los pines del dispositivo.
+</p>
+</section>
 
         </article>
         
