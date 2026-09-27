@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Los Tres Registros Fundamentales de Entrada y Salida (GPIO) | MC Mundo Tech</title>
+    <meta name="description" content="Manual técnico sobre el funcionamiento y configuración de los registros de entrada y salida GPIO (DDRx, PORTx, PINx) en microcontroladores AVR de 8 bits.">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>LOS TRES REGISTROS FUNDAMENTALES DE ENTRADA Y SALIDA (GPIO)</h1>
+            
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   -->
+            
+            <section> 
+            
+                <h2>1. LOS REGISTROS GPIO</h2>
+            <p>En la arquitectura de los microcontroladores AVR de 8 bits, los pines físicos de conexión con el mundo exterior se agrupan en bloques lógicos denominados <strong>PUERTOS</strong>. Un puerto comprende un banco de hasta 8 pines físicos de <em>Entrada/Salida</em> (<strong>E/S</strong> o <strong>GPIO</strong>), identificados con letras según el periférico del chip por ejemplo, Puerto A (<strong>PA</strong>), Puerto B (<strong>PB</strong>), Puerto C (<strong>PC</strong>), Puerto D (<strong>PD</strong>).</p>
+
+    <p>Para controlar de forma integral el comportamiento eléctrico, la dirección de la corriente y el nivel de voltaje de cada pin, el hardware del AVR destina <strong>tres registros dedicados de 8 bits</strong> por cada puerto:</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Registro</th>
+                <th>Nombre Oficial</th>
+                <th>Función Técnica Principal</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>DDRx</strong></td>
+                <td><em>Data-Direction Register</em></td>
+                <td>Controla la dirección del flujo de datos del pin: define si opera como <strong>Entrada (Input)</strong> o como <strong>Salida (Output)</strong>.</td>
+            </tr>
+            <tr>
+                <td><strong>PORTx</strong></td>
+                <td><em>Port x Data Register</em></td>
+                <td>En modo salida: controla el voltaje emitido (1 = VCC, 0 = GND). En modo entrada: activa o desactiva la resistencia <em>pull-up</em> interna del pin.</td>
+            </tr>
+            <tr>
+                <td><strong>PINx</strong></td>
+                <td><em>Port x Input Pins Address</em></td>
+                <td>Registro de solo lectura que refleja el voltaje digital real aplicado externamente en las patillas. En AVRs modernos, escribir un 1 conmuta (<em>toggle</em>) el estado del registro PORTx.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p>Tomando como ejemplo práctico el <strong>Puerto B</strong>, sus tres registros asociados son <code>DDRB</code>, <code>PORTB</code> y <code>PINB</code>. La arquitectura mantiene una correspondencia unívoca uno a uno entre cada bit de un registro de 8 bits y un pin físico del circuito integrado:</p>
+
+<pre>
+Bit del Registro:   7    6    5    4    3    2    1    0
+Pin Físico Chip:   PB7  PB6  PB5  PB4  PB3  PB2  PB1  PB0
+</pre>
+
+</section>
+
+    <section>
+        <h2>2. ASIGNACIÓN DE DIRECCIÓN (DDRx)</h2>
+        <p>Para determinar la orientación lógica de la corriente en un pin digital (si lee una señal exterior o maneja una carga), el programador modifica el <strong>Registro de Dirección de Datos (DDRx)</strong>.</p>
+
+        <h3>2.1. Configuración de Estados Lógicos de Dirección</h3>
+        <ul>
+            <li><strong>Asignar Salida (Output):</strong> Se escribe un uno (<code>1</code>) en el bit correspondiente del registro DDRx. Esto habilita los transistores de potencia internos para conmutar corriente hacia el exterior.</li>
+            <li><strong>Asignar Entrada (Input):</strong> Por defecto, tras un evento de encendido o reinicio por hardware (<em>Reset</em>), el sistema establece todos los bits de DDRx en cero (<code>0</code>). Esto coloca los pines automáticamente en modo entrada como medida de seguridad eléctrica.</li>
+        </ul>
+
+        <h3>2.2. Análisis de un Ejemplo Práctico de Asignación Directa</h3>
+        <p>Consideremos la ejecución del siguiente comando en lenguaje C:</p>
+<pre><code>DDRB = 0b00000010;</code></pre>
+
+        <p>Esta instrucción escribe un patrón de 8 bits directamente sobre el registro <code>DDRB</code>. El mapeo de bits a nivel de hardware se interpreta de la siguiente manera:</p>
+
+<pre>
+Pin Físico:     PB7  PB6  PB5  PB4  PB3  PB2  PB1  PB0
+Valor en DDRB:   0    0    0    0    0    0    1    0
+</pre>
+
+        <p>Al reescribir el registro por completo, la circuitería interna del microcontrolador aplica de inmediato el siguiente estado eléctrico individual en sus terminales:</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Pin Físico</th>
+                    <th>Estado de Dirección Configurado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>PB1</strong></td>
+                    <td><strong>SALIDA (Output)</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>PB0, PB2–PB7</strong></td>
+                    <td><strong>ENTRADA (Input)</strong></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>2.3. Inconvenientes de la Asignación Directa</h3>
+        <p>La asignación directa mediante literales binarios (<code>DDRB = 0b00000010;</code>) borra el estado previo de los 8 bits del puerto. En el desarrollo industrial de firmware, se prefiere modificar un único pin sin alterar la configuración de los pines vecinos utilizando operadores lógicos a nivel de bits (<em>bitwise operations</em>):</p>
+<pre><code>DDRB |= (1 &lt;&lt; PB1); // Configura PB1 como salida de forma no destructiva</code></pre>
+    </section>
+
+    <section>
+        <h2>3. CONTROL DEL VOLTAJE Y RESISTENCIAS INTERNAS (PORTx)</h2>
+        <p>Una vez definida la dirección de los pines a través del registro DDRx, el registro <strong>PORTx</strong> asume una doble funcionalidad según la configuración eléctrica establecida.</p>
+
+        <h3>3.1. Comportamiento en Modo Salida (DDRx = 1)</h3>
+        <p>Cuando un bit en DDRx está configurado como salida, el bit equivalente en PORTx controla el driver de salida de voltaje activo:</p>
+        <ul>
+            <li><strong>PORTx = 1 (Lógica Alta / High):</strong> El pin interno conmuta a <strong>VCC</strong> (usualmente 5 V o 3.3 V segun el circuito), inyectando voltaje y actuando como una fuente de corriente (<em>current source</em>).</li>
+            <li><strong>PORTx = 0 (Lógica Baja / Low):</strong> El pin interno conmuta a masa o tierra (<strong>GND / 0 V</strong>), actuando como un drena corriente (<em>current sink</em>).</li>
+        </ul>
+
+        <h3>3.2. Comportamiento en Modo Entrada (DDRx = 0)</h3>
+        <p>Cuando un bit en DDRx está configurado como entrada, el bit equivalente en PORTx gobierna el acoplamiento de resistencias internas:</p>
+        <ul>
+            <li><strong>PORTx = 1 (Pull-Up Activa):</strong> Conecta una resistencia de elevación interna (<em>pull-up resistor</em>) de entre 20 kΩ y 50 kΩ aproximadamente desde el pin hacia VCC. Esto garantiza que el pin lea un nivel '1' estable en reposo y evita lecturas erráticas sin consumir corriente apreciable.</li>
+            <li><strong>PORTx = 0 (Alta Impedancia / Hi-Z):</strong> Desconecta la resistencia interna. El pin queda flotando eléctricamente, presentando una impedancia extremadamente alta (ideal para medir circuitos analógicos o buses externos sin alterar la señal).</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>4. LECTURA DEL ESTADO E INVERSIÓN POR HARDWARE (PINx)</h2>
+        <p>A diferencia de DDRx y PORTx, el registro <strong>PINx</strong> interactúa directamente con los búferes de lectura conectados a la patilla metálica del integrado.</p>
+
+        <h3>4.1. Muestreo de Lectura Digital</h3>
+        <p>Para inspeccionar las condiciones eléctricas del circuito exterior (por ejemplo, detectar la pulsación de un botón o la señal de un sensor), el código debe leer el registro <code>PINx</code>. La lectura de este registro no consulta el valor guardado en la memoria RAM, sino la tensión real presente en el pin físico.</p>
+<pre><code>if (PINB &amp; (1 &lt;&lt; PB0)) {
+    // Código a ejecutar si el voltaje medido en el pin PB0 es ALTO (VCC)
+}</code></pre>
+
+        <h3>4.2. Conmutación Ultraeficiente por Hardware (Toggle Hardware)</h3>
+        <p>En los microcontroladores AVR modernos, el registro PINx posee un mecanismo físico especial: si el firmware escribe un valor <code>1</code> lógico en cualquiera de sus bits mientras el pin está configurado como salida, el hardware del AVR invierte automáticamente (<em>toggle</em>) el estado almacenado en el registro PORTx.</p>
+        <p>Esta operación pasa un pin de 0 V a 5 V (o viceversa) en un solo ciclo de reloj de la CPU, eliminando la necesidad de leer, modificar y reescribir manualmente por software el registro PORTx.</p>
+<pre><code>PINB = (1 &lt;&lt; PB1); // Conmuta el estado de PB1 instantáneamente por hardware</code></pre>
+    </section>
+
+    <section>
+        <h2>5. MATRIZ UNIFICADA DE CONFIGURACIÓN DE PINES (GPIO)</h2>
+        <p>Combinando las interacciones entre los registros DDRx, PORTx y PINx, se deriva la matriz absoluta de estados operacionales para cualquier pin individual (PBn) dentro de la arquitectura AVR:</p>
+
+        <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Bit DDRx</th>
+                    <th>Bit PORTx</th>
+                    <th>Bit PINx (PBn)</th>
+                    <th>Estado Físico y Comportamiento Electrónico</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>0</strong></td>
+                    <td><strong>0</strong></td>
+                    <td><strong>Lectura real (0 o 1)</strong></td>
+                    <td><strong>Entrada en Alta Impedancia (Hi-Z):</strong> El pin flota eléctricamente. El estado medido en PINx depende exclusivamente de la tensión aplicada por el circuito exterior.</td>
+                </tr>
+                <tr>
+                    <td><strong>0</strong></td>
+                    <td><strong>1</strong></td>
+                    <td><strong>Lectura real (1 por defecto)</strong></td>
+                    <td><strong>Entrada con Resistencia Pull-Up Activa:</strong> La resistencia interna mantiene el pin ligado a VCC. PINx lee 1 en reposo y 0 si un pulsador externo lo deriva a masa (GND).</td>
+                </tr>
+                <tr>
+                    <td><strong>1</strong></td>
+                    <td><strong>0</strong></td>
+                    <td><strong>0 (ó 1 tras Toggle)</strong></td>
+                    <td><strong>Salida Lógica BAJA (GND / 0 V):</strong> Conduce tierra de forma activa. Si se escribe un 1 en el bit correspondiente de PINx, el pin conmuta a 5 V por hardware.</td>
+                </tr>
+                <tr>
+                    <td><strong>1</strong></td>
+                    <td><strong>1</strong></td>
+                    <td><strong>1 (ó 0 tras Toggle)</strong></td>
+                    <td><strong>Salida Lógica ALTA (VCC / 5 V):</strong> Inyecta voltaje activo. Si se escribe un 1 en el bit correspondiente de PINx, el pin conmuta a 0 V por hardware.</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+
+    </section>
+
+</body>
+</html>
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>

@@ -62,7 +62,7 @@ Aun así, el lenguaje C mantiene su estructura fundamental: existen archivos de 
 Un encabezado profesional incluye el nombre del proyecto, autor  una descripción del programa, siguiendo un estilo de documentación técnica seria. No forma parte del lenguaje C y se incluyen como bloques de comentario.
 </p>
 
-<pre><code>/*
+<pre><code class="language-c">/*
  * ============================================================
  * Proyecto : C. Programación AVR – Secuencia de LEDs con barrido
  * Archivo  : led_sequence.c
@@ -102,7 +102,7 @@ Lo importante es comprender qué papel cumple cada parte: el código situado ant
 Una estructura conceptual habitual puede representarse así:
 </p>
 
-<pre><code>[preambulo]
+<pre><code class="language-c">[preambulo]
 
 [directivas de inclusión]
 [definiciones y constantes]
@@ -146,7 +146,7 @@ En muchos ejemplos de programación se denomina preámbulo a la parte situada an
 En esa zona pueden aparecer diferentes elementos:
 </p>
 
-<pre><code>Programa C
+<pre><code class="language-c">Programa C
 │
 ├── Inclusión de cabeceras
 ├── Definiciones y constantes
@@ -174,7 +174,7 @@ indica al preprocesador de C que debe incorporar el contenido de un archivo de c
 En un programa AVR aparecen con frecuencia:
 </p>
 
-<pre language="C"><code>#include &lt;avr/io.h&gt;
+<pre><code class="language-c">#include &lt;avr/io.h&gt;
 #include &lt;util/delay.h&gt;</code></pre>
 
 <p>
@@ -183,7 +183,7 @@ Estas directivas permiten incorporar declaraciones y definiciones necesarias par
 
 <h4>3.1.1. avr/io.h</h4>
 
-<pre><code>#include &lt;avr/io.h&gt;</code></pre>
+<pre><code class="language-c">#include &lt;avr/io.h&gt;</code></pre>
 
 <p>
 Es una de las cabeceras fundamentales cuando se programa un AVR utilizando <code>avr-gcc</code>.
@@ -201,7 +201,7 @@ Entre otras cosas, permite utilizar nombres simbólicos correspondientes a regis
 Por ejemplo:
 </p>
 
-<pre><code>DDRD
+<pre><code class="language-c">DDRD
 PORTD
 PIND
 PD0
@@ -221,25 +221,25 @@ Por eso no debe pensarse en <code>avr/io.h</code> como una tabla universal idén
 
 <h4>3.1.2. util/delay.h</h4>
 
-<pre><code>#include &lt;util/delay.h&gt;</code></pre>
+<pre><code class="language-c">#include &lt;util/delay.h&gt;</code></pre>
 
 <p>
 Proporciona funciones de retardo como:
 </p>
 
-<pre><code>_delay_ms()</code></pre>
+<pre><code class="language-c">_delay_ms()</code></pre>
 
 <p>
 y:
 </p>
 
-<pre><code>_delay_us()</code></pre>
+<pre><code class="language-c">_delay_us()</code></pre>
 
 <p>
 Por ejemplo:
 </p>
 
-<pre><code>_delay_ms(100);</code></pre>
+<pre><code class="language-c">_delay_ms(100);</code></pre>
 
 <p>
 solicita un retardo de aproximadamente 100 ms.
@@ -267,19 +267,19 @@ Después de las cabeceras pueden aparecer definiciones mediante el preprocesador
 Por ejemplo:
 </p>
 
-<pre><code>#define LED_DELAY 100</code></pre>
+<pre><code class="language-c">#define LED_DELAY 100</code></pre>
 
 <p>
 Esto permite utilizar un nombre simbólico en lugar de repetir directamente un valor:
 </p>
 
-<pre><code>_delay_ms(LED_DELAY);</code></pre>
+<pre><code class="language-c">_delay_ms(LED_DELAY);</code></pre>
 
 <p>
 También pueden definirse máscaras de bits:
 </p>
 
-<pre><code>#define LED_PIN PB0</code></pre>
+<pre><code class="language-c">#define LED_PIN PB0</code></pre>
 
 <p>
 El uso de nombres simbólicos mejora la legibilidad y facilita modificar posteriormente determinados valores.
@@ -295,19 +295,19 @@ Debe distinguirse una macro definida mediante <code>#define</code> de una variab
 Un programa puede necesitar declarar tipos propios mediante mecanismos como:
 </p>
 
-<pre><code>typedef</code></pre>
+<pre><code class="language-c">typedef</code></pre>
 
 <p>
 o:
 </p>
 
-<pre><code>struct</code></pre>
+<pre><code class="language-c">struct</code></pre>
 
 <p>
 Por ejemplo:
 </p>
 
-<pre><code>typedef struct
+<pre><code class="language-c">typedef struct
 {
     uint8_t estado;
     uint8_t contador;
@@ -323,7 +323,7 @@ En programas pequeños para AVR probablemente esta sección no aparezca. En apli
 También pueden declararse variables fuera de cualquier función:
 </p>
 
-<pre><code>uint8_t contador;</code></pre>
+<pre><code class="language-c">uint8_t contador;</code></pre>
 
 <p>
 Una variable declarada en este ámbito tiene duración de almacenamiento estática y puede ser utilizada por las funciones que tengan acceso a ella.
@@ -347,7 +347,7 @@ Antes de <code>main()</code> también pueden aparecer los prototipos de funcione
 Por ejemplo:
 </p>
 
-<pre><code>void configurar_puerto(void);
+<pre><code class="language-c">void configurar_puerto(void);
 void encender_led(uint8_t pin);</code></pre>
 
 <p>
@@ -364,7 +364,7 @@ Un prototipo informa al compilador de que existe una función, indicando:
 La definición completa puede aparecer posteriormente:
 </p>
 
-<pre><code>void configurar_puerto(void)
+<pre><code class="language-c">void configurar_puerto(void)
 {
     /* Código */
 }</code></pre>
@@ -377,7 +377,7 @@ Esto permite que <code>main()</code> pueda utilizar una función cuya implementa
 Por ejemplo:
 </p>
 
-<pre><code>void configurar_puerto(void);
+<pre><code class="language-c">void configurar_puerto(void);
 
 int main(void)
 {
@@ -404,7 +404,7 @@ void configurar_puerto(void)
 La función:
 </p>
 
-<pre><code>int main(void)</code></pre>
+<pre><code class="language-c">int main(void)</code></pre>
 
 <p>
 En muchos manuales se dice que la función <code>main()</code> es el punto de entrada de la aplicación escrita en C; esto es así pero sólo desde la perspectiva del programa en C.
@@ -418,7 +418,7 @@ Lo cierto es que, después de un reset, existe una secuencia de código de arran
 Una forma habitual de estructurarla es:
 </p>
 
-<pre><code>int main(void)
+<pre><code class="language-c">int main(void)
 {
     [inicialización]
 
@@ -439,7 +439,7 @@ Una forma habitual de estructurarla es:
 Las variables que solamente necesita <code>main()</code> pueden declararse dentro de la propia función:
 </p>
 
-<pre><code>int main(void)
+<pre><code class="language-c">int main(void)
 {
     uint8_t contador;
     ...
@@ -480,7 +480,7 @@ En un programa AVR puede incluir, dependiendo de la aplicación:
 Por ejemplo:
 </p>
 
-<pre><code>DDRB |= (1 &lt;&lt; PB0);</code></pre>
+<pre><code class="language-c">DDRB |= (1 &lt;&lt; PB0);</code></pre>
 
 <p>
 configura <code>PB0</code> como salida.
@@ -504,7 +504,7 @@ En programas sencillos, la inicialización y la configuración pueden parecer un
 Por ejemplo:
 </p>
 
-<pre><code>DDRB |= (1 &lt;&lt; PB0);</code></pre>
+<pre><code class="language-c">DDRB |= (1 &lt;&lt; PB0);</code></pre>
 
 <p>
 es simultáneamente una configuración del hardware y una operación que forma parte de la inicialización de nuestra aplicación.
@@ -514,7 +514,7 @@ es simultáneamente una configuración del hardware y una operación que forma p
 En programas más grandes puede ser útil separar conceptualmente:
 </p>
 
-<pre><code>Inicialización
+<pre><code class="language-bash">Inicialización
 │
 ├── Variables
 ├── Estado inicial
@@ -545,7 +545,7 @@ Una característica habitual de los sistemas embebidos es que el programa debe p
 Por ello es frecuente encontrar:
 </p>
 
-<pre><code>while (1)
+<pre><code class="language-c">while (1)
 {
     /* Código principal */
 }</code></pre>
@@ -595,7 +595,7 @@ Aquí se encuentra normalmente el funcionamiento principal de la aplicación.
 Por ejemplo:
 </p>
 
-<pre><code>while (1)
+<pre><code class="language-c">while (1)
 {
     leer_entradas();
     procesar_datos();
@@ -606,7 +606,7 @@ Por ejemplo:
 El microcontrolador ejecuta estas operaciones una y otra vez:
 </p>
 
-<pre><code>leer entradas
+<pre><code class="language-bash">leer entradas
      ↓
 procesar
      ↓
@@ -662,7 +662,7 @@ En un AVR utilizado como sistema embebido independiente, normalmente no existe u
 Además, si el programa está estructurado de esta manera:
 </p>
 
-<pre><code>while (1)
+<pre><code class="language-c">while (1)
 {
     /* Código */
 }
@@ -700,7 +700,7 @@ El hecho de que <code>main()</code> tenga un <code>return</code> no significa qu
 Reuniendo todos los elementos anteriores, podemos utilizar el siguiente esqueleto como referencia para los programas AVR, en el que vamos a incluir un encabezado:
 </p>
 
-<pre><code>/*
+<pre><code class="language-c">/*
  * ============================================================
  * ENCABEZADO DEL PROGRAMA
  * ============================================================

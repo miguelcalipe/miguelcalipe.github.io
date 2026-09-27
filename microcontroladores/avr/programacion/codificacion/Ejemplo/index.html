@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejemplo de Programación Bare Metal | MC Mundo Tech</title>
+    <meta name="description" content="El siguiente programa íntegro compila todas las técnicas expuestas en este manual: uso de cabeceras estándar, macros simbólicas, configuración segura de entradas con resistencia pull-up, salidas y evaluación de entradas mediante máscaras de bits.">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>EJEMPLO DE PROGRAMACIÓN BARE METAL</h1>
+            
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   -->
+            
+            <section> 
+            
+                            <p>
+                    El siguiente programa íntegro compila todas las técnicas expuestas en este manual: uso de cabeceras estándar, macros simbólicas, configuración segura de entradas con resistencia pull-up, salidas y evaluación de entradas mediante máscaras de bits.
+                </p>
+
+                <p>Con el paso del tiempo aparecieron distintos niveles de abstracción cuyo objetivo es simplificar el desarrollo de software. Mientras mayor es la abstracción, menor es la cantidad de detalles del hardware que el programador necesita conocer, a costa de perder algo de control y eficiencia.</p>
+
+           
+                <pre><code class="language-c">
+/==============================================================================
+ * ARCHIVO:       main.c
+ * DISPOSITIVO:   Microcontrolador AVR de 8 bits (ej. ATmega328P / ATmega168)
+ * FRECUENCIA:    16.0 MHz (F_CPU)
+ * DESCRIPCIÓN:   Programa de control GPIO para la manipulación de registros 
+ *                de hardware (SFR) utilizando técnicas de enmascaramiento 
+ *                y filtrado de rebotes mecánico (debounce) en una entrada.
+ 
+ ==============================================================================*/
+
+/* ----------------------------------------------------------------------------
+ * 1. DEFINICIÓN DE PARÁMETROS Y CABECERAS DEL SISTEMA
+ * ---------------------------------------------------------------------------- */ 
+#ifndef F_CPU
+#define F_CPU 16000000UL // Define la frecuencia de reloj del chip (16 MHz)
+#endif
+
+#include &lt;avr/io.h&gt;  // Contiene las definiciones mnemónicas de registros (DDRB, PORTB, PINB)
+#include &lt;util/delay.h&gt; // Proporciona funciones de retardo por software (_delay_ms)
+
+/* ----------------------------------------------------------------------------
+ * 2. DEFINICIÓN DE CONSTANTES SIMBÓLICAS Y PINES (MAPEO DE HARDWARE)
+ * ---------------------------------------------------------------------------- */
+#define LED_PIN     PB1 // Pin de salida para el indicador LED (Bit 1 del puerto B)
+#define BUTTON_PIN  PB0 // Pin de entrada para el pulsador (Bit 0 del puerto B)
+
+/* ----------------------------------------------------------------------------
+ * 3. FUNCIÓN PRINCIPAL (ENTRY POINT)
+ * ---------------------------------------------------------------------------- */
+int main(void) {
+   /* ========================================================================
+     * SECCIÓN A: CONFIGURACIÓN E INICIALIZACIÓN DE PUERTOS (GPIO)
+     * ======================================================================== */
+
+    // 1. Configurar LED_PIN (PB1) como SALIDA (Output) mediante Bitwise OR (no destructivo). 
+    // OR  (|)  --&gt; Pone en 1, los bits específicos sin alterar el resto (SET / ENCENDER).
+    // Cualquier bit que se opere con el bit 1 mediante OR, dará como resultado '1' en el bit  de salida.
+    // Se utiliza el operador OR a nivel de bits (|=) para no alterar los demás pines de PORTB .
+    // DDRB = DDRB | (1 << LED_PIN); // Configura PB1 como salida. Mas simplificadamente: 
+    DDRB |= (1 << LED_PIN);
+    
+    // 2. Configurar BUTTON_PIN (PB0) como ENTRADA (Input) mediante Bitwise AND con máscara invertida
+    // AND (&amp;)  --&gt; Pone en 0 (CLEAR) o evalúa el estado de bits específicos
+    // Cualquier bit que se opere con el bit 0 mediante AND, dará como resultado '0' en el bit de salida.
+    // Aquí se utiliza AND (&) con la máscara invertida (~) para colocar un '0' seguro en el bit 0 
+    // sin alterar los demás pines de PORTB. Esto asegura que PB0 se configure como entrada.
+    // DDRB = DDRB &amp; ~(1 << BUTTON_PIN); // Configura PB0 como entrada. Mas simplificadamente:
+    DDRB &= ~(1 << BUTTON_PIN);
+    
+    // 3. Habilitar la Resistencia Pull-Up Interna en BUTTON_PIN (PB0)
+    // Al escribir un '1' en el registro PORTx cuando el pin está configurado como entrada, 
+    // se activa la resistencia interna Pull-Up conectada a VCC
+    // Al activarla, se mantiene el pin en un nivel lógico alto (1/ 5V) cuando el pulsador no está presionado.
+    // Esto evita que el pin quede flotante y susceptible a interferencias o ruido eléctrico.
+    // PORTB = PORTB | (1 << BUTTON_PIN); // Habilita Pull-Up en PB0. Mas simplificadamente:
+    PORTB |= (1 << BUTTON_PIN);
+
+    /* ========================================================================
+     * SECCIÓN B: BUCLE PRINCIPAL DE EJECUCIÓN CONTINUA (INFINITE LOOP)
+     * ======================================================================== */
+    while (1) {
+        /* --------------------------------------------------------------------
+         * PASO 1: Muestrear el estado lógico del pulsador leyendo el registro PINB
+         * Dado que la resistencia Pull-Up está activa, el pin PB0 lee '1' en 
+         * reposo y '0' cuando el pulsador se presiona conectándolo a Tierra (GND)
+         * -------------------------------------------------------------------- */
+        if (!(PINB & (1 << BUTTON_PIN))){
+            
+            /* ----------------------------------------------------------------
+             * PASO 2: Filtrado Anti-rebote (Software Debounce)
+             * Se espera un intervalo de 20 ms para superar la ventana de 
+             * vibración o ruido mecánico de los contactos eléctricos.
+             * ---------------------------------------------------------------- */
+            _delay_ms(20);
+
+            /* ----------------------------------------------------------------
+             * PASO 3: Verificación de seguridad
+             * Se reevalúa el registro PINB. Si el bit sigue en '0', se confirma 
+             * que es una pulsación real y no un falso disparo por ruido.
+             * ---------------------------------------------------------------- */
+            if (!(PINB & (1 << BUTTON_PIN))) {
+                
+                // Activar la salida: Poner en Nivel Alto (5V) el bit PB1 en PORTB
+                PORTB |= (1 << LED_PIN);
+            }
+
+        } else {
+
+            /* ----------------------------------------------------------------
+             * PASO 4: Estado de reposo
+             * Si el botón no está presionado, se desactiva la salida (0V).
+             * ---------------------------------------------------------------- */
+            PORTB &= ~(1 << LED_PIN);
+        }
+    }
+
+    return 0; // Estructura formal de retorno según el estándar C[cite: 1]
+}
+
+                </code></pre>
+
+               
+            </section>
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control y Manipulación de bits de AVR en C | MC Mundo Tech</title>
+    <meta name="description" content=""Manual técnico pedagógico sobre métodos de control, asignación directa y manipulación bitwise de registros en microcontroladores AVR utilizando C.">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>MÉTODOS DE CONTROL Y MANIPULACIÓN DE BITS EN C</h1>
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   -->
+            
+            <section> 
+            
+            <h2>1. CONTROL DE BITS EN C</h2>
+            <p>
+                La programación de microcontroladores AVR se basa en el manejo directo de los registros de hardware
+            </p>
+            <p>
+                Controlar el microcontrolador significa escribir o leer valores en estos registros (como DDRB, PORTB,PINBX) para producir efectos físicos en el hardware, como configurar un pin como salida o establecer un voltaje.
+            </p>
+            
+            <p>
+                En la programación de microcontroladores AVR, los registros de hardware se representan en C como variables globales predefinidas. Sin embargo, a diferencia de una variable convencional en RAM, la manera exacta en que aplicamos operaciones sobre estos registros determina la estabilidad del firmware, la integridad de los periféricos y la previsibilidad del hardware.
+            </p> 
+            <p>
+                Existen dos métodos fundamentales para manipular bits en C: la <strong>asignación directa</strong> y la <strong>manipulación de bits (<em>bit twidding</em>) mediante máscaras</strong>. Cada enfoque tiene ventajas y desventajas, y su elección depende del contexto de programación y de los requisitos de seguridad y modularidad del firmware.
+            </p>
+
+                             
+        <h2>2. MÉTODO POR ASIGNACIÓN DIRECTA (=)</h2>
+        <p>La asignación directa es el mecanismo de escritura más elemental: reescribe de forma simultánea la totalidad de los 8 bits que integran un registro de hardware.</p>
+
+        <h3>2.1. Asignación Directa de Números Binarios</h3>
+        <p>Al aplicar el operador de asignación simple (<code>=</code>) sobre un registro como <code>DDRB</code> utilizando un literal binario, el microcontrolador ignora y borra cualquier configuración preexistente en dicho puerto:</p>
+
+<pre><code>DDRB = 0b00000010;</code></pre>
+
+        <p>Esta operación evalúa y transfiere el patrón bit a bit directamente al registro:</p>
+        <ul>
+            <li><strong>Valor Asignado:</strong> El literal <code>0b00000010</code> (equivalente a 2 en decimal) sitúa un uno (<code>1</code>) lógico únicamente en la posición correspondiente al pin PB1 (índice 1) y establece ceros (<code>0</code>) en las siete posiciones restantes.</li>
+            <li><strong>Efecto Final en Hardware:</strong> Se configura únicamente el pin PB1 como salida digital, mientras que los pines PB0 y del PB2 al PB7 son forzados a operar como entradas.</li>
+        </ul>
+
+        <h3>2.2. Asignación Directa con Máscaras por Desplazamiento (&lt;&lt;)</h3>
+        <p>En lugar de escribir literales completos, es común construir máscaras dinámicas mediante el operador de desplazamiento de bits (<em>bit shifting</em>). El desplazamiento reubica la posición de los bits hacia la izquierda o derecha dentro del registro:</p>
+        <ul>
+            <li><strong><code>&lt;&lt;</code> (Desplazamiento a la izquierda):</strong> Mueve los bits hacia posiciones de mayor peso, rellenando los espacios vacíos a la derecha con ceros (<code>0</code>).</li>
+            <li><strong><code>&gt;&gt;</code> (Desplazamiento a la derecha):</strong> Mueve los bits hacia posiciones de menor peso, rellenando con ceros a la izquierda en variables sin signo.</li>
+        </ul>
+
+        <p>La expresión formal <code>(1 &lt;&lt; n)</code> crea una máscara binaria de 8 bits donde únicamente el bit en la posición <em>n</em> se sitúa en nivel alto (<code>1</code>). Conceptualmente, el valor inicial <code>1</code> representa <code>0b00000001</code>, el cual es desplazado <em>n</em> posiciones hacia la izquierda. Por ejemplo, la expresión <code>(1 &lt;&lt; 3)</code> desplaza el bit tres posiciones, resultando en el patrón binario <code>0b00001000</code>.</p>
+
+        <p>Si aplicamos esta técnica con asignación directa:</p>
+<pre><code>DDRB = (1 &lt;&lt; PB3); // PB3 equivale conceptualmente a la constante 3</code></pre>
+
+        <p>
+            La expresión <code>(1 &lt;&lt; PB3)</code> genera la máscara <code>0b00001000</code>. Al asignarla directamente mediante el operador <code>=</code>, forzamos a que el pin PB3 se configure como salida, pero simultáneamente reescribimos los otros 7 pines como entradas (<code>0</code>), destruyendo la configuración previa del puerto.
+        </p>
+
+        <p> 
+            La asignación directa (<code>=</code>) es el método más intuitivo para comprender la correspondencia biunívoca entre las posiciones del código en C y las 8 patillas del integrado al iniciar el estudio de la arquitectura AVR.
+        </p>
+        <p> 
+            En arquitecturas modulares, utilizar asignación directa dentro del flujo principal del programa representa una mala práctica severa. Si un módulo periférico configuró previamente un pin para una interfaz de comunicación o un sensor, ejecutar <code>DDRB = (1 &lt;&lt; PB1)</code> en otra sección del programa borrará la configuración de los otros 7 pines, interrumpiendo buses de datos y desactivando periféricos críticos.</li>
+        </p>
+    
+    
+        <h2>3. MÉTODO DE MANIPULACIÓN DE BITS (BIT TWIDDING) POR MÁSCARAS</h2>
+        <p>Para prevenir la alteración accidental de bits vecinos, se recurre a la técnica del <strong>enmascaramiento de registros (Register Masking)</strong>. Esta técnica aplica operaciones lógicas a nivel de bits (AND, OR, XOR) entre el valor presente en el registro y un patrón binario denominado <strong>máscara (mask)</strong>, permitiendo modificar, limpiar o evaluar pines específicos sin afectar el resto del puerto.</p>
+
+        <pre>
+Resumen de Operadores Lógicos a Nivel de Bits:
+  • OR  (|)  --&gt; Pone en 1 bits específicos sin alterar el resto (SET / ENCENDER).
+  • AND (&amp;)  --&gt; Pone en 0 (CLEAR) o evalúa el estado de bits específicos.
+  • XOR (^)  --&gt; Invierte o conmuta el estado de bits específicos (TOGGLE).
+        </pre>
+
+        <h3>3.1. Activación Selectiva de Bits (Operación Bitwise OR: |=)</h3>
+        <p>El operador combinado <code>|=</code> fuerza a '1' uno o varios bits específicos. La regla de la compuerta OR garantiza que cualquier bit comparado con '0' preserve su valor previo.</p>
+
+<pre><code>DDRB |= (1 &lt;&lt; PB1); // Equivale sintácticamente a: DDRB = DDRB | (1 &lt;&lt; PB1);</code></pre>
+
+        <p><strong>Desglose del Mecanismo Interno:</strong></p>
+        <ol>
+            <li>Asumamos un estado inicial en el registro: <code>DDRB = 0b00101000</code> (donde PB5 y PB3 estaban configurados previamente como salidas).</li>
+            <li>Se evalúa la máscara <code>(1 &lt;&lt; PB1)</code>, obteniendo: <code>0b00000010</code>.</li>
+            <li>Se ejecuta la operación OR bit a bit entre el registro y la máscara:</li>
+        </ol>
+
+<pre>
+   0b00101000    (Estado previo de DDRB)
+OR 0b00000010    (Máscara 1 &lt;&lt; PB1)
+---------------------------------------
+   0b00101010    (Nuevo estado guardado en DDRB)
+</pre>
+
+        <p><strong>Resultado en Hardware:</strong> El pin PB1 conmuta a modo SALIDA. Los pines PB3 y PB5 mantienen intacta su condición de salida, y el resto permanece como entrada sin sufrir perturbaciones.</p>
+
+        <p><strong>Activación Múltiple Simultánea:</strong> Para configurar múltiples pines en una sola instrucción, se combinan las máscaras mediante el operador OR:</p>
+<pre><code>DDRB |= (1 &lt;&lt; PB1) | (1 &lt;&lt; PB3);</code></pre>
+
+<pre>
+   0b00000010    (Máscara 1 &lt;&lt; PB1)
+OR 0b00001000    (Máscara 1 &lt;&lt; PB3)
+---------------------------------------
+   0b00001010    (Máscara combinada resultante)
+</pre>
+
+        <h3>3.2. Limpieza Selectiva de Bits (Operación Bitwise AND con Máscara Invertida: &amp;= ~)</h3>
+        <p>
+            Para forzar a '0' un bit determinado sin modificar los demás, se utiliza el operador <code>&amp;=</code> junto con la negación unaria (<code>~</code>). Dado que el operador AND devuelve '0' siempre que se compare con '0', se requiere una máscara con un '0' en la posición a borrar y '1' en las demás.
+        </p>
+
+<pre><code>PORTB &amp;= ~(1 &lt;&lt; PB2); // Desactiva o apaga el pin PB2 de forma segura</code></pre>
+
+        <p><strong>Desglose del Mecanismo Interno:</strong></p>
+        <ol>
+            <li>La expresión <code>(1 &lt;&lt; PB2)</code> genera la máscara base: <code>0b00000100</code>.</li>
+            <li>El operador complemento <code>~</code> invierte la totalidad de los bits: <code>~0b00000100</code> resulta en <code>0b11111011</code>.</li>
+            <li>Se aplica la operación AND combinada sobre el registro <code>PORTB</code>:</li>
+        </ol>
+
+<pre>
+    0b00000111    (Estado previo de PORTB)
+AND 0b11111011    (Máscara invertida)
+---------------------------------------
+    0b00000011    (Nuevo estado guardado en PORTB)
+</pre>
+
+        <p><strong>Resultado en Hardware:</strong> El bit PB2 se limpia a '0' (desconectando el voltaje o la resistencia pull-up según el modo), mientras que PB0 y PB1 conservan su estado lógico alto '1' sin alteraciones.</p>
+
+        <h3>3.3. Evaluación del Estado de un Bit (Operación Bitwise AND: &amp;)</h3>
+        <p>Para inspeccionar el voltaje presente en un pin de entrada, se efectúa una operación AND entre el byte completo del registro de lectura (como <code>PINB</code> o <code>PIND</code>) y una máscara que contenga un '1' únicamente en la posición a consultar:</p>
+
+<pre><code>if (PIND &amp; (1 &lt;&lt; PD2)) {
+    // Se ejecuta si el pin PD2 se encuentra en nivel alto (VCC / 5V)
+}</code></pre>
+
+        <p><strong>Lógica de Evaluación:</strong> Si el bit en PD2 vale '0', la operación AND resulta en <code>0b00000000</code> (evaluado como falso por la estructura <code>if</code>). Si el bit se encuentra en nivel alto ('1'), la operación devuelve el valor entero equivalente a la máscara (<code>0b00000100</code>), el cual, al ser distinto de cero, es interpretado como verdadero.</p>
+
+        <h3>2.4. Máscaras Selectivas para Configuración de Periféricos (ADC / Multiplexores)</h3>
+        <p>El operador AND se emplea asimismo para limpiar campos o nipples de bits específicos dentro de registros de configuración compleja antes de escribir nuevos parámetros, evitando sobreescribir los bits de control global.</p>
+
+        <p>Un caso de aplicación habitual es la selección de canal en el multiplexor del Convertidor Analógico a Digital (ADC) mediante el registro <code>ADMUX</code>:</p>
+
+<pre><code>// Enmascara y limpia los 4 bits menos significativos (AND con 0b11110000) y asigna el canal
+ADMUX = (ADMUX &amp; 0b11110000) | canal;</code></pre>
+
+        <h2>3. OPTIMIZACIÓN Y PROTECCIÓN CON EL SUFIJO 1UL</h2>
+        <p>En el estándar ANSI C para microcontroladores AVR de 8 bits, las constantes enteras literales como <code>1</code> son interpretadas por defecto como números enteros con signo de 16 bits (<code>signed int</code>). Al realizar desplazamientos de bits en registros de 16 bits o en arquitecturas de mayor escala, desplazar un entero con signo más de 14 posiciones (ej. <code>1 &lt;&lt; 15</code>) puede derivar en un desbordamiento de entero firmado (<em>signed integer overflow</em>) o comportamiento indeterminado.</p>
+
+        <p><strong>Regla de Ingeniería de Firmware:</strong></p>
+<pre><code>PORTB |= (1UL &lt;&lt; PB1);</code></pre>
+
+        <p>El sufijo <code>UL</code> (<em>Unsigned Long</em>) fuerza al compilador GCC a tratar la constante como un entero sin signo de 32 bits, garantizando que el desplazamiento de la máscara se ejecute sin desbordamiento ni corrupción de signo en cualquier registro del microcontrolador.</p>
+    </section>
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>

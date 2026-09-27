@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registros de Hardware en AVR | MC Mundo Tech</title>
+    <meta name="description" content="Guía sobre el funcionamiento y programación de bajo nivel de los registros de hardware (GPR y SFR) en los microcontroladores AVR de 8 bits.">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>LOS REGISTROS DE HARDWARE EN uMC AVR</h1>
+            
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   -->
+            
+            <section>
+            <h2>1. QUE SON LOS REGISTROS DE HARDWARE. TIPOS</h2>
+
+    <p>En la programación de bajo nivel (bare-metal) de microcontroladores AVR de 8 bits (como los circuitos integrados ATmega328P, ATmega168 o ATmega32), se interactúa directamente con el silicio.</p>
+
+    <p>En la arquitectura de un microcontrolador AVR, los <strong>registros de hardware</strong>, o simplemente los <strong>registros</strong>, son celdas de memoria de alta velocidad integradas directamente en el procesador. Físicamente, cada registro es un bloque estandarizado de 8 bits compuesto por 8 flip-flops (biestables), los cuales se construyen a partir de transistores MOSFET dentro del silicio del chip.Estos registros actúan como el centro de control del microcontrolador y se dividen principalmente en dos grupos: </p>
+
+    <ul>
+        <li><strong>Registros de Propósito General (GPR):</strong> Son registros internos de la CPU (como los registros R0 a R31 en AVR) que se usan para realizar operaciones matemáticas, lógicas y almacenamiento temporal de variables.</li>
+        <li><strong>Registros de Función Especial (SFR):</strong> Son registros de hardware cableados directamente a los periféricos del chip (como los puertos I/O, temporizadores, ADC o módulos de comunicación UART). Actúan como el "puente de mando" para controlar el comportamiento físico del silicio.</li>
+    </ul>
+
+
+    <p>Cada flip-flop interno:</p>
+    <ul>
+        <li>Guarda un solo bit de información.</li>
+        <li>Posee memoria (retiene su estado lógico hasta que sea reescrito o se interrumpa la alimentación).</li>
+        <li>Cada bit únicamente puede adoptar dos valores: 0 o 1.</li>
+    </ul>
+
+    <p>Aunque físicamente son idénticos, estos registros se conectan a circuitos diferentes:</p>
+    <ul>
+        <li><strong>En un GPR (como R16):</strong> Las salidas de esos 8 flip-flops están conectadas directamente a las entradas de la ALU (Unidad Aritmético Lógica) para hacer cálculos.</li>
+        <li><strong>En un SFR (como PORTB):</strong> Las salidas de esos 8 flip-flops viajan a través del chip hasta los transistores de los pines físicos (las patillas) para cambiar el voltaje exterior, o hacia los circuitos de los periféricos (timers, ADC, etc.).</li>
+    </ul>
+
+        <h3>1.1 Los Registros de Propósito General (GPR)</h3>
+        <p>La CPU del microcontrolador no puede hacer operaciones directamente entre la memoria RAM o los periféricos (SFR). Todo dato debe pasar primero por un registro general para ser procesado. Sirven para hacer cálculos matemáticos y lógicos dentro de la CPU.</p>
+        <p>Los GPR están pegados físicamente al procesador. Cualquier operación matemática o lógica que se haga dentro de estos registros toma un solo ciclo de reloj. Si el chip corre a 16 MHz, esa operación toma apenas 62.5 nanosegundos (T = 1 / f). Leer o escribir en otros lados toma el doble de tiempo.</p>
+        <p>El chip tiene exactamente 32 de estos registros, nombrados del R0 al R31 (todos de 8 bits). Aunque parecen iguales, el fabricante los dividió sutilmente por software:</p>
+        <ul>
+            <li><strong>R0 al R15:</strong> Son más limitados. Por ejemplo, no se le puede asignar un número fijo directamente (como R0 = 5) usando instrucciones rápidas.</li>
+            <li><strong>R16 al R25:</strong> Son los de batalla. Aquí es donde el compilador hace el 90% de las sumas, restas y comparaciones del código.</li>
+            <li><strong>R26 al R31 (X, Y, Z):</strong> Se pueden usar en parejas para formar tres registros de 16 bits. Sirven como "punteros" para guardar direcciones de memoria cuando necesitas leer datos que están muy lejos en la memoria RAM o en la memoria Flash (donde se guarda el código).</li>
+        </ul>
+   
+        <h3>1.2 Los Registros de Función Especial (SFR)</h3>
+        <p>En los AVR de 8 bits, los SFR están mapeados en la memoria de datos (SRAM). Esto significa que el microcontrolador les asigna una dirección de memoria específica.</p>
+        <p>Cuando se escribe un valor en un SFR desde el código C o Ensamblador, no solo se guarda una variable; en realidad se modifica directamente el estado físico de un circuito:</p>
+        <ul>
+            <li><strong>Fijar la dirección (DDRx):</strong> Modificando el registro de hardware DDRB, se alteran los transistores que configuran los pines del Puerto B como entradas o salidas.</li>
+            <li><strong>Cambiar el estado del pin (PORTx):</strong> Escribiendo en <code>PORTB</code>, se aplica o retira voltaje físico (5V o 0V) en esos pines.</li>
+            <li><strong>Configurar un periférico:</strong> Si se escribe en <code>TCCR1A</code>, se alteran los multiplexores internos para cambiar la frecuencia o el modo de un temporizador de hardware.</li>
+        </ul>
+
+        <div class="table-container">
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Característica</th>
+                    <th>Registros de Propósito General (GPR)</th>
+                    <th>Registros de Función Especial (SFR)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Función</td>
+                    <td>Procesar datos y realizar cálculos en la CPU.</td>
+                    <td>Controlar y monitorear el hardware y periféricos.</td>
+                </tr>
+                <tr>
+                    <td>Conexión física</td>
+                    <td>Internos a la ALU (Unidad Aritmético Lógica).</td>
+                    <td>Conectados a módulos físicos (Pines, ADC, Timers).</td>
+                </tr>
+                <tr>
+                    <td>Ejemplos en AVR</td>
+                    <td>R16, R17, X, Y, Z</td>
+                    <td>PORTB, DDRD, UDR0, ADMUX</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+
+    </section>
+
+    <section>
+        <h2>2. LA PROGRAMACIÓN Y EL MANEJO DE LOS SFR</h2>
+        <p>El control de los periféricos y funciones del dispositivo se logra mediante la lectura y escritura de valores en ubicaciones especiales de memoria denominadas <strong>Registros de Función Especial (SFR)</strong>. La programación de microcontroladores AVR se basa en el manejo directo de estos registros de hardware. Controlar el microcontrolador significa escribir o leer valores en estos registros (como <code>DDRB</code>, <code>PORTB</code>, <code>PINB</code>) para producir efectos físicos en el hardware, como configurar un pin como salida o establecer un nivel de voltaje medible en una patilla física del circuito integrado.</p>
+
+        <p>Cuando se escribe en C, el compilador (<code>AVR-GCC</code>) se encarga de administrar los 32 registros de propósito general (R0-R31). Si se crea una variable para un bucle como <code>for(int i=0; i &lt; 10; i++)</code>, el compilador asignará automáticamente esa i a un GPR (por ejemplo, R16). El programador (la persona que crea el código) no tuvo que escribir la palabra R16 en el código. En cambio, para los efectos físicos, sí se está obligado a escribir explícitamente los nombres de los SFR (<code>DDRB</code>, <code>PORTB</code>, <code>PINB</code>).</p>
+
+        <p>Si se pone un número en el registro R16, no pasa absolutamente nada en los pines del chip. Para que ese dato altere el mundo exterior, tiene que ser copiado obligatoriamente a un SFR.</p>
+
+        <p>En el código escrito en lenguaje C, un programador accede a estos registros como si fueran variables predefinidas en las cabeceras estándar del sistema (como &lt;avr/io.h&gt;). El manejo directo de los registros se logra mediante una técnica fundamental denominada manipulación de bits (<em>bit twiddling</em>).</p>
+
+        <p>La manipulación de bits (<em>bit twiddling</em>) es la práctica de usar operadores lógicos binarios (como AND &amp;, OR |, XOR ^ y NOT ~) para modificar el estado de bits individuales dentro de un byte. Esta técnica es estrictamente necesaria porque cada registro de hardware (que es típicamente un byte de 8 bits) controla múltiples funciones o pines simultáneamente. Para configurar una sola característica (un bit individual), se requiere de un método analítico que asegure que los otros siete bits del registro permanezcan intactos y sin cambios indeseados.</p>
+   
+        <h3>2.1. Naturaleza Física de los Registros de Funión Especial</h3>
+        <p>A diferencia de una variable ordinaria almacenada temporalmente en la memoria RAM (que solo conserva valores numéricos para operaciones matemáticas), los registros de función especial poseen efectos secundarios físicos directos e inmediatos. Están conectados físicamente mediante buses internos de datos a circuitos lógicos, amplificadores de corriente y arreglos de transistores MOSFET que interactúan directamente con el entorno eléctrico externo del microcontrolador.</p>
+
+        <p>Estructura interna de un registro de hardware de 8 bits (Byte):</p>
+
+<pre> <code>
+ [ FF7 ][ FF6 ][ FF5 ][ FF4 ][ FF3 ][ FF2 ][ FF1 ][ FF0 ]  &lt;-- 8 Flip-Flops
+    b7     b6     b5     b4     b3     b2     b1     b0   &lt;-- Posición del bit
+</pre></code>
+
+        <p>Un registro de hardware en la arquitectura AVR es un bloque estandarizado compuesto por 8 flip-flops (biestables). Dentro del chip AVR existen millones de transistores MOSFET agrupados en estas estructuras flip-flop. 8 flip-flops juntos forman un registro de 8 bits.</p>
+        <p>Cada flip-flop interno:</p>
+        <ul>
+            <li>Guarda un solo bit de información.</li>
+            <li>Posee memoria (retiene su estado lógico hasta que sea reescrito o se interrumpa la alimentación).</li>
+            <li>Cada bit únicamente puede adoptar dos valores: 0 o 1.</li>
+        </ul>
+
+        <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Bit</th>
+                    <th>Estado Lógico</th>
+                    <th>Estado Físico Interno</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>0</td>
+                    <td>LOW (Bajo)</td>
+                    <td>Transistor apagado / Estado de corte (0 V / Tierra).</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>HIGH (Alto)</td>
+                    <td>Transistor encendido / Estado de saturación (VCC aprox. 5 V o 3.3 V).</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+
+        <h3>2.2 Secuencia de Eventos Físicos al Modificar un Pin:</h3>
+        <p>Tomemos como ejemplo el Puerto B (PORTB). El bit 1 de este registro está conectado eléctricamente a través de un arreglo de transistores internos al pin externo PB1. Cuando escribimos código en lenguaje C para establecer un nivel lógico alto en el pin PB1, físicamente ocurre la siguiente secuencia paso a paso:</p>
+        <ol>
+            <li>La CPU procesa la instrucción y escribe un 1 en el flip-flop correspondiente al bit 1 (b1) del registro del Puerto B.</li>
+            <li>El flip-flop conmuta su estado y mantiene electrónicamente ese bit en nivel alto.</li>
+            <li>Se activa la compuerta de un transistor MOSFET de potencia interno.</li>
+            <li>El pin externo PB1 queda conectado internamente al riel de alimentación VCC.</li>
+            <li>Se entregan 5 V físicos (o 3.3 V) medibles externamente con un voltímetro en la patilla del chip.</li>
+        </ol>
+    </section>
+
+    <section>
+        <h2>3. ANCHO DE PALABRA (WORD SIZE) Y CLARIFICACIÓN TERMINOLÓGICA</h2>
+        <p>En la programación de sistemas embebidos, la imprecisión terminológica conduce a errores de diseño. Es crucial distinguir los siguientes conceptos en la arquitectura AVR:</p>
+        <ul>
+            <li><strong>Byte:</strong> Es la unidad fundamental de datos de 8 bits. Todos los registros de E/S de propósito general (DDRx, PORTx, PINx) miden exactamente 8 bits.</li>
+            <li><strong>Word (Palabra):</strong> En la CPU AVR de 8 bits, una "palabra" se define formalmente en su Hoja de Datos (Datasheet) como un bloque de 16 bits (2 bytes). Se utiliza para la arquitectura de instrucciones en la memoria Flash o para la gestión de registros de periféricos de 16 bits (como los temporizadores/contadores TCNT1). Denominar "palabra" a un registro de 8 bits es un error técnico que debe evitarse.</li>
+        </ul>
+    </section>
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>
