@@ -44,6 +44,7 @@
 
     <p>Para controlar de forma integral el comportamiento eléctrico, la dirección de la corriente y el nivel de voltaje de cada pin, el hardware del AVR destina <strong>tres registros dedicados de 8 bits</strong> por cada puerto:</p>
 
+    <div class="table-container">
     <table>
         <thead>
             <tr>
@@ -70,6 +71,7 @@
             </tr>
         </tbody>
     </table>
+    </div>
 
     <p>Tomando como ejemplo práctico el <strong>Puerto B</strong>, sus tres registros asociados son <code>DDRB</code>, <code>PORTB</code> y <code>PINB</code>. La arquitectura mantiene una correspondencia unívoca uno a uno entre cada bit de un registro de 8 bits y un pin físico del circuito integrado:</p>
 
@@ -102,7 +104,7 @@ Valor en DDRB:   0    0    0    0    0    0    1    0
 </pre>
 
         <p>Al reescribir el registro por completo, la circuitería interna del microcontrolador aplica de inmediato el siguiente estado eléctrico individual en sus terminales:</p>
-
+        <div class="table-container">
         <table>
             <thead>
                 <tr>
@@ -121,6 +123,7 @@ Valor en DDRB:   0    0    0    0    0    0    1    0
                 </tr>
             </tbody>
         </table>
+        </div>
 
         <h3>2.3. Inconvenientes de la Asignación Directa</h3>
         <p>La asignación directa mediante literales binarios (<code>DDRB = 0b00000010;</code>) borra el estado previo de los 8 bits del puerto. En el desarrollo industrial de firmware, se prefiere modificar un único pin sin alterar la configuración de los pines vecinos utilizando operadores lógicos a nivel de bits (<em>bitwise operations</em>):</p>
@@ -148,6 +151,7 @@ Valor en DDRB:   0    0    0    0    0    0    1    0
 
     <section>
         <h2>4. LECTURA DEL ESTADO E INVERSIÓN POR HARDWARE (PINx)</h2>
+        <p>El registro PINx se utiliza para conocer el estado lógico de los pines configurados como entradas.</p>
         <p>A diferencia de DDRx y PORTx, el registro <strong>PINx</strong> interactúa directamente con los búferes de lectura conectados a la patilla metálica del integrado.</p>
 
         <h3>4.1. Muestreo de Lectura Digital</h3>

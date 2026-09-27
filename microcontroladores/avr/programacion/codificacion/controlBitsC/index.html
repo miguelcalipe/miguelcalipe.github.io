@@ -52,8 +52,10 @@
             <p>
                 Existen dos métodos fundamentales para manipular bits en C: la <strong>asignación directa</strong> y la <strong>manipulación de bits (<em>bit twidding</em>) mediante máscaras</strong>. Cada enfoque tiene ventajas y desventajas, y su elección depende del contexto de programación y de los requisitos de seguridad y modularidad del firmware.
             </p>
+            </section>
 
-                             
+        <section>
+                            
         <h2>2. MÉTODO POR ASIGNACIÓN DIRECTA (=)</h2>
         <p>La asignación directa es el mecanismo de escritura más elemental: reescribe de forma simultánea la totalidad de los 8 bits que integran un registro de hardware.</p>
 
@@ -90,8 +92,9 @@
         <p> 
             En arquitecturas modulares, utilizar asignación directa dentro del flujo principal del programa representa una mala práctica severa. Si un módulo periférico configuró previamente un pin para una interfaz de comunicación o un sensor, ejecutar <code>DDRB = (1 &lt;&lt; PB1)</code> en otra sección del programa borrará la configuración de los otros 7 pines, interrumpiendo buses de datos y desactivando periféricos críticos.</li>
         </p>
-    
-    
+        </section>
+
+        <section>
         <h2>3. MÉTODO DE MANIPULACIÓN DE BITS (BIT TWIDDING) POR MÁSCARAS</h2>
         <p>Para prevenir la alteración accidental de bits vecinos, se recurre a la técnica del <strong>enmascaramiento de registros (Register Masking)</strong>. Esta técnica aplica operaciones lógicas a nivel de bits (AND, OR, XOR) entre el valor presente en el registro y un patrón binario denominado <strong>máscara (mask)</strong>, permitiendo modificar, limpiar o evaluar pines específicos sin afectar el resto del puerto.</p>
 
@@ -165,15 +168,194 @@ AND 0b11111011    (Máscara invertida)
 
         <p><strong>Lógica de Evaluación:</strong> Si el bit en PD2 vale '0', la operación AND resulta en <code>0b00000000</code> (evaluado como falso por la estructura <code>if</code>). Si el bit se encuentra en nivel alto ('1'), la operación devuelve el valor entero equivalente a la máscara (<code>0b00000100</code>), el cual, al ser distinto de cero, es interpretado como verdadero.</p>
 
-        <h3>2.4. Máscaras Selectivas para Configuración de Periféricos (ADC / Multiplexores)</h3>
+        <h3>3.4. Máscaras Selectivas para Configuración de Periféricos (ADC / Multiplexores)</h3>
         <p>El operador AND se emplea asimismo para limpiar campos o nipples de bits específicos dentro de registros de configuración compleja antes de escribir nuevos parámetros, evitando sobreescribir los bits de control global.</p>
 
         <p>Un caso de aplicación habitual es la selección de canal en el multiplexor del Convertidor Analógico a Digital (ADC) mediante el registro <code>ADMUX</code>:</p>
 
 <pre><code>// Enmascara y limpia los 4 bits menos significativos (AND con 0b11110000) y asigna el canal
 ADMUX = (ADMUX &amp; 0b11110000) | canal;</code></pre>
+        </section>
 
-        <h2>3. OPTIMIZACIÓN Y PROTECCIÓN CON EL SUFIJO 1UL</h2>
+        <section>
+        <h2>4. SECUENCIA BÁSICA PARA CONFIGURAR UNA SALIDA DIGITAL</h2>
+        <p>
+            Para controlar un dispositivo mediante un pin AVR se siguen dos pasos fundamentales:
+        </p>
+        <ol>
+            <li>Configurar el pin como salida mediante el registro DDRx. <br>
+                Primero se establece el bit correspondiente de DDRx:
+<pre><code class="langage-c">DDRB |= (1 << PB0);</code></pre>
+Esto configura <code>PB0</code> como salida.
+            </li>
+            <li>Establecer el nivel lógico deseado (alto o bajo) mediante el registro PORTx. <br>
+Después se escribe en <code>PORTB</code>:
+
+<pre><code class="language-c">PORTB |= (1 << PB0); //para establecer el pin en nivel alto.</code></pre>
+
+<pre><code class="language-c">PORTB &= ~(1 << PB0);// Para llevarlo a nivel bajo:</code></pre>
+            </li>
+        </ol>
+
+        <p> El principio fundamental es: </p>
+<ul>
+    <li>DDRx  → ¿entrada o salida? </li>
+    <li>PORTx → ¿qué nivel lógico? </li>
+    <li>PINx  → ¿qué estado lógico estoy leyendo? </li>
+</ul>
+        
+
+        <h3>4.1. Ejemplo básico de salidas digitales: blinkLED</h3>
+        <p>Un programa mínimo puede ser:</p>
+
+<pre><code class="language-c">  
+#include <avr/io.h>
+#include <util/delay.h>
+
+int main(void)
+{
+    DDRB |= (1 << PB0);
+
+    while (1)
+    {
+        PORTB = 0b00000001;
+        _delay_ms(1000);
+
+        PORTB = 0b00000000;
+        _delay_ms(1000);
+    }
+
+    return (0);
+}
+</code></pre>
+
+<h3>4.2. Secuencia de Funcionamiento</h3>
+
+<pre><code class="language-bash">
+Configurar PB0 como salida
+        ↓
+Poner PB0 en HIGH
+        ↓
+Esperar 1 segundo
+        ↓
+Poner PB0 en LOW
+        ↓
+Esperar 1 segundo
+        ↓
+Repetir
+</code></pre>
+
+<p>El resultado es un LED que se enciende y apaga aproximadamente una vez por segundo.</p>
+        
+
+        <h3>4.3. Secuencia Resumida</h3>
+<p>Por tanto, la secuencia fundamental puede resumirse así:</p>
+
+<ul>
+    <li>DDRx  → configura el pin como entrada</li>
+    <li>PORTx → opcional: activa/desactiva pull-up</li>
+    <li>PINx  → lee el estado lógico del pin </li>
+</ul>
+</section>
+
+<section>
+    <h2>5. SECUENCIA BÁSICA PARA CONFIGURAR UNA ENTRADA DIGITAL</h2>
+
+<p>La configuración básica de un pin de un puerto AVR como entrada digital sigue tres pasos:</p>
+
+<ol>
+    <li>
+        <strong>Configurar el pin como entrada mediante <code>DDRx</code>.</strong>
+        <p>El bit correspondiente en el registro <code>DDRx</code> debe establecerse en <code>0</code>.</p>
+
+        <pre><code>DDRB &amp;= ~(1 &lt;&lt; PB0);</code></pre>
+    </li>
+
+    <li>
+        <strong>Configurar opcionalmente la resistencia <em>pull-up</em> interna mediante <code>PORTx</code>.</strong>
+        <p>Si se necesita utilizar la resistencia <em>pull-up</em> interna, el bit correspondiente de <code>PORTx</code> se establece en <code>1</code>.</p>
+
+        <pre><code>PORTB |= (1 &lt;&lt; PB0);</code></pre>
+    </li>
+
+    <li>
+        <strong>Leer el estado lógico mediante <code>PINx</code>.</strong>
+        <p>El estado lógico presente en el pin se obtiene leyendo el bit correspondiente del registro <code>PINx</code>.</p>
+
+        <pre><code>if (PINB &amp; (1 &lt;&lt; PB0))
+
+
+{
+/* Entrada HIGH */
+}
+else
+{
+/* Entrada LOW */
+}</code></pre> </li> </ol>
+
+<h3>5.1. Ejemplo básico</h3>
+
+<p>El siguiente ejemplo configura <code>PB0</code> como entrada digital y habilita su resistencia <em>pull-up</em> interna. Después, el programa lee continuamente el estado del pin mediante <code>PINB</code>.</p>
+
+<pre><code class="language-c">
+#include &lt;avr/io.h&gt;
+
+int main(void)
+{
+DDRB &= ~(1 << PB0);    // PB0 como entrada
+PORTB |= (1 << PB0);    // Habilitar pull-up interna
+
+while (1)
+{
+    if (PINB &amp; (1 &lt;&lt; PB0))
+    {
+        // PB0 está en HIGH
+    }
+    else
+    {
+        // PB0 está en LOW
+    }
+}
+
+return (0);
+
+}</code></pre>
+
+<h3>5.2. Secuencia de funcionamiento</h3>
+
+<pre><code class="language-bash">Configurar PB0 como entrada
+↓
+
+Habilitar la resistencia pull-up interna
+↓
+Leer el estado de PB0 mediante PINB
+↓
+¿PB0 está en HIGH?
+↓
+Sí → ejecutar la acción correspondiente a HIGH
+↓
+No → ejecutar la acción correspondiente a LOW
+↓
+Volver a leer PB0
+↓
+Repetir
+</code></pre>
+
+
+<h3>5.3. Secuencia Resumida</h3>
+
+<p>Por tanto, la función de cada registro dentro de la configuración de una entrada es:</p>
+
+<ul>
+    <li><code>DDRx</code>: determina que el pin funciona como entrada.</li>
+    <li><code>PORTx</code>: determina, cuando el pin está configurado como entrada, si se habilita o no la resistencia <em>pull-up</em> interna.</li>
+    <li><code>PINx</code>: permite leer el estado lógico presente en el pin.</li>
+</ul>
+</section>  
+
+        
+        <section>
+        <h2>4. OPTIMIZACIÓN Y PROTECCIÓN CON EL SUFIJO 1UL</h2>
         <p>En el estándar ANSI C para microcontroladores AVR de 8 bits, las constantes enteras literales como <code>1</code> son interpretadas por defecto como números enteros con signo de 16 bits (<code>signed int</code>). Al realizar desplazamientos de bits en registros de 16 bits o en arquitecturas de mayor escala, desplazar un entero con signo más de 14 posiciones (ej. <code>1 &lt;&lt; 15</code>) puede derivar en un desbordamiento de entero firmado (<em>signed integer overflow</em>) o comportamiento indeterminado.</p>
 
         <p><strong>Regla de Ingeniería de Firmware:</strong></p>
