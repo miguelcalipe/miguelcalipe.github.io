@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ejemplo de Programación Bare Metal | MC Mundo Tech</title>
+    <title>Ejemplo de Programación Bare Metal para AVR en C | MC Mundo Tech</title>
     <meta name="description" content="El siguiente programa íntegro compila todas las técnicas expuestas en este manual: uso de cabeceras estándar, macros simbólicas, configuración segura de entradas con resistencia pull-up, salidas y evaluación de entradas mediante máscaras de bits.">
     <link rel="stylesheet" href="/assets/css/principal.css">
     <link rel="stylesheet" href="/assets/css/articulo.css">
@@ -30,22 +30,168 @@
     <main>        
         <article>            
             <header class="article-header">
-            <h1>EJEMPLO DE PROGRAMACIÓN BARE METAL</h1>
+            <h1>EJEMPLO DE PROGRAMACIÓN BARE METAL de uMC AVR en C</h1>
             
             </header>
                         
             <aside id="indice"></aside>    
             <!-- CONTENIDO DEL ARTÍCULO   -->
             
-            <section> 
+            <section>
+                <h2>1. DATOS DEL PROGRAMA</h2>
+<pre><code class="language-c">
+/* ==============================================================================
+ * ARCHIVO:       main.c
+ * DISPOSITIVO:   Microcontrolador AVR de 8 bits (ej. ATmega328P / ATmega168)
+ * FRECUENCIA:    16.0 MHz (F_CPU)
+ * DESCRIPCIÓN:   Programa de control GPIO para la manipulación de registros 
+ *                de hardware (SFR) utilizando técnicas de enmascaramiento 
+ *                y filtrado de rebotes mecánico (debounce) en una entrada.
+=================================================================================
+*/
+</code></pre>    
+            </section>     
             
-                            <p>
-                    El siguiente programa íntegro compila todas las técnicas expuestas en este manual: uso de cabeceras estándar, macros simbólicas, configuración segura de entradas con resistencia pull-up, salidas y evaluación de entradas mediante máscaras de bits.
-                </p>
+            <section>
+            <h2>2. DESCRIPCIÓN DEL PROGRAMA</h2>
+<pre><code class="language-c"> 
+ /**
+ * ============================================================================
+ * DESCRIPCIÓN
+ * ============================================================================
+ *
+ * Programa desarrollado en lenguaje C para un microcontrolador AVR de 8 bits.
+ *
+ * El programa configura el pin PB1 (Bit 1 del puerto B) como pin de salida 
+ * para el indicador LED, definido como LED_PIN
+ * Configura el pin PB0 (Bit 0 del puerto B) como pin de entrada 
+ * para el pulsador definido como BUTTON_PIN
+ * 
+ * Mientras el pulsador esté en reposo, el led permanece apagado. 
+ * Cuando se presiona el pulsador, el LED se enciende.
+ * 
+ * El programa utiliza operadores OR bitwise, AND bitwise para establecer la entrada y salida
+ * También utiliza una compuerta AND invertida como comparador para detectar si un botón 
+ * está presionado (activo en bajo). 
+ *
+ * ============================================================================
+ * OBJETIVOS
+ * ============================================================================
+ * 1. Configurar un puerto GPIO del microcontrolador AVR como salida y entrada.
+ * 2. Comprender el funcionamiento y la manipulación del registro DDRB.
+ * 3. Activar y utilizar la resistencia Pull-Up interna mediante el registro PORTB.
+ * 4. Manipular bits específicos del registro PORTB de forma no destructiva 
+ *    utilizando operadores lógicos (OR |=, AND &=) y de desplazamiento (<<, ~).
+ * 5. Implementar retardos mediante _delay_ms().
+ * 6. Leer e inspeccionar el estado de entradas digitales en el registro PINB.
+ * 7. Implementar un filtrado anti-rebote (software debounce) mediante _delay_ms().
+ * 8. Estructurar un bucle principal de ejecución continua (while(1)).
+ * 
+ * ============================================================================
+ * MICROCONTROLADOR Y HERRAMIENTAS
+ * ============================================================================
+ *
+ * Microcontrolador : AVR de 8 bits
+ * Dispositivo      : ATmega88PA / ATmega328P
+ * Compilador       : avr-gcc
+ * Lenguaje         : C
+ *
+ * El dispositivo concreto depende del microcontrolador seleccionado durante
+ * la compilación.
+ *
+ * ============================================================================
+ * PERIFÉRICOS UTILIZADOS
+ * ============================================================================
+ * Puerto utilizado : PORTB
+ * Pines utilizados  : PB0 y PB1
+ * Funciones         : 
+ *   - PB0 (BUTTON_PIN) : Entrada digital para lectura de pulsador físico
+ *                        con resistencia Pull-Up interna activa.
+ *   - PB1 (LED_PIN)    : Salida digital para control de actuador/LED.
+ * 
+ */
+ </code></pre>
+</section>
 
-                <p>Con el paso del tiempo aparecieron distintos niveles de abstracción cuyo objetivo es simplificar el desarrollo de software. Mientras mayor es la abstracción, menor es la cantidad de detalles del hardware que el programador necesita conocer, a costa de perder algo de control y eficiencia.</p>
+<section>
+    
+    <h2>3. PRINCIPIOS DE FUNCIONAMIENTO</h2>
+<pre><code class="language-c">
+ 
+/* ============================================================================
+ * PRINCIPIO DE FUNCIONAMIENTO
+ * ============================================================================
+ *
+ * 1. DIRECCIÓN DE DATOS (DDRB):
+ *    El registro DDRB determina la dirección de los pines del Puerto B:
+ *        DDRB bit = 0  → Entrada
+ *        DDRB bit = 1  → Salida
+ *
+ *    - DDRB |= (1 << PB1)         : Configura PB1 como salida sin borrar los
+ *                                   demás bits (bit-wise OR).
+ *    - DDRB &= ~(1 << PB0)        : Configura PB0 como entrada limpiando 
+ *                                   el bit 0 mediante máscara invertida.
+ *
+ * 2. RESISTENCIA PULL-UP INTERNA (PORTB):
+ *    Al escribir un '1' en el registro PORTB sobre un pin configurado como 
+ *    entrada, se activa su resistencia Pull-Up interna, manteniendo el pin 
+ *    en nivel lógico alto (1 / 5V) cuando no se presiona el pulsador:
+ *        PORTB |= (1 << PB0);
+ *
+ *    Esto mantiene a PB0 en nivel ALTO (VCC / 5V) en reposo. Cuando el 
+ *    pulsador se presiona, conecta el pin directamente a Tierra (GND / 0V).
+ *
+ * 3. LECTURA Y ENMASCARAMIENTO (PINB):
+ *    Para consultar el estado real del pin se examina el registro PINB:
+ *        PINB & (1 << PB0)
+ *
+ *    Esta expresión aísla el bit 0. La condición !(PINB & (1 << PB0)) evalúa 
+ *    como VERDADERA únicamente cuando el botón está presionado (nivel 0V)[cite: 3].
+ *
+ * ============================================================================
+ * TEMPORIZACIÓN Y ANTI-REBOTE (DEBOUNCE)
+ * ============================================================================
+ *
+ * Tiempo de espera : 20 ms
+ *
+ * La temporización se implementa mediante _delay_ms(20).
+ *
+ * Los pulsadores mecánicos generan micro-vibraciones eléctricas al cerrarse.
+ * El retardo de 20 ms introduce una ventana de estabilización bloqueante:
+ * el procesador suspende momentáneamente la ejecución para ignorar el ruido 
+ * mecánico inicial antes de reconfirmar mediante un segundo 'if' que la 
+ * pulsación sigue siendo válida.
+ *
+ * ============================================================================
+ * OBSERVACIONES
+ * ============================================================================
+ *
+ * 1. DEFINICIÓN DE F_CPU:
+ *    La macro F_CPU debe definirse (16000000UL) antes de incluir la cabecera
+ *    <util/delay.h> para que los retardos por software sean calculados 
+ *    con precisión de tiempo real[cite: 1].
+ *
+ * 2. MODIFICACIÓN NO DESTRUCTIVA:
+ *    El uso estricto de operadores |= y &= evita la "destrucción de estado",
+ *    permitiendo modificar únicamente los pines PB0 y PB1 sin alterar la 
+ *    configuración previa de los pines PB2 a PB7[cite: 3].
+ *
+ * ============================================================================
+ * REFERENCIAS DE PROGRAMACIÓN AVR
+ * ============================================================================
+ *
+ * - avr/io.h    : Definición mnemónica de registros (DDRB, PORTB, PINB)[cite: 1, 3].
+ * - util/delay.h: Funciones de retardo por software (_delay_ms)[cite: 1].
+ *
+ * ============================================================================
+ */
+</code></pre>
+</section>
 
-           
+<sectiom></sectiom>
+
+            <h2>4. CÓDIGO DEL PROGRAMA</h2>
+                           
                 <pre><code class="language-c">
 /==============================================================================
  * ARCHIVO:       main.c
@@ -128,12 +274,21 @@ int main(void) {
              * que es una pulsación real y no un falso disparo por ruido.
              * ---------------------------------------------------------------- */
             if (!(PINB & (1 << BUTTON_PIN))) {
-                
-                // Activar la salida: Poner en Nivel Alto (5V) el bit PB1 en PORTB
+                // Al activar la resistencia pull-up del pin (PORTB |= (1 << BUTTON_PIN);), 
+                // el hardware mantiene el pin en un nivel lógico alto (1 / 5 V) cuando el pulsador no está presionado.
+                // Operación de evaluación: (PINB & (1 << BUTTON_PIN)).
+                // Botón PRESIONADO: La máscara  devuelve 0 (en C, equivale a Falso / FALSE)
+                // La negación (!) invierte el estado de la mascara (0) --&gt; 1; Verdadero / TRUE
+                // Entonces se ejecuta el código del bloque if:
                 PORTB |= (1 << LED_PIN);
             }
 
         } else {
+            // Botón SUELTO: La máscara lee 1 en el bit PB0 (BUTTON_PIN). No importan los otros pines.
+            // La expresión (PINB & (1 << BUTTON_PIN)) devuelve un valor diferente de cero 
+            // en C, esto equivale a Verdadero / TRUE.  
+            // La negación (!) invierte el estado de la mascara (1) --&gt; 0; Falso / FALSE
+            // Entonces se ejecuta la parte del código en el bloque else
 
             /* ----------------------------------------------------------------
              * PASO 4: Estado de reposo
