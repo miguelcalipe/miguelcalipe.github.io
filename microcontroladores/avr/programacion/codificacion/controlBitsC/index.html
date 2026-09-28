@@ -79,7 +79,9 @@
 
         <p>La expresión formal <code>(1 &lt;&lt; n)</code> crea una máscara binaria de 8 bits donde únicamente el bit en la posición <em>n</em> se sitúa en nivel alto (<code>1</code>). Conceptualmente, el valor inicial <code>1</code> representa <code>0b00000001</code>, el cual es desplazado <em>n</em> posiciones hacia la izquierda. Por ejemplo, la expresión <code>(1 &lt;&lt; 3)</code> desplaza el bit tres posiciones, resultando en el patrón binario <code>0b00001000</code>.</p>
 
-        <p>Si aplicamos esta técnica con asignación directa:</p>
+        <p> ¿Que pasa con <code>(1 &lt;&lt; PBx)</code> ?, pues el microcontrolador interpretará que debe  colocar directamente el pin x del puerto X, en un nivel alto (high) y los otros bits en un nivel bajo (low). Los efectos físicos dependerá de como han sido definidos DDRx y PORTx </p>
+
+            <p>Si aplicamos esta técnica con asignación directa:</p>
 <pre><code>DDRB = (1 &lt;&lt; PB3); // PB3 equivale conceptualmente a la constante 3</code></pre>
 
         <p>
@@ -96,6 +98,13 @@
 
         <section>
         <h2>3. MÉTODO DE MANIPULACIÓN DE BITS (BIT TWIDDING) POR MÁSCARAS</h2>
+
+        <p> Cuando encendemos un LED, un motor u otro actuador conectado a la salida de PB3, usando numeros, scribimos algo parecido a: </p>
+<pre><code class="language-c"> PORTB = 0b00001000; </code></pre>
+
+        <p> Esto funciona, siempre que supiéramos con certeza que queríamos que todos los demás LED estuvieran apagados. Pero ¿qué ocurre si necesitamos encender o apagar un LED determinado sin afectar a ninguno de los demás?</p>
+
+        <p> Las operaciones lógicas a nivel de bit (bitwise logical operations) —la llamada manipulación de bits (bit twiddling)— permiten modificar un solo bit de un byte de registro sin tener que ocuparnos explícitamente de los demás. </p>
         <p>Para prevenir la alteración accidental de bits vecinos, se recurre a la técnica del <strong>enmascaramiento de registros (Register Masking)</strong>. Esta técnica aplica operaciones lógicas a nivel de bits (AND, OR, XOR) entre el valor presente en el registro y un patrón binario denominado <strong>máscara (mask)</strong>, permitiendo modificar, limpiar o evaluar pines específicos sin afectar el resto del puerto.</p>
 
         <pre>
