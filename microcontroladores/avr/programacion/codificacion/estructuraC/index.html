@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Estructura de un programa en C para AVR | MC Mundo Tech</title>
-    <meta name="description" content="Lo importante es comprender qué papel cumple cada parte: el código situado antes de <code>main()</code> prepara las declaraciones y definiciones que utilizará el programa; <code>main()</code> organiza la ejecución de la aplicación; y el <code>while(1)</code> mantiene funcionando continuamente la lógica principal del sistema embebido. ">
+    <meta name="description" content="Lo importante es comprender qué papel cumple cada parte: el código situado antes de main() prepara las declaraciones y definiciones que utilizará el programa; <code>main()</code> organiza la ejecución de la aplicación; y el <code>while(1)</code> mantiene funcionando continuamente la lógica principal del sistema embebido. ">
     <link rel="stylesheet" href="/assets/css/principal.css">
     <link rel="stylesheet" href="/assets/css/articulo.css">
     
@@ -59,7 +59,7 @@ Aun así, el lenguaje C mantiene su estructura fundamental: existen archivos de 
 <h2>1. EL ENCABEZADO DEL PROGRAMA</h2>
 
 <p>
-Un encabezado profesional incluye el nombre del proyecto, autor  una descripción del programa, siguiendo un estilo de documentación técnica seria. No forma parte del lenguaje C y se incluyen como bloques de comentario.
+Un encabezado profesional incluye el nombre del proyecto, autor,  una descripción del programa, siguiendo un estilo de documentación técnica seria. No forma parte del lenguaje C y se incluyen como bloques de comentario.
 </p>
 
 <pre><code class="language-c">/*
@@ -91,7 +91,7 @@ Un encabezado profesional incluye el nombre del proyecto, autor  una descripció
 <h2>2. ESTRUCTURA CONCEPTUAL DE UN PROGRAMA AVR</h2>
 
 <p>
-Para trabajar con microcontroladores AVR no es necesario memorizar esta estructura como si fuera una plantilla rígida; no es una sintaxis obligatoria de C. Pero si nos ofrece un esquema de como se organiza un programa coodificado en lenguaje C. 
+Para trabajar con microcontroladores AVR no es necesario memorizar esta estructura como si fuera una plantilla rígida. Pero si nos ofrece un esquema de como se organiza un programa coodificado en lenguaje C. 
 </p>
 
 <p>
@@ -131,7 +131,7 @@ int main(void)
 [definición de funciones]</code></pre>
 
 <p>
-Esta estructura no es una obligación sintáctica de C. Es una forma ordenada de organizar un programa, especialmente útil cuando el código comienza a crecer.
+Esta estructura no es una sintaxis obligada del lenguaje C. Es una forma ordenada de organizar un programa, especialmente útil cuando el código comienza a crecer.
 </p>
 </section>
 
@@ -198,17 +198,7 @@ Entre otras cosas, permite utilizar nombres simbólicos correspondientes a regis
 </p>
 
 <p>
-Por ejemplo:
-</p>
-
-<pre><code class="language-c">DDRD
-PORTD
-PIND
-PD0
-PD1</code></pre>
-
-<p>
-En lugar de tener que trabajar directamente con direcciones numéricas.
+Por ejemplo, en lugar de tener que trabajar directamente con direcciones numéricas podemos usar palabras menemónicas como <code>DDRD</code>, <code>PORTD</code>, <code>PIND</code>, <code>PD0</code>, <code>PD1</code>. 
 </p>
 
 <p>
@@ -260,12 +250,22 @@ Además, el funcionamiento de estos retardos depende de que la frecuencia de rel
 <h3>3.2. Definiciones y constantes</h3>
 
 <p>
-Después de las cabeceras pueden aparecer definiciones mediante el preprocesador.
+Después de las cabeceras pueden aparecer definiciones de constantes o fragmentos de código.
 </p>
+<p> Esas definiciones la hacemos mediante la instrucción o directiva <code>#define</code>, la cual mejora la legibilidad y la portabilidad del código al definir sinónimos fáciles de entender para constantes o fragmentos de código. </p>
 
-<p>
-Por ejemplo:
-</p>
+<p>Por ejemplo, en un circuito con un solo LED (por ejemplo el famoso blink) normalmente definiría LED como sinónimo de un pin determinado del AVR, en este caso PB0: </p>
+    
+<pre><code class="language-c">#define LED PB0</code></pre>
+
+<p>Estamos diciendole al microcontrolador que en el programa, al LED que usaremos lo llamaremos PB0, (a) en parte para recordar cómo conectar el circuito, (b) pero también para facilitar un cambio posterior.  </p>
+  
+<p>Si quisieramos conectar físicamente el LED ya no al pin <code>PB0</code> sino al pin <code>PB5</code>, y no hemos usado la directiva <code>#define</code>, tendríamos que recorrer el código y cambiar cada aparición de <cod>PB0</code> por <code>PB5</code>. En cambio, si definimos el pin del LED al principio del código, como <code>PB5</code> y utilizamos sistemáticamente LED en el cuerpo principal, solo tendremos que cambiar <code>PB0</code> por <code>PB5</code> en el único lugar donde está definido, en la parte superior del código o en un archivo de inclusión (include) adecuadamente nombrado. </p>
+
+    <p> El uso de <code>#define</code> para describir la distribución de los pines también hace que el código sea flexible entre diferentes configuraciones de hardware y ayuda a recordar a qué pin estaba conectado, por ejemplo, un acelerómetro. Posteriormente será más fácil modificarlo  y también facilita la lectura del código.</p>
+
+
+<p> Si hemos definido una retraso: </p>:
 
 <pre><code class="language-c">#define LED_DELAY 100</code></pre>
 
@@ -275,6 +275,10 @@ Esto permite utilizar un nombre simbólico en lugar de repetir directamente un v
 
 <pre><code class="language-c">_delay_ms(LED_DELAY);</code></pre>
 
+<p>Y si luego necesitamos modificarlo, ya no tendremos que recorrer todo el código y cambiar su valor en las líneas donde aparece; sino, simplemente vamos a la cabecera donde se <code>#define </code> el <code> delay </code></p>
+    
+
+    
 <p>
 También pueden definirse máscaras de bits:
 </p>
@@ -284,10 +288,43 @@ También pueden definirse máscaras de bits:
 <p>
 El uso de nombres simbólicos mejora la legibilidad y facilita modificar posteriormente determinados valores.
 </p>
+    
+
+<p> Las definiciones son procesadas por el preprocesador (preprocessor), que recorre el código y, esencialmente, realiza una búsqueda y sustitución de todos los #define antes de entregar el resultado al compilador.</p>
+
+<p> Como las instrucciones #define son simples sustituciones realizadas por el preprocesador, no son variables, no ocupan memoria en el AVR y no pueden modificarse desde el código.</p>
+
+<p> Por convención, los nombres de los #define se escriben siempre en LETRAS MAYÚSCULAS y separando las palabras con guiones bajos (_).A este estilo de escritura se le conoce como</p>
+
+<pre><code>ALL_CAPS_SEPARATED_WITH_UNDERSCORES (o técnicamente SCREAMING_SNAKE_CASE).</code></pre>
+
+<p>Esto hace que los <code>define</code> destaquen en el código y nos recuerden que son constantes.</p>
+
+<p> El uso correcto de define es una buena práctica.</p>
+
+<p> Este es un patrón más general en C para AVR: <strong> muchos de los detalles de bajo nivel relacionados con la organización y configuración del microcontrolador —como las ubicaciones de memoria de los registros de hardware— </strong> se proporcionan mediante instrucciones <code>#define</code>, y sus nombres funcionan como mnemónicos relativamente útiles de aquello que aparece en la hoja de datos.</p>
+
 
 <p>
 Debe distinguirse una macro definida mediante <code>#define</code> de una variable de C. Una macro es procesada por el preprocesador antes de que el compilador analice el programa.
 </p>
+
+    <h4>3.2.1. Los #include ocultos y donde se definen los nombres mnemónicos </h4>
+    <p>Además de los define definidos por el usuario, el archivo avr/io.h que incluimos en el código también contiene directivas <code>#define</code></p>
+    
+    <p> Cuando ponemos esta línea al principio del código:</p>
+
+<pre><code class="language-c">#include <avr/io.h> </code></pre>
+
+<p> El compilador busca automáticamente el archivo dentro de sus propias carpetas internas y lo lee. Encontraremos en este archivo miles de líneas y un #define para cada registro de hardware incluido en la hoja de datos. Estas definiciones apuntan a su vez a las ubicaciones de memoria correctas de los registros de hardware del AVR. Por ejemplo: </p>
+
+<pre><code class="language-c">
+#define PORTB _SFR_IO8(0x05)
+</code></pre>
+
+<p> Esto significa que cuando  escribimos <code> PORTB</code>, el archivo avr/io.h le traduce al compilador: "La palabra PORTB significa: ve a la dirección de memoria física 0x05 del chip".</p>
+<p> Gracias a que ese archivo existe, podemos escribir código usando nombres menmónicos como PORTB o DDRB en lugar de tener que aprenderte de memoria números en hexadecimal como 0x05 o 0x04.</p>
+
 
 <h3>3.3. Declaración de tipos</h3>
 
