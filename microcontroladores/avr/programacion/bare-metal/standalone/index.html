@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Circuito Mínimo. μMC Standalone | MC Mundo Tech</title>
-    <meta name="description" content="Este artículo muestra como hacer las conecciones del microcontrolador AVR con un circuito mínimo para que pueda funciona independientemente, <em>standalone</em>, fuera de cualquier placa de desarrollo.">
+    <meta name="description" content="Este artículo muestra como hacer las conecciones del microcontrolador AVR con un circuito mínimo para que pueda funcionar independientemente, <em>standalone</em>, fuera de cualquier placa de desarrollo.">
     <link rel="stylesheet" href="/assets/css/principal.css">
     <link rel="stylesheet" href="/assets/css/articulo.css">
     
@@ -40,10 +40,9 @@
             <section>   
             <h2>INTRODUCCIÓN</h2>
                 <p>
-                    Este artículo muestra directamente como hacer las conexiones de los microcontrolador AVR de la serie ATmega48A/PA/88A/PA/168A/PA/328/P, con un circuito mínimo para que pueda funcionar independientemente, <em>standalone</em> es decir, fuera de cualquier placa de desarrollo.
+                    Este artículo muestra directamente como hacer las conexiones de los microcontrolador AVR de la serie <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong>, con un circuito mínimo para que pueda funcionar independientemente, <em>standalone</em> es decir, fuera de cualquier placa de desarrollo.
                 </p>   
-
-               
+            
 
                 <p>
                     El recorrido que estudiaremos es:
@@ -55,12 +54,12 @@
             </section>
             
             <section>
-                <h2>1. LA SERIE ATmega48A/PA/88A/PA/168A/PA/328/P</h2>
+                <h2>1. LA SERIE ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</h2>
                 <p>
-                    Para el diseño o prueba de un proyecto electrónico podemos utilizar una placa de desarrollo, pero en su prototipado o implementación no podemos dejar una tarjeta de desarrollo como Arduino Uno o Arduino Nano como parte del circuito porque haría caro el proyecto y demasiado voluminoso. Para ello debemos montarlo en un circuito con los componentes mínimos necesarios para que el microcontrolador funcione de forma independiente, <em>standalone</em>.
+                    Para el diseño o prueba de un proyecto electrónico podemos utilizar una placa de desarrollo, pero en su prototipado o implementación no podemos dejar una tarjeta de desarrollo como Arduino Uno o Arduino Nano como parte del circuito porque haría caro el proyecto y además, demasiado voluminoso. Para ello debemos montar el microcontrolador en un circuito con los componentes mínimos necesarios para que funcione de forma independiente o <em>standalone</em>.
                 </p>
                 <p>
-                    En este proyecto utilizaremos un microcontrolador ATmega168P. Como  hemos visto anteriormente, los microcontroladores de la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> tienen características similares y difieren sólo en el tamaño se la memoria, soporte de bootloader, y el tamaño de los vectores de interrupción. La siguiente tabla resume estas características.</strong>. </p>
+                    En este proyecto utilizaremos un microcontrolador ATmega168P. Como  hemos visto anteriormente, los microcontroladores de la serie <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong> tienen características similares y difieren sólo en el tamaño de la memoria, soporte de bootloader, y el tamaño de los vectores de interrupción. La siguiente tabla resume estas características.</strong>. </p>
                 </p>
                 
                 <div class="table-container">
@@ -150,35 +149,37 @@
 
         <div class="imagen-derecha">
             <div class="texto" >
-                </h3><strong>2.1 Circuito mínimo con oscialdor </strong></h3>
+                </h3><strong>2.1 Circuito mínimo con oscilador interno</strong></h3>
                     <p>
-                        Un dispositivo de la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> incorpora un oscilador RC interno. 
+                        Un dispositivo de la serie <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong> incorpora un oscilador RC interno. 
                     </p>
                     <p>    
                         Para optimizar el espacio en el circuito impreso (PCB) y reducir el costo del proyecto se puede prescindir de un cristal de cuarzo externo y de sus respectivos condensadores de carga, logrando un diseño más compacto y económico. 
                     </p>
 
                     <p>
-                        Por defecto, el oscilador interno viene configurado a 8 MHz con el fusible CKDIV8 activado, lo que resulta en una frecuencia de operación efectiva de 1 MHz. El oscilador RC interno puede presentar ligeras variaciones con la temperatura, por lo que se recomienda usar un cristal externo si el proyecto requiere comunicación serial (UART) de alta precisión o temporizaciones críticas.
+                        Todos los microcontroladores de la serie <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong> incorporan un oscilador RC interno calibrado. 
+                        </p>
+                    <p>    De acuerdo con las especificaciones de la hoja de datos de Microchip, este oscilador interno funciona por defecto a una frecuencia de 8 MHz. Además, los dispositivos vienen configurados de fábrica con el bit de fusibles (fuse bit) CKDIV8 activado, lo que divide esa frecuencia por 8 y hace que el chip empiece a funcionar inicialmente a 1 MHz de forma predeterminada sin necesidad de conectar ningún componente externo.    
                     </p>
                     <p>
                         A continuación, se presenta el esquema eléctrico para operar el dispositivo con su configuración de frecuencia de fábrica:
                     </p>
             </div>
-        <img src="img/EsquematicoCircuitoMinimoAtmega.jpeg" alt="Circuito mínimo microcontrolador AVR ATmega48A/PA/88A/PA/168A/PA/328/P" tittle="ATmega48A/PA/88A/PA/168A/PA/328/P Standalone. Circuito mínimo" class="imagen-derecha">
+        <img src="img/EsquematicoCircuitoMinimoAtmega.jpeg" alt="Circuito mínimo microcontrolador AVR ATmega48A/PA/88A/PA/168A/PA/328/P" tittle="ATmega48A/PA/ 88A/PA/ 168A/PA/328/P Standalone. Circuito mínimo" class="imagen-derecha">
         </div>
 
         <div class="imagen-derecha">
             <div class="texto">
-                </h3><strong>2.1 Circuito mínimo con oscilador de cristal externo</strong></h3>
+                </h3><strong>2.2 Circuito mínimo con oscilador de cristal externo</strong></h3>
                 <p>
-                    El uso de un cristal oscilador externo en la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P </strong> permite maximizar la frecuencia de operación del dispositivo (hasta 20 MHz en variantes seleccionadas) y garantizar un error de frecuencia mínimo. 
+                    El uso de un cristal oscilador externo en la serie <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong> permite maximizar la frecuencia de operación del dispositivo (hasta 20 MHz en variantes seleccionadas) y garantizar un error de frecuencia mínimo. 
                 </p>
                 <p>
                     Esta configuración también se recomienda para aplicaciones que requieren una alta precisión temporal y estabilidad ante variaciones térmicas
                 </p>
                 <p>
-                    El circuito requiere la adición del cristal y dos condensadores de desacoplo cerámicos conectados a los pines XTAL1 y XTAL2 para asegurar el arranque correcto del oscilador. A continuación, se detalla el diagrama de conexiones correspondiente:
+                    El circuito requiere la adición del cristal y dos condensadores de desacoplo cerámicos de 22pF conectados a los pines XTAL1 y XTAL2 y a GND para asegurar el arranque correcto del oscilador. A continuación, se detalla el diagrama de conexiones correspondiente:
                 </p>
             </div>
                 <img src="img/CircuitoMinimoConOscilador.jpeg" alt="Circuito mínimo microcontrolador AVR ATmega48A/PA/88A/PA/168A/PA/328/P con oscilador externo" tittle="ATmega48A/PA/88A/PA/168A/PA/328/P Standalone. Circuito mínimo con fuente de reloj externa" class="imagen-derecha">
@@ -186,10 +187,10 @@
 
                 <h2>3. ALIMENTACIÓN DEL MICROCONTROLADOR</h2>
 
-                    <p>El primer paso consiste en conectar correctamente la alimentación del microcontrolador:</p>
+                    <p>El primer paso para la implementación del circuito mínimo consiste en conectar correctamente la alimentación del microcontrolador:</p>
 
                     <p>
-                        VCC y AVCC deben conectarse a la tensión de alimentación correspondiente y GND a la referencia del circuito. La familia ATmega48A/88A/168A/328P admite, según las condiciones especificadas en la hoja de datos, un rango amplio de alimentación especificado entre 1,8 V y 5,5 V.
+                        VCC y AVCC deben conectarse a la tensión de alimentación correspondiente y GND a la referencia del circuito. La familia <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong> admite, según las condiciones especificadas en la hoja de datos, un rango amplio de alimentación especificado entre 1,8 V y 5,5 V.
 
                     </p>
 
@@ -229,9 +230,9 @@
                             title="Resistencia de 10 kΩ entre RESET y VCC"
                             class="imagen-centrada">
                     </div>
-                <h2>6. ESTABLECER EL ORIGEN DE LA SEÑAL DE RELOJ DEL MICROCONTROLADOR</h2>
+                <h2>6. OSCILADOR EXTERNO PARA LA SEÑAL DE RELOJ DEL MICROCONTROLADOR</h2>
                 <p>
-                    El reloj es la referencia temporal utilizada por el núcleo AVR y por muchos de sus periféricos. Determina la velocidad de ejecución de las instrucciones y la frecuencia de funcionamiento de los temporizadores, el ADC y otros periféricos. El reloj puede provenir de un oscilador interno o de un cristal externo.
+                    El reloj es la referencia temporal utilizada por el núcleo AVR y por muchos de sus periféricos. Determina la velocidad de ejecución de las instrucciones y la frecuencia de funcionamiento de los temporizadores, el ADC y otros periféricos. 
                 </p>
                  <p>
                     A partir de aquí aparecen dos posibilidades:
@@ -242,10 +243,10 @@
                     </ul>
 
                     <p>
-                        Elegir entre oscilador interno o externo es la decisión central para establecer la señal de reloj de un microcontrolador. Al seleccionar el tipo de oscilador, estás definiendo cuál será el origen físico que generará los impulsos eléctricos (latidos) que marcan el ritmo de trabajo de la CPU y los periféricos del chip.
+                        Elegir entre oscilador interno o externo es la decisión central para establecer la señal de reloj de un microcontrolador. Al seleccionar el tipo de oscilador, estás definiendo cuál será el origen físico que generará los impulsos eléctricos  que marcan el ritmo de trabajo de la CPU y los periféricos del chip.
                     </p>
                     <p>
-                        De fábrica, los microcontroladores de la serie ATmega48A/PA/88A/PA/168A/PA/328/P vienen configurados para priorizar la compatibilidad y la seguridad en la primera conexión. El chip arranca utilizando su oscilador RC interno calibrado a 8.0 MHz, pero con el fusible de división por ocho (CKDIV8) activado por defecto. Esto reduce la frecuencia real del reloj del sistema a 1.0 MHz. El fabricante elige esta velocidad tan baja deliberadamente para garantizar que cualquier programador de bajo costo (como un USBasp o un Arduino como ISP) pueda comunicarse con el dispositivo nada más sacarlo de la caja, sin riesgo de fallos por desincronización. Una vez que establezcas la comunicación inicial, puedes reprogramar los fusibles CKSEL y CKDIV8 para desactivar este divisor o para conmutar a un cristal de cuarzo externo si tu aplicación requiere mayor velocidad o precisión en el tiempo. 
+                        De fábrica, los microcontroladores de la serie ATmega48A/PA/88A/PA/168A/PA/328/P vienen configurados para priorizar la compatibilidad y la seguridad en la primera conexión. El chip arranca utilizando su oscilador RC interno calibrado a 8.0 MHz, pero con el fusible de división por ocho (CKDIV8) activado por defecto. Esto reduce la frecuencia real del reloj del sistema a 1.0 MHz. El fabricante elige esta velocidad tan baja deliberadamente para garantizar que cualquier programador de bajo costo (como un USBasp o un Arduino como ISP) pueda comunicarse con el dispositivo nada más sacarlo de su empaque, sin riesgo de fallos por desincronización. Una vez que se establece la comunicación inicial, se puede reprogramar los fusibles CKSEL y CKDIV8 para desactivar este divisor o para conmutar a un cristal de cuarzo externo si tu aplicación requiere mayor velocidad o precisión en el tiempo. 
                     </p>
 
                    
