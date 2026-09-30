@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Niveles de abstracción del hardware | MC Mundo Tech</title>
-    <meta name="description" content="Con el paso del tiempo han aparecido distintos niveles de abstracción cuyo objetivo es simplificar el desarrollo de software. Mientras mayor es la abstracción, menor es la cantidad de detalles del hardware que el programador necesita conocer, a costa de perder algo de control y eficiencia ">
+    <title>Sistemas de Numeración y representación de un Registro de 8 bits | MC Mundo Tech</title>
+    <meta name="description" content="Conceptos de sistemas de numeración y representación de registros de 8 bits en microcontroladores AVR, incluyendo binario, decimal, hexadecimal, octal, posiciones de bits y conversión entre representaciones">
     <link rel="stylesheet" href="/assets/css/principal.css">
     <link rel="stylesheet" href="/assets/css/articulo.css">
     
@@ -30,99 +30,324 @@
     <main>        
         <article>            
             <header class="article-header">
-            <h1>ABSTRACCIÓN DEL HARDWARE</h1>
+            <h1>SISTEMAS DE NUMERACIÓN Y REPRESENTACIÓN DE UN REGISTRO DE 8 BITS</h1>
             
             </header>
                         
             <aside id="indice"></aside>    
             <!-- CONTENIDO DEL ARTÍCULO   -->
-            
-            <section> 
-            
-            <H2>INTRODUCCIÓN</H2>
-                <p>Todo microcontrolador, sin importar su arquitectura, se controla mediante <strong>registros de hardware</strong>. Lo que cambia entre proyectos es cuánto contacto directo tiene el programador con esos registros.</p>
+        <section> <h2>1. Introducción</h2>
 
-                <p>Con el paso del tiempo aparecieron distintos niveles de abstracción cuyo objetivo es simplificar el desarrollo de software. Mientras mayor es la abstracción, menor es la cantidad de detalles del hardware que el programador necesita conocer, a costa de perder algo de control y eficiencia.</p>
+<p>En la programación de microcontroladores es habitual trabajar directamente con registros cuyos bits representan estados o funciones específicas del hardware. En los microcontroladores AVR, muchos registros de propósito especial (<em>Special Function Registers, SFR</em>) tienen un ancho de 8 bits.</p>
 
-            <h2>BARE METAL</h2>
+<p>Para trabajar correctamente con estos registros es necesario comprender dos conceptos relacionados:</p>
 
-                <p>La programación <strong>Bare Metal</strong> consiste en escribir directamente sobre los registros del microcontrolador sin utilizar bibliotecas intermedias.</p>
+<ol> <li>cómo se organiza y representa un registro de 8 bits;</li> <li>cómo puede expresarse un mismo valor numérico utilizando diferentes sistemas de numeración.</li> </ol>
 
-                <p>Por ejemplo, en un AVR:</p>
+<p>Un registro de 8 bits contiene ocho posiciones binarias independientes. Cada posición puede adoptar uno de dos estados:</p>
 
-                <pre><code>DDRB |= (1 &lt;&lt; PB0);
-                PORTB |= (1 &lt;&lt; PB0);</code></pre>
+<pre><code>0 o 1</code></pre>
 
-                <p>Aquí el programa modifica directamente los registros responsables de configurar y activar un pin de salida.</p>
+<p>Por esta razón, la representación binaria resulta especialmente útil cuando se trabaja directamente con los bits de un registro.</p> </section>
 
-                <p>Las ventajas son:</p>
+<section> <h2>2. El registro de 8 bits</h2>
 
-                <ul>
-                    <li><strong>Máximo rendimiento.</strong></li>
-                    <li>Código muy eficiente.</li>
-                    <li><strong>Control absoluto</strong> del hardware.</li>
-                    <li>Bajo consumo de memoria.</li>
-                </ul>
+<section> <h3>2.1. Organización de los bits</h3>
 
-                <p>Como desventaja, el programador debe conocer detalladamente la arquitectura del microcontrolador y consultar continuamente la hoja de datos.</p>
+<p>Un registro de 8 bits puede representarse de la siguiente manera:</p>
 
-                <h2>CMSIS</h2>
+<pre><code>Registro = [ b7 ][ b6 ][ b5 ][ b4 ][ b3 ][ b2 ][ b1 ][ b0 ] | | | | | | | | 7 6 5 4 3 2 1 0</code></pre>
 
-                <p>En los microcontroladores ARM apareció el estándar <strong>CMSIS (Cortex Microcontroller Software Interface Standard)</strong>.</p>
+<p>Cada posición representa un bit individual del registro.</p>
 
-                <p>CMSIS no oculta los registros. Simplemente proporciona nombres estandarizados, estructuras y archivos de definición para acceder a ellos de forma más organizada.</p>
+<p>El bit situado más a la derecha es el <strong>bit 0 (b0)</strong>, denominado bit menos significativo (<em>Least Significant Bit, LSB</em>). El bit situado más a la izquierda es el <strong>bit 7 (b7)</strong>, denominado bit más significativo (<em>Most Significant Bit, MSB</em>).</p>
 
-                <p>Por ejemplo:</p>
+<pre><code>MSB LSB ↓ ↓ b7 b6 b5 b4 b3 b2 b1 b0 │ │ bit más significativo bit menos significativo</code></pre>
 
-                <pre><code>GPIOA->MODER
-                GPIOA->ODR
-                TIM2->CR1</code></pre>
+<p>La numeración de los bits aumenta desde la derecha hacia la izquierda, comenzando en cero.</p> </section>
 
-                <p>Internamente siguen siendo registros de hardware. CMSIS únicamente facilita su acceso mediante estructuras del lenguaje C.</p>
+<section> <h3>2.2. Ejemplo de un registro</h3>
 
-                <p>Pero CMSIS va un poco más allá de solo nombrar registros: también estandariza funciones para elementos comunes del núcleo ARM Cortex-M, como el manejo del <strong>NVIC</strong> (el controlador que gestiona las interrupciones) o del <strong>SysTick</strong> (el temporizador de sistema), y define la estructura de los archivos de arranque (<em>startup files</em>) junto con el mapa de vectores de interrupción. Por eso se dice que CMSIS estandariza el acceso al <em>núcleo</em>, no a los periféricos específicos de cada fabricante.</p>
+<p>Supongamos que un registro denominado <code>X</code> contiene:</p>
 
-                <p>Su principal ventaja es que proporciona una <strong>interfaz común</strong> para los distintos fabricantes de microcontroladores basados en núcleos ARM Cortex.</p>
+<pre><code>Registro X = 0b00110011</code></pre>
 
-                <h2>HAL Y NIVELES INTERMEDIOS</h2>
+<p>La representación binaria permite observar directamente el estado de cada uno de sus ocho bits:</p>
 
-                <p><strong>HAL</strong> significa <strong>Hardware Abstraction Layer</strong>.</p>
+<pre><code> b7 b6 b5 b4 b3 b2 b1 b0 0 0 1 1 0 0 1 1</code></pre>
 
-                <p>Su propósito es ofrecer funciones de alto nivel que evitan manipular directamente los registros.</p>
+<p>Por tanto:</p>
 
-                <p>Por ejemplo:</p>
+<pre><code>b7 = 0 b6 = 0 b5 = 1 b4 = 1 b3 = 0 b2 = 0 b1 = 1 b0 = 1</code></pre>
 
-                <pre><code>HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);</code></pre>
+<p>La ventaja de esta representación es que existe una correspondencia visual directa entre cada dígito binario y una posición concreta del registro.</p> </section> </section>
 
-                <p>Internamente esta función termina modificando uno o varios registros del periférico GPIO. La diferencia es que el programador ya no necesita conocer cuáles son esos registros.</p>
+<section> <h2>3. Sistemas de numeración</h2>
 
-                <p>Las ventajas de HAL son:</p>
+<section> <h3>3.1. Qué es una base numérica</h3>
 
-                    <ul>
-                    <li><strong>Desarrollo más rápido.</strong></li>
-                    <li>Mayor <strong>portabilidad</strong> entre dispositivos del mismo fabricante.</li>
-                    <li>Código más sencillo de comprender para proyectos grandes.</li>
-                </ul>
+<p>Un mismo valor numérico puede representarse utilizando diferentes sistemas de numeración. En programación de microcontroladores son especialmente importantes los sistemas decimal, binario, hexadecimal y octal.</p>
 
-                <p>Como contrapartida:</p>
+<p>La diferencia entre ellos está en la base utilizada para representar los valores:</p>
 
-                <ul>
-                    <li>Mayor consumo de memoria Flash.</li>
-                    <li>Más uso de RAM.</li>
-                    <li>Menor velocidad de ejecución.</li>
-                    <li><strong>Menor control</strong> sobre el hardware.</li>
-                </ul>
+<table> <thead> <tr> <th>Sistema</th> <th>Base</th> <th>Dígitos utilizados</th> </tr> </thead> <tbody> <tr> <td>Binario</td> <td>2</td> <td>0–1</td> </tr> <tr> <td>Octal</td> <td>8</td> <td>0–7</td> </tr> <tr> <td>Decimal</td> <td>10</td> <td>0–9</td> </tr> <tr> <td>Hexadecimal</td> <td>16</td> <td>0–9 y A–F</td> </tr> </tbody> </table>
 
-                <p>En la práctica, además, el código HAL rara vez se escribe línea por línea a mano: herramientas como <strong>STM32CubeMX</strong> permiten configurar los periféricos de forma gráfica y generan automáticamente el código HAL correspondiente, lo que acelera aún más el desarrollo.</p>
+<p>La elección de una representación no cambia el valor almacenado. Solamente cambia la forma en que el programador escribe y visualiza ese valor.</p> </section>
 
-                <p>Entre CMSIS y HAL existe también un nivel intermedio que vale la pena conocer: los drivers <strong>LL (Low-Layer)</strong>, ofrecidos por fabricantes como STMicroelectronics. Son más cercanos al registro que HAL —y por lo tanto más rápidos y ligeros— pero sin la verbosidad de escribir directamente sobre bits individuales, como en Bare Metal.</p>
+<section> <h3>3.2. El sistema binario</h3>
 
-                <p>Y todavía existe un nivel de abstracción mayor que el propio HAL: el framework de <strong>Arduino</strong>, con funciones como <code>digitalWrite()</code> o <code>pinMode()</code>, que oculta casi por completo los detalles del hardware subyacente y prioriza la simplicidad por encima del control o la eficiencia.</p>
+<p>El sistema binario utiliza únicamente dos dígitos:</p>
 
-                <p>Por esta razón, en aplicaciones críticas de tiempo real o con recursos muy limitados todavía es frecuente utilizar programación Bare Metal o directamente CMSIS/LL, mientras que HAL y frameworks como Arduino se prefieren cuando importa más la velocidad de desarrollo que el control fino del hardware.</p>
+<pre><code>0 1</code></pre>
 
-                <p>Vale la pena tener presente que, sin importar el nivel de abstracción utilizado, todos terminan produciendo el mismo resultado final: una escritura o lectura sobre el mismo registro físico. De hecho, es habitual encontrar proyectos que combinan varios niveles a la vez —por ejemplo, usar HAL para la mayor parte del código y recurrir a Bare Metal solo en la rutina de interrupción más crítica, donde cada ciclo de reloj cuenta.</p>
-            </section>
+<p>Esto coincide directamente con los dos estados posibles de cada bit de un registro digital.</p>
+
+<p>Por ejemplo:</p>
+
+<pre><code>00110011₂</code></pre>
+
+<p>es una representación binaria de un valor numérico.</p>
+
+<p>En un registro de 8 bits, los ocho dígitos permiten asociar visualmente cada posición con un bit:</p>
+
+<pre><code>Registro: b7 b6 b5 b4 b3 b2 b1 b0 0 0 1 1 0 0 1 1 Binario: 0 0 1 1 0 0 1 1</code></pre>
+
+</section> </section>
+
+<section> <h2>4. El prefijo 0b</h2>
+
+<section> <h3>4.1. Identificación de un número binario</h3>
+
+<p>En C, el prefijo <code>0b</code> o <code>0B</code> indica que el número escrito a continuación está expresado en base 2.</p>
+
+<p>Por ejemplo:</p>
+
+<pre><code>0b00110011</code></pre>
+
+<p>representa el mismo valor numérico que:</p>
+
+<pre><code>51 decimal 33 hexadecimal 063 octal</code></pre>
+
+<p>La letra <code>b</code> procede de la palabra inglesa <em>binary</em>.</p> </section>
+
+<section> <h3>4.2. Prefijos utilizados en C</h3>
+
+<p>Las constantes enteras pueden escribirse utilizando diferentes bases. La forma habitual de identificarlas es:</p>
+
+<table> <thead> <tr> <th>Representación</th> <th>Base</th> <th>Prefijo</th> <th>Ejemplo</th> </tr> </thead> <tbody> <tr> <td>Decimal</td> <td>10</td> <td>Ninguno</td> <td><code>51</code></td> </tr> <tr> <td>Octal</td> <td>8</td> <td><code>0</code></td> <td><code>063</code></td> </tr> <tr> <td>Hexadecimal</td> <td>16</td> <td><code>0x</code> o <code>0X</code></td> <td><code>0x33</code></td> </tr> <tr> <td>Binaria</td> <td>2</td> <td><code>0b</code> o <code>0B</code></td> <td><code>0b00110011</code></td> </tr> </tbody> </table>
+
+<p>La notación binaria con <code>0b</code> fue incorporada originalmente por GCC como una extensión para escribir constantes binarias directamente en C y C++. En versiones modernas del estándar de C, esta notación también está contemplada por el lenguaje.</p>
+
+<p>Para la programación de microcontroladores, la representación binaria resulta especialmente útil porque permite visualizar directamente el estado de cada bit de un registro.</p> </section> </section>
+
+<section> <h2>5. Un número binario no es necesariamente un número de 8 bits</h2>
+
+<section> <h3>5.1. Diferencia entre valor y representación</h3>
+
+<p>Es importante hacer una precisión conceptual. La expresión:</p>
+
+<pre><code>00110011</code></pre>
+
+<p>es una representación de un número en base 2 utilizando ocho dígitos binarios. Esto no significa que el valor numérico, por sí mismo, sea necesariamente un <strong>número de 8 bits</strong>.</p>
+
+<p>Por ejemplo, las siguientes expresiones representan exactamente el mismo valor:</p>
+
+<pre><code>0b00110011 0b0110011 0b110011</code></pre>
+
+<p>Todas representan:</p>
+
+<pre><code>51₁₀</code></pre>
+
+<p>Los ceros situados a la izquierda no modifican el valor numérico.</p> </section>
+
+<section> <h3>5.2. Por qué se utilizan ocho dígitos en un registro de 8 bits</h3>
+
+<p>Aunque no es obligatorio escribir los ceros iniciales, cuando se trabaja con un registro de 8 bits resulta conveniente utilizar siempre ocho posiciones:</p>
+
+<pre><code>0b00110011</code></pre>
+
+<p>en lugar de:</p>
+
+<pre><code>0b110011</code></pre>
+
+<p>La razón es principalmente visual y pedagógica. Los ocho dígitos permiten establecer una correspondencia directa entre cada posición binaria y cada bit del registro:</p>
+
+<pre><code>Registro: b7 b6 b5 b4 b3 b2 b1 b0 0 0 1 1 0 0 1 1</code></pre>
+
+<p>Esto resulta particularmente útil al trabajar con registros como <code>DDRB</code>, <code>PORTB</code> o <code>PINB</code>, donde cada bit está asociado con una función concreta del microcontrolador.</p>
+
+<p>Por tanto, escribir los ocho bits no es una obligación del lenguaje C. Es una convención de escritura muy útil para hacer visible la correspondencia entre el valor escrito y un registro de 8 bits.</p> </section> </section>
+
+<section> <h2>6. Diferentes formas de representar el mismo valor</h2>
+
+<section> <h3>6.1. Un mismo valor en cuatro bases</h3>
+
+<p>Supongamos que queremos asignar a <code>DDRB</code> el valor correspondiente a:</p>
+
+<pre><code>00110011₂</code></pre>
+
+<p>Podemos escribir:</p>
+
+<pre><code>DDRB = 0b00110011; // Binario DDRB = 51; // Decimal DDRB = 0x33; // Hexadecimal DDRB = 063; // Octal</code></pre>
+
+<p>Las cuatro expresiones representan el mismo valor numérico:</p>
+
+<pre><code>0b00110011₂ = 51₁₀ = 0x33₁₆ = 063₈</code></pre>
+
+<p>Por lo tanto, al realizar la asignación, el valor numérico escrito es el mismo. Lo que cambia es la forma de representarlo en el código fuente.</p> </section>
+
+<section> <h3>6.2. Representación binaria</h3>
+
+<pre><code>DDRB = 0b00110011;</code></pre>
+
+<p>Esta forma permite observar directamente el estado de cada bit:</p>
+
+<pre><code> b7 b6 b5 b4 b3 b2 b1 b0 0 0 1 1 0 0 1 1</code></pre>
+
+<p>Por ello resulta especialmente clara cuando el objetivo es trabajar directamente con bits.</p> </section>
+
+<section> <h3>6.3. Representación decimal</h3>
+
+<pre><code>DDRB = 51;</code></pre>
+
+<p>El compilador interpreta <code>51</code> como una constante decimal:</p>
+
+<pre><code>51₁₀ = 00110011₂</code></pre>
+
+<p>La expresión es válida, pero no permite visualizar inmediatamente qué bits contienen <code>1</code> y cuáles contienen <code>0</code>.</p> </section>
+
+<section> <h3>6.4. Representación hexadecimal</h3>
+
+<pre><code>DDRB = 0x33;</code></pre>
+
+<p>El prefijo <code>0x</code> indica que el número está expresado en hexadecimal.</p>
+
+<p>En este caso:</p>
+
+<pre><code>0x33₁₆ = 0011 0011₂</code></pre>
+
+<p>Una ventaja importante de la representación hexadecimal es que dos dígitos hexadecimales permiten representar los ocho bits de un registro:</p>
+
+<pre><code>0x33 ││ │└── bits b3...b0 └─── bits b7...b4</code></pre>
+
+<p>Por esta razón, el hexadecimal es una representación muy utilizada en programación de microcontroladores, especialmente cuando se trabaja con valores y máscaras de bits (<em>bit masks</em>).</p> </section>
+
+<section> <h3>6.5. Representación octal</h3>
+
+<pre><code>DDRB = 063;</code></pre>
+
+<p>En esta notación, el cero inicial indica que se trata de una constante octal:</p>
+
+<pre><code>063₈ = 51₁₀ = 00110011₂</code></pre>
+
+<p>Aunque es una representación válida en C, el octal es mucho menos utilizado que el binario y el hexadecimal en la programación moderna de microcontroladores AVR.</p> </section> </section>
+
+<section> <h2>7. Elección de la representación según el objetivo</h2>
+
+<p>Las cuatro formas anteriores producen el mismo valor numérico, pero no ofrecen la misma utilidad para el programador.</p>
+
+<table> <thead> <tr> <th>Representación</th> <th>Ejemplo</th> <th>Utilidad principal</th> </tr> </thead> <tbody> <tr> <td>Binaria</td> <td><code>0b00110011</code></td> <td>Visualizar directamente el estado de cada bit.</td> </tr> <tr> <td>Decimal</td> <td><code>51</code></td> <td>Representar el valor numérico de forma convencional.</td> </tr> <tr> <td>Hexadecimal</td> <td><code>0x33</code></td> <td>Representar de forma compacta los ocho bits y trabajar con máscaras.</td> </tr> <tr> <td>Octal</td> <td><code>063</code></td> <td>Representar el valor en base 8; tiene menor uso en este contexto.</td> </tr> </tbody> </table>
+
+<p>Por ejemplo, cuando se quiere observar claramente qué bits se están estableciendo en un registro:</p>
+
+<pre><code>DDRB = 0b00110011;</code></pre>
+
+<p>puede ser más fácil de interpretar que:</p>
+
+<pre><code>DDRB = 51;</code></pre>
+
+<p>Mientras que para representar de forma compacta el mismo valor puede utilizarse:</p>
+
+<pre><code>DDRB = 0x33;</code></pre>
+
+<p>La elección depende, por tanto, de qué aspecto del valor resulte más importante visualizar.</p> </section>
+
+<section> <h2>8. Conversión entre representaciones</h2>
+
+<section> <h3>8.1. De binario a decimal</h3>
+
+<p>Para convertir un número binario a decimal se considera el peso correspondiente a cada posición.</p>
+
+<p>En un registro de 8 bits, las posiciones tienen los siguientes valores:</p>
+
+<pre><code>Bit: b7 b6 b5 b4 b3 b2 b1 b0 Peso: 128 64 32 16 8 4 2 1</code></pre>
+
+<p>Para:</p>
+
+<pre><code>00110011₂</code></pre>
+
+<p>los bits que contienen <code>1</code> corresponden a los pesos 32, 16, 2 y 1:</p>
+
+<pre><code>32 + 16 + 2 + 1 = 51</code></pre>
+
+<p>Por tanto:</p>
+
+<pre><code>00110011₂ = 51₁₀</code></pre>
+
+</section>
+
+<section> <h3>8.2. De binario a hexadecimal</h3>
+
+<p>La conversión entre binario y hexadecimal resulta especialmente sencilla porque cada dígito hexadecimal representa cuatro bits.</p>
+
+<pre><code>0011 0011 │ │ 3 3</code></pre>
+
+<p>Por tanto:</p>
+
+<pre><code>00110011₂ = 0x33</code></pre>
+
+<p>Esta relación explica por qué un registro de 8 bits puede representarse mediante exactamente dos dígitos hexadecimales.</p> </section>
+
+<section> <h3>8.3. Relación entre las cuatro representaciones</h3>
+
+<pre><code> 00110011₂ │ ┌─────────┼─────────┐ ↓ ↓ ↓ decimal hexadecimal octal 51 0x33 063</code></pre>
+
+<p>Las representaciones son diferentes, pero el valor numérico es el mismo.</p> </section> </section>
+
+<section> <h2>9. Aplicación en registros AVR</h2>
+
+<p>La utilidad de estas representaciones se hace evidente cuando se trabaja directamente con registros de los microcontroladores AVR.</p>
+
+<p>Por ejemplo:</p>
+
+<pre><code>DDRB = 0b00110011;</code></pre>
+
+<p>permite identificar inmediatamente qué bits del registro <code>DDRB</code> contienen <code>1</code>:</p>
+
+<pre><code> b7 b6 b5 b4 b3 b2 b1 b0 0 0 1 1 0 0 1 1</code></pre>
+
+<p>Mientras que:</p>
+
+<pre><code>DDRB = 0x33;</code></pre>
+
+<p>representa exactamente el mismo valor de una manera más compacta.</p>
+
+<p>En registros como <code>DDRB</code>, <code>PORTB</code> y <code>PINB</code>, la representación binaria resulta particularmente útil para relacionar el valor escrito o leído con los ocho bits individuales del puerto.</p> </section>
+
+<section> <h2>10. Resumen</h2>
+
+<p>Un registro de 8 bits está formado por ocho posiciones binarias, numeradas desde <code>b0</code> hasta <code>b7</code>. Cada posición puede contener <code>0</code> o <code>1</code>.</p>
+
+<pre><code> b7 b6 b5 b4 b3 b2 b1 b0 ↑ ↑ MSB LSB</code></pre>
+
+<p>Un mismo valor puede escribirse utilizando diferentes bases. Por ejemplo:</p>
+
+<pre><code>0b00110011 = 51 = 0x33 = 063</code></pre>
+
+<p>Las cuatro expresiones representan el mismo valor numérico.</p>
+
+<p>La diferencia está en la forma de visualización:</p>
+
+<pre><code>Binario → facilita observar los bits Decimal → representa el valor numérico convencional Hexadecimal → proporciona una representación compacta Octal → representa el valor en base 8</code></pre>
+
+<p>Cuando se trabaja con registros AVR, la representación binaria de ocho posiciones resulta especialmente útil porque permite establecer una correspondencia directa entre cada dígito y cada bit del registro.</p>
+
+<p>Por ejemplo:</p>
+
+<pre><code>Registro: b7 b6 b5 b4 b3 b2 b1 b0 0 0 1 1 0 0 1 1 Valor: 0b00110011 ↓ 0x33 ↓ 51 ↓ 063</code></pre>
+
+<p>Comprender esta equivalencia es fundamental para trabajar posteriormente con operaciones a nivel de bit (<em>bitwise operations</em>), máscaras de bits (<em>bit masks</em>) y registros de control de los microcontroladores AVR.</p> </section>    
+           
 
         </article>
         
