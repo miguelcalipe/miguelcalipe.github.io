@@ -148,7 +148,41 @@
             Una vez conocido el pinout, podemos montar el microcontrolador directamente en una placa de pruebas o en una PCB. Esto es lo que normalmente se denomina una configuración standalone: el ATmega funciona como el microcontrolador principal del circuito y no depende de una placa Arduino para ejecutar el programa.
         </p>
 
-            
+        <div class="imagen-derecha">
+            <div class="texto" >
+                </h3><strong>2.1 Circuito mínimo con oscialdor </strong></h3>
+                    <p>
+                        Un dispositivo de la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> incorpora un oscilador RC interno. 
+                    </p>
+                    <p>    
+                        Para optimizar el espacio en el circuito impreso (PCB) y reducir el costo del proyecto se puede prescindir de un cristal de cuarzo externo y de sus respectivos condensadores de carga, logrando un diseño más compacto y económico. 
+                    </p>
+
+                    <p>
+                        Por defecto, el oscilador interno viene configurado a 8 MHz con el fusible CKDIV8 activado, lo que resulta en una frecuencia de operación efectiva de 1 MHz. El oscilador RC interno puede presentar ligeras variaciones con la temperatura, por lo que se recomienda usar un cristal externo si el proyecto requiere comunicación serial (UART) de alta precisión o temporizaciones críticas.
+                    </p>
+                    <p>
+                        A continuación, se presenta el esquema eléctrico para operar el dispositivo con su configuración de frecuencia de fábrica:
+                    </p>
+            </div>
+        <img src="img/EsquematicoCircuitoMinimoAtmega.jpeg" alt="Circuito mínimo microcontrolador AVR ATmega48A/PA/88A/PA/168A/PA/328/P" tittle="ATmega48A/PA/88A/PA/168A/PA/328/P Standalone. Circuito mínimo" class="imagen-derecha">
+        </div>
+
+        <div class="imagen-derecha">
+            <div class="texto">
+                </h3><strong>2.1 Circuito mínimo con oscilador de cristal externo</strong></h3>
+                <p>
+                    El uso de un cristal oscilador externo en la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P </strong> permite maximizar la frecuencia de operación del dispositivo (hasta 20 MHz en variantes seleccionadas) y garantizar un error de frecuencia mínimo. 
+                </p>
+                <p>
+                    Esta configuración también se recomienda para aplicaciones que requieren una alta precisión temporal y estabilidad ante variaciones térmicas
+                </p>
+                <p>
+                    El circuito requiere la adición del cristal y dos condensadores de desacoplo cerámicos conectados a los pines XTAL1 y XTAL2 para asegurar el arranque correcto del oscilador. A continuación, se detalla el diagrama de conexiones correspondiente:
+                </p>
+            </div>
+                <img src="img/CircuitoMinimoConOscilador.jpeg" alt="Circuito mínimo microcontrolador AVR ATmega48A/PA/88A/PA/168A/PA/328/P con oscilador externo" tittle="ATmega48A/PA/88A/PA/168A/PA/328/P Standalone. Circuito mínimo con fuente de reloj externa" class="imagen-derecha">
+        </div>
 
                 <h2>3. ALIMENTACIÓN DEL MICROCONTROLADOR</h2>
 
