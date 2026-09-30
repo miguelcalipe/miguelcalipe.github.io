@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Niveles de abstracción del hardware | MC Mundo Tech</title>
+    <meta name="description" content="Con el paso del tiempo han aparecido distintos niveles de abstracción cuyo objetivo es simplificar el desarrollo de software. Mientras mayor es la abstracción, menor es la cantidad de detalles del hardware que el programador necesita conocer, a costa de perder algo de control y eficiencia ">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>ABSTRACCIÓN DEL HARDWARE</h1>
+            
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   -->
+            
+            <section> 
+            
+            <H2>INTRODUCCIÓN</H2>
+                <p>Todo microcontrolador, sin importar su arquitectura, se controla mediante <strong>registros de hardware</strong>. Lo que cambia entre proyectos es cuánto contacto directo tiene el programador con esos registros.</p>
+
+                <p>Con el paso del tiempo aparecieron distintos niveles de abstracción cuyo objetivo es simplificar el desarrollo de software. Mientras mayor es la abstracción, menor es la cantidad de detalles del hardware que el programador necesita conocer, a costa de perder algo de control y eficiencia.</p>
+
+            <h2>BARE METAL</h2>
+
+                <p>La programación <strong>Bare Metal</strong> consiste en escribir directamente sobre los registros del microcontrolador sin utilizar bibliotecas intermedias.</p>
+
+                <p>Por ejemplo, en un AVR:</p>
+
+                <pre><code>DDRB |= (1 &lt;&lt; PB0);
+                PORTB |= (1 &lt;&lt; PB0);</code></pre>
+
+                <p>Aquí el programa modifica directamente los registros responsables de configurar y activar un pin de salida.</p>
+
+                <p>Las ventajas son:</p>
+
+                <ul>
+                    <li><strong>Máximo rendimiento.</strong></li>
+                    <li>Código muy eficiente.</li>
+                    <li><strong>Control absoluto</strong> del hardware.</li>
+                    <li>Bajo consumo de memoria.</li>
+                </ul>
+
+                <p>Como desventaja, el programador debe conocer detalladamente la arquitectura del microcontrolador y consultar continuamente la hoja de datos.</p>
+
+                <h2>CMSIS</h2>
+
+                <p>En los microcontroladores ARM apareció el estándar <strong>CMSIS (Cortex Microcontroller Software Interface Standard)</strong>.</p>
+
+                <p>CMSIS no oculta los registros. Simplemente proporciona nombres estandarizados, estructuras y archivos de definición para acceder a ellos de forma más organizada.</p>
+
+                <p>Por ejemplo:</p>
+
+                <pre><code>GPIOA->MODER
+                GPIOA->ODR
+                TIM2->CR1</code></pre>
+
+                <p>Internamente siguen siendo registros de hardware. CMSIS únicamente facilita su acceso mediante estructuras del lenguaje C.</p>
+
+                <p>Pero CMSIS va un poco más allá de solo nombrar registros: también estandariza funciones para elementos comunes del núcleo ARM Cortex-M, como el manejo del <strong>NVIC</strong> (el controlador que gestiona las interrupciones) o del <strong>SysTick</strong> (el temporizador de sistema), y define la estructura de los archivos de arranque (<em>startup files</em>) junto con el mapa de vectores de interrupción. Por eso se dice que CMSIS estandariza el acceso al <em>núcleo</em>, no a los periféricos específicos de cada fabricante.</p>
+
+                <p>Su principal ventaja es que proporciona una <strong>interfaz común</strong> para los distintos fabricantes de microcontroladores basados en núcleos ARM Cortex.</p>
+
+                <h2>HAL Y NIVELES INTERMEDIOS</h2>
+
+                <p><strong>HAL</strong> significa <strong>Hardware Abstraction Layer</strong>.</p>
+
+                <p>Su propósito es ofrecer funciones de alto nivel que evitan manipular directamente los registros.</p>
+
+                <p>Por ejemplo:</p>
+
+                <pre><code>HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);</code></pre>
+
+                <p>Internamente esta función termina modificando uno o varios registros del periférico GPIO. La diferencia es que el programador ya no necesita conocer cuáles son esos registros.</p>
+
+                <p>Las ventajas de HAL son:</p>
+
+                    <ul>
+                    <li><strong>Desarrollo más rápido.</strong></li>
+                    <li>Mayor <strong>portabilidad</strong> entre dispositivos del mismo fabricante.</li>
+                    <li>Código más sencillo de comprender para proyectos grandes.</li>
+                </ul>
+
+                <p>Como contrapartida:</p>
+
+                <ul>
+                    <li>Mayor consumo de memoria Flash.</li>
+                    <li>Más uso de RAM.</li>
+                    <li>Menor velocidad de ejecución.</li>
+                    <li><strong>Menor control</strong> sobre el hardware.</li>
+                </ul>
+
+                <p>En la práctica, además, el código HAL rara vez se escribe línea por línea a mano: herramientas como <strong>STM32CubeMX</strong> permiten configurar los periféricos de forma gráfica y generan automáticamente el código HAL correspondiente, lo que acelera aún más el desarrollo.</p>
+
+                <p>Entre CMSIS y HAL existe también un nivel intermedio que vale la pena conocer: los drivers <strong>LL (Low-Layer)</strong>, ofrecidos por fabricantes como STMicroelectronics. Son más cercanos al registro que HAL —y por lo tanto más rápidos y ligeros— pero sin la verbosidad de escribir directamente sobre bits individuales, como en Bare Metal.</p>
+
+                <p>Y todavía existe un nivel de abstracción mayor que el propio HAL: el framework de <strong>Arduino</strong>, con funciones como <code>digitalWrite()</code> o <code>pinMode()</code>, que oculta casi por completo los detalles del hardware subyacente y prioriza la simplicidad por encima del control o la eficiencia.</p>
+
+                <p>Por esta razón, en aplicaciones críticas de tiempo real o con recursos muy limitados todavía es frecuente utilizar programación Bare Metal o directamente CMSIS/LL, mientras que HAL y frameworks como Arduino se prefieren cuando importa más la velocidad de desarrollo que el control fino del hardware.</p>
+
+                <p>Vale la pena tener presente que, sin importar el nivel de abstracción utilizado, todos terminan produciendo el mismo resultado final: una escritura o lectura sobre el mismo registro físico. De hecho, es habitual encontrar proyectos que combinan varios niveles a la vez —por ejemplo, usar HAL para la mayor parte del código y recurrir a Bare Metal solo en la rutina de interrupción más crítica, donde cada ciclo de reloj cuenta.</p>
+            </section>
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>
