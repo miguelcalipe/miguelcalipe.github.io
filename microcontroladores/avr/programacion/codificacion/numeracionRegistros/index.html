@@ -36,7 +36,8 @@
                         
             <aside id="indice"></aside>    
             <!-- CONTENIDO DEL ARTÍCULO   -->
-        <section> <h2>1. Introducción</h2>
+        <section> 
+            <h2>1. INTRODUCCIÓN</h2>
 
 <p>En la programación de microcontroladores es habitual trabajar directamente con registros cuyos bits representan estados o funciones específicas del hardware. En los microcontroladores AVR, muchos registros de propósito especial (<em>Special Function Registers, SFR</em>) tienen un ancho de 8 bits.</p>
 
@@ -48,77 +49,85 @@
 
 <pre><code>0 o 1</code></pre>
 
-<p>Por esta razón, la representación binaria resulta especialmente útil cuando se trabaja directamente con los bits de un registro.</p> </section>
+<p>Por esta razón, la representación binaria resulta especialmente útil cuando se trabaja directamente con los bits de un registro.</p> 
+</section>
 
-<section> <h2>2. El registro de 8 bits</h2>
+<section> 
+    <h2>2. EL REGISTRO DE 8 BITS</h2>
 
-<section> <h3>2.1. Organización de los bits</h3>
+<h3>2.1. Organización de los bits</h3>
 
 <p>Un registro de 8 bits puede representarse de la siguiente manera:</p>
 
-<pre><code>Registro = [ b7 ][ b6 ][ b5 ][ b4 ][ b3 ][ b2 ][ b1 ][ b0 ] | | | | | | | | 7 6 5 4 3 2 1 0</code></pre>
+<img src="img/Registro8byte.jpeg" alt="Representación de un registro de 8 bits" class="imagen-centrada">
 
 <p>Cada posición representa un bit individual del registro.</p>
 
 <p>El bit situado más a la derecha es el <strong>bit 0 (b0)</strong>, denominado bit menos significativo (<em>Least Significant Bit, LSB</em>). El bit situado más a la izquierda es el <strong>bit 7 (b7)</strong>, denominado bit más significativo (<em>Most Significant Bit, MSB</em>).</p>
 
-<pre><code>MSB LSB ↓ ↓ b7 b6 b5 b4 b3 b2 b1 b0 │ │ bit más significativo bit menos significativo</code></pre>
+<p>La numeración de los bits aumenta desde la derecha hacia la izquierda, comenzando en cero.</p> 
 
-<p>La numeración de los bits aumenta desde la derecha hacia la izquierda, comenzando en cero.</p> </section>
+<h3>2.2. Ejemplo de un registro</h3>
 
-<section> <h3>2.2. Ejemplo de un registro</h3>
-
-<p>Supongamos que un registro denominado <code>X</code> contiene:</p>
+<p>Supongamos que un registro denominado <code>X</code> contiene en sus ocho posiciones los siguientes valores:</p>
 
 <pre><code>Registro X = 0b00110011</code></pre>
 
 <p>La representación binaria permite observar directamente el estado de cada uno de sus ocho bits:</p>
 
-<pre><code> b7 b6 b5 b4 b3 b2 b1 b0 0 0 1 1 0 0 1 1</code></pre>
+<img src="img/Valor8Bits.jpeg" alt="Representación de un registro de 8 bits con valores" class="imagen-centrada">
 
 <p>Por tanto:</p>
 
 <pre><code>b7 = 0 b6 = 0 b5 = 1 b4 = 1 b3 = 0 b2 = 0 b1 = 1 b0 = 1</code></pre>
 
-<p>La ventaja de esta representación es que existe una correspondencia visual directa entre cada dígito binario y una posición concreta del registro.</p> </section> </section>
+<p>La ventaja de esta representación es que existe una correspondencia visual directa entre cada dígito binario y una posición concreta del registro.</p> </section>
 
-<section> <h2>3. Sistemas de numeración</h2>
+<section> 
+    <h2>3. SISTEMAS DE NUMERACIÓN</h2>
 
-<section> <h3>3.1. Qué es una base numérica</h3>
+ <h3>3.1. Qué es una base numérica</h3>
 
 <p>Un mismo valor numérico puede representarse utilizando diferentes sistemas de numeración. En programación de microcontroladores son especialmente importantes los sistemas decimal, binario, hexadecimal y octal.</p>
 
 <p>La diferencia entre ellos está en la base utilizada para representar los valores:</p>
 
-<table> <thead> <tr> <th>Sistema</th> <th>Base</th> <th>Dígitos utilizados</th> </tr> </thead> <tbody> <tr> <td>Binario</td> <td>2</td> <td>0–1</td> </tr> <tr> <td>Octal</td> <td>8</td> <td>0–7</td> </tr> <tr> <td>Decimal</td> <td>10</td> <td>0–9</td> </tr> <tr> <td>Hexadecimal</td> <td>16</td> <td>0–9 y A–F</td> </tr> </tbody> </table>
+<div class="table-container">
+    <table> 
+        <thead> <tr> <th>Sistema</th> <th>Base</th> <th>Dígitos utilizados</th> <th>Prefijo en C</th> <th>Ejemplo</th></tr> </thead> 
+        <tbody> <tr> <td>Binario</td> <td>2</td> <td>0–1</td> <td>0b</td> <td>0b00110011</td></tr> <tr> <td>Octal</td> <td>8</td> <td>0–7</td> <td>0</td> <td>063</td></tr> <tr> <td>Decimal</td> <td>10</td> <td>0–9</td> <td></td> <td>51</td></tr> <tr> <td>Hexadecimal</td> <td>16</td> <td>0–9 y A–F</td> <td>0x</td> <td>0x33</td></tr> </tbody> </table>
+</div>
 
-<p>La elección de una representación no cambia el valor almacenado. Solamente cambia la forma en que el programador escribe y visualiza ese valor.</p> </section>
+<p>La elección de una representación no cambia el valor almacenado en la memoria del microcontrolador. Solamente cambia la forma en que el programador escribe y visualiza ese valor.</p> 
 
-<section> <h3>3.2. El sistema binario</h3>
+<h3>3.2. Prefijos utilizados en C</h3>
 
-<p>El sistema binario utiliza únicamente dos dígitos:</p>
+<p>Las constantes enteras pueden escribirse utilizando diferentes bases. La forma habitual de identificarlas es mediante un prefijo:</p>
 
-<pre><code>0 1</code></pre>
+<div class="table-container"> 
+<table> 
+    <thead> <tr> <th>Representación</th> <th>Base</th> <th>Prefijo</th> <th>Ejemplo</th> </tr> </thead> <tbody> <tr> <td>Decimal</td> <td>10</td> <td>Ninguno</td> <td><code>51</code></td> </tr> <tr> <td>Octal</td> <td>8</td> <td><code>0</code></td> <td><code>063</code></td> </tr> <tr> <td>Hexadecimal</td> <td>16</td> <td><code>0x</code> o <code>0X</code></td> <td><code>0x33</code></td> </tr> <tr> <td>Binaria</td> <td>2</td> <td><code>0b</code> o <code>0B</code></td> <td><code>0b00110011</code></td> </tr> </tbody> </table>
+    </div>
+</section>
+
+<section>
+    <h2>4. EL SISTEMA BINARIO</h2>
+
+<p>El sistema binario utiliza únicamente dos dígitos: <code>0, 1</code></p>
 
 <p>Esto coincide directamente con los dos estados posibles de cada bit de un registro digital.</p>
 
-<p>Por ejemplo:</p>
-
-<pre><code>00110011₂</code></pre>
-
-<p>es una representación binaria de un valor numérico.</p>
+<p>Por ejemplo: <code>00110011₂</code>, es una representación binaria de un valor numérico. </p>
 
 <p>En un registro de 8 bits, los ocho dígitos permiten asociar visualmente cada posición con un bit:</p>
 
-<pre><code>Registro: b7 b6 b5 b4 b3 b2 b1 b0 0 0 1 1 0 0 1 1 Binario: 0 0 1 1 0 0 1 1</code></pre>
+<img src="img/ValorRegistro.jpeg" alt="Representación de un registro de 8 bits con valores" class="imagen-centrada">
 
-</section> </section>
+<p>De tal manera que el valor escrito en binario permite identificar inmediatamente qué bits contienen <code>1</code> y cuáles contienen <code>0</code>.</p>
 
-<section> <h2>4. El prefijo 0b</h2>
+<h3>4.1. El prefijo 0b. Identificación de un número binario</h3>
 
-<section> <h3>4.1. Identificación de un número binario</h3>
-
-<p>En C, el prefijo <code>0b</code> o <code>0B</code> indica que el número escrito a continuación está expresado en base 2.</p>
+<p>En lenguaje C, el prefijo <code>0b</code> o <code>0B</code> indica que el número escrito a continuación está expresado en base 2.</p>
 
 <p>Por ejemplo:</p>
 
@@ -126,25 +135,17 @@
 
 <p>representa el mismo valor numérico que:</p>
 
-<pre><code>51 decimal 33 hexadecimal 063 octal</code></pre>
+<pre><code>51 decimal, 33 hexadecimal, 063 octal</code></pre>
 
-<p>La letra <code>b</code> procede de la palabra inglesa <em>binary</em>.</p> </section>
-
-<section> <h3>4.2. Prefijos utilizados en C</h3>
-
-<p>Las constantes enteras pueden escribirse utilizando diferentes bases. La forma habitual de identificarlas es:</p>
-
-<table> <thead> <tr> <th>Representación</th> <th>Base</th> <th>Prefijo</th> <th>Ejemplo</th> </tr> </thead> <tbody> <tr> <td>Decimal</td> <td>10</td> <td>Ninguno</td> <td><code>51</code></td> </tr> <tr> <td>Octal</td> <td>8</td> <td><code>0</code></td> <td><code>063</code></td> </tr> <tr> <td>Hexadecimal</td> <td>16</td> <td><code>0x</code> o <code>0X</code></td> <td><code>0x33</code></td> </tr> <tr> <td>Binaria</td> <td>2</td> <td><code>0b</code> o <code>0B</code></td> <td><code>0b00110011</code></td> </tr> </tbody> </table>
+<p>La letra <code>b</code> procede de la palabra inglesa <em>binary</em>.</p> 
 
 <p>La notación binaria con <code>0b</code> fue incorporada originalmente por GCC como una extensión para escribir constantes binarias directamente en C y C++. En versiones modernas del estándar de C, esta notación también está contemplada por el lenguaje.</p>
 
-<p>Para la programación de microcontroladores, la representación binaria resulta especialmente útil porque permite visualizar directamente el estado de cada bit de un registro.</p> </section> </section>
+<p>Para la programación de microcontroladores, la representación binaria resulta especialmente útil porque permite visualizar directamente el estado de cada bit de un registro.</p>  
 
-<section> <h2>5. Un número binario no es necesariamente un número de 8 bits</h2>
+<h3>4.2. Por qué se utilizan ocho dígitos en un registro de 8 bits</h3>
 
-<section> <h3>5.1. Diferencia entre valor y representación</h3>
-
-<p>Es importante hacer una precisión conceptual. La expresión:</p>
+<p>Es importante hacer una precisión conceptual: Un número binario no es necesariamente un número de 8 bits. La expresión:</p>
 
 <pre><code>00110011</code></pre>
 
@@ -152,15 +153,13 @@
 
 <p>Por ejemplo, las siguientes expresiones representan exactamente el mismo valor:</p>
 
-<pre><code>0b00110011 0b0110011 0b110011</code></pre>
+<pre><code>0b00110011 = 0b0110011 = 0b110011</code></pre>
 
 <p>Todas representan:</p>
 
 <pre><code>51₁₀</code></pre>
 
-<p>Los ceros situados a la izquierda no modifican el valor numérico.</p> </section>
-
-<section> <h3>5.2. Por qué se utilizan ocho dígitos en un registro de 8 bits</h3>
+<p>Los ceros situados a la izquierda no modifican el valor numérico.</p> 
 
 <p>Aunque no es obligatorio escribir los ceros iniciales, cuando se trabaja con un registro de 8 bits resulta conveniente utilizar siempre ocho posiciones:</p>
 
@@ -172,15 +171,11 @@
 
 <p>La razón es principalmente visual y pedagógica. Los ocho dígitos permiten establecer una correspondencia directa entre cada posición binaria y cada bit del registro:</p>
 
-<pre><code>Registro: b7 b6 b5 b4 b3 b2 b1 b0 0 0 1 1 0 0 1 1</code></pre>
-
 <p>Esto resulta particularmente útil al trabajar con registros como <code>DDRB</code>, <code>PORTB</code> o <code>PINB</code>, donde cada bit está asociado con una función concreta del microcontrolador.</p>
 
-<p>Por tanto, escribir los ocho bits no es una obligación del lenguaje C. Es una convención de escritura muy útil para hacer visible la correspondencia entre el valor escrito y un registro de 8 bits.</p> </section> </section>
+<p>Por tanto, escribir los ocho bits no es una obligación del lenguaje C. Es una convención de escritura muy útil para hacer visible la correspondencia entre el valor escrito y un registro de 8 bits.</p> </section> 
 
-<section> <h2>6. Diferentes formas de representar el mismo valor</h2>
-
-<section> <h3>6.1. Un mismo valor en cuatro bases</h3>
+<section> <h2>5. DIFERENTES FORMAS DE REPRESENTAR EL MISMO VALOR</h2>
 
 <p>Supongamos que queremos asignar a <code>DDRB</code> el valor correspondiente a:</p>
 
@@ -188,25 +183,30 @@
 
 <p>Podemos escribir:</p>
 
-<pre><code>DDRB = 0b00110011; // Binario DDRB = 51; // Decimal DDRB = 0x33; // Hexadecimal DDRB = 063; // Octal</code></pre>
+<pre><code>
+    DDRB = 0b00110011; // Binario 
+    DDRB = 51; // Decimal 
+    DDRB = 0x33; // Hexadecimal 
+    DDRB = 063; // Octal
+</code></pre>
 
 <p>Las cuatro expresiones representan el mismo valor numérico:</p>
 
 <pre><code>0b00110011₂ = 51₁₀ = 0x33₁₆ = 063₈</code></pre>
 
-<p>Por lo tanto, al realizar la asignación, el valor numérico escrito es el mismo. Lo que cambia es la forma de representarlo en el código fuente.</p> </section>
+<p>Por lo tanto, al realizar la asignación, el valor numérico escrito es el mismo. Lo que cambia es la forma de representarlo en el código fuente.</p> 
 
-<section> <h3>6.2. Representación binaria</h3>
+<h3>5.1. Representación binaria</h3>
 
 <pre><code>DDRB = 0b00110011;</code></pre>
 
 <p>Esta forma permite observar directamente el estado de cada bit:</p>
 
-<pre><code> b7 b6 b5 b4 b3 b2 b1 b0 0 0 1 1 0 0 1 1</code></pre>
+<img src="img/ValorRegistro.jpeg" alt="Representación de un registro de 8 bits con valores" class="imagen-centrada">
 
-<p>Por ello resulta especialmente clara cuando el objetivo es trabajar directamente con bits.</p> </section>
+<p>Por ello, la representación binaria resulta especialmente clara cuando el objetivo es trabajar directamente con bits.</p> 
 
-<section> <h3>6.3. Representación decimal</h3>
+<h3>5.2. Representación decimal</h3>
 
 <pre><code>DDRB = 51;</code></pre>
 
@@ -214,25 +214,29 @@
 
 <pre><code>51₁₀ = 00110011₂</code></pre>
 
-<p>La expresión es válida, pero no permite visualizar inmediatamente qué bits contienen <code>1</code> y cuáles contienen <code>0</code>.</p> </section>
+<p>La expresión es válida, pero no permite visualizar inmediatamente qué bits contienen <code>1</code> y cuáles contienen <code>0</code>.</p> 
 
-<section> <h3>6.4. Representación hexadecimal</h3>
+<h3>5.3. Representación hexadecimal</h3>
 
 <pre><code>DDRB = 0x33;</code></pre>
 
 <p>El prefijo <code>0x</code> indica que el número está expresado en hexadecimal.</p>
 
-<p>En este caso:</p>
-
+<div class="imagen-derecha">
+    <div class="texto">
+        <p>Una ventaja importante de la representación hexadecimal es que dos dígitos hexadecimales permiten representar los ocho bits de un registro</p>
+        <p>En este caso:</p>
 <pre><code>0x33₁₆ = 0011 0011₂</code></pre>
+        
+    </div>
 
-<p>Una ventaja importante de la representación hexadecimal es que dos dígitos hexadecimales permiten representar los ocho bits de un registro:</p>
+<img src="img/0x33.jpeg" alt="Representación de un registro de 8 bits con valores en hexadecimal" class="imagen-responsive">
+</div>
 
-<pre><code>0x33 ││ │└── bits b3...b0 └─── bits b7...b4</code></pre>
+<p>Por esta razón, el hexadecimal es una representación muy utilizada en programación de microcontroladores, especialmente cuando se trabaja con valores y máscaras de bits (<em>bit masks</em>).</p> 
 
-<p>Por esta razón, el hexadecimal es una representación muy utilizada en programación de microcontroladores, especialmente cuando se trabaja con valores y máscaras de bits (<em>bit masks</em>).</p> </section>
 
-<section> <h3>6.5. Representación octal</h3>
+<h3>5.4. Representación octal</h3>
 
 <pre><code>DDRB = 063;</code></pre>
 
@@ -240,13 +244,15 @@
 
 <pre><code>063₈ = 51₁₀ = 00110011₂</code></pre>
 
-<p>Aunque es una representación válida en C, el octal es mucho menos utilizado que el binario y el hexadecimal en la programación moderna de microcontroladores AVR.</p> </section> </section>
+<p>Aunque es una representación válida en C, el octal es mucho menos utilizado que el binario y el hexadecimal en la programación moderna de microcontroladores AVR.</p> 
 
-<section> <h2>7. Elección de la representación según el objetivo</h2>
+<h3>5.5. Elección de la representación según el objetivo</h3>
 
 <p>Las cuatro formas anteriores producen el mismo valor numérico, pero no ofrecen la misma utilidad para el programador.</p>
 
+<div class="table-container"> 
 <table> <thead> <tr> <th>Representación</th> <th>Ejemplo</th> <th>Utilidad principal</th> </tr> </thead> <tbody> <tr> <td>Binaria</td> <td><code>0b00110011</code></td> <td>Visualizar directamente el estado de cada bit.</td> </tr> <tr> <td>Decimal</td> <td><code>51</code></td> <td>Representar el valor numérico de forma convencional.</td> </tr> <tr> <td>Hexadecimal</td> <td><code>0x33</code></td> <td>Representar de forma compacta los ocho bits y trabajar con máscaras.</td> </tr> <tr> <td>Octal</td> <td><code>063</code></td> <td>Representar el valor en base 8; tiene menor uso en este contexto.</td> </tr> </tbody> </table>
+<div> 
 
 <p>Por ejemplo, cuando se quiere observar claramente qué bits se están estableciendo en un registro:</p>
 
@@ -262,9 +268,10 @@
 
 <p>La elección depende, por tanto, de qué aspecto del valor resulte más importante visualizar.</p> </section>
 
-<section> <h2>8. Conversión entre representaciones</h2>
+<section> 
+    <h2>6. CONVERSIÓN ENTRE REPRESENTACIONES</h2>
 
-<section> <h3>8.1. De binario a decimal</h3>
+<h3>6.1. De binario a decimal</h3>
 
 <p>Para convertir un número binario a decimal se considera el peso correspondiente a cada posición.</p>
 
@@ -284,27 +291,33 @@
 
 <pre><code>00110011₂ = 51₁₀</code></pre>
 
-</section>
+<img src="img/BinarioDecimal.jpeg" alt="Conversión de binario a decimal" class="imagen-centrada">
 
-<section> <h3>8.2. De binario a hexadecimal</h3>
+
+<h3>6.2. De binario a hexadecimal</h3>
 
 <p>La conversión entre binario y hexadecimal resulta especialmente sencilla porque cada dígito hexadecimal representa cuatro bits.</p>
 
-<pre><code>0011 0011 │ │ 3 3</code></pre>
+<p>Un nibble es un conjunto de 4 bits (la mitad de un byte), que equivale exactamente a un dígito en el sistema hexadecimal. Si nos fijamos en la tabla de conversión, 4 bits (un nibble) puede representar 2⁴ = 16 valores diferentes (16 es la base del sistema hexadecimal), desde el <code>0000</code> (cero) hasta el <code>1111</code>, quince en decimal o F en hexadecimal y es el digito más significativo en hexadecimal</p>
 
-<p>Por tanto:</p>
+<p>Por tanto, un registro de 8 bits puede representarse mediante exactamente dos dígitos hexadecimales. El nibble superiors representa el dígito más significativo y el nibble inferiors representa el dígito menos significativo.</p>
+
+<p>Por ejemplo para convertir un binario <code>0b00110011 </code>a hexadecimal, separamos el binario de 8 bits en dos nibbles: <code>0011</code> y <code>0011</code> </p>
+
+<p>Convertimos cada nibble en hexadecimal, los dos dígitos resultantes forman el número hexadecimal equivalente </p> 
+
+<code>0b0011 = 0x3 </code>. Por tanto:</p>
 
 <pre><code>00110011₂ = 0x33</code></pre>
 
-<p>Esta relación explica por qué un registro de 8 bits puede representarse mediante exactamente dos dígitos hexadecimales.</p> </section>
+<p>Esta relación explica por qué un registro de 8 bits puede representarse mediante exactamente dos dígitos hexadecimales.</p> 
 
-<section> <h3>8.3. Relación entre las cuatro representaciones</h3>
+<img src="img/binarioHexadecimal.jpeg" alt="Conversión de binario a hexadecimal" class="imagen-centrada">
+</section>
 
-<pre><code> 00110011₂ │ ┌─────────┼─────────┐ ↓ ↓ ↓ decimal hexadecimal octal 51 0x33 063</code></pre>
+<section>
 
-<p>Las representaciones son diferentes, pero el valor numérico es el mismo.</p> </section> </section>
-
-<section> <h2>9. Aplicación en registros AVR</h2>
+<h2>7. APLICACIÓN EN REGISTROS AVR</h2>
 
 <p>La utilidad de estas representaciones se hace evidente cuando se trabaja directamente con registros de los microcontroladores AVR.</p>
 
@@ -314,21 +327,28 @@
 
 <p>permite identificar inmediatamente qué bits del registro <code>DDRB</code> contienen <code>1</code>:</p>
 
-<pre><code> b7 b6 b5 b4 b3 b2 b1 b0 0 0 1 1 0 0 1 1</code></pre>
+<pre><code> 
+    b7 b6 b5 b4 b3 b2 b1 b0 
+    0 0 1 1 0 0 1 1</code></pre>
 
 <p>Mientras que:</p>
 
-<pre><code>DDRB = 0x33;</code></pre>
+<pre><code class="language-c">DDRB = 0x33;</code></pre>
 
 <p>representa exactamente el mismo valor de una manera más compacta.</p>
 
-<p>En registros como <code>DDRB</code>, <code>PORTB</code> y <code>PINB</code>, la representación binaria resulta particularmente útil para relacionar el valor escrito o leído con los ocho bits individuales del puerto.</p> </section>
+<p>En registros como <code>DDRB</code>, <code>PORTB</code> y <code>PINB</code>, la representación binaria resulta particularmente útil para relacionar el valor escrito o leído con los ocho bits individuales del puerto.</p> 
+</section>
 
-<section> <h2>10. Resumen</h2>
+<section> <h2>8. RESUMEN</h2>
 
 <p>Un registro de 8 bits está formado por ocho posiciones binarias, numeradas desde <code>b0</code> hasta <code>b7</code>. Cada posición puede contener <code>0</code> o <code>1</code>.</p>
 
-<pre><code> b7 b6 b5 b4 b3 b2 b1 b0 ↑ ↑ MSB LSB</code></pre>
+<pre><code> 
+    b7 b6 b5 b4 b3 b2 b1 b0 
+    ↑                     ↑ 
+   MSB                   LSB
+</code></pre>
 
 <p>Un mismo valor puede escribirse utilizando diferentes bases. Por ejemplo:</p>
 
@@ -338,16 +358,17 @@
 
 <p>La diferencia está en la forma de visualización:</p>
 
-<pre><code>Binario → facilita observar los bits Decimal → representa el valor numérico convencional Hexadecimal → proporciona una representación compacta Octal → representa el valor en base 8</code></pre>
+<pre><code>
+    Binario → facilita observar los bits 
+    Decimal → representa el valor numérico convencional 
+    Hexadecimal → proporciona una representación compacta 
+    Octal → representa el valor en base 8
+</code></pre>
 
 <p>Cuando se trabaja con registros AVR, la representación binaria de ocho posiciones resulta especialmente útil porque permite establecer una correspondencia directa entre cada dígito y cada bit del registro.</p>
 
-<p>Por ejemplo:</p>
-
-<pre><code>Registro: b7 b6 b5 b4 b3 b2 b1 b0 0 0 1 1 0 0 1 1 Valor: 0b00110011 ↓ 0x33 ↓ 51 ↓ 063</code></pre>
-
-<p>Comprender esta equivalencia es fundamental para trabajar posteriormente con operaciones a nivel de bit (<em>bitwise operations</em>), máscaras de bits (<em>bit masks</em>) y registros de control de los microcontroladores AVR.</p> </section>    
-           
+<p>Comprender esta equivalencia es fundamental para trabajar posteriormente con operaciones a nivel de bit (<em>bitwise operations</em>), máscaras de bits (<em>bit masks</em>) y registros de control de los microcontroladores AVR.</p> 
+</section>  
 
         </article>
         
