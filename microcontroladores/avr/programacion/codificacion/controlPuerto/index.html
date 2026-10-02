@@ -30,7 +30,7 @@
     <main>        
         <article>            
             <header class="article-header">
-            <h1>CONTROL DE TODO UN PUERTO CON uMC AVR</h1>
+            <h1>CONTROL DE TODO UN PUERTO DE uMC AVR COMO SALIDAS DIGITALES</h1>
             
             </header>
                         
@@ -49,7 +49,7 @@
     <li>Comprender el funcionamiento básico de un MOSFET 2N7000 como interruptor electrónico.</li>
     <li>Comprender cómo la señal <code>RESET</code>, activa en bajo, puede utilizarse para controlar el aislamiento del circuito de LED.</li>
     <li>Configurar los ocho pines de un puerto AVR como salidas digitales.</li>
-    <li>Controlar ocho LED mediante los ocho bits de un puerto.</li>
+    <li>Controlar ocho LEDs mediante los ocho bits de un puerto.</li>
     <li>Comprender la relación entre el nivel lógico de una salida y el estado físico de un LED según su conexión.</li>
     <li>Representar patrones luminosos mediante valores binarios escritos en <code>PORTB</code>.</li>
 </ol>
@@ -60,7 +60,7 @@
 
 <p>El control de un LED mediante una salida digital es uno de los primeros ejercicios para comprender la relación entre el software y el hardware de un microcontrolador.</p>
 
-<p>Cuando el número de LED aumenta, el mismo principio puede extenderse para controlar varios pines de un puerto simultáneamente. En un AVR con un puerto de ocho bits, un único registro puede utilizarse para controlar ocho señales digitales.</p>
+<p>Cuando el número de LEDs aumenta, el mismo principio puede extenderse para controlar varios pines de un puerto simultáneamente. En un AVR con un puerto de ocho bits, un único registro puede utilizarse para controlar ocho señales digitales.</p>
 
 <p>Sin embargo, al construir un circuito real aparecen otros aspectos que deben tenerse en cuenta. Los LED necesitan una resistencia limitadora de corriente y, además, algunos de los pines utilizados para controlarlos pueden compartir funciones con las señales utilizadas durante la programación del microcontrolador.</p>
 

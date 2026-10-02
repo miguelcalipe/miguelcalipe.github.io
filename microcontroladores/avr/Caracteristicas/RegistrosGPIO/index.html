@@ -89,8 +89,36 @@ Pin Físico Chip:   PB7  PB6  PB5  PB4  PB3  PB2  PB1  PB0
         <h3>2.1. Configuración de Estados Lógicos de Dirección</h3>
         <ul>
             <li><strong>Asignar Salida (Output):</strong> Se escribe un uno (<code>1</code>) en el bit correspondiente del registro DDRx. Esto habilita los transistores de potencia internos para conmutar corriente hacia el exterior.</li>
-            <li><strong>Asignar Entrada (Input):</strong> Por defecto, tras un evento de encendido o reinicio por hardware (<em>Reset</em>), el sistema establece todos los bits de DDRx en cero (<code>0</code>). Esto coloca los pines automáticamente en modo entrada como medida de seguridad eléctrica.</li>
+            <li><strong>Asignar Entrada (Input):</strong> Se escribe un cero (<code>0</code>) en el bit correspondiente del registro DDRx. Esto coloca el pin en modo entrada.</li>
         </ul>
+
+        <p>
+            Por defecto, tras un evento de encendido o reinicio por hardware (<em>Reset</em>), el sistema establece todos los bits de DDRx en cero (<code>0</code>). Esto coloca los pines automáticamente en modo entrada como medida de seguridad eléctrica. Por lo tanto, la configuración solo requiere cambiar específicamente los pines de salida.
+        </p>
+        
+        <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>DDRX - Estado Lógico del Bit</th>
+                    <th>Orientación Lógica de Bit</th>
+                    <th>Orientación Lógica de la Corriente</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>0</strong></td>
+                    <td><strong>SALIDA (Output)</strong></td>
+                    <td><strong>Corriente Fluye hacia el Exterior (Manejará una carga)</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>1</strong></td>
+                    <td><strong>ENTRADA (Input)</strong></td>
+                    <td><strong>Corriente Fluye hacia el Interior (Leerá una señal)</strong></td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
 
         <h3>2.2. Análisis de un Ejemplo Práctico de Asignación Directa</h3>
         <p>Consideremos la ejecución del siguiente comando en lenguaje C:</p>
@@ -109,25 +137,28 @@ Valor en DDRB:   0    0    0    0    0    0    1    0
             <thead>
                 <tr>
                     <th>Pin Físico</th>
+                    <th>Estado Lógico</th>
                     <th>Estado de Dirección Configurado</th>
+                    <th>Orientación Lógica de la Corriente</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td><strong>PB1</strong></td>
+                    <td><strong>1</strong></td>
                     <td><strong>SALIDA (Output)</strong></td>
+                    <td><strong>Corriente Fluye hacia el Exterior (Manejará una carga)</strong></td>
                 </tr>
                 <tr>
                     <td><strong>PB0, PB2–PB7</strong></td>
+                    <td><strong>0</strong></td>
                     <td><strong>ENTRADA (Input)</strong></td>
+                    <td><strong>Corriente Fluye hacia el Interior (Leerá una señal)</strong></td>
                 </tr>
             </tbody>
         </table>
         </div>
 
-        <h3>2.3. Inconvenientes de la Asignación Directa</h3>
-        <p>La asignación directa mediante literales binarios (<code>DDRB = 0b00000010;</code>) borra el estado previo de los 8 bits del puerto. En el desarrollo industrial de firmware, se prefiere modificar un único pin sin alterar la configuración de los pines vecinos utilizando operadores lógicos a nivel de bits (<em>bitwise operations</em>):</p>
-<pre><code>DDRB |= (1 &lt;&lt; PB1); // Configura PB1 como salida de forma no destructiva</code></pre>
     </section>
 
     <section>
@@ -138,7 +169,7 @@ Valor en DDRB:   0    0    0    0    0    0    1    0
         <p>Cuando un bit en DDRx está configurado como salida, el bit equivalente en PORTx controla el driver de salida de voltaje activo:</p>
         <ul>
             <li><strong>PORTx = 1 (Lógica Alta / High):</strong> El pin interno conmuta a <strong>VCC</strong> (usualmente 5 V o 3.3 V segun el circuito), inyectando voltaje y actuando como una fuente de corriente (<em>current source</em>).</li>
-            <li><strong>PORTx = 0 (Lógica Baja / Low):</strong> El pin interno conmuta a masa o tierra (<strong>GND / 0 V</strong>), actuando como un drena corriente (<em>current sink</em>).</li>
+            <li><strong>PORTx = 0 (Lógica Baja / Low):</strong> El pin interno conmuta a masa o tierra (<strong>GND / 0 V</strong>), actuando como un sumidero de corriente (<em>current sink</em>).</li>
         </ul>
 
         <h3>3.2. Comportamiento en Modo Entrada (DDRx = 0)</h3>
@@ -147,6 +178,41 @@ Valor en DDRB:   0    0    0    0    0    0    1    0
             <li><strong>PORTx = 1 (Pull-Up Activa):</strong> Conecta una resistencia de elevación interna (<em>pull-up resistor</em>) de entre 20 kΩ y 50 kΩ aproximadamente desde el pin hacia VCC. Esto garantiza que el pin lea un nivel '1' estable en reposo y evita lecturas erráticas sin consumir corriente apreciable.</li>
             <li><strong>PORTx = 0 (Alta Impedancia / Hi-Z):</strong> Desconecta la resistencia interna. El pin queda flotando eléctricamente, presentando una impedancia extremadamente alta (ideal para medir circuitos analógicos o buses externos sin alterar la señal).</li>
         </ul>
+
+        <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Bit DDRx</th>
+                    <th>Bit PORTx</th>
+                    <th>Estado Físico y Comportamiento Electrónico</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>0</strong> <br> (Entrada)</td>
+                    <td><strong>0</strong> <br> (Alta Impedancia) </td>
+                    <td><strong>Entrada en Alta Impedancia (Hi-Z):</strong> El pin flota eléctricamente. El estado medido en PINx depende exclusivamente de la tensión aplicada por el circuito exterior. Es ideal para leer sensores externos que ya proveen su propia señal fuerte.</td>
+                </tr>
+                <tr>
+                    <td><strong>0</strong> <br> (Entrada)</td>
+                    <td><strong>1</strong> <br> (Pull-Up Activo)</td>
+                    <td><strong>Entrada con Resistencia Pull-Up Activa:</strong> La resistencia interna mantiene el pin ligado a VCC. Esta es la configuración clásica para conectar pulsadores a tierra. </td>
+                </tr>
+                <tr>
+                    <td><strong>1</strong> <br> (Salida)</td>
+                    <td><strong>0</strong> <br> (GND. Lógica Baja)</td>                    
+                    <td><strong>Salida Lógica BAJA (GND / 0 V):</strong> Conduce tierra de forma activa. El pin actúa como un sumidero de corriente (sink), conectando internamente la carga a GND</td>
+                </tr>
+                <tr>
+                    <td><strong>1</strong> <br> (Salida)</td>
+                    <td><strong>1</strong><br> (VCC. Lógica Alta)</td>                    
+                    <td><strong>Salida Lógica ALTA (VCC / 5 V o 3.3 V):</strong> Inyecta voltaje activo.</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+        
     </section>
 
     <section>
@@ -182,28 +248,28 @@ Valor en DDRB:   0    0    0    0    0    0    1    0
             </thead>
             <tbody>
                 <tr>
-                    <td><strong>0</strong></td>
-                    <td><strong>0</strong></td>
+                    <td><strong>0</strong> <br> (Entrada)</td>
+                    <td><strong>0</strong> <br> (Alta Impedancia) </td>
                     <td><strong>Lectura real (0 o 1)</strong></td>
-                    <td><strong>Entrada en Alta Impedancia (Hi-Z):</strong> El pin flota eléctricamente. El estado medido en PINx depende exclusivamente de la tensión aplicada por el circuito exterior.</td>
+                    <td><strong>Entrada en Alta Impedancia (Hi-Z):</strong> El pin flota eléctricamente. Es ideal para leer sensores externos que ya proveen su propia señal fuerte. El estado medido en PINx depende exclusivamente de la tensión aplicada por el circuito exterior.</td>
                 </tr>
                 <tr>
-                    <td><strong>0</strong></td>
-                    <td><strong>1</strong></td>
+                    <td><strong>0</strong> <br> (Entrada)</td>
+                    <td><strong>1</strong> <br> (Pull-Up Activo)</td>
                     <td><strong>Lectura real (1 por defecto)</strong></td>
-                    <td><strong>Entrada con Resistencia Pull-Up Activa:</strong> La resistencia interna mantiene el pin ligado a VCC. PINx lee 1 en reposo y 0 si un pulsador externo lo deriva a masa (GND).</td>
+                    <td><strong>Entrada con Resistencia Pull-Up Activa:</strong> La resistencia interna  mantiene el pin ligado a VCC. Esta es la configuración clásica para conectar pulsadores a tierra. La resistencia interna (típicamente de entre 20kΩ y 50kΩ en AVR) asegura un '1' lógico cuando el botón no está presionado. PINx lee 1 en reposo y 0 si un pulsador externo lo deriva a masa (GND).</td>
                 </tr>
                 <tr>
-                    <td><strong>1</strong></td>
-                    <td><strong>0</strong></td>
+                    <td><strong>1</strong> <br> (Salida)</td>
+                    <td><strong>0</strong> <br> (GND. Lógica Baja)</td>
                     <td><strong>0 (ó 1 tras Toggle)</strong></td>
-                    <td><strong>Salida Lógica BAJA (GND / 0 V):</strong> Conduce tierra de forma activa. Si se escribe un 1 en el bit correspondiente de PINx, el pin conmuta a 5 V por hardware.</td>
+                    <td><strong>Salida Lógica BAJA (GND / 0 V):</strong> Conduce tierra de forma activa. El pin actúa como un sumidero de corriente (sink), conectando internamente la carga a GND.Si se escribe un 1 en el bit correspondiente de PINx, el pin conmuta a 5 V por hardware.</td>
                 </tr>
                 <tr>
-                    <td><strong>1</strong></td>
-                    <td><strong>1</strong></td>
+                    <td><strong>1</strong> <br> (Salida)</td>
+                    <td><strong>1</strong><br> (VCC. Lógica Alta)</td>
                     <td><strong>1 (ó 0 tras Toggle)</strong></td>
-                    <td><strong>Salida Lógica ALTA (VCC / 5 V):</strong> Inyecta voltaje activo. Si se escribe un 1 en el bit correspondiente de PINx, el pin conmuta a 0 V por hardware.</td>
+                    <td><strong>Salida Lógica ALTA (VCC / 5 V o 3.3 V):</strong> Inyecta voltaje activo. El pin actúa como una fuente de corriente (source), entregando el voltaje de alimentación del chip.Si se escribe un 1 en el bit correspondiente de PINx, el pin conmuta a 0 V por hardware.</td>
                 </tr>
             </tbody>
         </table>

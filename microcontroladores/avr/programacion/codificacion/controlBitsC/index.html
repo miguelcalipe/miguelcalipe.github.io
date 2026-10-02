@@ -42,15 +42,16 @@
             <p>
                 La programación de microcontroladores AVR se basa en el manejo directo de los registros de hardware
             </p>
+
             <p>
-                Controlar el microcontrolador significa escribir o leer valores en estos registros (como DDRB, PORTB,PINBX) para producir efectos físicos en el hardware, como configurar un pin como salida o establecer un voltaje.
+                Cada microcontrolador AVR contiene un conjunto de registros de 8 bits que representan la configuración y el estado de los periféricos internos, como puertos de entrada/salida, temporizadores, convertidores analógico-digitales, entre otros. Estos registros son accesibles mediante direcciones de memoria específicas y se utilizan para controlar el comportamiento del microcontrolador.
             </p>
-            
             <p>
-                En la programación de microcontroladores AVR, los registros de hardware se representan en C como variables globales predefinidas. Sin embargo, a diferencia de una variable convencional en RAM, la manera exacta en que aplicamos operaciones sobre estos registros determina la estabilidad del firmware, la integridad de los periféricos y la previsibilidad del hardware.
-            </p> 
+                Controlar el microcontrolador significa escribir o leer valores en estos registros (como DDRB, PORTB,PINBX) para producir efectos físicos en el hardware, como configurar un pin como salida o establecer un voltaje. Para ello debemos aprender un concepto fundamental de la programación específica de microcontroladores: <strong> cómo activar y desactivar bits individuales dentro de un registro de hardware</strong>.
+            </p>
+         
             <p>
-                Existen dos métodos fundamentales para manipular bits en C: la <strong>asignación directa</strong> y la <strong>manipulación de bits (<em>bit twidding</em>) mediante máscaras</strong>. Cada enfoque tiene ventajas y desventajas, y su elección depende del contexto de programación y de los requisitos de seguridad y modularidad del firmware.
+                Existen dos métodos fundamentales para activar y desactivar bits individuales dentro de un registro de funciones especiales: la <strong>asignación directa</strong> y la <strong>manipulación de bits (<em>bit twidding</em>) mediante máscaras</strong>. Cada enfoque tiene ventajas y desventajas, y su elección depende del contexto de programación y de los requisitos de seguridad y modularidad del firmware.
             </p>
             </section>
 
@@ -66,9 +67,16 @@
 
         <p>Esta operación evalúa y transfiere el patrón bit a bit directamente al registro:</p>
         <ul>
-            <li><strong>Valor Asignado:</strong> El literal <code>0b00000010</code> (equivalente a 2 en decimal) sitúa un uno (<code>1</code>) lógico únicamente en la posición correspondiente al pin PB1 (índice 1) y establece ceros (<code>0</code>) en las siete posiciones restantes.</li>
+            <li><strong>Valor Asignado:</strong> El literal <code>0b00000010</code> sitúa un uno (<code>1</code>) lógico únicamente en la posición correspondiente al pin PB1 (índice 1) y establece ceros (<code>0</code>) en las siete posiciones restantes.</li>
             <li><strong>Efecto Final en Hardware:</strong> Se configura únicamente el pin PB1 como salida digital, mientras que los pines PB0 y del PB2 al PB7 son forzados a operar como entradas.</li>
         </ul>
+<pre><code>PORTB = 0b00001000;</code></pre>
+        <p>Esta operación evalúa y transfiere el patrón bit a bit directamente al registro:</p>
+        <ul>
+            <li><strong>Valor Asignado:</strong> El literal <code>0b00001000</code> sitúa un uno (<code>1</code>) lógico únicamente en la posición correspondiente al pin PB3 (índice 3) y establece ceros (<code>0</code>) en las siete posiciones restantes.</li>
+            <li><strong>Efecto Final en Hardware:</strong> Como DDRB ha establecido como salida sólo el bit PB1. El registro PORTB establece un nivel bajo en PB1, conectándolo a masa o tierra (GND / 0 V). Como DDRB ha definido como entradas los bits PB0 y PB2 - PB7,  PORTB conecta una resistencia pull-up de entre 20 kΩ y 50 kΩ aproximadamente desde el pin PB3 hacia VCC. Esto garantiza que el pin lea un nivel '1' estable en reposo y evita lecturas erráticas sin consumir corriente apreciable en el bit PB3; mientras que los pines PB0, PB2 y del PB4 al PB7 permanecen en nivel bajo (GND / 0V), estos pines quedan flotando eléctricamente, presentando una impedancia extremadamente alta (ideal para medir circuitos analógicos o buses externos sin alterar la señal)</li> 
+        </ul>
+
 
         <h3>2.2. Asignación Directa con Máscaras por Desplazamiento (&lt;&lt;)</h3>
         <p>En lugar de escribir literales completos, es común construir máscaras dinámicas mediante el operador de desplazamiento de bits (<em>bit shifting</em>). El desplazamiento reubica la posición de los bits hacia la izquierda o derecha dentro del registro:</p>
@@ -91,13 +99,22 @@
         <p> 
             La asignación directa (<code>=</code>) es el método más intuitivo para comprender la correspondencia biunívoca entre las posiciones del código en C y las 8 patillas del integrado al iniciar el estudio de la arquitectura AVR.
         </p>
+
+        <p>
+            La asignación directa de un numero binaro o de una máscara funciona, siempre que sepamos con certeza que queremos que todos los demás LED tengan un estado específico. Pero ¿qué ocurre si necesitas encender o apagar un LED determinado sin afectar a ninguno de los demás?
+        </p>
+
         <p> 
-            En arquitecturas modulares, utilizar asignación directa dentro del flujo principal del programa representa una mala práctica severa. Si un módulo periférico configuró previamente un pin para una interfaz de comunicación o un sensor, ejecutar <code>DDRB = (1 &lt;&lt; PB1)</code> en otra sección del programa borrará la configuración de los otros 7 pines, interrumpiendo buses de datos y desactivando periféricos críticos.</li>
+            En arquitecturas modulares, utilizar asignación directa dentro del flujo principal del programa representa una mala práctica severa. Si un módulo periférico configuró previamente un pin para una interfaz de comunicación o un sensor, ejecutar <code>DDRB = (1 &lt;&lt; PB1)</code> en otra sección del programa borrará la configuración de los otros 7 pines, interrumpiendo buses de datos y desactivando periféricos críticos.</pi>
         </p>
         </section>
 
         <section>
         <h2>3. MÉTODO DE MANIPULACIÓN DE BITS (BIT TWIDDING) POR MÁSCARAS</h2>
+        
+        <p>
+            Las operaciones lógicas a nivel de bit (bitwise logical operations) —la llamada manipulación de bits (bit twiddling)— permiten modificar un solo bit de un byte de registro sin tener que ocuparnos explícitamente de los demás.
+        </p>
 
         <p> Cuando encendemos un LED, un motor u otro actuador conectado a la salida de PB3, usando numeros, scribimos algo parecido a: </p>
 <pre><code class="language-c"> PORTB = 0b00001000; </code></pre>
