@@ -110,6 +110,9 @@
   </tbody>
 </table>
                 </div>
+            </section>
+
+            <section>
             <h2>2. COMPRENSION DEL PINOUT DE LA SERIE  ATmega48A/PA/88A/PA/168A/PA/328/P </h2>
                 <p>
                 El pinout o patillaje del dispositivo lo podemos ver en la siguiente imagen del datasheet de la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> que brinda Microchip
@@ -145,52 +148,18 @@
 
         <p>
             Una vez conocido el pinout, podemos montar el microcontrolador directamente en una placa de pruebas o en una PCB. Esto es lo que normalmente se denomina una configuración standalone: el ATmega funciona como el microcontrolador principal del circuito y no depende de una placa Arduino para ejecutar el programa.
-        </p>
+        </p>        
 
-        <div class="imagen-derecha">
-            <div class="texto" >
-                </h3><strong>2.1 Circuito mínimo con oscilador interno</strong></h3>
-                    <p>
-                        Un dispositivo de la serie <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong> incorpora un oscilador RC interno. 
-                    </p>
-                    <p>    
-                        Para optimizar el espacio en el circuito impreso (PCB) y reducir el costo del proyecto se puede prescindir de un cristal de cuarzo externo y de sus respectivos condensadores de carga, logrando un diseño más compacto y económico. 
-                    </p>
+        
+        </section>
 
-                    <p>
-                        Todos los microcontroladores de la serie <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong> incorporan un oscilador RC interno calibrado. 
-                        </p>
-                    <p>    De acuerdo con las especificaciones de la hoja de datos de Microchip, este oscilador interno funciona por defecto a una frecuencia de 8 MHz. Además, los dispositivos vienen configurados de fábrica con el bit de fusibles (fuse bit) CKDIV8 activado, lo que divide esa frecuencia por 8 y hace que el chip empiece a funcionar inicialmente a 1 MHz de forma predeterminada sin necesidad de conectar ningún componente externo.    
-                    </p>
-                    <p>
-                        A continuación, se presenta el esquema eléctrico para operar el dispositivo con su configuración de frecuencia de fábrica:
-                    </p>
-            </div>
-        <img src="img/CircuitoMinimoSinOscilador.jpeg" alt="Circuito mínimo microcontrolador AVR ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P" tittle="ATmega48A/PA/ 88A/PA/ 168A/PA/328/P Standalone. Circuito mínimo" class="imagen-derecha">
-        </div>
-
-        <div class="imagen-derecha">
-            <div class="texto">
-                </h3><strong>2.2 Circuito mínimo con oscilador de cristal externo</strong></h3>
-                <p>
-                    El uso de un cristal oscilador externo en la serie <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong> permite maximizar la frecuencia de operación del dispositivo (hasta 20 MHz en variantes seleccionadas) y garantizar un error de frecuencia mínimo. 
-                </p>
-                <p>
-                    Esta configuración también se recomienda para aplicaciones que requieren una alta precisión temporal y estabilidad ante variaciones térmicas
-                </p>
-                <p>
-                    El circuito requiere la adición del cristal y dos condensadores de desacoplo cerámicos de 22pF conectados a los pines XTAL1 y XTAL2 y a GND para asegurar el arranque correcto del oscilador. A continuación, se detalla el diagrama de conexiones correspondiente:
-                </p>
-            </div>
-                <img src="img/CircuitoMinimoConOscilador.jpg" alt="Circuito mínimo microcontrolador AVR ATmega48A/PA/88A/PA/168A/PA/328/P con oscilador externo" tittle="ATmega48A/PA/88A/PA/168A/PA/328/P Standalone. Circuito mínimo con fuente de reloj externa" class="imagen-derecha">
-        </div>
-
+        <section>
                 <h2>3. ALIMENTACIÓN DEL MICROCONTROLADOR</h2>
 
                     <p>El primer paso para la implementación del circuito mínimo consiste en conectar correctamente la alimentación del microcontrolador:</p>
 
                     <p>
-                        VCC y AVCC deben conectarse a la tensión de alimentación correspondiente y GND a la referencia del circuito. La familia <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong> admite, según las condiciones especificadas en la hoja de datos, un rango amplio de alimentación especificado entre 1,8 V y 5,5 V.
+                        <code>VCC</code> y <code>AVCC</code> deben conectarse a la tensión de alimentación correspondiente y <code>GND</code> a la referencia del circuito. La familia <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong> admite, según las condiciones especificadas en la hoja de datos, un rango amplio de alimentación especificado entre 1,8 V y 5,5 V.
 
                     </p>
 
@@ -201,36 +170,64 @@
                         <li><strong>GND (pin 22)</strong> → tierra.</li>
                     </ul>
 
-                    <p>AVCC debe conectarse a VCC incluso si el programa no utiliza el convertidor analógico-digital (ADC), ya que este pin también está relacionado con la alimentación del puerto C.</p>
+                    <p><code>AVCC</code> debe conectarse a <code>VCC</code> incluso si el programa no utiliza el convertidor analógico-digital (ADC), ya que este pin también está relacionado con la alimentación del puerto C.</p>
 
 
-                        <img src="/microcontroladores/avr/programacion/bare-metal/standalone/img/alimentacion-atmega168.jpeg"
+                        <img src="img/alimentacion-atmega168.jpeg"
                             alt="Alimentación del ATmega168 en protoboard"
                             title="Conexión de VCC, AVCC y GND del ATmega168"
                             class="imagen-centrada">
-
+            </section>
+            
+            <section> 
                 <h2>4. CONDENSADORES DE DESACOPL0</h2>
 
-                    <p>Se recomienda colocar dos condensadores cerámicos de <strong>100 nF</strong> entre VCC y GND y entre AVCC y GND, situados lo más cerca posible del microcontrolador. Su función es reducir las pequeñas perturbaciones de la tensión de alimentación producidas por los cambios de corriente internos del microcontrolador.</p>
+                    <p>Se recomienda colocar dos condensadores cerámicos de <strong>100 nF</strong> entre <code>VCC</code> y <code>GND</code> y entre <code>AVCC</code> y <code>GND</code>, situados lo más cerca posible del microcontrolador. Su función es reducir las pequeñas perturbaciones de la tensión de alimentación producidas por los cambios de corriente internos del microcontrolador.</p>
 
-                        <img src="/microcontroladores/avr/programacion/bare-metal/standalone/img/2-Atemega168_bb.png"
+                        <img src="img/2Condensadores.png"
                             alt="Condensador de desacoplo del ATmega168"
                             title="Condensador cerámico de 100 nF entre VCC y GND"
                             class="imagen-centrada">
+            </section>
 
+            $V_{BB}=V_{CC}\frac{R_2}{R_1+R_2} $ 
+
+            <section>
                 <h2>5. CONEXIÓN DEL RESET</h2>
+                    <p>
+                        El <strong> ATmega48A/PA/88A/PA/168A/PA/328/P</strong> tiene cuatro fuentes de reinicio (reset):
+                    </p>
+                        <ul>
+                            <li><strong>Reinicio por encendido (Power-on Reset)</strong>. El MCU se reinicia cuando el voltaje de alimentación está por debajo del umbral de reinicio por encendido $V_{POT}$.</li>
+                            <li><strong>Reinicio externo (External Reset)</strong>. El MCU se reinicia cuando se presenta un nivel bajo en el pin <code>RESET</code> durante más tiempo que la longitud mínima del pulso ($=> 2,5 uS$).</li>
+                            <li><strong>Reinicio del sistema por Watchdog (Watchdog System Reset)</strong>. El MCU se reinicia cuando el período del temporizador Watchdog expira y el modo de reinicio del sistema por Watchdog está activado.</li>
+                            <li><strong>Reinicio por caída de voltaje (Brown-out Reset)</strong>. El MCU se reinicia cuando el voltaje de alimentación <code>VCC</code> está por debajo del umbral de reinicio por caída de voltaje ($V_{BOT}$) y el detector de caída de voltaje (Brown-out Detector) está activado.</li>
+                        </ul>
+                    <p>
+                        El <strong>reinicio por encendido (Power-on Reset)</strong> y el <strong>reinicio por caída de voltaje (Brown-out Reset)</strong> son automáticos y no requieren intervención del usuario. Sin embargo, el <strong>reinicio externo (External Reset)</strong> se puede activar manualmente mediante un pulsador o un circuito externo que aplique un nivel bajo al pin <code>RESET</code>.
+                    </p>
+                    <p>
+                        El pin <code>RESET</code> (pin 1) es un pin de entrada que permite reiniciar el microcontrolador. Cuando se aplica un nivel bajo a este pin, el microcontrolador se reinicia y comienza la ejecución del programa desde el <strong>vector de restablecimiento (Reset Vector)</strong>.
+                    </p>
+                    <p>
+                        Durante el restablecimiento (reset), todos los <code>Registros de E/S</code> (<code>I/O Registers</code>) se configuran en sus valores iniciales y el programa comienza su ejecución desde el <strong>vector de restablecimiento (Reset Vector)</strong>.
+                    </p>
 
-                    <p>El pin <strong>RESET (pin 1)</strong> debe mantenerse normalmente en nivel alto para que el microcontrolador pueda ejecutar el programa. Para ello, se conecta una resistencia de aproximadamente <strong>10 kΩ entre RESET y VCC</strong>.</p>
+                    <p>El pin <code>RESET</code> (<strong></strong>pin 1</strong>) debe mantenerse normalmente en nivel alto para que el microcontrolador pueda ejecutar el programa. Para ello, se conecta una resistencia de aproximadamente <strong>10 kΩ</strong> entre <code>RESET</code> y <code>VCC</code>.</p>
 
                     <p>La resistencia actúa como <em>pull-up</em> y evita que el pin RESET quede flotante, reduciendo la posibilidad de reinicios provocados por perturbaciones eléctricas.</p>
 
                     <div class="imagen-centrada">
-                        <img src="/microcontroladores/avr/programacion/bare-metal/standalone/img/reset-atmega168.png"
+                        <img src="img/ProtoCircMinimoSinOsc.png"
                             alt="Resistencia pull-up de 10 kΩ en el pin RESET del ATmega168"
                             title="Resistencia de 10 kΩ entre RESET y VCC"
                             class="imagen-centrada">
                     </div>
-                <h2>6. OSCILADOR EXTERNO PARA LA SEÑAL DE RELOJ DEL MICROCONTROLADOR</h2>
+            </section>
+
+            <section>
+
+                <h2>6. ELECCIÓN DE LA SEÑAL DE RELOJ DEL MICROCONTROLADOR</h2>
                 <p>
                     El reloj es la referencia temporal utilizada por el núcleo AVR y por muchos de sus periféricos. Determina la velocidad de ejecución de las instrucciones y la frecuencia de funcionamiento de los temporizadores, el ADC y otros periféricos. 
                 </p>
@@ -239,57 +236,85 @@
                 </p>
                     <ul>
                         <li>Utilizar el reloj interno, reduciendo el circuito externo.</li>
-                        <li>Utilizar un cristal o resonador externo, conectándolo a XTAL1 y XTAL2 según las condiciones de la hoja de datos.</li>
+                        <li>Utilizar un cristal o resonador externo, conectándolo a <code>XTAL1</code> y <code>XTAL2</code> según las condiciones de la hoja de datos.</li>
                     </ul>
 
                     <p>
                         Elegir entre oscilador interno o externo es la decisión central para establecer la señal de reloj de un microcontrolador. Al seleccionar el tipo de oscilador, estás definiendo cuál será el origen físico que generará los impulsos eléctricos  que marcan el ritmo de trabajo de la CPU y los periféricos del chip.
                     </p>
+                <h3><strong>6.1. Circuito mínimo con oscilador interno</strong></h3>
+                <div class="imagen-derecha">
+                <div class="texto" >
+                
                     <p>
-                        De fábrica, los microcontroladores de la serie ATmega48A/PA/88A/PA/168A/PA/328/P vienen configurados para priorizar la compatibilidad y la seguridad en la primera conexión. El chip arranca utilizando su oscilador RC interno calibrado a 8.0 MHz, pero con el fusible de división por ocho (CKDIV8) activado por defecto. Esto reduce la frecuencia real del reloj del sistema a 1.0 MHz. El fabricante elige esta velocidad tan baja deliberadamente para garantizar que cualquier programador de bajo costo (como un USBasp o un Arduino como ISP) pueda comunicarse con el dispositivo nada más sacarlo de su empaque, sin riesgo de fallos por desincronización. Una vez que se establece la comunicación inicial, se puede reprogramar los fusibles CKSEL y CKDIV8 para desactivar este divisor o para conmutar a un cristal de cuarzo externo si tu aplicación requiere mayor velocidad o precisión en el tiempo. 
+                        Hasta este punto, hemos descrito la conexión de los pines de alimentación, el pin de reset y los condensadores de desacoplo. El circuito mínimo con oscilador interno representa el diseño más básico para hacer funcionar un microcontrolador ATmega sin necesidad de componentes externos adicionales. Se presenta a la izquierda el esquema eléctrico que hemos desarrollado hasta ahora para operar el dispositivo con su configuración de frecuencia de fábrica. En este caso, el microcontrolador puede funcionar de manera independiente en la protoboard utilizando su oscilador interno.
                     </p>
-
-                   
+                    <p>
+                        Un dispositivo de la serie <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong> incorpora un oscilador RC interno calibrado, que permite prescindir de un cristal de cuarzo externo y de sus respectivos condensadores de carga. Esto permite un diseño más compacto y económico.
+                    </p>
+                     <p>
+                        De fábrica, los microcontroladores de la serie <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong> vienen configurados para priorizar la compatibilidad y la seguridad en la primera conexión. El chip arranca utilizando su oscilador RC interno calibrado a 8.0 MHz, pero con el fusible (fuse bit)de división por ocho (<code>CKDIV8</code>) activado por defecto. Esto reduce la frecuencia real del reloj del sistema a 1.0 MHz. El fabricante elige esta velocidad tan baja deliberadamente para garantizar que cualquier programador de bajo costo (como un USBasp o un Arduino como ISP) pueda comunicarse con el dispositivo nada más sacarlo de su empaque, sin riesgo de fallos por desincronización. Una vez que se establece la comunicación inicial, se puede reprogramar los fusibles <code>CKSEL</code> y <code>CKDIV8</code> para desactivar este divisor o para conmutar a un cristal de cuarzo externo si tu aplicación requiere mayor velocidad o precisión en el tiempo. 
+                    </p>
+                    
+                </div>
+        <img src="img/CircuitoMinimoSinOscilador.jpeg" alt="Circuito mínimo microcontrolador AVR ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P" tittle="ATmega48A/PA/ 88A/PA/ 168A/PA/328/P Standalone. Circuito mínimo" class="imagen-derecha">
+        </div>                   
                     <p>
                         Para que el microcontrolador funcione a 8 MHz, es necesario reconfigurar los fuses para desactivar la división por 8. Esto se puede hacer mediante un programador ISP como el USBasp y el software AVRDUDE, que permite modificar los fuses del microcontrolador. Para hacerlo puedes consultar la sección de programación de fuses en este sitio.
                     </p>
                     <p>
-                        Si deseamos utilizar un cristal externo para obtener una mayor precisión en la frecuencia del reloj, entonces sí será necesario conectar el cristal y sus condensadores asociados. O si el microcontrolador ya ha sido configurado previamente para usar un cristal externo, entonces también será necesario conectar el cristal y sus dos capacitores de 22 pF para que el microcontrolador pueda arrancar correctamente.
+                        En resumen, el circuito mínimo con oscilador interno es una configuración básica que permite que el microcontrolador funcione de manera independiente sin necesidad de componentes externos adicionales. En la secuencia que hemos seguido hasta ahora, con la instalación de la resistencia de pull-up en el pin de reset ya tenemos el circuito mínimo sin oscilador externo. Sin embargo, si se requiere mayor precisión en la frecuencia del reloj o si el microcontrolador ya ha sido configurado para usar un cristal externo, será necesario conectar el cristal y sus condensadores asociados.
                     </p>
-                      
+            <div class="imagen-centrada">
+                <img src="img/ProtoCircMinimoSinOsc.png"
+                    alt="Circuito mínimo del ATmega48A/PA/ 88A/PA/ 168A/PA/328/P Standalone sin oscilador externo"
+                    title="ATmega48A/PA/ 88A/PA/ 168A/PA/328/P Standalone sin oscilador externo"
+                    class="imagen-centrada">
+            </div>
+
+            <h3><strong>6.2. Circuito mínimo con oscilador de cristal externo</strong></h3>
+            <div class="imagen-derecha">
+            <div class="texto">
+
+                <p>
+                        Si deseamos utilizar un cristal externo para obtener una mayor precisión en la frecuencia del reloj, entonces sí será necesario conectar el cristal y sus condensadores asociados. O si el microcontrolador ya ha sido configurado previamente para usar un cristal externo, entonces también será necesario conectar el cristal y sus dos capacitores de 22 pF para que el microcontrolador pueda arrancar correctamente.
+                </p>
+                <p>
+                    El uso de un cristal oscilador externo en la serie <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong> permite maximizar la frecuencia de operación del dispositivo (hasta 20 MHz en variantes seleccionadas) y garantizar un error de frecuencia mínimo. 
+                </p>
+                <p>
+                    Esta configuración también se recomienda para aplicaciones que requieren una alta precisión temporal y estabilidad ante variaciones térmicas
+                </p>
+                <p>
+                    El circuito requiere la adición del cristal y dos condensadores de desacoplo cerámicos de 22pF conectados a los pines <code>XTAL1</code> y <code>XTAL2</code> y a <code>GND</code> para asegurar el arranque correcto del oscilador. A continuación, se detalla el diagrama de conexiones correspondiente:
+                </p>
+            </div>
+                <img src="img/CircuitoMinimoConOscilador.jpg" alt="Circuito mínimo microcontrolador AVR ATmega48A/PA/88A/PA/ 168A/PA/ 328/P con oscilador externo" title="ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P Standalone. Circuito mínimo con fuente de reloj externa" class="imagen-derecha">
+        </div>                
+                   
+    <img src="img/ProtoCircMinConOsc.png"
+    alt="Circuito mínimo del ATmega48A/PA/ 88A/PA/ 168A/PA/328/P Standalone con oscilador externo"
+    title="ATmega48A/PA/ 88A/PA/ 168A/PA/328/P Standalone con oscilador externo"
+    class="imagen-centrada"> 
+    
+        <p>
+        Con la conexión del cristal externo, el microcontrolador puede funcionar a su máxima frecuencia de operación y con una mayor precisión en la señal de reloj. Esto es especialmente importante en aplicaciones que requieren temporización precisa, como la comunicación serial o el control de motores.
+        </p>
+                </section>
+
+                <section>
+
+                    <h2>7. PASOS SIGUIENTES</h2>
+                    <p>
+                        Con oscilador interno o con oscilador externo, una vez que hemos establecido las conexiones básicas del microcontrolador, podemos proceder a programarlo. Para ello, debemos tener el programa o código fuente que hará funcionar, instalar en el protoboard el circuito embebido a utilizar y el programador que cargará el programa  al dispositivo microcontrolador. 
+                    <p>
+                    <p>
+                        El programa lo desarrollaremos en lenguaje C, el cual cargaremos en la memoria flash del microcontrolador utilizando un programador USBasp y el software AVRDUDE que ya hemos instalado .
+                    </p>
                     <p>
                         Si el circuito embebido requiere una alimentación externa, el USBasp y el circuito deben compartir la misma referencia de tierra (GND).
                     </p>
-
-                    <h2>4. CONEXIÓN DEL CIRCUITO EMBEBIDO</h2>
-
-                    <p>
-                        Una vez establecidas las conexiones básicas del microcontrolador y conectado el programadoer USBasp, podemos conectar el ciruito del proyecto, en este caso el LED que utilizaremos para comprobar el funcionamiento del programa.
-                    </p>
-
-                    <p>El LED no debe conectarse directamente al pin PB0 sin una resistencia. La resistencia limita la corriente que circula por el LED y protege tanto al LED como al circuito de salida del microcontrolador.</p>
-
-                    <p>Una conexión sencilla es:</p>
-
-                    <p><strong>PB0 (pin 14) → resistencia de 220 Ω → LED → GND</strong></p>
-
-                    <p>Cuando PB0 se encuentra en nivel alto, existe una diferencia de potencial entre el pin y GND. Esta diferencia de potencial hace que circule corriente a través de la resistencia y del LED, provocando que el LED emita luz.</p>
-
-                    <div class="imagen-centrada">
-                        <img src="/microcontroladores/avr/programacion/bare-metal/standalone/img/LedAtmega168_bb.png"
-                            alt="LED conectado al pin PB0 del ATmega168"
-                            title="LED conectado a PB0 mediante una resistencia de 220 ohmios"
-                            class="imagen-centrada">
-                    </div>
-
-                    <p>La resistencia de <strong>220 Ω</strong> es solamente un valor de ejemplo. El valor adecuado depende de la tensión de alimentación, de la caída de tensión del LED y de la corriente que se quiera hacer circular. En todos los casos deben respetarse las especificaciones eléctricas del microcontrolador, especialmente los límites de corriente de sus pines.</p>
-
-                    <p>Al integrar las conexiones anteriores obtenemos el circuito mínimo del ATmega168 para este ejemplo: alimentación, desacoplo, resistencia de <em>pull-up</em> en RESET y LED conectado a PB0. El microcontrolador puede funcionar de forma independiente en la protoboard utilizando su oscilador interno.</p>
-
-                        <img src="/microcontroladores/avr/programacion/bare-metal/standalone/img/completoAtemega168_bb.png"
-                            alt="Circuito completo del ATmega168 standalone en protoboard"
-                            title="Circuito mínimo del ATmega168 standalone con LED en PB0"
-                            class="imagen-centrada">       
+                       
             </section>
             
             

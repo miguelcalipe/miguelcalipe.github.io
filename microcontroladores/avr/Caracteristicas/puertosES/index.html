@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PUERTOS DE E/S. ATmega48A/PA/88A/PA/168A/PA/328/P</title>
+    <meta name="description" content="Todos los puertos AVR disponen de una verdadera funcionalidad de lectura-modificación-escritura (Read-Modify-Write) cuando se utilizan como puertos digitales de E/S (I/O). Esto significa que la dirección de un pin del puerto puede modificarse sin cambiar involuntariamente la dirección de ningún otro pin mediante las instrucciones mediante las instrucciones SBI y CBI. SBI (Set Bit in I/O Register) pone a 1 lógico (nivel alto, 5V o 3.3V) un bit específico dentro de un registro de E/S sin alterar los demás bits. CBI (Clear Bit in I/O Register) pone a 0 lógico (nivel bajo, 0V) un bit específico dentro de un registro de E/S sin modificar los otros bits.">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>PUERTOS DE E/S. ATmega48A/PA/88A/PA/168A/PA/328/P</h1>
+            
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   -->
+            
+            <section> 
+            
+            <H2>1. DESCRIPCIÓN GENERAL</H2>
+                <p>Todos los puertos AVR disponen de una verdadera funcionalidad de <strong>lectura-modificación-escritura (Read-Modify-Write)</strong> cuando se utilizan como puertos digitales de <strong>E/S (I/O)</strong>. Esto significa que la dirección de un pin del puerto puede modificarse sin cambiar involuntariamente la dirección de ningún otro pin mediante las instrucciones <strong>SBI</strong> y <strong>CBI</strong>.
+
+<p> Lo mismo se aplica al modificar el valor de <strong> salida</strong> (cuando el pin está configurado como salida) o al habilitar/deshabilitar las <strong>resistencias pull-up</strong>(cuando está configurado como entrada).</p>
+
+<p> Cada búfer de salida presenta características de accionamiento simétricas, con una elevada capacidad tanto para absorber corriente (<emp>sink</emp>) como para suministrar corriente (<emp>source</emp>). El controlador del pin tiene suficiente capacidad para controlar directamente indicadores LED.</p>
+
+<p>Todos los pines del puerto disponen de resistencias pull-up seleccionables individualmente, cuya resistencia es independiente de la tensión de alimentación.</p>
+
+<p>Todos los pines de E/S poseen diodos de protección conectados tanto a VCC como a Ground (GND), tal como se indica en la siguiente</p>
+
+<img src="img/esquema_equivalente_pines_ATmega.png" alt="Esquema equivalente de los pines de E/S del ATmega48A/PA/88A/PA/168A/PA/328/P" class="imagen-centrada">
+
+<h3>1.1. Registros de control de puertos</h3>
+<p>Para la gestión de cada puerto, el dispositivo asigna tres posiciones de memoria de E/S fundamentales:</p>
+    
+    <ul>
+        <li><strong>PORTx:</strong> Registro de datos (Data Register).</li>
+        <li><strong>DDRx:</strong> Registro de dirección de datos (Data Direction Register).</li>
+        <li><strong>PINx:</strong> Pines de entrada del puerto (Port Input Pins).</li>
+    </ul>
+    <div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Registro / Componente</th>
+                <th>Tipo de Acceso</th>
+                <th>Descripción y Características</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>PINx</strong></td>
+                <td>Solo Lectura</td>
+                <td>Permite leer el estado lógico actual de los pines. <em>Excepción:</em> Escribir un uno lógico (1) en un bit de este registro provoca una conmutación (toggle) del bit correspondiente en el Registro de datos PORTx.</td>
+            </tr>
+            <tr>
+                <td><strong>PORTx</strong></td>
+                <td>Lectura / Escritura</td>
+                <td>Controla el valor de salida (si el pin está como salida) o activa las resistencias de pull-up (si el pin está como entrada).</td>
+            </tr>
+            <tr>
+                <td><strong>DDRx</strong></td>
+                <td>Lectura / Escritura</td>
+                <td>Define la dirección del pin: 0 para entrada (Input) y 1 para salida (Output).</td>
+            </tr>
+        </tbody>
+    </table>
+    </div>
+
+
+                <p><strong>Control Global de Pull-up (PUD):</strong> El bit <em>PUD</em> (Pull-up Disable) ubicado en el registro <code>MCUCR</code> se encarga de deshabilitar la función pull-up para absolutamente todos los pines de todos los puertos cuando se encuentra establecido (en uno).</p>
+           
+    <h3>1.2. Funciones Alternativas y Multiplexación</h3>
+    <p>La gran mayoría de los pines de los puertos se encuentran multiplexados con funciones alternativas correspondientes a los distintos periféricos internos del dispositivo.</p>
+    <p>Cabe destacar que habilitar la función alternativa de algunos pines específicos de un puerto <strong>no afecta </strong> al uso de los demás pines del mismo puerto, los cuales pueden seguir utilizándose como E/S digital de propósito general.</p>
+
+                </section>
+
+            <section> 
+            <h2>2. PUERTOS COMO E/S DIGITAL GENERAL</h2>
+            <p>
+                Los puertos son puertos de E/S bidireccionales con resistencias <em>pull-up</em> internas opcionales. La descripción funcional de un pin de E/S se denomina genéricamente <strong>Pxn</strong>.
+            </p>
+
+            <img src="img/descripcion_funcional_pin_avr.png" alt="Esquema equivalente de los pines de E/S del ATmega48A/PA/88A/PA/168A/PA/328/P" class="imagen-centrada">
+
+            <h3>2.1 Configuración del pin</h3>
+                <p>Cada pin del puerto está asociado con tres bits de registro: <code>DDxn</code>, <code>PORTxn</code> y <code>PINxn</code>:</p>
+                <ul>
+                    <li>Los bits <code>DDxn</code> se encuentran en la dirección de E/S de <code>DDRx</code>.</li>
+                    <li>Los bits <code>PORTxn</code> se encuentran en la dirección de E/S de <code>PORTx</code>.</li>
+                    <li>Los bits <code>PINxn</code> se encuentran en la dirección de E/S de <code>PINx</code>.</li>
+                </ul>
+                
+                <p>El bit <code>DDxn</code> del registro <code>DDRx</code> selecciona la dirección de funcionamiento del pin:</p>
+                <ul>
+                    <li>Si se escribe un uno lógico (<code>1</code>) en <code>DDxn</code>, el pin <code>Pxn</code> se configura como <strong>salida</strong>.</li>
+                    <li>Si se escribe un cero lógico (<code>0</code>) en <code>DDxn</code>, el pin <code>Pxn</code> se configura como <strong>entrada</strong>.</li>
+                </ul>
+
+                <p><strong>Comportamiento como Entrada:</strong></p>
+                <ul>
+                    <li>Escribir un <code>1</code> en <code>PORTxn</code> activa la resistencia <em>pull-up</em>.</li>
+                    <li>Para desactivar la resistencia <em>pull-up</em>, se debe escribir un <code>0</code> en <code>PORTxn</code> o configurar el pin como salida.</li>
+                    <li>Los pines se encuentran en estado <em>tri-state</em> (alta impedancia) durante el <em>reset</em>.</li>
+                </ul>
+
+                <p><strong>Comportamiento como Salida:</strong></p>
+                <ul>
+                    <li>Escribir un <code>1</code> en <code>PORTxn</code> lleva el pin a <strong>nivel alto (1)</strong>.</li>
+                    <li>Escribir un <code>0</code> en <code>PORTxn</code> lleva el pin a <strong>nivel bajo (0)</strong>.</li>
+                </ul>
+
+            <h3>2.2 Conmutación del pin</h3>
+                <p>Escribir un uno lógico (<code>1</code>) en <code>PINxn</code> conmuta (<em>toggle</em>) el valor de <code>PORTxn</code>, independientemente del valor de <code>DDxn</code>. La instrucción <code>SBI</code> puede utilizarse para este fin en un único bit.</p>
+
+            <h3>2.3 Conmutación entre entrada y salida</h3>
+                <p>Al cambiar entre el estado <em>tri-state</em> <span class="formula">{DDxn, PORTxn} = 0b00</span> y el estado de salida en nivel alto <span class="formula">{DDxn, PORTxn} = 0b11</span>, debe producirse un estado intermedio:</p>
+                <ul>
+                    <li><em>Pull-up</em> habilitado: <span class="formula">{DDxn, PORTxn} = 0b01</span></li>
+                    <li>Salida en nivel bajo: <span class="formula">{DDxn, PORTxn} = 0b10</span></li>
+                </ul>
+                <p>Si el entorno de alta impedancia no percibe diferencia entre un nivel alto activo y un <em>pull-up</em>, el estado con <em>pull-up</em> habilitado es totalmente aceptable; de lo contrario, se puede usar el bit <code>PUD</code> del registro <code>MCUCR</code> para deshabilitar todas las resistencias <em>pull-up</em> globalmente.</p>
+                <p>Para la conmutación inversa (de entrada con <em>pull-up</em> a salida en nivel bajo), el usuario debe usar como estado intermedio <em>tri-state</em> (<span class="formula">0b00</span>) o salida en nivel alto (<span class="formula">0b11</span>).</p>
+
+                <h4>Tabla: Configuraciones de los pines del puerto</h4>
+                <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>DDxn</th>
+                            <th>PORTxn</th>
+                            <th>PUD (en MCUCR)</th>
+                            <th>E/S</th>
+                            <th>Pull-up</th>
+                            <th>Comentario</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>X</td>
+                            <td>Entrada</td>
+                            <td>No</td>
+                            <td>Tri-state (Hi-Z)</td>
+                        </tr>
+                        <tr>
+                            <td>0</td>
+                            <td>1</td>
+                            <td>0</td>
+                            <td>Entrada</td>
+                            <td>Sí</td>
+                            <td>Pxn suministrará corriente si externamente se fuerza a nivel bajo</td>
+                        </tr>
+                        <tr>
+                            <td>0</td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>Entrada</td>
+                            <td>No</td>
+                            <td>Tri-state (Hi-Z)</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>0</td>
+                            <td>X</td>
+                            <td>Salida</td>
+                            <td>No</td>
+                            <td>Salida en nivel bajo (Sink)</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>X</td>
+                            <td>Salida</td>
+                            <td>No</td>
+                            <td>Salida en nivel alto (Source)</td>
+                        </tr>
+                    </tbody>
+                </table>
+                </div>
+
+                <p><small><em>Nota: «X» significa que el valor de ese bit es irrelevante para el estado indicado.</em></small></p>
+
+                <h3>2.4 Lectura del valor del pin</h3>
+                <p>
+                    Independientemente de <code>DDxn</code>, el estado del pin puede leerse mediante el bit correspondiente en <code>PINxn</code>. Como se muestra en la figura siguiente, el bit del registro PINxn y el latch (cerrojo) que lo precede constituyen un  <strong>sincronizador</strong>. Este sincronizador es necesario para evitar situaciones de metastabilidad cuando el valor del pin físico cambia cerca del flanco del reloj interno. Sin embargo, también introduce un retardo.
+                </p>
+
+                <p>
+                    La figura siguiente muestra un diagrama temporal de la sincronización cuando se lee un valor aplicado externamente al pin. Los retardos de propagación máximo y mínimo se representan respectivamente como tpd,max y tpd,min.
+                </p>
+
+                <img src="img/sincronizacion_lectura_pin_externo_avr.png" alt="Diagrama temporal de la sincronización cuando se lee un valor aplicado externamente al pin" class="imagen-centrada">
+                
+                <div class="note-box">
+                    <strong>Lectura de un valor asignado por hardware:</strong> Cuando se lee un valor del pin que ha sido asignado por hardware, el retardo de propagación es de <strong>½ período del reloj del sistema</strong>.
+
+                <div class="note-box">
+                    <strong>Lectura de un valor asignado por software:</strong> Cuando se lee nuevamente un valor del pin asignado mediante software, debe insertarse una instrucción <code>NOP</code>. La instrucción <code>OUT</code> establece la señal de sincronización, haciendo que el retardo <code>tpd</code> introducido sea exactamente de <strong>1 período del reloj del sistema</strong>.
+                </div>
+
+                <img src="img/sincronizacion_lectura_pin_software_avr.png" alt="Diagrama temporal de la sincronización cuando se lee un valor aplicado externamente al pin" class="imagen-centrada">
+                
+                <h3>2.4.1. Ejemplo de código</h3>
+                <p>El siguiente ejemplo ilustra las operaciones descritas para el <strong>Puerto B</strong>:</p>
+                <ul>
+                    <li>Establecer en nivel alto los pines 0 y 1.</li>
+                    <li>Establecer en nivel bajo los pines 2 y 3.</li>
+                    <li>Configurar los pines 4 a 7 como entradas.</li>
+                    <li>Asignar resistencias <em>pull-up</em> a los pines 6 y 7.</li>
+                    <li>Inserción de la instrucción <code>NOP</code> previa a la lectura de los pines.</li>
+                </ul>
+                
+                <pre><code class="language-c"> 
+&lt;pre&gt;&lt;code class="language-c"&gt; 
+
+                    unsigned char i;
+...
+/* Definir resistencias de pull-up y establecer salidas en alto */
+PORTB = (1&lt;&lt;PB7)|(1&lt;&lt;PB6)|(1&lt;&lt;PB1)|(1&lt;&lt;PB0);
+
+/* Definir direcciones para los pines del puerto */
+DDRB = (1&lt;&lt;DDB3)|(1&lt;&lt;DDB2)|(1&lt;&lt;DDB1)|(1&lt;&lt;DDB0);
+
+/* Insertar nop para sincronización */
+__no_operation();
+
+/* Leer pines del puerto */
+i = PINB;
+...
+&lt;/pre&gt;&lt;/code&gt;
+</code></pre>
+
+            <h3>2.5 Habilitación de Entrada Digital y Modos de Reposo (<em>Sleep Modes</em>)</h3>
+            <p>
+                Como se muestra en el  <strong>Esquema equivalente de un pin E/S</strong>, en el pun to 2.1. la señal de entrada digital se puede acoplar/fijar a masa (<em>ground</em>) en la entrada del Disparador Schmitt (<em>Schmitt Trigger</em>).
+            </p>
+            <p>
+                La señal denotada como <code>SLEEP</code> en la figura la establece el Controlador de Reposo (<em>MCU Sleep Controller</em>) en el modo de Reducción de Potencia (<em>Power-down</em>), modo de Ahorro de Potencia (<em>Power-save</em>) y modo de Espera (<em>Standby</em>) para evitar un alto consumo de potencia si algunas señales de entrada se dejan flotantes o tienen un nivel de señal analógica cercano a $V_{CC}/2$.
+            </p>
+            <p>
+                <code>SLEEP</code> se anula para los pines de puerto habilitados como pines de interrupción externa. Si la solicitud de interrupción externa no está habilitada, <code>SLEEP</code> permanece activa también para estos pines. <code>SLEEP</code> también es anulada por varias otras funciones alternativas, tal como se describe en ”Funciones Alternativas del Puerto” más adelante.
+            </p>
+            <p>
+                Si un nivel lógico alto (“uno”) está presente en un pin de interrupción externa asíncrona configurado como “Interrupción por Flanco de Subida, Flanco de Bajada o Cualquier Cambio Lógico en el Pin” mientras la interrupción externa no está habilitada, el <em>Flag</em> de Interrupción Externa correspondiente se activará al reanudar desde alguno de los modos de reposo (<em>Sleep</em>) mencionados anteriormente, ya que la fijación de nivel (<em>clamping</em>) en estos modos de reposo produce el cambio lógico solicitado.
+            </p>
+
+            <h2>2.6 Pines No Conectados</h2>
+            <p>
+                Si algunos pines no se utilizan, se recomienda garantizar que tengan un nivel definido. Aunque la mayoría de las entradas digitales se deshabilitan en los modos de reposo profundo (<em>deep sleep</em>) como se describió anteriormente, deben evitarse las entradas flotantes para reducir el consumo de corriente en todos los demás modos donde las entradas digitales están habilitadas (Reset, modo Activo y modo <em>Idle</em>).
+            </p>
+            <p>
+                El método más simple para garantizar un nivel definido en un pin no utilizado es habilitar la resistencia de <em>pull-up</em> interna. En este caso, la <em>pull-up</em> se deshabilitará durante el Reset. Si es importante mantener un bajo consumo de potencia durante el Reset, se recomienda utilizar una <em>pull-up</em> o <em>pull-down</em> externa. No se recomienda conectar los pines no utilizados directamente a $V_{CC}$ o GND, ya que esto puede causar corrientes excesivas si el pin se configura accidentalmente como salida.
+            </p>
+
+            <h2>3. FUNCIONES ALTERNATIVAS DEL PUERTO</h2>
+            <p>
+                La mayoría de los pines de puerto tienen funciones alternativas además de operar como E/S digitales de propósito general. La imagen siguiente, <strong>ALTERNATE PORT FUNCTIONS</strong> muestra cómo las señales de control de los pines de puerto de la versión simplificada de la imagen <strong>Descripción funcional de un pin de E/S</strong> en el punto 2. PUERTOS COMO E/S DIGITAL GENERAL, pueden ser anuladas por funciones alternativas. Es posible que las señales de anulación (<em>overriding signals</em>) no estén presentes en todos los pines de puerto, pero la figura sirve como una descripción genérica aplicable a todos los pines de puerto de la familia de microcontroladores AVR.
+            </p>
+            <img src="img/alternate_port_functions_avr.png" alt="Diagrama del circuito de control de E/S y anulación de funciones alternativas para un pin de puerto en arquitectura AVR" class="imagen-centrada">
+            
+            <ol class="avr-notes">
+                <li>
+                <strong>Nota.</strong> <code>WRx</code>, <code>WPx</code>, <code>WDx</code>, <code>RRx</code>, <code>RPx</code> y <code>RDx</code> son comunes a todos los pines dentro del mismo puerto. clk<sub>I/O</sub>, <code>SLEEP</code> y <code>PUD</code> son comunes a todos los puertos. Todas las demás señales son únicas para cada pin.
+                </li>
+            </ol>
+
+            <p>
+  La Tabla siguiente  resume la función de las señales de anulación (<em>overriding signals</em>). Los índices de pin y puerto de la Figura 14-5 en la página 89 no se muestran en las tablas siguientes. Las señales de anulación se generan internamente en los módulos que poseen la función alternativa.
+</p>
+
+<div class="table-container">
+<table>
+  <caption><strong>Tabla 14-2.</strong> Descripción Genérica de las Señales de Anulación para Funciones Alternativas</caption>
+  <thead>
+    <tr>
+      <th scope="col">Nombre de la Señal</th>
+      <th scope="col">Nombre Completo</th>
+      <th scope="col">Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code><strong>PUOE</strong></code></td>
+      <td>Pull-up Override Enable<br><span>(Habilitación de Anulación de <em>Pull-up</em>)</span></td>
+      <td>Si esta señal se establece a '1', la habilitación de la resistencia de <em>pull-up</em> es controlada por la señal <code>PUOV</code>. Si esta señal se limpia a '0', la <em>pull-up</em> se habilita cuando <code>{DDxn, PORTxn, PUD} = 0b010</code>.</td>
+    </tr>
+    <tr>
+      <td><code><strong>PUOV</strong></code></td>
+      <td>Pull-up Override Value<br><span>(Valor de Anulación de <em>Pull-up</em>)</span></td>
+      <td>Si <code>PUOE</code> está activa, la <em>pull-up</em> se habilita/deshabilita cuando <code>PUOV</code> se establece/limpia, independientemente de la configuración de los bits de los registros <code>DDxn</code>, <code>PORTxn</code> y <code>PUD</code>.</td>
+    </tr>
+    <tr>
+      <td><code><strong>DDOE</strong></code></td>
+      <td>Data Direction Override Enable<br><span>(Habilitación de Anulación de Dirección de Datos)</span></td>
+      <td>Si esta señal se establece a '1', la habilitación del controlador de salida (<em>Output Driver</em>) es controlada por la señal <code>DDOV</code>. Si esta señal se limpia a '0', el controlador de salida se habilita mediante el bit del registro <code>DDxn</code>.</td>
+    </tr>
+    <tr>
+      <td><code><strong>DDOV</strong></code></td>
+      <td>Data Direction Override Value<br><span>(Valor de Anulación de Dirección de Datos)</span></td>
+      <td>Si <code>DDOE</code> está activa, el controlador de salida se habilita/deshabilita cuando <code>DDOV</code> se establece/limpia, independientemente de la configuración del bit del registro <code>DDxn</code>.</td>
+    </tr>
+    <tr>
+      <td><code><strong>PVOE</strong></code></td>
+      <td>Port Value Override Enable<br><span>(Habilitación de Anulación del Valor del Puerto)</span></td>
+      <td>Si esta señal se establece a '1' y el controlador de salida está habilitado, el valor del puerto es controlado por la señal <code>PVOV</code>. Si <code>PVOE</code> se limpia a '0' y el controlador de salida está habilitado, el valor del puerto es controlado por el bit del registro <code>PORTxn</code>.</td>
+    </tr>
+    <tr>
+      <td><code><strong>PVOV</strong></code></td>
+      <td>Port Value Override Value<br><span>(Valor de Anulación del Valor del Puerto)</span></td>
+      <td>Si <code>PVOE</code> está activa, el valor del puerto se establece en <code>PVOV</code>, independientemente de la configuración del bit del registro <code>PORTxn</code>.</td>
+    </tr>
+    <tr>
+      <td><code><strong>PTOE</strong></code></td>
+      <td>Port Toggle Override Enable<br><span>(Habilitación de Anulación de Conmutación del Puerto)</span></td>
+      <td>Si <code>PTOE</code> está activa, el bit del registro <code>PORTxn</code> se invierte (<em>toggle</em>).</td>
+    </tr>
+    <tr>
+      <td><code><strong>DIEOE</strong></code></td>
+      <td>Digital Input Enable Override Enable<br><span>(Habilitación de Anulación de Habilitación de Entrada Digital)</span></td>
+      <td>Si este bit se establece a '1', la habilitación de la entrada digital es controlada por la señal <code>DIEOV</code>. Si esta señal se limpia a '0', la habilitación de la entrada digital es determinada por el estado de la MCU (modo Normal, modo <em>Sleep</em>).
+    </tr>
+    <tr>
+      <td><code><strong>DIEOV</strong></code></td>
+      <td>Digital Input Enable Override Value<br><span>(Valor de Anulación de Habilitación de Entrada Digital)</span></td>
+      <td>Si <code>DIEOE</code> está activa, la entrada digital se habilita/deshabilita cuando <code>DIEOV</code> se establece/limpia, independientemente del estado de la MCU (modo Normal, modo <em>Sleep</em>).</td>
+    </tr>
+    <tr>
+      <td><code><strong>DI</strong></code></td>
+      <td>Digital Input<br><span>(Entrada Digital)</span></td>
+      <td>Esta es la entrada digital hacia las funciones alternativas. En la figura, la señal está conectada a la salida del Disparador Schmitt (<em>Schmitt Trigger</em>), pero antes del sincronizador. A menos que la entrada digital se utilice como fuente de reloj, el módulo con la función alternativa utilizará su propio sincronizador.</td>
+    </tr>
+    <tr>
+      <td><code><strong>AIO</strong></code></td>
+      <td>Analog Input/Output<br><span>(Entrada/Salida Analógica)</span></td>
+      <td>Esta es la entrada/salida analógica hacia/desde las funciones alternativas. La señal está conectada directamente a la terminal física (<em>pad</em>) y se puede utilizar de forma bidireccional.</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p>
+  Las siguientes subsecciones describen brevemente las funciones alternativas para cada puerto y relacionan las señales de anulación con la función alternativa. Consulte la descripción de la función alternativa correspondiente para obtener más detalles.
+</p>
+            </section>
+               
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>

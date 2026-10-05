@@ -107,14 +107,20 @@ Pin Físico Chip:   PB7  PB6  PB5  PB4  PB3  PB2  PB1  PB0
             </thead>
             <tbody>
                 <tr>
-                    <td><strong>0</strong></td>
-                    <td><strong>SALIDA (Output)</strong></td>
-                    <td><strong>Corriente Fluye hacia el Exterior (Manejará una carga)</strong></td>
+                    <td>
+                        <strong>0</strong><br>
+                        <code>DDRB &= ~(1 << PB2);</code>
+                    </td>
+                    <td><strong>SALIDA</strong> <br> (Output)</td>
+                    <td>Corriente Fluye hacia el Exterior (Manejará una carga)</td>
                 </tr>
                 <tr>
-                    <td><strong>1</strong></td>
-                    <td><strong>ENTRADA (Input)</strong></td>
-                    <td><strong>Corriente Fluye hacia el Interior (Leerá una señal)</strong></td>
+                    <td>
+                        <strong>1</strong><br>
+                        <code>DDRB |= (1 << PB2);</code>
+                    </td>
+                    <td><strong>ENTRADA</strong> <br> (Input)</td>
+                    <td>Corriente Fluye hacia el Interior (Leerá una señal)</td>
                 </tr>
             </tbody>
         </table>
@@ -146,13 +152,13 @@ Valor en DDRB:   0    0    0    0    0    0    1    0
                 <tr>
                     <td><strong>PB1</strong></td>
                     <td><strong>1</strong></td>
-                    <td><strong>SALIDA (Output)</strong></td>
+                    <td><strong>SALIDA</strong> <br>    (Output)</td>
                     <td><strong>Corriente Fluye hacia el Exterior (Manejará una carga)</strong></td>
                 </tr>
                 <tr>
                     <td><strong>PB0, PB2–PB7</strong></td>
                     <td><strong>0</strong></td>
-                    <td><strong>ENTRADA (Input)</strong></td>
+                    <td><strong>ENTRADA</strong> <br> (Input)</td>
                     <td><strong>Corriente Fluye hacia el Interior (Leerá una señal)</strong></td>
                 </tr>
             </tbody>
@@ -190,23 +196,23 @@ Valor en DDRB:   0    0    0    0    0    0    1    0
             </thead>
             <tbody>
                 <tr>
-                    <td><strong>0</strong> <br> (Entrada)</td>
-                    <td><strong>0</strong> <br> (Alta Impedancia) </td>
+                    <td><strong>0</strong> <br> (Entrada) <br> <code>DDRB &= ~(1 << PB2);</code></td>
+                    <td><strong>0</strong> <br> (Alta Impedancia) <br> <code>PORTB &= ~(1 << PB2);</code></td>
                     <td><strong>Entrada en Alta Impedancia (Hi-Z):</strong> El pin flota eléctricamente. El estado medido en PINx depende exclusivamente de la tensión aplicada por el circuito exterior. Es ideal para leer sensores externos que ya proveen su propia señal fuerte.</td>
                 </tr>
                 <tr>
-                    <td><strong>0</strong> <br> (Entrada)</td>
-                    <td><strong>1</strong> <br> (Pull-Up Activo)</td>
+                    <td><strong>0</strong> <br> (Entrada) <br> <code>DDRB &= ~(1 << PB2);</code></td>
+                    <td><strong>1</strong> <br> (Pull-Up Activo) <br> <code>PORTB |= (1 << PB2);</code></td>
                     <td><strong>Entrada con Resistencia Pull-Up Activa:</strong> La resistencia interna mantiene el pin ligado a VCC. Esta es la configuración clásica para conectar pulsadores a tierra. </td>
                 </tr>
                 <tr>
-                    <td><strong>1</strong> <br> (Salida)</td>
-                    <td><strong>0</strong> <br> (GND. Lógica Baja)</td>                    
+                    <td><strong>1</strong> <br> (Salida) <br> <code>DDRB |= (1 << PB2);</code></td>
+                    <td><strong>0</strong> <br> (GND. Lógica Baja) <br> <code>PORTB &= ~(1 << PB2);</code></td>                    
                     <td><strong>Salida Lógica BAJA (GND / 0 V):</strong> Conduce tierra de forma activa. El pin actúa como un sumidero de corriente (sink), conectando internamente la carga a GND</td>
                 </tr>
                 <tr>
-                    <td><strong>1</strong> <br> (Salida)</td>
-                    <td><strong>1</strong><br> (VCC. Lógica Alta)</td>                    
+                    <td><strong>1</strong> <br> (Salida) <br> <code>DDRB |= (1 << PB2);</code></td>
+                    <td><strong>1</strong><br> (VCC. Lógica Alta) <br> <code>PORTB |= (1 << PB2);</code></td>                    
                     <td><strong>Salida Lógica ALTA (VCC / 5 V o 3.3 V):</strong> Inyecta voltaje activo.</td>
                 </tr>
             </tbody>
@@ -217,18 +223,18 @@ Valor en DDRB:   0    0    0    0    0    0    1    0
 
     <section>
         <h2>4. LECTURA DEL ESTADO E INVERSIÓN POR HARDWARE (PINx)</h2>
-        <p>El registro PINx se utiliza para conocer el estado lógico de los pines configurados como entradas.</p>
-        <p>A diferencia de DDRx y PORTx, el registro <strong>PINx</strong> interactúa directamente con los búferes de lectura conectados a la patilla metálica del integrado.</p>
+        <p>El registro <strong>PINx</strong> se utiliza para conocer el estado lógico de los pines configurados como entradas.</p>
+        <p>A diferencia de <strong>DDRx</strong> y <strong>PORTx</strong>, el registro <strong>PINx</strong> interactúa directamente con los búferes de lectura conectados a la patilla metálica del integrado.</p>
 
         <h3>4.1. Muestreo de Lectura Digital</h3>
-        <p>Para inspeccionar las condiciones eléctricas del circuito exterior (por ejemplo, detectar la pulsación de un botón o la señal de un sensor), el código debe leer el registro <code>PINx</code>. La lectura de este registro no consulta el valor guardado en la memoria RAM, sino la tensión real presente en el pin físico.</p>
+        <p>Para inspeccionar las condiciones eléctricas del circuito exterior (por ejemplo, detectar la pulsación de un botón o la señal de un sensor), el código debe leer el registro <strong>PINx</strong>. La lectura de este registro no consulta el valor guardado en la memoria RAM, sino la tensión real presente en el pin físico.</p>
 <pre><code>if (PINB &amp; (1 &lt;&lt; PB0)) {
     // Código a ejecutar si el voltaje medido en el pin PB0 es ALTO (VCC)
 }</code></pre>
 
         <h3>4.2. Conmutación Ultraeficiente por Hardware (Toggle Hardware)</h3>
-        <p>En los microcontroladores AVR modernos, el registro PINx posee un mecanismo físico especial: si el firmware escribe un valor <code>1</code> lógico en cualquiera de sus bits mientras el pin está configurado como salida, el hardware del AVR invierte automáticamente (<em>toggle</em>) el estado almacenado en el registro PORTx.</p>
-        <p>Esta operación pasa un pin de 0 V a 5 V (o viceversa) en un solo ciclo de reloj de la CPU, eliminando la necesidad de leer, modificar y reescribir manualmente por software el registro PORTx.</p>
+        <p>En los microcontroladores AVR modernos, el registro PINx posee un mecanismo físico special: si el firmware escribe un valor <code>1</code> lógico en cualquiera de sus bits mientras el pin está configurado como salida, el hardware del AVR invierte automáticamente (<em>toggle</em>) el estado almacenado en el registro <strong>PORTx</strong>.</p>
+        <p>Esta operación pasa un pin de 0 V a 5 V (o viceversa) en un solo ciclo de reloj de la CPU, eliminando la necesidad de leer, modificar y reescribir manualmente por software el registro <strong>PORTx</strong></p>
 <pre><code>PINB = (1 &lt;&lt; PB1); // Conmuta el estado de PB1 instantáneamente por hardware</code></pre>
     </section>
 
@@ -248,26 +254,26 @@ Valor en DDRB:   0    0    0    0    0    0    1    0
             </thead>
             <tbody>
                 <tr>
-                    <td><strong>0</strong> <br> (Entrada)</td>
-                    <td><strong>0</strong> <br> (Alta Impedancia) </td>
+                    <td><strong>0</strong> <br> (Entrada) <br> <code> DDRx &= ~(1<<Pxn);</code> </td>
+                    <td><strong>0</strong> <br> (Alta Impedancia) <br> <code> PORTx &= ~(1<<Pxn);</code> </td>
                     <td><strong>Lectura real (0 o 1)</strong></td>
                     <td><strong>Entrada en Alta Impedancia (Hi-Z):</strong> El pin flota eléctricamente. Es ideal para leer sensores externos que ya proveen su propia señal fuerte. El estado medido en PINx depende exclusivamente de la tensión aplicada por el circuito exterior.</td>
                 </tr>
                 <tr>
-                    <td><strong>0</strong> <br> (Entrada)</td>
-                    <td><strong>1</strong> <br> (Pull-Up Activo)</td>
+                    <td><strong>0</strong> <br> (Entrada) <br> <code> DDRx &= ~(1<<Pxn);</code> </td>
+                    <td><strong>1</strong> <br> (Pull-Up Activo) <br> <code> PORTx |= (1<<Pxn);</code> </td>
                     <td><strong>Lectura real (1 por defecto)</strong></td>
                     <td><strong>Entrada con Resistencia Pull-Up Activa:</strong> La resistencia interna  mantiene el pin ligado a VCC. Esta es la configuración clásica para conectar pulsadores a tierra. La resistencia interna (típicamente de entre 20kΩ y 50kΩ en AVR) asegura un '1' lógico cuando el botón no está presionado. PINx lee 1 en reposo y 0 si un pulsador externo lo deriva a masa (GND).</td>
                 </tr>
                 <tr>
-                    <td><strong>1</strong> <br> (Salida)</td>
-                    <td><strong>0</strong> <br> (GND. Lógica Baja)</td>
+                    <td><strong>1</strong> <br> (Salida) <br> <code> DDRx |= (1<<Pxn);</code> </td>
+                    <td><strong>0</strong> <br> (GND. Lógica Baja) <br> <code> PORTx &= ~(1<<Pxn);</code> </td>
                     <td><strong>0 (ó 1 tras Toggle)</strong></td>
                     <td><strong>Salida Lógica BAJA (GND / 0 V):</strong> Conduce tierra de forma activa. El pin actúa como un sumidero de corriente (sink), conectando internamente la carga a GND.Si se escribe un 1 en el bit correspondiente de PINx, el pin conmuta a 5 V por hardware.</td>
                 </tr>
                 <tr>
-                    <td><strong>1</strong> <br> (Salida)</td>
-                    <td><strong>1</strong><br> (VCC. Lógica Alta)</td>
+                    <td><strong>1</strong> <br> (Salida) <br> <code> DDRx |= (1<<Pxn);</code> </td>
+                    <td><strong>1</strong> <br> (VCC. Lógica Alta) <br> <code> PORTx |= (1<<Pxn);</code></td>
                     <td><strong>1 (ó 0 tras Toggle)</strong></td>
                     <td><strong>Salida Lógica ALTA (VCC / 5 V o 3.3 V):</strong> Inyecta voltaje activo. El pin actúa como una fuente de corriente (source), entregando el voltaje de alimentación del chip.Si se escribe un 1 en el bit correspondiente de PINx, el pin conmuta a 0 V por hardware.</td>
                 </tr>
