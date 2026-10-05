@@ -1,1 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Todo un Puerto del Microcontrolador AVR | MC Mundo Tech</title>
+    <meta name="description" content="Tutorial práctico para controlar ocho LED con un microcontrolador AVR, configurando un puerto como salidas digitales y utilizando un MOSFET 2N7000 controlado por RESET para aislar los LED durante la programación.">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
 
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>CONTROL DE TODO UN PUERTO DE uMC AVR COMO SALIDAS DIGITALES</h1>
+            
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   -->
+            
+<section>
+<h2>1. OBJETIVOS</h2>
+
+<p>Al finalizar este tutorial, el lector será capaz de:</p>
+
+<ol>
+    <li>Comprender la función de la resistencia limitadora de corriente utilizada con los LED conectados a las salidas digitales de un microcontrolador AVR.</li>
+    <li>Identificar el problema que puede producirse cuando los LED comparten pines con las señales utilizadas para programar el AVR.</li>
+    <li>Comprender la necesidad de aislar temporalmente los LED durante la programación.</li>
+    <li>Comprender el funcionamiento básico de un MOSFET 2N7000 como interruptor electrónico.</li>
+    <li>Comprender cómo la señal <code>RESET</code>, activa en bajo, puede utilizarse para controlar el aislamiento del circuito de LED.</li>
+    <li>Configurar los ocho pines de un puerto AVR como salidas digitales.</li>
+    <li>Controlar ocho LEDs mediante los ocho bits de un puerto.</li>
+    <li>Comprender la relación entre el nivel lógico de una salida y el estado físico de un LED según su conexión.</li>
+    <li>Representar patrones luminosos mediante valores binarios escritos en <code>PORTB</code>.</li>
+</ol>
+</section>
+
+<section>
+<h2>2. INTRODUCCIÓN</h2>
+
+<p>El control de un LED mediante una salida digital es uno de los primeros ejercicios para comprender la relación entre el software y el hardware de un microcontrolador.</p>
+
+<p>Cuando el número de LEDs aumenta, el mismo principio puede extenderse para controlar varios pines de un puerto simultáneamente. En un AVR con un puerto de ocho bits, un único registro puede utilizarse para controlar ocho señales digitales.</p>
+
+<p>Sin embargo, al construir un circuito real aparecen otros aspectos que deben tenerse en cuenta. Los LED necesitan una resistencia limitadora de corriente y, además, algunos de los pines utilizados para controlarlos pueden compartir funciones con las señales utilizadas durante la programación del microcontrolador.</p>
+
+<p>Por esta razón, este tutorial desarrolla progresivamente el siguiente problema:</p>
+
+<pre><code>Controlar ocho LED
+        ↓
+Limitar la corriente mediante resistencias
+        ↓
+Identificar posibles interferencias durante la programación
+        ↓
+Aislar los LED mediante un MOSFET
+
+Programación / RESET activo
+        ↓
+RESET = LOW
+        ↓
+2N7000 deja de conducir
+        ↓
+GND de los LED desconectado
+        ↓
+LED aislados
+        ↓
+Programar el AVR
+        ↓
+Liberar RESET
+        ↓
+RESET = HIGH
+        ↓
+2N7000 conduce nuevamente
+        ↓
+GND de los LED conectado
+        ↓
+Ejecutar el programa</code></pre>
+
+</section>
+
+<section>
+<h2>10. RELACIÓN ENTRE SOFTWARE Y HARDWARE</h2>
+
+<p>Una instrucción como:</p>
+
+<pre><code>PORTB = 0b10101010;</code></pre>
+
+<p>puede analizarse mediante la siguiente cadena:</p>
+
+<pre><code>Valor binario
+     ↓
+Registro PORTB
+     ↓
+Lógica interna del AVR
+     ↓
+Niveles lógicos de PB0–PB7
+     ↓
+Corriente en los circuitos de los LED
+     ↓
+LED encendidos/apagados
+     ↓
+Patrón luminoso</code></pre>
+
+<p>Esta relación entre software, registros, señales eléctricas y dispositivos externos constituye uno de los fundamentos de la programación de microcontroladores.</p>
+</section>
+
+<section>
+<h2>11. RESUMEN</h2>
+
+<pre><code>1. Conectar cada LED mediante una resistencia limitadora
+        ↓
+2. Conectar los LED a los pines del puerto
+        ↓
+3. Verificar la lógica activa del circuito
+        ↓
+4. Identificar posibles interferencias durante la programación
+        ↓
+5. Aislar el GND común mediante un MOSFET
+        ↓
+6. Conectar el Gate del MOSFET a RESET
+        ↓
+7. RESET HIGH → MOSFET ON → LED conectados
+        ↓
+8. RESET LOW → MOSFET OFF → LED aislados
+        ↓
+9. Configurar PB0–PB7 como salidas mediante DDRB
+        ↓
+10. Escribir patrones binarios en PORTB
+        ↓
+11. Observar el patrón producido por los LED</code></pre>
+
+<p>En la configuración estudiada, los LED tienen <strong>lógica activa en HIGH</strong> y el MOSFET presenta una lógica de control directa respecto de <code>RESET</code>:</p>
+
+<pre><code>RESET HIGH → 2N7000 ON  → GND conectado → LED disponibles
+RESET LOW  → 2N7000 OFF → GND desconectado → LED aislados</code></pre>
+
+<p>Esta relación permite utilizar la señal de <code>RESET</code> para aislar automáticamente el circuito de los LED cuando el microcontrolador entra en reset y, una vez liberado el reset, volver a conectar el circuito para el funcionamiento normal.</p>
+</section>
+
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>
