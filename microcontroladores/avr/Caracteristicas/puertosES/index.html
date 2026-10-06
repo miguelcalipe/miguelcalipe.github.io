@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PUERTOS DE E/S. ATmega48A/PA/88A/PA/168A/PA/328/P</title>
+    <title>PUERTOS DE E/S. ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</title>
     <meta name="description" content="Todos los puertos AVR disponen de una verdadera funcionalidad de lectura-modificación-escritura (Read-Modify-Write) cuando se utilizan como puertos digitales de E/S (I/O). Esto significa que la dirección de un pin del puerto puede modificarse sin cambiar involuntariamente la dirección de ningún otro pin mediante las instrucciones mediante las instrucciones SBI y CBI. SBI (Set Bit in I/O Register) pone a 1 lógico (nivel alto, 5V o 3.3V) un bit específico dentro de un registro de E/S sin alterar los demás bits. CBI (Clear Bit in I/O Register) pone a 0 lógico (nivel bajo, 0V) un bit específico dentro de un registro de E/S sin modificar los otros bits.">
     <link rel="stylesheet" href="/assets/css/principal.css">
     <link rel="stylesheet" href="/assets/css/articulo.css">
@@ -30,7 +30,7 @@
     <main>        
         <article>            
             <header class="article-header">
-            <h1>PUERTOS DE E/S. ATmega48A/PA/88A/PA/168A/PA/328/P</h1>
+            <h1>PUERTOS DE E/S. ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</h1>
             
             </header>
                         
@@ -53,13 +53,29 @@
 <img src="img/esquema_equivalente_pines_ATmega.png" alt="Esquema equivalente de los pines de E/S del ATmega48A/PA/88A/PA/168A/PA/328/P" class="imagen-centrada">
 
 <h3>1.1. Registros de control de puertos</h3>
-<p>Para la gestión de cada puerto, el dispositivo asigna tres posiciones de memoria de E/S fundamentales:</p>
+
+                <p> 
+                    Todos los registros y referencias a bits de esta sección se escriben utilizando una forma general. Una letra minúscula «x» representa la letra correspondiente al puerto, mientras que una letra minúscula «n» representa el número de bit y en esta documentación se representa de forma general como <code> PORTxn</code>.
+                </p>
+                <p> 
+                    Sin embargo, al utilizar las definiciones de registros o bits en un programa, debe emplearse la denominación específica. Por ejemplo, PORTB3 corresponde al bit n.º 3 del Puerto B, 
+                    
+    <p>Para la gestión de cada puerto, el dispositivo asigna tres posiciones de memoria de E/S fundamentales:</p>
     
     <ul>
         <li><strong>PORTx:</strong> Registro de datos (Data Register).</li>
         <li><strong>DDRx:</strong> Registro de dirección de datos (Data Direction Register).</li>
         <li><strong>PINx:</strong> Pines de entrada del puerto (Port Input Pins).</li>
     </ul>
+    <p>
+        La posición de E/S correspondiente a los pines de entrada del puerto (<code>PINx</code>) es de solo lectura, mientras que el Registro de datos (<code>PORTx</code>) y el Registro de dirección de datos (<code>DDRx</code>) permiten tanto lectura como escritura.
+    </p>
+
+    <p>
+        Sin embargo, escribir un uno lógico (1) en un bit del registro <code>PINx</code> provoca una conmutación (toggle) del bit correspondiente en el Registro de datos <code>PORTx</code>.            
+    </p>
+                
+                
     <div class="table-container">
     <table>
         <thead>
@@ -93,7 +109,7 @@
                 <p><strong>Control Global de Pull-up (PUD):</strong> El bit <em>PUD</em> (Pull-up Disable) ubicado en el registro <code>MCUCR</code> se encarga de deshabilitar la función pull-up para absolutamente todos los pines de todos los puertos cuando se encuentra establecido (en uno).</p>
            
     <h3>1.2. Funciones Alternativas y Multiplexación</h3>
-    <p>La gran mayoría de los pines de los puertos se encuentran multiplexados con funciones alternativas correspondientes a los distintos periféricos internos del dispositivo.</p>
+    <p>La mayoría de los pines de los puertos se encuentran multiplexados con funciones alternativas correspondientes a los distintos periféricos internos del dispositivo.</p>
     <p>Cabe destacar que habilitar la función alternativa de algunos pines específicos de un puerto <strong>no afecta </strong> al uso de los demás pines del mismo puerto, los cuales pueden seguir utilizándose como E/S digital de propósito general.</p>
 
                 </section>
@@ -122,25 +138,29 @@
 
                 <p><strong>Comportamiento como Entrada:</strong></p>
                 <ul>
-                    <li>Escribir un <code>1</code> en <code>PORTxn</code> activa la resistencia <em>pull-up</em>.</li>
-                    <li>Para desactivar la resistencia <em>pull-up</em>, se debe escribir un <code>0</code> en <code>PORTxn</code> o configurar el pin como salida.</li>
+                    <li>Escribir un uno lógico (<code>1</code>) en <code>PORTxn</code> activa la resistencia <em>pull-up</em>.</li>
+                    <li>Para desactivar la resistencia <em>pull-up</em>, se debe escribir un cero lógico (<code>0</code>) en <code>PORTxn</code> o configurar el pin como salida.</li>
                     <li>Los pines se encuentran en estado <em>tri-state</em> (alta impedancia) durante el <em>reset</em>.</li>
                 </ul>
 
                 <p><strong>Comportamiento como Salida:</strong></p>
                 <ul>
-                    <li>Escribir un <code>1</code> en <code>PORTxn</code> lleva el pin a <strong>nivel alto (1)</strong>.</li>
-                    <li>Escribir un <code>0</code> en <code>PORTxn</code> lleva el pin a <strong>nivel bajo (0)</strong>.</li>
+                    <li>Escribir un uno lógico (<code>1</code>) en <code>PORTxn</code> lleva el pin a <strong>nivel alto (1)</strong>.</li>
+                    <li>Escribir un cero lógico (<code>0</code>) en <code>PORTxn</code> lleva el pin a <strong>nivel bajo (0)</strong>.</li>
                 </ul>
 
             <h3>2.2 Conmutación del pin</h3>
                 <p>Escribir un uno lógico (<code>1</code>) en <code>PINxn</code> conmuta (<em>toggle</em>) el valor de <code>PORTxn</code>, independientemente del valor de <code>DDxn</code>. La instrucción <code>SBI</code> puede utilizarse para este fin en un único bit.</p>
 
             <h3>2.3 Conmutación entre entrada y salida</h3>
-                <p>Al cambiar entre el estado <em>tri-state</em> <span class="formula">{DDxn, PORTxn} = 0b00</span> y el estado de salida en nivel alto <span class="formula">{DDxn, PORTxn} = 0b11</span>, debe producirse un estado intermedio:</p>
+                <p>Al cambiar entre el estado <em>tri-state</em> </p>
+                 <pre><code> DDxn, PORTxn = 0b00 </code></pre>
+                <p> y el estado de salida en nivel alto</p> 
+                <pre><code> DDxn, PORTxn = 0b11</code></pre>, 
+                <p>Debe producirse un estado intermedio que sea uno de los siguientes</p>
                 <ul>
-                    <li><em>Pull-up</em> habilitado: <span class="formula">{DDxn, PORTxn} = 0b01</span></li>
-                    <li>Salida en nivel bajo: <span class="formula">{DDxn, PORTxn} = 0b10</span></li>
+                    <li><em>Pull-up</em> habilitado: <code> DDxn, PORTxn = 0b01</code></li>
+                    <li>Salida en nivel bajo: <code>DDxn, PORTxn = 0b10</code></li>
                 </ul>
                 <p>Si el entorno de alta impedancia no percibe diferencia entre un nivel alto activo y un <em>pull-up</em>, el estado con <em>pull-up</em> habilitado es totalmente aceptable; de lo contrario, se puede usar el bit <code>PUD</code> del registro <code>MCUCR</code> para deshabilitar todas las resistencias <em>pull-up</em> globalmente.</p>
                 <p>Para la conmutación inversa (de entrada con <em>pull-up</em> a salida en nivel bajo), el usuario debe usar como estado intermedio <em>tri-state</em> (<span class="formula">0b00</span>) o salida en nivel alto (<span class="formula">0b11</span>).</p>
