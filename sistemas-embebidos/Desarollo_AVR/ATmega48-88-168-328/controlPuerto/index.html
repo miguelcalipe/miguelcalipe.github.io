@@ -73,6 +73,407 @@ Limitar la corriente mediante resistencias
 Identificar posibles interferencias durante la programación
         ↓
 Aislar los LED mediante un MOSFET
+        ↓
+Utilizar RESET como señal de control
+        ↓
+Configurar ocho salidas digitales
+        ↓
+Controlar los LED mediante PORTB</code></pre>
+
+</section>
+
+<section>
+<h2>3. RESISTENCIAS LIMITADORAS PARA LOS LED</h2>
+
+<h3>3.1. Función de la resistencia</h3>
+
+<p>Un LED no debe conectarse directamente a una salida del microcontrolador sin considerar la corriente que circulará por él.</p>
+
+<p>Para limitar esa corriente se utiliza una resistencia conectada en serie con el LED.</p>
+
+<p>En el montaje utilizado en este tutorial, la conexión básica es:</p>
+
+<pre><code>PB0 ─── Resistencia ─── LED ─── GND</code></pre>
+
+<p>En esta configuración, cuando <code>PB0</code> se encuentra en nivel alto (<code>HIGH</code>), existe una diferencia de potencial que permite circular corriente por la resistencia y el LED, haciendo que este se ilumine.</p>
+
+<p>Cuando <code>PB0</code> se encuentra en nivel bajo (<code>LOW</code>), el LED se apaga.</p>
+
+<h3>3.2. Lógica activa de los LED</h3>
+
+<p>En este tutorial se utiliza una conexión en la que el LED está conectado entre la salida del AVR y <code>GND</code>, mediante una resistencia limitadora:</p>
+
+<pre><code>PB0 ─── R ─── LED ─── GND</code></pre>
+
+<p>Por esta razón, el LED presenta <strong>lógica activa en HIGH</strong>.</p>
+
+<pre><code>PB0 = HIGH  →  LED encendido
+PB0 = LOW   →  LED apagado</code></pre>
+
+<p>Por ejemplo:</p>
+
+<pre><code>PORTB = 0b00000001;</code></pre>
+
+<p>establece <code>PB0</code> en <code>HIGH</code> y, en esta configuración, enciende el LED conectado a <code>PB0</code>.</p>
+
+<p>La lógica activa depende siempre de la conexión eléctrica del dispositivo. Si el LED se conectara mediante una configuración diferente, podría utilizarse lógica activa en <code>LOW</code>.</p>
+
+<h3>3.3. Valores de la resistencia</h3>
+
+<p>En el material se utilizan como ejemplos:</p>
+
+<pre><code>220 Ω
+1 kΩ</code></pre>
+
+<p>En un circuito real, el valor de la resistencia debe determinarse considerando la tensión de alimentación, la caída de tensión directa del LED, la corriente deseada y las características eléctricas de la salida del microcontrolador.</p>
+</section>
+
+
+<section>
+<h2>4. PROBLEMA DE COMPARTIR PINES CON EL DISPOSITIVO PROGRAMADOR</h2>
+
+
+<h3>4.1. El conflicto entre el circuito y el programador</h3>
+
+<p>Al construir un circuito con varios LED, algunos de los pines utilizados para controlarlos pueden coincidir con las señales necesarias para programar el AVR.</p>
+
+<p>Durante la programación, el programador necesita establecer y leer determinados niveles lógicos. Sin embargo, esos mismos pines están conectados al circuito externo de los LED.</p>
+
+<pre><code>Programador
+     ↓
+Pin del AVR
+     ↓
+Circuito externo
+     ↓
+LED + resistencia</code></pre>
+
+<p>El circuito externo puede modificar las condiciones eléctricas del pin y dificultar la comunicación con el programador.</p>
+
+<h3>4.2. Solución manual</h3>
+
+<p>La solución más sencilla consiste en desconectar temporalmente el circuito de los LED durante la programación.</p>
+
+<pre><code>Desconectar los LED
+        ↓
+Programar el AVR
+        ↓
+Desconectar el programador
+        ↓
+Volver a conectar los LED
+        ↓
+Ejecutar el programa</code></pre>
+
+<p>Esta solución funciona, pero resulta poco práctica cuando se programa repetidamente el microcontrolador.</p>
+</section>
+
+<section>
+<h2>5. AISLAMIENTO DE LOS LED MEDIANTE UN MOSFET</h2>
+
+<h3>5.1. Función del MOSFET</h3>
+
+<p>Una solución consiste en utilizar un MOSFET como interruptor electrónico para conectar o desconectar el <strong>GND común del circuito de los LED</strong>.</p>
+
+<p>En este proyecto se utiliza un <code>2N7000</code>.</p>
+
+<pre><code>MOSFET conduce
+        ↓
+GND de los LED conectado
+
+MOSFET no conduce
+        ↓
+GND de los LED desconectado</code></pre>
+
+
+<h3>5.2. Terminales del MOSFET</h3>
+
+<p>El MOSFET tiene tres terminales principales:</p>
+
+<pre><code>Gate
+Drain
+Source</code></pre>
+
+<p>En la configuración utilizada:</p>
+
+<pre><code>Gate   → señal de control
+Drain  → GND común de los LED
+Source → GND</code></pre>
+
+<p>El <code>Gate</code> controla la conducción entre <code>Drain</code> y <code>Source</code>.</p>
+</section>
+
+<section>
+<h2>6. CONTROL DEL MOSFET MEDIANTE RESET </h2>
+
+<h3>6.1. RESET es una señal activa en bajo</h3>
+
+<p>La señal <code>RESET</code> del AVR es <strong>activa en bajo (active-low)</strong>. Esto significa que:</p>
+
+<pre><code>RESET = HIGH → funcionamiento normal
+RESET = LOW  → reset activo</code></pre>
+
+<p>Durante la programación, el programador utiliza la línea <code>RESET</code> como parte de la secuencia necesaria para colocar al microcontrolador en el modo de programación correspondiente.</p>
+
+<p>En el circuito descrito, el <code>Gate</code> del 2N7000 se conecta a esta señal.</p>
+
+<h3>6.2. Funcionamiento normal</h3>
+
+<p>Una vez liberado el reset, la línea <code>RESET</code> vuelve a <code>HIGH</code>.</p>
+
+<pre><code>RESET = HIGH
+        ↓
+Gate del 2N7000 = HIGH
+        ↓
+2N7000 conduce
+        ↓
+Drain y Source quedan conectados
+        ↓
+GND de los LED queda conectado
+        ↓
+Los LED pueden funcionar</code></pre>
+
+<p>Por tanto, durante el funcionamiento normal el MOSFET se encuentra activado.</p>
+
+<h3>6.3. Durante el reset y la programación</h3>
+
+<p>Cuando <code>RESET</code> se lleva a nivel bajo:</p>
+
+<pre><code>RESET = LOW
+        ↓
+Gate del 2N7000 = LOW
+        ↓
+2N7000 deja de conducir
+        ↓
+GND de los LED queda desconectado
+        ↓
+Los LED quedan aislados del circuito de retorno
+</code></pre>
+
+<p>Esta es la lógica fundamental del aislamiento:</p>
+
+<div class="table-container">
+<table>
+    <thead>
+        <tr>
+            <th>RESET</th>
+            <th>Gate del 2N7000</th>
+            <th>MOSFET</th>
+            <th>GND de LED</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><code>HIGH</code></td>
+            <td>HIGH</td>
+            <td>Conduce</td>
+            <td>Conectado</td>
+        </tr>
+        <tr>
+            <td><code>LOW</code></td>
+            <td>LOW</td>
+            <td>No conduce</td>
+            <td>Desconectado</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+
+<h3>6.4. Secuencia de funcionamiento</h3>
+
+<p>La lógica completa puede resumirse así:</p>
+
+<pre><code>Funcionamiento normal
+        ↓
+RESET = HIGH
+        ↓
+MOSFET ON
+        ↓
+GND de LED conectado
+        ↓
+LED disponibles
+
+Programación / RESET activo
+        ↓
+RESET = LOW
+        ↓
+MOSFET OFF
+        ↓
+GND de LED desconectado
+        ↓
+LED aislados</code></pre>
+
+<p>La ventaja de esta configuración es que el aislamiento del circuito de LED se produce automáticamente como consecuencia del cambio de estado de <code>RESET</code>.</p>
+
+<h3>6.5. Aclaración sobre RESET/PC6</h3>
+
+<p>En los AVR donde el pin está multiplexado como <code>RESET/PC6</code>, mientras la función de reset está habilitada, el pin se utiliza como entrada de reset y <strong>no debe tratarse como un GPIO <code>PC6</code> convencional</strong>.</p>
+
+<p>Por ello, en esta aplicación debe entenderse la conexión como:</p>
+
+<pre><code>RESET/PC6
+     ↓
+Función utilizada: RESET
+     ↓
+Gate del 2N7000</code></pre>
+
+<p>La denominación <code>PC6</code> corresponde a la función alternativa del pin, pero no significa que el programa esté utilizando ese pin como una salida digital convencional.</p>
+</section>
+
+<section>
+<h2>7. CONEXIÓN DEL 2N7000</h2>
+
+<h3>7.1. Conexiones básicas</h3>
+
+<p>De acuerdo con la configuración utilizada:</p>
+
+<pre><code>Source → GND
+Gate   → RESET / PC6
+Drain  → GND común de los LED</code></pre>
+
+<p>Conceptualmente:</p>
+
+<pre><code>                 GND común
+                     │
+                     ↓
+                   Drain
+                  ┌─────┐
+RESET / PC6 ──────┤Gate │
+                  │2N7000
+GND ──────────────┤Source
+                  └─────┘</code></pre>
+
+
+<h3>7.2. Importancia del pinout</h3>
+
+<p>La distribución física de los terminales debe comprobarse para el componente concreto utilizado.</p>
+
+<p>Para el componente descrito en el material, observado desde el frente con la cara plana y la identificación visible:</p>
+
+<pre><code>Izquierda → Source
+Centro    → Gate
+Derecha   → Drain</code></pre>
+
+<p>En un montaje real debe verificarse siempre el <em>datasheet</em> correspondiente al fabricante y encapsulado del MOSFET.</p>
+</section>
+
+<section>
+<h2>8. CONTROL DE 8 SALIDAS MEDIANTEB UN BYTE</h2>
+
+<h3>8.1. Relación entre el puerto y los LED</h3>
+
+<p>Los ocho bits de <code>PORTB</code> pueden utilizarse para controlar ocho LED:</p>
+
+<pre><code>bit7 → PB7 → LED7
+bit6 → PB6 → LED6
+bit5 → PB5 → LED5
+bit4 → PB4 → LED4
+bit3 → PB3 → LED3
+bit2 → PB2 → LED2
+bit1 → PB1 → LED1
+bit0 → PB0 → LED0</code></pre>
+
+
+<h3>8.2. Configurar los ocho pines como salidas</h3>
+
+<pre><code>DDRB = 0xff;</code></pre>
+
+<p><code>0xff</code> equivale a:</p>
+
+<pre><code>11111111</code></pre>
+
+<p>Por tanto, los ocho pines correspondientes quedan configurados como salidas.</p>
+
+<h3>8.3. Relación entre el bit y el LED</h3>
+
+<p>Debido a que el circuito utiliza lógica activa en HIGH:</p>
+
+<pre><code>PORTB bit = 1 → pin HIGH → LED encendido
+PORTB bit = 0 → pin LOW  → LED apagado</code></pre>
+
+<p>Por ejemplo:</p>
+
+<pre><code>PORTB = 0b10101010;</code></pre>
+
+<p>produce:</p>
+
+<pre><code>PB7 PB6 PB5 PB4 PB3 PB2 PB1 PB0
+ 1   0   1   0   1   0   1   0
+ ●   ○   ●   ○   ●   ○   ●   ○</code></pre>
+
+</section>
+
+<section>
+<h2>9. EJEMPLO PRÁCTICO COMPLETO</h2>
+
+<h3>9.1. Programa</h3>
+
+<pre><code class="language-c">
+#include <avr/io.h>
+#include <util/delay.h>
+
+int main(void)
+{
+    DDRB = 0xff;
+
+    while (1)
+    {
+        PORTB = 0b10101010;
+        _delay_ms(500);
+
+        PORTB = 0b01010101;
+        _delay_ms(500);
+    }
+
+    return (0);
+}</code></pre>
+
+<h3>9.2. Funcionamiento</h3>
+
+<p>Primero se configuran los ocho pines del puerto B como salidas:</p>
+
+<pre><code>DDRB = 0xff;</code></pre>
+
+<p>Después se escribe:</p>
+
+<pre><code>PORTB = 0b10101010;</code></pre>
+
+<p>Como los LED tienen lógica activa en HIGH, los LED asociados a los bits en <code>1</code> se encienden.</p>
+
+<p>Después de 500 ms se escribe:</p>
+
+<pre><code>PORTB = 0b01010101;</code></pre>
+
+<p>y se obtiene el patrón contrario.</p>
+
+<h3>9.3. Secuencia de funcionamiento</h3>
+
+<pre><code>Configurar PB0–PB7 como salidas
+        ↓
+Mostrar 10101010 en PORTB
+        ↓
+LED7, LED5, LED3 y LED1 encendidos
+        ↓
+Esperar 500 ms
+        ↓
+Mostrar 01010101 en PORTB
+        ↓
+LED6, LED4, LED2 y LED0 encendidos
+        ↓
+Esperar 500 ms
+        ↓
+Repetir</code></pre>
+
+
+<h3>9.4. Secuencia de programación y funcionamiento</h3>
+
+<pre><code>Funcionamiento normal
+        ↓
+RESET = HIGH
+        ↓
+2N7000 conduce
+        ↓
+GND de los LED conectado
+        ↓
+LED disponibles
 
 Programación / RESET activo
         ↓
