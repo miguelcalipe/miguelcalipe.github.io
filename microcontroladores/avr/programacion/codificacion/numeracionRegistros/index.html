@@ -39,22 +39,59 @@
         <section> 
             <h2>1. INTRODUCCIÓN</h2>
 
-<p>En la programación de microcontroladores es habitual trabajar directamente con registros cuyos bits representan estados o funciones específicas del hardware. En los microcontroladores AVR, muchos registros de propósito especial (<em>Special Function Registers, SFR</em>) tienen un ancho de 8 bits.</p>
+                <p>En la programación de microcontroladores es habitual trabajar directamente con registros cuyos bits representan estados o funciones específicas del hardware. En los microcontroladores AVR, muchos registros de propósito especial (<em>Special Function Registers, SFR</em>) tienen un ancho de 8 bits.</p>
 
-<p>Para trabajar correctamente con estos registros es necesario comprender dos conceptos relacionados:</p>
+                <p>Para trabajar correctamente con estos registros es necesario comprender dos conceptos relacionados:</p>
 
-<ol> <li>cómo se organiza y representa un registro de 8 bits;</li> <li>cómo puede expresarse un mismo valor numérico utilizando diferentes sistemas de numeración.</li> </ol>
+                <ol> 
+                    <li>Cómo se organiza y representa un registro de 8 bits;</li> 
+                    <li>cómo puede expresarse un mismo valor numérico utilizando diferentes sistemas de numeración.</li> 
+                </ol>
 
-<p>Un registro de 8 bits contiene ocho posiciones binarias independientes. Cada posición puede adoptar uno de dos estados:</p>
+                <p>Un registro de 8 bits contiene ocho posiciones binarias independientes. Cada posición puede adoptar uno de dos estados: <code>0</code> o <code>1</code> </p>
+            
+                <p>Por esta razón, la representación binaria resulta especialmente útil cuando se trabaja directamente con los bits de un registro.</p> 
 
-<pre><code>0 o 1</code></pre>
+                <h3>1.1 El principio de la indexación desde cero (Zero-Indexing) en C</h3>
+                    <p>
+                        El lenguaje C utiliza la indexación basada en cero (zero-indexing) para recorrer secuencias, matrices y conjuntos de bits. Por tanto, el primer elemento se identifica con el índice 0, el segundo con el índice 1, y así sucesivamente.
+                    </p>
+                    <p> 
+                        Al programar microcontroladores, esta convención refleja el funcionamiento interno del hardware y la aritmética de direcciones de memoria. 
+                        
+                        <ul>
+                            <li>En un registro de 8 bits, los bits se numeran desde el menos significativo (LSB) hasta el más significativo (MSB).</li>
+                            <li>El bit menos significativo se identifica como b0, el siguiente como b1, y así sucesivamente hasta el bit más significativo, que se identifica como b7.</li>
+                            <li>Al contar ocho elementos (o pines), la secuencia numérica estándar en C es: $0, 1, 2, 3, 4, 5, 6, 7$. </li>
+                            <li>El primer elemento de cualquier grupo se referencia mediante el índice 0, y el octavo y último elemento corresponde al índice 7.</li>
+                        </ul>
+                                   
+                <h3>1.2. Correspondencia entre bits y pines en un registro de 8 bits</h3> 
+                    <p>
+                        En el caso de un registro de 8 bits, la indexación desde cero se aplica a cada posición del registro, numerando los bits desde el menos significativo (LSB) hasta el más significativo (MSB).
+                    </p>
+                    <p>Por ejemplo, en un registro de 8 bits:</p>
+                    <p>El bit menos significativo (LSB) se identifica como b0, el siguiente como b1, y así sucesivamente hasta el bit más significativo (MSB), que se identifica como b7.</p>
+                    <p>Esta convención de indexación desde cero es fundamental para comprender cómo se accede y manipula cada bit individualmente en un registro de 8 bits en el lenguaje C.</p>    
+                    <p>En resumen, la indexación desde cero en C establece que el primer elemento de un conjunto se identifica con el índice 0, y en el caso de un registro de 8 bits, los bits se numeran desde b0 (LSB) hasta b7 (MSB).</p>
+                    </p>                      
 
-<p>Por esta razón, la representación binaria resulta especialmente útil cuando se trabaja directamente con los bits de un registro.</p> 
-</section>
+                <h3>1.3. Aplicación práctica: Mapeo de hardware y conexión de LEDs</h3>
+                    
+                    <p>Esta convención de indexación desde cero es fundamental para comprender cómo se accede y manipula cada bit individualmente en un registro de 8 bits en el lenguaje C.</p>
+                   
+                    
 
-<section> 
-    <h2>2. EL REGISTRO DE 8 BITS</h2>
 
+        </section>
+            
+
+        <section> 
+            <h2>2. EL REGISTRO DE 8 BITS</h2>
+
+                <p>
+                    En los microcontroladores de arquitectura AVR, la estructura fundamental de datos se alinea con la longitud natural del bus del procesador: un byte compuesto por ocho bits. Los pines de entrada y salida (General Purpose Input/Output, GPIO) se agrupa físicamente en puertos de ocho pines (como PORTB, PORTC y PORTD). Esta correspondencia directa de uno a uno entre los ocho bits de un registro de control y los ocho pines físicos de un puerto simplifica notablemente el manejo del hardware a nivel de software.
+                </p>
 <h3>2.1. Organización de los bits</h3>
 
 <p>Un registro de 8 bits puede representarse de la siguiente manera:</p>
@@ -65,7 +102,15 @@
 
 <p>El bit situado más a la derecha es el <strong>bit 0 (b0)</strong>, denominado bit menos significativo (<em>Least Significant Bit, LSB</em>). El bit situado más a la izquierda es el <strong>bit 7 (b7)</strong>, denominado bit más significativo (<em>Most Significant Bit, MSB</em>).</p>
 
-<p>La numeración de los bits aumenta desde la derecha hacia la izquierda, comenzando en cero.</p> 
+<p>La numeración de los bits aumenta desde la derecha hacia la izquierda, comenzando en cero. Esto se conoce como la <strong> indexación desde 0</strong></p> 
+
+<p> La indexación desde cero resulta natural si piensas en términos de una ubicación base y un desplazamiento (offset), que es precisamente la razón por la que se utiliza en C.</p>
+
+<p>Si el registro de hardware del puerto B se encuentra en una determinada ubicación de memoria —el byte número cinco en el mega168, por ejemplo—, entonces la ubicación del primer pin está en el byte cinco más cero bits.</p>
+
+<p>El segundo pin (PB1) se encuentra en el byte cinco más un bit, etc.</p>
+
+<p>Si simplemente recuerdas pensar en el primer LED como “LED número cero” o “LED en PORTB + 0”, estarás preparado para comprender cómo accederemos posteriormente a bits individuales mediante desplazamientos de bits.</p>
 
 <h3>2.2. Ejemplo de un registro</h3>
 
