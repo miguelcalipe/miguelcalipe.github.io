@@ -49,7 +49,7 @@
             <p>
                 Controlar el microcontrolador significa escribir o leer valores en estos registros (como DDRB, PORTB,PINBX) para producir efectos físicos en el hardware, como configurar un pin como salida o establecer un voltaje. Para ello debemos aprender un concepto fundamental de la programación específica de microcontroladores: <strong> cómo activar y desactivar bits individuales dentro de un registro de hardware</strong>.
             </p>
-         
+                
             <p>
                 Existen dos métodos fundamentales para activar y desactivar bits individuales dentro de un registro de funciones especiales: la <strong>asignación directa</strong> y la <strong>manipulación de bits (<em>bit twidding</em>) mediante máscaras</strong>. Cada enfoque tiene ventajas y desventajas, y su elección depende del contexto de programación y de los requisitos de seguridad y modularidad del firmware.
             </p>
@@ -90,7 +90,7 @@
         <p> ¿Que pasa con <code>(1 &lt;&lt; PBx)</code> ?, pues el microcontrolador interpretará que debe  colocar directamente el pin x del puerto X, en un nivel alto (high) y los otros bits en un nivel bajo (low). Los efectos físicos dependerá de como han sido definidos DDRx y PORTx </p>
 
             <p>Si aplicamos esta técnica con asignación directa:</p>
-<pre><code>DDRB = (1 &lt;&lt; PB3); // PB3 equivale conceptualmente a la constante 3</code></pre>
+<pre><code>DDRB = (1 &lt;&lt; PB3); // La expresión equivale a 1 &lt;&lt; 3. El bit PB3  tiene el índice 3</code></pre>
 
         <p>
             La expresión <code>(1 &lt;&lt; PB3)</code> genera la máscara <code>0b00001000</code>. Al asignarla directamente mediante el operador <code>=</code>, forzamos a que el pin PB3 se configure como salida, pero simultáneamente reescribimos los otros 7 pines como entradas (<code>0</code>), destruyendo la configuración previa del puerto.
@@ -110,10 +110,24 @@
         </section>
 
         <section>
-        <h2>3. MÉTODO DE MANIPULACIÓN DE BITS (BIT TWIDDING) POR MÁSCARAS</h2>
-        
+        <h2>3. LA MANIPULACIÓN DE BITS (BIT TWIDDING) POR MÁSCARAS</h2>
+            <h3>3.1. Los comandos SBI y CBI de Ensamblador</h3>
+            <p>
+                Todos los puertos AVR disponen de una verdadera funcionalidad de lectura-modificación-escritura (Read-Modify-Write) cuando se utilizan como puertos digitales de E/S (I/O) Esto significa que pueden manipualrse mediante las instrucciones en lenguaje ensamblador <code>SBI</code> y <code>CBI</code>:
+            </p>
+            <ul>
+                <li> La dirección (entrada o salida) de un pin del puerto puede modificarse sin cambiar involuntariamente la dirección de ningún otro pin </li>
+                <li> Cuando el pin está configurado como salida, su valor de salida (<code>GND</code> o <code>VCC</code>) puede modificarse sin afectar el estado de los demás pines.</li>
+                <li> Cuando el pin está configurado como entrada, su resistencia pull-up interna puede habilitarse o deshabilitarse sin alterar la configuración de los demás pines.</li>
+            </ul>
+            <img src="img/infografia_sbi_cbi.png" alt="Instrucciones SBI y CBI en AVR" class="imagen-centrada">
+          
+            <p>En versiones antiguas de <stong> AVR-Libc</stong> para C (<strong>avr-gcc</strong>), existían las macros <code>sbi()</code> y <code>cbi()</code>, pero fueron descontinuadas. Hoy en día en C se usan operaciones de enmascaramiento con bits, por ejemplo: <code>PORTB |= (1 &lt;&lt; PB0);</code> para activar bits y <code>PORTB &amp;= ~(1 &lt;&lt; PB0);</code> para desactivar bits.
+            </p>  
+
+            <h3>3.2. Operaciones Lógicas a Nivel de Bit para Manipular Bits</h3>
         <p>
-            Las operaciones lógicas a nivel de bit (bitwise logical operations) —la llamada manipulación de bits (bit twiddling)— permiten modificar un solo bit de un byte de registro sin tener que ocuparnos explícitamente de los demás.
+            Las operaciones lógicas a nivel de bit (bitwise logical operations) permiten manipular bits (bit twiddling) modificando un solo bit de un byte de registro sin tener que ocuparnos explícitamente de los demás mediante técnicas de enmascaramiento de bits.
         </p>
 
         <p> Cuando encendemos un LED, un motor u otro actuador conectado a la salida de PB3, usando numeros, scribimos algo parecido a: </p>
@@ -121,7 +135,6 @@
 
         <p> Esto funciona, siempre que supiéramos con certeza que queríamos que todos los demás LED estuvieran apagados. Pero ¿qué ocurre si necesitamos encender o apagar un LED determinado sin afectar a ninguno de los demás?</p>
 
-        <p> Las operaciones lógicas a nivel de bit (bitwise logical operations) —la llamada manipulación de bits (bit twiddling)— permiten modificar un solo bit de un byte de registro sin tener que ocuparnos explícitamente de los demás. </p>
         <p>Para prevenir la alteración accidental de bits vecinos, se recurre a la técnica del <strong>enmascaramiento de registros (Register Masking)</strong>. Esta técnica aplica operaciones lógicas a nivel de bits (AND, OR, XOR) entre el valor presente en el registro y un patrón binario denominado <strong>máscara (mask)</strong>, permitiendo modificar, limpiar o evaluar pines específicos sin afectar el resto del puerto.</p>
 
         <pre>
@@ -130,8 +143,11 @@ Resumen de Operadores Lógicos a Nivel de Bits:
   • AND (&amp;)  --&gt; Pone en 0 (CLEAR) o evalúa el estado de bits específicos.
   • XOR (^)  --&gt; Invierte o conmuta el estado de bits específicos (TOGGLE).
         </pre>
+</section>
 
-        <h3>3.1. Activación Selectiva de Bits (Operación Bitwise OR: |=)</h3>
+<section>
+
+        <h2>4. ACTIVACIÓN SELECTIVA DE BITS (Bitwise OR: |=)</h2>
         <p>El operador combinado <code>|=</code> fuerza a '1' uno o varios bits específicos. La regla de la compuerta OR garantiza que cualquier bit comparado con '0' preserve su valor previo.</p>
 
 <pre><code>DDRB |= (1 &lt;&lt; PB1); // Equivale sintácticamente a: DDRB = DDRB | (1 &lt;&lt; PB1);</code></pre>
@@ -156,13 +172,17 @@ OR 0b00000010    (Máscara 1 &lt;&lt; PB1)
 <pre><code>DDRB |= (1 &lt;&lt; PB1) | (1 &lt;&lt; PB3);</code></pre>
 
 <pre>
+   0b00101000    (Estado previo de DDRB)
    0b00000010    (Máscara 1 &lt;&lt; PB1)
 OR 0b00001000    (Máscara 1 &lt;&lt; PB3)
 ---------------------------------------
-   0b00001010    (Máscara combinada resultante)
+   0b00101010    (Máscara combinada resultante)
 </pre>
 
-        <h3>3.2. Limpieza Selectiva de Bits (Operación Bitwise AND con Máscara Invertida: &amp;= ~)</h3>
+</section>
+
+<section>
+        <h2>5. LIMPIEZA SELECTIVA DE BITS (Bitwise AND con Máscara Invertida: &amp;= ~)</h2>
         <p>
             Para forzar a '0' un bit determinado sin modificar los demás, se utiliza el operador <code>&amp;=</code> junto con la negación unaria (<code>~</code>). Dado que el operador AND devuelve '0' siempre que se compare con '0', se requiere una máscara con un '0' en la posición a borrar y '1' en las demás.
         </p>
@@ -171,6 +191,7 @@ OR 0b00001000    (Máscara 1 &lt;&lt; PB3)
 
         <p><strong>Desglose del Mecanismo Interno:</strong></p>
         <ol>
+            <li>Asumamos un estado inicial en el registro: <code>PORTB = 0b00000111</code> (donde PB2, PB1 y PB0 estaban configurados previamente en alto o high).</li>
             <li>La expresión <code>(1 &lt;&lt; PB2)</code> genera la máscara base: <code>0b00000100</code>.</li>
             <li>El operador complemento <code>~</code> invierte la totalidad de los bits: <code>~0b00000100</code> resulta en <code>0b11111011</code>.</li>
             <li>Se aplica la operación AND combinada sobre el registro <code>PORTB</code>:</li>
@@ -184,27 +205,39 @@ AND 0b11111011    (Máscara invertida)
 </pre>
 
         <p><strong>Resultado en Hardware:</strong> El bit PB2 se limpia a '0' (desconectando el voltaje o la resistencia pull-up según el modo), mientras que PB0 y PB1 conservan su estado lógico alto '1' sin alteraciones.</p>
+</section>
 
-        <h3>3.3. Evaluación del Estado de un Bit (Operación Bitwise AND: &amp;)</h3>
-        <p>Para inspeccionar el voltaje presente en un pin de entrada, se efectúa una operación AND entre el byte completo del registro de lectura (como <code>PINB</code> o <code>PIND</code>) y una máscara que contenga un '1' únicamente en la posición a consultar:</p>
+<section>
+        <h2>6. EVALUACIÓN DEL ESTADO DE UN BIT (Operación Bitwise AND: &amp;)</h3>
+        <p>Para inspeccionar el voltaje presente en un pin de entrada, se efectúa una operación AND entre el byte completo del registro de lectura (como <code>PINB</code> o <code>PIND</code>) y una máscara que contenga un '1' únicamente en la posición a consultar.</p>
+        <p>
+            Recordemos que cuando se compara con 0, la operación AND devuelve '0' cualquiera sea el estado del bit correspondiente en el registro de lectura. Si se compara con 1, la operación AND devuelve un valor distinto de cero si el bit en el registro de lectura es '1'. Esto úlñtimo permite evaluar condicionalmente el estado del pin mediante estructuras de control como <code>if</code>.
+        </p>
+
+        <p>Al comparar con 1, si el el pin PD2 se encuentra en nivel bajo (GND / 0V), la operación AND resulta en <code>0</code>, evaluado como falso por la estructura <code>if</code>. Si el pin PD2 se encuentra en nivel alto (VCC / 5V), la operación AND resulta en un valor distinto de cero, lo cual es interpretado como verdadero por la estructura <code>if</code>.</p>
 
 <pre><code>if (PIND &amp; (1 &lt;&lt; PD2)) {
-    // Se ejecuta si el pin PD2 se encuentra en nivel alto (VCC / 5V)
+    // El código dentro de { } se ejecuta si el pin PD2 se encuentra en nivel alto (VCC / 5V)
 }</code></pre>
 
         <p><strong>Lógica de Evaluación:</strong> Si el bit en PD2 vale '0', la operación AND resulta en <code>0b00000000</code> (evaluado como falso por la estructura <code>if</code>). Si el bit se encuentra en nivel alto ('1'), la operación devuelve el valor entero equivalente a la máscara (<code>0b00000100</code>), el cual, al ser distinto de cero, es interpretado como verdadero.</p>
+        </section>
 
-        <h3>3.4. Máscaras Selectivas para Configuración de Periféricos (ADC / Multiplexores)</h3>
+        <section>
+        <h2>7. MÁSCARAS SELECTIVAS PARA CONFIGUTACIÓN DE PERIFÉRICOS (ADC / Multiplexores)</h2>
         <p>El operador AND se emplea asimismo para limpiar campos o nipples de bits específicos dentro de registros de configuración compleja antes de escribir nuevos parámetros, evitando sobreescribir los bits de control global.</p>
 
         <p>Un caso de aplicación habitual es la selección de canal en el multiplexor del Convertidor Analógico a Digital (ADC) mediante el registro <code>ADMUX</code>:</p>
 
 <pre><code>// Enmascara y limpia los 4 bits menos significativos (AND con 0b11110000) y asigna el canal
 ADMUX = (ADMUX &amp; 0b11110000) | canal;</code></pre>
-        </section>
+        
+    
+    </section>
+
 
         <section>
-        <h2>4. SECUENCIA BÁSICA PARA CONFIGURAR UNA SALIDA DIGITAL</h2>
+        <h2>8. SECUENCIA BÁSICA PARA CONFIGURAR UNA SALIDA DIGITAL</h2>
         <p>
             Para controlar un dispositivo mediante un pin AVR se siguen dos pasos fundamentales:
         </p>
@@ -231,7 +264,7 @@ Después se escribe en <code>PORTB</code>:
 </ul>
         
 
-        <h3>4.1. Ejemplo básico de salidas digitales: blinkLED</h3>
+        <h3>8.1. Ejemplo básico de salidas digitales: blinkLED</h3>
         <p>Un programa mínimo puede ser:</p>
 
 <pre><code class="language-c">  
@@ -255,7 +288,7 @@ int main(void)
 }
 </code></pre>
 
-<h3>4.2. Secuencia de Funcionamiento</h3>
+<h3>8.2. Secuencia de Funcionamiento</h3>
 
 <pre><code class="language-bash">
 Configurar PB0 como salida
@@ -274,7 +307,7 @@ Repetir
 <p>El resultado es un LED que se enciende y apaga aproximadamente una vez por segundo.</p>
         
 
-        <h3>4.3. Secuencia Resumida</h3>
+        <h3>8.3. Secuencia Resumida</h3>
 <p>Por tanto, la secuencia fundamental puede resumirse así:</p>
 
 <ul>
@@ -285,7 +318,7 @@ Repetir
 </section>
 
 <section>
-    <h2>5. SECUENCIA BÁSICA PARA CONFIGURAR UNA ENTRADA DIGITAL</h2>
+    <h2>9. SECUENCIA BÁSICA PARA CONFIGURAR UNA ENTRADA DIGITAL</h2>
 
 <p>La configuración básica de un pin de un puerto AVR como entrada digital sigue tres pasos:</p>
 
@@ -319,7 +352,7 @@ else
 /* Entrada LOW */
 }</code></pre> </li> </ol>
 
-<h3>5.1. Ejemplo básico</h3>
+<h3>9.1. Ejemplo básico</h3>
 
 <p>El siguiente ejemplo configura <code>PB0</code> como entrada digital y habilita su resistencia <em>pull-up</em> interna. Después, el programa lee continuamente el estado del pin mediante <code>PINB</code>.</p>
 
@@ -347,7 +380,7 @@ return (0);
 
 }</code></pre>
 
-<h3>5.2. Secuencia de funcionamiento</h3>
+<h3>9.2. Secuencia de funcionamiento</h3>
 
 <pre><code class="language-bash">Configurar PB0 como entrada
 ↓
@@ -367,8 +400,7 @@ Volver a leer PB0
 Repetir
 </code></pre>
 
-
-<h3>5.3. Secuencia Resumida</h3>
+<h3>9.3. Secuencia Resumida</h3>
 
 <p>Por tanto, la función de cada registro dentro de la configuración de una entrada es:</p>
 
@@ -377,20 +409,11 @@ Repetir
     <li><code>PORTx</code>: determina, cuando el pin está configurado como entrada, si se habilita o no la resistencia <em>pull-up</em> interna.</li>
     <li><code>PINx</code>: permite leer el estado lógico presente en el pin.</li>
 </ul>
+
+<img src="img/infografia_operadores_bits_avr.png" alt="Resumen de Operadores Lógicos a Nivel de Bits" class="imagen-centrada">
+
 </section>  
-
-        
-        <section>
-        <h2>4. OPTIMIZACIÓN Y PROTECCIÓN CON EL SUFIJO 1UL</h2>
-        <p>En el estándar ANSI C para microcontroladores AVR de 8 bits, las constantes enteras literales como <code>1</code> son interpretadas por defecto como números enteros con signo de 16 bits (<code>signed int</code>). Al realizar desplazamientos de bits en registros de 16 bits o en arquitecturas de mayor escala, desplazar un entero con signo más de 14 posiciones (ej. <code>1 &lt;&lt; 15</code>) puede derivar en un desbordamiento de entero firmado (<em>signed integer overflow</em>) o comportamiento indeterminado.</p>
-
-        <p><strong>Regla de Ingeniería de Firmware:</strong></p>
-<pre><code>PORTB |= (1UL &lt;&lt; PB1);</code></pre>
-
-        <p>El sufijo <code>UL</code> (<em>Unsigned Long</em>) fuerza al compilador GCC a tratar la constante como un entero sin signo de 32 bits, garantizando que el desplazamiento de la máscara se ejecute sin desbordamiento ni corrupción de signo en cualquier registro del microcontrolador.</p>
-    </section>
-
-        </article>
+    </article>
         
     </main>
 
