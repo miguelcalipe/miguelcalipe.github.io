@@ -308,6 +308,7 @@ i = PINB;
                 El método más simple para garantizar un nivel definido en un pin no utilizado es habilitar la resistencia de <em>pull-up</em> interna. En este caso, la <em>pull-up</em> se deshabilitará durante el Reset. Si es importante mantener un bajo consumo de potencia durante el Reset, se recomienda utilizar una <em>pull-up</em> o <em>pull-down</em> externa. No se recomienda conectar los pines no utilizados directamente a $V_{CC}$ o GND, ya que esto puede causar corrientes excesivas si el pin se configura accidentalmente como salida.
             </p>
 
+            <section>   
             <h2>3. FUNCIONES ALTERNATIVAS DEL PUERTO</h2>
             <p>
                 La mayoría de los pines de puerto tienen funciones alternativas además de operar como E/S digitales de propósito general. La imagen siguiente, <strong>ALTERNATE PORT FUNCTIONS</strong> muestra cómo las señales de control de los pines de puerto de la versión simplificada de la imagen <strong>Descripción funcional de un pin de E/S</strong> en el punto 2. PUERTOS COMO E/S DIGITAL GENERAL, pueden ser anuladas por funciones alternativas. Es posible que las señales de anulación (<em>overriding signals</em>) no estén presentes en todos los pines de puerto, pero la figura sirve como una descripción genérica aplicable a todos los pines de puerto de la familia de microcontroladores AVR.

@@ -55,22 +55,50 @@
                     Las operaciones lógicas a nivel de bit (bitwise logical operations) permiten manipular bits (bit twiddling) modificando un solo bit de un byte de registro sin tener que ocuparnos explícitamente de los demás mediante técnicas de enmascaramiento de bits.
                 </p>
 
-                <p>
-                    Existen cuatro operadores lógicos a nivel de bit.
-                </p>
             </section> 
             
             <section>
-                <h2>1. CREACION DE MÁSCARAS DE BITS</h2>
+                <h2>1. DESPLAZAMIENTO DE BITS</h2>
                 <p>
-                    El enmascaramiento de bits (bit masking) es una técnica que permite modificar bits individuales dentro de un byte de registro sin afectar los demás bits. Esto se logra mediante el uso de operadores lógicos a nivel de bit y máscaras de bits.
+                    El desplazamiento de bits (bit shifting) es una técnica que permite mover bits dentro de un byte de registro. Esto se logra mediante el uso de operadores de desplazamiento de bits (bit shifting operators).
                 </p>
                 <p>
-                    Una máscara de bits es un valor binario que se utiliza para seleccionar o modificar bits específicos dentro de un byte de registro. Cada bit de la máscara puede ser 0 o 1.   
+                    Una máscara de bits es un valor binario que se utiliza para seleccionar o modificar bits específicos dentro de un byte de registro. Cada bit de la máscara puede ser 0 o 1. La máscara de bits se genera mediante operaciones de desplazamiento de bits (bit shifting) y se combina con el byte de registro mediante operadores lógicos a nivel de bit.   
                 </p>
+
+                    <h3>1.1 Operación de Desplazamiento de bits (bit shifting)</h3>
+                    <p>
+                        Los desplazamientos de bits tienen el efecto de mover todos los bits n posiciones hacia la izquierda o hacia la derecha, dependiendo de la instrucción. Los bits que salen por cualquiera de los extremos simplemente desaparecen y los nuevos bits que se incorporan son todos ceros.
+                    </p>
+
+                    <p>Las instrucciones del lenguaje C para desplazar todos los bits de un número hacia la izquierda o hacia la derecha son:</p>
+                    <pre><code>
+                        &lt;&lt;  Desplazamiento a la izquierda (left shift)
+                        &gt;&gt;  Desplazamiento a la derecha (right shift) 
+                    </code></pre>
+
+                    <p>Ejemplos de desplazamiento de bits</p>
+<pre><code>
+  0b00001110 >> 3
+= 0b00000001
+</code></pre>
+<p> Se agregaron tres ceros nuevos a la izquierda y los bits de la derecha simplemente salieron por el extremo.</p>
+
+<pre><code> 
+  0b00001110 << 2
+= 0b00111000
+</code></pre>
+<p> Se incorporaron dos nuevos bits, ambos ceros, desde la derecha.</p>
+
+<p>
+    Esto significa que, si quieres un único bit 1 en la posición número tres, puedes comenzar con el número que tiene un bit 1 en la posición cero y desplazarlo tres posiciones hacia la izquierda.
+</p>
+
+<h3>1.2. Creación de máscaras de bits mediante desplazamiento</h3>
                 <p>
                     La máscara de bits la creamos con el operador de desplazamiento a la izquierda (<<) para colocar un 1 en la posición del bit que queremos modificar y 0s en todas las demás posiciones. En forma general, la máscara de bits para modificar el bit <strong>n</strong> se puede crear con la expresión (1 << n), donde n es el número del bit que queremos modificar.
                 </p>
+                
                 <p>
                     Es necesario tener en cuenta que en la programación de microcontroladores (como en muchos lenguajes de programación) se usa la indexación por 0 para enumerar los bits (que representan un registro, un pin). Los bits se numeran de derecha a izquierda, comenzando desde 0. Por lo tanto, el bit 0 es el bit menos significativo (LSB) y el bit 7 es el bit más significativo (MSB) en un byte de 8 bits.
                 </p>
@@ -79,28 +107,69 @@
                     Si el BLS (bit menos significativo) es el bit 0, entonces la máscara de bits para modificar el bit n se puede crear con la expresión <code>1 << n</code>, que da como resultado el valor binario con el bit <strong>n</strong> establecido en 1 y todos los demás bits establecidos en 0.
                 </p>
 
+                <p>El desplazamiento del bit, en binarios de 8 bits, sería:</p>
+
+<pre><code>
+1          = 0b00000001
+(1 << 0)   = 0b00000001
+(1 << 1)   = 0b00000010
+(1 << 2)   = 0b00000100
+(1 << 3)   = 0b00001000
+(1 << 4)   = 0b00010000
+(1 << 5)   = 0b00100000
+(1 << 6)   = 0b01000000
+(1 << 7)   = 0b10000000
+</code></pre>
+
                 <p>
                     Por ejemplo, si queremos establecer en 1 el bit 3 de un registro (set bit), debemos crear una máscara de bits con la expresión <code>1 << 3</code> donde el bit 3 estará establecido en 1 y todos los demás bits estarán establecidos en 0. Si realizamos la operación de desplazamiento a la izquierda, en un binario de 8 bits obtenemos el siguiente resultado:
                 </p>
                 <pre><code>
-                1 << 3 = 00001000
+1 << 3 = 0b00001000
                 </code></pre>
-                            
-
-                <p>La verdadera utiidad de las máscaras de bits se hace evidente cuando se combinan con los operadores lógicos a nivel de bit para modificar bits individuales dentro de un registro sin afectar los demás bits que veremos más adelante. Por ahora, es importante entender cómo crear máscaras de bits para seleccionar o modificar bits específicos dentro de un byte de registro.
+            
+            <h3>1.3. Establecer y borrar bits</h3>
+                <p>La verdadera utiidad de las máscaras de bits se hace evidente cuando se combinan con los operadores lógicos a nivel de bit para modificar bits individuales dentro de un registro sin afectar los demás bits que veremos más adelante. 
                 </p>
                 
-                <p> El enmascaramiento de bits nos permtirá realizar operaciones SET BIT (1) y CLEAR BIT (0) dentro de un registro sin afectar los demás bits.</p>
+                <p> El enmascaramiento de bits nos permtirá realizar operaciones <strong>SET BIT (1)</strong> y <strong>CLEAR BIT (0)</strong> dentro de un registro sin afectar los demás bits.</p>
                 
                 <ul>
-                    <li>SET BIT: Para establecer un bit en 1, se utiliza una máscara de bits con el bit correspondiente establecido en 1 y todos los demás bits establecidos en 0. Luego, se realiza una operación OR a nivel de bit entre el registro original y la máscara de bits.</li>
-                    <li>CLEAR BIT: Para borrar un bit (establecerlo en 0), se utiliza una máscara de bits con el bit correspondiente establecido en 0 y todos los demás bits establecidos en 1. Luego, se realiza una operación AND a nivel de bit entre el registro original y la máscara de bits.</li>    
+                    <li><strong>SET BIT</strong>: Para establecer un bit en 1, se utiliza una máscara de bits con el bit correspondiente establecido en 1 y todos los demás bits establecidos en 0. Luego, se realiza una operación OR a nivel de bit entre el registro original y la máscara de bits.</li>
+
+                    <li><strong>CLEAR BIT</strong>: Para borrar un bit (establecerlo en 0), se utiliza una máscara de bits con el bit correspondiente establecido en 0 y todos los demás bits establecidos en 1. Luego, se realiza una operación AND a nivel de bit entre el registro original y la máscara de bits.</li>    
                 </ul>                
                 
             </section>
 
             <section>
-            <h2>1. OR (|)</h2>
+            <h2>2. OPERACIONES LÓGICAS BIT A BIT</h2>
+                <p>
+                    Queremos un número binario con un 1 en la posición <em>i</em>, que encienda únicamente el LED <em>i</em> de nuestra serie.
+                </p>
+
+                <p>Lo conseguimos comenzando con un 1 en la posición cero y desplazándolo <em>i</em> veces hacia la izquierda. </p>
+                <p> Pero ¿qué sucede si ya tenemos varios LED encendidos y queremos agregar otro? Por ejemplo, ¿solo LED1?</p>
+
+                <p>Si escribiéramos:</p>
+                <pre><code>LED_PORT = (1 << 1);</code></pre>
+                <p>encenderíamos correctamente LED1, pero al mismo tiempo apagaríamos todos los demás.</p>
+
+                <p>En esta sección aprenderemos técnicas esenciales de manipulación de bits que nos permitirán modificar fácilmente bits individuales sin destruir el resto del contenido del registro.</p>
+
+                <p>Podemos imaginar cada byte de los registros de hardware del AVR como una fila de ocho pequeños interruptores. En esta sección utilizaremos funciones lógicas a nivel de bit para establecer, limpiar o conmutar cada interruptor individualmente sin modificar los demás.</p>
+                <p>
+                    Aunque hayas programado en C durante mucho tiempo, es posible que no hayas trabajado demasiado con manipulaciones a nivel de bit. Los operadores a nivel de bit toman bytes completos como entrada y realizan operaciones lógicas sobre esos bytes bit por bit. De ahí su nombre.
+                </p>
+                <p>
+                    Esto hace que los operadores a nivel de bit sean especialmente adecuados para manipular bits individuales dentro del byte de un registro.
+                </p>
+
+                <p>
+                    Existen cuatro operadores lógicos a nivel de bit.
+                </p>
+                                
+                <h3>2.1.  OR (|) </h3>
                 <p>
                     El operador OR a nivel de bit compara dos binarios y devuelve un binario donde cada bit es el resultado de la operación OR entre los bits correspondientes de los binarios  de entrada.
                 </p>
@@ -114,16 +183,16 @@
                   10101010
                 | 11001100    
                 = 11101110
-                <code></pre>   
+                </code></pre>   
                 
-                <p>
-                    La operación OR a nivel de bit (OR bitwise) se puede utilizar para establecer en 1 (alto, high, Vcc) bits individuales en un registro. Por ejemplo, si queremos establecer el bit 3 de un registro sin afectar los demás bits, podemos hacer una operación OR con un valor que tenga el bit 3 establecido en 1 y todos los demás bits establecidos en 0.
-                </p>
                     
-            </section>
+                <p>
+                    La operación OR a nivel de bit (OR bitwise) se puede utilizar para establecer en 1 (<strong>SET BIT</strong>) bits individuales en un registro. Por ejemplo, si queremos establecer el bit 3 de un registro sin afectar los demás bits, podemos hacer una operación OR con un valor que tenga el bit 3 establecido en 1 (<code>1 << 3</code> ) y todos los demás bits establecidos en 0.
+                </p>
 
-            <section>
-            <h2>2. AND (&)</h2>
+
+           
+            <h2>2.2.  AND (&)</h2>
                 <p>
                     El operador AND a nivel de bit compara dos binarios y devuelve un binario donde cada bit es el resultado de la operación AND entre los bits correspondientes de los binarios  de entrada.
                 </p>
