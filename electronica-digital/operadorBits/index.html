@@ -68,33 +68,45 @@
 
                     <h3>1.1 Operación de Desplazamiento de bits (bit shifting)</h3>
                     <p>
-                        Los desplazamientos de bits tienen el efecto de mover todos los bits n posiciones hacia la izquierda o hacia la derecha, dependiendo de la instrucción. Los bits que salen por cualquiera de los extremos simplemente desaparecen y los nuevos bits que se incorporan son todos ceros.
+                        Los desplazamientos de bits tienen el efecto de mover todos los bits <strong>n</strong> posiciones hacia la izquierda o hacia la derecha, dependiendo de la instrucción. Los bits que salen por cualquiera de los extremos simplemente desaparecen y los nuevos bits que se incorporan son todos ceros.
                     </p>
 
                     <p>Las instrucciones del lenguaje C para desplazar todos los bits de un número hacia la izquierda o hacia la derecha son:</p>
                     <pre><code>
-                        &lt;&lt;  Desplazamiento a la izquierda (left shift)
-                        &gt;&gt;  Desplazamiento a la derecha (right shift) 
+&lt;&lt;  Desplazamiento a la izquierda (left shift)
+&gt;&gt;  Desplazamiento a la derecha (right shift) 
                     </code></pre>
 
-                    <p>Ejemplos de desplazamiento de bits</p>
+
+
+                    <h4>1.1.1 Desplazamiento de Bits hacia la Derecha</h4>
 <pre><code>
   0b00001110 >> 3
 = 0b00000001
 </code></pre>
 <p> Se agregaron tres ceros nuevos a la izquierda y los bits de la derecha simplemente salieron por el extremo.</p>
+<img src="img/desplazamiento_de_bits_1_derecha.png" alt="Desplazamiento de bits" class="imagen-centrada">
 
+                    <h4>1.1.2 Desplazamiento de Bits hacia la Izquierda</h4>
 <pre><code> 
   0b00001110 << 2
 = 0b00111000
 </code></pre>
 <p> Se incorporaron dos nuevos bits, ambos ceros, desde la derecha.</p>
+<img src="img/desplazamiento_de_bits_2_izquierda.png" alt="Desplazamiento de bits" class="imagen-centrada">
 
 <p>
     Esto significa que, si quieres un único bit 1 en la posición número tres, puedes comenzar con el número que tiene un bit 1 en la posición cero y desplazarlo tres posiciones hacia la izquierda.
 </p>
 
+
 <h3>1.2. Creación de máscaras de bits mediante desplazamiento</h3>
+
+                <p>
+                    Una máscara de bits (bitmask) es simplemente un byte normal, pero lo interpretamos como un conjunto de unos y ceros situados en posiciones específicas, en lugar de considerarlo únicamente como un valor numérico.
+                <p>
+                    Utilizamos una máscara de bits junto con un operador lógico a nivel de bit para modificar determinados bits de un byte objetivo, haciendo una operación de enmascaramiento de bits (bit masking). La máscara de bits nos permite seleccionar qué bits queremos modificar y cuáles queremos dejar intactos.
+                </p>
                 <p>
                     La máscara de bits la creamos con el operador de desplazamiento a la izquierda (<<) para colocar un 1 en la posición del bit que queremos modificar y 0s en todas las demás posiciones. En forma general, la máscara de bits para modificar el bit <strong>n</strong> se puede crear con la expresión (1 << n), donde n es el número del bit que queremos modificar.
                 </p>
@@ -104,7 +116,7 @@
                 </p>
 
                 <p>
-                    Si el BLS (bit menos significativo) es el bit 0, entonces la máscara de bits para modificar el bit n se puede crear con la expresión <code>1 << n</code>, que da como resultado el valor binario con el bit <strong>n</strong> establecido en 1 y todos los demás bits establecidos en 0.
+                    Si el BLS (bit menos significativo) es el bit 0, entonces la máscara de bits para modificar el bit <STRONG>n</STRONG> se puede crear con la expresión <code>1 << n</code>, que da como resultado el valor binario con el bit <strong>n</strong> establecido en 1 y todos los demás bits establecidos en 0.
                 </p>
 
                 <p>El desplazamiento del bit, en binarios de 8 bits, sería:</p>
@@ -127,9 +139,11 @@
                 <pre><code>
 1 << 3 = 0b00001000
                 </code></pre>
+
+                <img src="img/desplazamiento_de_bits_3_posicion_tres.png" alt="Desplazamiento de bits" class="imagen-centrada">
             
             <h3>1.3. Establecer y borrar bits</h3>
-                <p>La verdadera utiidad de las máscaras de bits se hace evidente cuando se combinan con los operadores lógicos a nivel de bit para modificar bits individuales dentro de un registro sin afectar los demás bits que veremos más adelante. 
+                <p>La verdadera utilidad de las máscaras de bits se hace evidente cuando se combinan con los operadores lógicos a nivel de bit para modificar bits individuales dentro de un registro sin afectar los demás bits que veremos más adelante. 
                 </p>
                 
                 <p> El enmascaramiento de bits nos permtirá realizar operaciones <strong>SET BIT (1)</strong> y <strong>CLEAR BIT (0)</strong> dentro de un registro sin afectar los demás bits.</p>
@@ -145,15 +159,19 @@
             <section>
             <h2>2. OPERACIONES LÓGICAS BIT A BIT</h2>
                 <p>
-                    Queremos un número binario con un 1 en la posición <em>i</em>, que encienda únicamente el LED <em>i</em> de nuestra serie.
+                    Tenemos un número binario con pone en <code>1</code> determinados bits de un registro. 
                 </p>
 
-                <p>Lo conseguimos comenzando con un 1 en la posición cero y desplazándolo <em>i</em> veces hacia la izquierda. </p>
-                <p> Pero ¿qué sucede si ya tenemos varios LED encendidos y queremos agregar otro? Por ejemplo, ¿solo LED1?</p>
+                <p> Pero ¿qué sucede si queremos poner también otro bit en <code>1</code>? Por ejemplo, solo <code>b1 </code> (en el caso que estuviera previamente en <code>0</code>).</p>
 
                 <p>Si escribiéramos:</p>
-                <pre><code>LED_PORT = (1 << 1);</code></pre>
-                <p>encenderíamos correctamente LED1, pero al mismo tiempo apagaríamos todos los demás.</p>
+                <pre><code>REGISTRO = (1 << 1);</code></pre>
+                <p>
+                    Esa expresión es la misma que: 
+                </p>
+                <pre><code>REGISTRO = 0b00000010;</code></pre>
+
+                <p>Y activaríamos correctamente <code>b1</code>, pero al mismo tiempo apagaríamos todos los demás.</p>
 
                 <p>En esta sección aprenderemos técnicas esenciales de manipulación de bits que nos permitirán modificar fácilmente bits individuales sin destruir el resto del contenido del registro.</p>
 
@@ -170,8 +188,28 @@
                 </p>
                                 
                 <h3>2.1.  OR (|) </h3>
+
+                <p>Recordemos cómo funciona el operador <strong>OR</strong> a nivel de bits:</p>
+        
+            <h4>Caso 1: Hacer OR de un bit con cero (<code>0</code>)</h4>
+            <ul>
+                <li><code>0 | 0 &rarr; 0</code></li>
+                <li><code>1 | 0 &rarr; 1</code></li>
+            </ul>
+            <p>Como puedes observar, <strong>el bit original no cambia</strong>.</p>
+       
+            <h4>Caso 2: Hacer OR de un bit con uno (<code>1</code>)</h4>
+            <ul>
+                <li><code>0 | 1 &rarr; 1</code></li>
+                <li><code>1 | 1 &rarr; 1</code></li>
+            </ul>
+            <p>En este caso, <strong>el resultado siempre es 1</strong>.</p>
+        
+            <p><strong>Conclusión:</strong> Este comportamiento constituye la base para utilizar el operador OR para <strong>activar bits específicos</strong> mediante el uso de máscaras de bits (<em>bitmasks</em>).</p>
+        
+            <h4> OR (|) entre binarios</h4>
                 <p>
-                    El operador OR a nivel de bit compara dos binarios y devuelve un binario donde cada bit es el resultado de la operación OR entre los bits correspondientes de los binarios  de entrada.
+                    El operador OR a nivel de bit compara dos binarios (el registro de entrada en su estado actual y una máscara) y devuelve un binario donde cada bit es el resultado de la operación OR entre los bits correspondientes de los binarios  de entrada.
                 </p>
                 <p>
                     Para cada posición de bit, un OR a nivel de bit devuelve 1 si cualquiera de los dos bits comparados es 1. Devuelve 0 únicamente cuando ambos bits son 0:
@@ -180,19 +218,48 @@
                     Por ejemplo, si tenemos los bytes 10101010 y 11001100, la operación OR a nivel de bit devolverá 11101110.
                 </p>
                 <pre><code>
+Registro (entrada, en su estado actual): b010101010
+Máscara:                                 b011001100
+
                   10101010
                 | 11001100    
-                = 11101110
+                = 11101110     Registro (salida, en su nuevo estado)   
                 </code></pre>   
-                
-                    
+            
+                <h4>OR (|) para Establecer en 1, Bits de un Registro (SET BIT)</h4>
                 <p>
-                    La operación OR a nivel de bit (OR bitwise) se puede utilizar para establecer en 1 (<strong>SET BIT</strong>) bits individuales en un registro. Por ejemplo, si queremos establecer el bit 3 de un registro sin afectar los demás bits, podemos hacer una operación OR con un valor que tenga el bit 3 establecido en 1 (<code>1 << 3</code> ) y todos los demás bits establecidos en 0.
+                    La operación <code>OR</code> a nivel de bit (OR bitwise) se puede utilizar para establecer en 1 (<strong>SET BIT</strong>) bits individuales en un registro. Por ejemplo, si queremos establecer el bit 3 de un registro sin afectar los demás bits, podemos hacer una operación OR con un valor que tenga el bit 3 establecido en 1 (<code>1 << 3</code> ) y todos los demás bits establecidos en 0.
                 </p>
 
+<pre><code>
+REGISTRO = REGISTRO | 1 << 3
+</code></pre>
+                <p>
+                    Usando registros reales:
+                </p>                
+<pre><code>PORTB = PORTB | 1 << 3 </code></pre>
+<p>
+    Leemos el estado original del registro <code>PORTB</code> y hacemos <code>OR</code> con la máscara de bits (<code>1 << 3</code>>). Esto produce un nuevo byte que posteriormente escribimos en <code>PORTB</code>. El nuevo byte conserva el contenido original de PORTB allí donde la máscara tenía 0, y contiene 1 allí donde la máscara tenía 1 (<code>PB3</code>).
+</p>
+<p>
+    Escribimos nuevamente el resultado en <code>PORTB</code> y tendremos todos los bits originales intactos, excepto aquellos correspondientes a los 1 de la máscara, que habrán sido activados.
+</p>
+                    <h5>Forma abreviada para establecer bits </h5>
+                        <p>
+                            Acabamos de ver cómo obtener una copia del byte actualmente almacenado en PORTB y cómo poner en 1 PB3, utilizando OR y una máscara de bits. Esto produce un nuevo byte que luego escribimos en <code>PORTB</code>.
+                        </p>
+                        <p>En lenguaje C lo hemos expresado así:</p>
+<pre><code>PORTB = PORTB | 1 << 3 </code></pre>
 
-           
-            <h2>2.2.  AND (&)</h2>
+<p> Este tipo de operación es tan común que C dispone de una forma abreviada:</p>
+<pre><code>PORTB |= (1 << 3); </code></pre>
+
+<p>Después de la compilación, ambas formas terminan produciendo el mismo resultado. Las dos tienen el efecto de poner en Alto (High) el bit PB3 LED2 dejando los demás bits tal como estaban.</p>
+
+
+                        </p>
+
+            <h3>2.2.  AND (&)</h3>
                 <p>
                     El operador AND a nivel de bit compara dos binarios y devuelve un binario donde cada bit es el resultado de la operación AND entre los bits correspondientes de los binarios  de entrada.
                 </p>
@@ -206,7 +273,7 @@
                   10101010
                 & 11001100    
                 = 10001000
-                <code></pre>
+                </code></pre>
             </section>
 
         
