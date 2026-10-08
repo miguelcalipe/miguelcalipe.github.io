@@ -163,7 +163,7 @@
                     <li>Salida en nivel bajo: <code>DDxn, PORTxn = 0b10</code></li>
                 </ul>
                 <p>Si el entorno de alta impedancia no percibe diferencia entre un nivel alto activo y un <em>pull-up</em>, el estado con <em>pull-up</em> habilitado es totalmente aceptable; de lo contrario, se puede usar el bit <code>PUD</code> del registro <code>MCUCR</code> para deshabilitar todas las resistencias <em>pull-up</em> globalmente.</p>
-                <p>Para la conmutación inversa (de entrada con <em>pull-up</em> a salida en nivel bajo), el usuario debe usar como estado intermedio <em>tri-state</em> (<span class="formula">0b00</span>) o salida en nivel alto (<span class="formula">0b11</span>).</p>
+                <p>Para la conmutación inversa (de entrada con <em>pull-up</em> a salida en nivel bajo), el usuario debe usar como estado intermedio <em>tri-state</em> (<code>0b00</code>) o salida en nivel alto (<code>0b11</code>).</p>
 
                 <h4>Tabla: Configuraciones de los pines del puerto</h4>
                 <div class="table-container">
@@ -227,21 +227,26 @@
 
                 <h3>2.4 Lectura del valor del pin</h3>
                 <p>
-                    Independientemente de <code>DDxn</code>, el estado del pin puede leerse mediante el bit correspondiente en <code>PINxn</code>. Como se muestra en la figura siguiente, el bit del registro PINxn y el latch (cerrojo) que lo precede constituyen un  <strong>sincronizador</strong>. Este sincronizador es necesario para evitar situaciones de metastabilidad cuando el valor del pin físico cambia cerca del flanco del reloj interno. Sin embargo, también introduce un retardo.
+                    Independientemente de la configuración del bit de dirección <code>DDxn</code>, el estado del pin puede leerse mediante el bit correspondiente en <code>PINxn</code>. Como se muestra en la figura Descripción Funcional de un Pin de E/S (2. PUERTOS COMO E/S DIGITAL GENERAL), el bit del registro PINxn y el latch (cerrojo) que lo precede constituyen un  <strong>sincronizador</strong>. Este sincronizador es necesario para evitar situaciones de metastabilidad cuando el valor del pin físico cambia cerca del flanco del reloj interno. Sin embargo, también introduce un retardo.
                 </p>
 
                 <p>
-                    La figura siguiente muestra un diagrama temporal de la sincronización cuando se lee un valor aplicado externamente al pin. Los retardos de propagación máximo y mínimo se representan respectivamente como tpd,max y tpd,min.
+                    La metaestabilidad es un estado inestable en el que un circuito digital electrónico (como un flip-flop) falla en adoptar un nivel lógico definido (0 o 1) dentro del tiempo requerido.
+                </p>
+
+                <p>
+                    La figura siguiente muestra un diagrama temporal de la sincronización cuando se lee un valor aplicado externamente al pin. Los retardos de propagación máximo y mínimo se representan respectivamente como $t_{pd,max}$ y $t_{pd,min}$.
+                </p>
+
+                <p>
+                    Considere el período de reloj que comienza poco después del primer flanco descendente del reloj del sistema. El latch está cerrado cuando el reloj se encuentra en nivel bajo y pasa a ser transparente cuando el reloj está en nivel alto, tal como indica la región sombreada de la señal «SYNC LATCH». El valor de la señal queda almacenado en el latch cuando el reloj del sistema pasa a nivel bajo. Posteriormente, el valor es transferido al registro PINxn en el siguiente flanco ascendente del reloj. Como indican las dos flechas $t_{pd,max}$ y $t_{pd,min}$, una única transición de señal en el pin sufrirá un retardo comprendido entre ½ y 1½ períodos del reloj del sistema, dependiendo del instante en que se produzca dicha transición.
                 </p>
 
                 <img src="img/sincronizacion_lectura_pin_externo_avr.png" alt="Diagrama temporal de la sincronización cuando se lee un valor aplicado externamente al pin" class="imagen-centrada">
-                
-                <div class="note-box">
-                    <strong>Lectura de un valor asignado por hardware:</strong> Cuando se lee un valor del pin que ha sido asignado por hardware, el retardo de propagación es de <strong>½ período del reloj del sistema</strong>.
-
-                <div class="note-box">
-                    <strong>Lectura de un valor asignado por software:</strong> Cuando se lee nuevamente un valor del pin asignado mediante software, debe insertarse una instrucción <code>NOP</code>. La instrucción <code>OUT</code> establece la señal de sincronización, haciendo que el retardo <code>tpd</code> introducido sea exactamente de <strong>1 período del reloj del sistema</strong>.
-                </div>
+    
+                <p>
+                    <strong>Lectura de un valor asignado por software:</strong> Cuando se lee nuevamente un valor del pin asignado mediante software, debe insertarse una instrucción <code>NOP</code> tal como se indica en la figura siguiente. La instrucción <code>OUT</code> establece la señal de sincronización «SYNC LATCH» en el flanco ascendente del reloj, haciendo que el retardo <code>tpd</code> introducido sea exactamente de <strong>1 período del reloj del sistema</strong>.
+                </p>
 
                 <img src="img/sincronizacion_lectura_pin_software_avr.png" alt="Diagrama temporal de la sincronización cuando se lee un valor aplicado externamente al pin" class="imagen-centrada">
                 
@@ -254,6 +259,12 @@
                     <li>Asignar resistencias <em>pull-up</em> a los pines 6 y 7.</li>
                     <li>Inserción de la instrucción <code>NOP</code> previa a la lectura de los pines.</li>
                 </ul>
+
+                <p> A continuación, se vuelven a leer los valores de los pines.</p>
+
+                <p>
+                    Como se explicó anteriormente, se incluye una instrucción NOP para poder leer correctamente el valor que acaba de ser asignado mediante software a algunos de los pines.
+                </p>
                 
                 <pre><code class="language-c"> 
 &lt;pre&gt;&lt;code class="language-c"&gt; 

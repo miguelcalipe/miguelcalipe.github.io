@@ -68,13 +68,13 @@
         <p>Esta operación evalúa y transfiere el patrón bit a bit directamente al registro:</p>
         <ul>
             <li><strong>Valor Asignado:</strong> El literal <code>0b00000010</code> sitúa un uno (<code>1</code>) lógico únicamente en la posición correspondiente al pin PB1 (índice 1) y establece ceros (<code>0</code>) en las siete posiciones restantes.</li>
-            <li><strong>Efecto Final en Hardware:</strong> Se configura únicamente el pin PB1 como salida digital, mientras que los pines PB0 y del PB2 al PB7 son forzados a operar como entradas.</li>
+            <li><strong>Efecto Final en Hardware:</strong> Se configura únicamente el pin <code>PB1</code> como salida digital, mientras que los pines <code>PB0</code> y del <code>PB2</code> al <code>PB7</code> son forzados a operar como entradas.</li>
         </ul>
 <pre><code>PORTB = 0b00001000;</code></pre>
         <p>Esta operación evalúa y transfiere el patrón bit a bit directamente al registro:</p>
         <ul>
             <li><strong>Valor Asignado:</strong> El literal <code>0b00001000</code> sitúa un uno (<code>1</code>) lógico únicamente en la posición correspondiente al pin PB3 (índice 3) y establece ceros (<code>0</code>) en las siete posiciones restantes.</li>
-            <li><strong>Efecto Final en Hardware:</strong> Como DDRB ha establecido como salida sólo el bit PB1. El registro PORTB establece un nivel bajo en PB1, conectándolo a masa o tierra (GND / 0 V). Como DDRB ha definido como entradas los bits PB0 y PB2 - PB7,  PORTB conecta una resistencia pull-up de entre 20 kΩ y 50 kΩ aproximadamente desde el pin PB3 hacia VCC. Esto garantiza que el pin lea un nivel '1' estable en reposo y evita lecturas erráticas sin consumir corriente apreciable en el bit PB3; mientras que los pines PB0, PB2 y del PB4 al PB7 permanecen en nivel bajo (GND / 0V), estos pines quedan flotando eléctricamente, presentando una impedancia extremadamente alta (ideal para medir circuitos analógicos o buses externos sin alterar la señal)</li> 
+            <li><strong>Efecto Final en Hardware:</strong> Como <code>DDRB</code> ha establecido como salida sólo el bit <code>PB1</code>. El registro <code>PORTB</code> establece un nivel bajo en <code>PB1</code>, conectándolo a masa o tierra (GND / 0 V). Como <code>DDRB</code> ha definido como entradas los bits <code>PB0</code> y del <code>PB2</code> al <code>PB7</code>,  <code>PORTB</code>  conecta una resistencia pull-up de entre 20 kΩ y 50 kΩ aproximadamente desde el pin <code>PB3</code> hacia VCC. Esto garantiza que el pin lea un nivel '1' estable en reposo y evita lecturas erráticas sin consumir corriente apreciable en el bit <code>PB3</code>; mientras que los pines <code>PB0</code> , <code>PB2</code> y del <code>PB4</code> al <code>PB7</code> permanecen en nivel bajo (GND / 0V), estos pines quedan flotando eléctricamente, presentando una impedancia extremadamente alta (ideal para medir circuitos analógicos o buses externos sin alterar la señal)</li> 
         </ul>
 
 
@@ -231,10 +231,15 @@ AND 0b11111011    (Máscara invertida)
 
 <pre><code>// Enmascara y limpia los 4 bits menos significativos (AND con 0b11110000) y asigna el canal
 ADMUX = (ADMUX &amp; 0b11110000) | canal;</code></pre>
-        
-    
+            
     </section>
 
+        <section>
+
+        <img src="img/infografia_operadores_bits_avr.png" alt="Resumen de Operadores Lógicos a Nivel de Bits" class="imagen-centrada">
+
+
+        </section>
 
         <section>
         <h2>8. SECUENCIA BÁSICA PARA CONFIGURAR UNA SALIDA DIGITAL</h2>
@@ -409,9 +414,6 @@ Repetir
     <li><code>PORTx</code>: determina, cuando el pin está configurado como entrada, si se habilita o no la resistencia <em>pull-up</em> interna.</li>
     <li><code>PINx</code>: permite leer el estado lógico presente en el pin.</li>
 </ul>
-
-<img src="img/infografia_operadores_bits_avr.png" alt="Resumen de Operadores Lógicos a Nivel de Bits" class="imagen-centrada">
-
 </section>  
     </article>
         
