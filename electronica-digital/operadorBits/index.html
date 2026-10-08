@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operadores Lógicos a Nivel de Bits | MC Mundo Tech</title>
+    <meta name="description" content="Aunque hayas programado en C durante mucho tiempo, es posible que no hayas trabajado demasiado con manipulaciones a nivel de bit. Los operadores a nivel de bit toman bytes completos como entrada y realizan operaciones lógicas sobre esos bytes bit por bit. De ahí su nombre.">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>OPERADORES LÓGICOS A NIVEL DE BITS</h1>
+            
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   -->
+            
+            <section> 
+            
+            <h2>INTRODUCCIÓN</h2>
+                <p>
+                    Aunque hayas programado en C durante mucho tiempo, es posible que no hayas trabajado demasiado con manipulaciones a nivel de bit. 
+                </p>
+                <p>
+                    Los operadores a nivel de bit toman bytes completos como entrada y realizan operaciones lógicas sobre esos bytes bit por bit. De ahí su nombre.
+                </p>
+
+                <p>
+                    Esto hace que los operadores a nivel de bit sean especialmente adecuados para manipular bits individuales dentro del byte de un registro.
+                </p>
+
+                <p>
+                    Las operaciones lógicas a nivel de bit (bitwise logical operations) permiten manipular bits (bit twiddling) modificando un solo bit de un byte de registro sin tener que ocuparnos explícitamente de los demás mediante técnicas de enmascaramiento de bits.
+                </p>
+
+                <p>
+                    Existen cuatro operadores lógicos a nivel de bit.
+                </p>
+            </section> 
+            
+            <section>
+                <h2>1. CREACION DE MÁSCARAS DE BITS</h2>
+                <p>
+                    El enmascaramiento de bits (bit masking) es una técnica que permite modificar bits individuales dentro de un byte de registro sin afectar los demás bits. Esto se logra mediante el uso de operadores lógicos a nivel de bit y máscaras de bits.
+                </p>
+                <p>
+                    Una máscara de bits es un valor binario que se utiliza para seleccionar o modificar bits específicos dentro de un byte de registro. Cada bit de la máscara puede ser 0 o 1.   
+                </p>
+                <p>
+                    La máscara de bits la creamos con el operador de desplazamiento a la izquierda (<<) para colocar un 1 en la posición del bit que queremos modificar y 0s en todas las demás posiciones. En forma general, la máscara de bits para modificar el bit <strong>n</strong> se puede crear con la expresión (1 << n), donde n es el número del bit que queremos modificar.
+                </p>
+                <p>
+                    Es necesario tener en cuenta que en la programación de microcontroladores (como en muchos lenguajes de programación) se usa la indexación por 0 para enumerar los bits (que representan un registro, un pin). Los bits se numeran de derecha a izquierda, comenzando desde 0. Por lo tanto, el bit 0 es el bit menos significativo (LSB) y el bit 7 es el bit más significativo (MSB) en un byte de 8 bits.
+                </p>
+
+                <p>
+                    Si el BLS (bit menos significativo) es el bit 0, entonces la máscara de bits para modificar el bit n se puede crear con la expresión <code>1 << n</code>, que da como resultado el valor binario con el bit <strong>n</strong> establecido en 1 y todos los demás bits establecidos en 0.
+                </p>
+
+                <p>
+                    Por ejemplo, si queremos establecer en 1 el bit 3 de un registro (set bit), debemos crear una máscara de bits con la expresión <code>1 << 3</code> donde el bit 3 estará establecido en 1 y todos los demás bits estarán establecidos en 0. Si realizamos la operación de desplazamiento a la izquierda, en un binario de 8 bits obtenemos el siguiente resultado:
+                </p>
+                <pre><code>
+                1 << 3 = 00001000
+                </code></pre>
+                            
+
+                <p>La verdadera utiidad de las máscaras de bits se hace evidente cuando se combinan con los operadores lógicos a nivel de bit para modificar bits individuales dentro de un registro sin afectar los demás bits que veremos más adelante. Por ahora, es importante entender cómo crear máscaras de bits para seleccionar o modificar bits específicos dentro de un byte de registro.
+                </p>
+                
+                <p> El enmascaramiento de bits nos permtirá realizar operaciones SET BIT (1) y CLEAR BIT (0) dentro de un registro sin afectar los demás bits.</p>
+                
+                <ul>
+                    <li>SET BIT: Para establecer un bit en 1, se utiliza una máscara de bits con el bit correspondiente establecido en 1 y todos los demás bits establecidos en 0. Luego, se realiza una operación OR a nivel de bit entre el registro original y la máscara de bits.</li>
+                    <li>CLEAR BIT: Para borrar un bit (establecerlo en 0), se utiliza una máscara de bits con el bit correspondiente establecido en 0 y todos los demás bits establecidos en 1. Luego, se realiza una operación AND a nivel de bit entre el registro original y la máscara de bits.</li>    
+                </ul>                
+                
+            </section>
+
+            <section>
+            <h2>1. OR (|)</h2>
+                <p>
+                    El operador OR a nivel de bit compara dos binarios y devuelve un binario donde cada bit es el resultado de la operación OR entre los bits correspondientes de los binarios  de entrada.
+                </p>
+                <p>
+                    Para cada posición de bit, un OR a nivel de bit devuelve 1 si cualquiera de los dos bits comparados es 1. Devuelve 0 únicamente cuando ambos bits son 0:
+                </p>
+                <p>
+                    Por ejemplo, si tenemos los bytes 10101010 y 11001100, la operación OR a nivel de bit devolverá 11101110.
+                </p>
+                <pre><code>
+                  10101010
+                | 11001100    
+                = 11101110
+                <code></pre>   
+                
+                <p>
+                    La operación OR a nivel de bit (OR bitwise) se puede utilizar para establecer en 1 (alto, high, Vcc) bits individuales en un registro. Por ejemplo, si queremos establecer el bit 3 de un registro sin afectar los demás bits, podemos hacer una operación OR con un valor que tenga el bit 3 establecido en 1 y todos los demás bits establecidos en 0.
+                </p>
+                    
+            </section>
+
+            <section>
+            <h2>2. AND (&)</h2>
+                <p>
+                    El operador AND a nivel de bit compara dos binarios y devuelve un binario donde cada bit es el resultado de la operación AND entre los bits correspondientes de los binarios  de entrada.
+                </p>
+                <p>
+                    Para cada posición de bit, un AND a nivel de bit devuelve 1 únicamente si ambos bits comparados son 1. AND Devuelve 0 si cualquiera de los bits es 0:
+                </p>
+                <p>
+                    Por ejemplo, si tenemos los bytes 10101010 y 11001100, la operación AND a nivel de bit devolverá 10001000.
+                </p>
+                <pre><code>
+                  10101010
+                & 11001100    
+                = 10001000
+                <code></pre>
+            </section>
+
+        
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>
