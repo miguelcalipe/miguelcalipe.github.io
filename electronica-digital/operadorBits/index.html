@@ -157,7 +157,7 @@
             </section>
 
             <section>
-            <h2>2. OPERACIONES LÓGICAS BIT A BIT</h2>
+            <h2>2. LAS OPERACIONES LÓGICAS BIT A BIT</h2>
                 <p>
                     Tenemos un número binario con pone en <code>1</code> determinados bits de un registro. 
                 </p>
@@ -173,7 +173,7 @@
 
                 <p>Y activaríamos correctamente <code>b1</code>, pero al mismo tiempo apagaríamos todos los demás.</p>
 
-                <p>En esta sección aprenderemos técnicas esenciales de manipulación de bits que nos permitirán modificar fácilmente bits individuales sin destruir el resto del contenido del registro.</p>
+                <p>En las siguientes secciones aprenderemos técnicas esenciales de manipulación de bits que nos permitirán modificar fácilmente bits individuales sin destruir el resto del contenido del registro.</p>
 
                 <p>Podemos imaginar cada byte de los registros de hardware del AVR como una fila de ocho pequeños interruptores. En esta sección utilizaremos funciones lógicas a nivel de bit para establecer, limpiar o conmutar cada interruptor individualmente sin modificar los demás.</p>
                 <p>
@@ -182,23 +182,22 @@
                 <p>
                     Esto hace que los operadores a nivel de bit sean especialmente adecuados para manipular bits individuales dentro del byte de un registro.
                 </p>
+            </section>
 
-                <p>
-                    Existen cuatro operadores lógicos a nivel de bit.
-                </p>
-                                
-                <h3>2.1.  OR (|) </h3>
+            <section>
+                                                
+                <h2>3. OR (|) </h2>
 
-                <p>Recordemos cómo funciona el operador <strong>OR</strong> a nivel de bits:</p>
+                <p>Recordemos cómo funciona el operador <strong>OR</strong>:</p>
         
-            <h4>Caso 1: Hacer OR de un bit con cero (<code>0</code>)</h4>
+            <h3>3.1. Caso 1: Hacer OR de un bit con cero (<code>0</code>)</h4>
             <ul>
                 <li><code>0 | 0 &rarr; 0</code></li>
                 <li><code>1 | 0 &rarr; 1</code></li>
             </ul>
             <p>Como puedes observar, <strong>el bit original no cambia</strong>.</p>
        
-            <h4>Caso 2: Hacer OR de un bit con uno (<code>1</code>)</h4>
+            <h3>3.2. Caso 2: Hacer OR de un bit con uno (<code>1</code>)</h3>
             <ul>
                 <li><code>0 | 1 &rarr; 1</code></li>
                 <li><code>1 | 1 &rarr; 1</code></li>
@@ -207,7 +206,7 @@
         
             <p><strong>Conclusión:</strong> Este comportamiento constituye la base para utilizar el operador OR para <strong>activar bits específicos</strong> mediante el uso de máscaras de bits (<em>bitmasks</em>).</p>
         
-            <h4> OR (|) entre binarios</h4>
+            <h3>3.3 OR (|) entre binarios</h3>
                 <p>
                     El operador OR a nivel de bit compara dos binarios (el registro de entrada en su estado actual y una máscara) y devuelve un binario donde cada bit es el resultado de la operación OR entre los bits correspondientes de los binarios  de entrada.
                 </p>
@@ -226,7 +225,7 @@ Máscara:                                 b011001100
                 = 11101110     Registro (salida, en su nuevo estado)   
                 </code></pre>   
             
-                <h4>OR (|) para Establecer en 1, Bits de un Registro (SET BIT)</h4>
+                <h3>3.4. OR (|) para Establecer en 1, Bits de un Registro (SET BIT)</h3>
                 <p>
                     La operación <code>OR</code> a nivel de bit (OR bitwise) se puede utilizar para establecer en 1 (<strong>SET BIT</strong>) bits individuales en un registro. Por ejemplo, si queremos establecer el bit 3 de un registro sin afectar los demás bits, podemos hacer una operación OR con un valor que tenga el bit 3 establecido en 1 (<code>1 << 3</code> ) y todos los demás bits establecidos en 0.
                 </p>
@@ -244,22 +243,51 @@ REGISTRO = REGISTRO | 1 << 3
 <p>
     Escribimos nuevamente el resultado en <code>PORTB</code> y tendremos todos los bits originales intactos, excepto aquellos correspondientes a los 1 de la máscara, que habrán sido activados.
 </p>
-                    <h5>Forma abreviada para establecer bits </h5>
+                    <h3>3.5. Forma abreviada para establecer bits </h3>
                         <p>
                             Acabamos de ver cómo obtener una copia del byte actualmente almacenado en PORTB y cómo poner en 1 PB3, utilizando OR y una máscara de bits. Esto produce un nuevo byte que luego escribimos en <code>PORTB</code>.
                         </p>
                         <p>En lenguaje C lo hemos expresado así:</p>
 <pre><code>PORTB = PORTB | 1 << 3 </code></pre>
 
-<p> Este tipo de operación es tan común que C dispone de una forma abreviada:</p>
-<pre><code>PORTB |= (1 << 3); </code></pre>
+                        <p> Este tipo de operación es tan común que C dispone de una forma abreviada:</p>
+                        <pre><code>PORTB |= (1 << 3); </code></pre>
 
-<p>Después de la compilación, ambas formas terminan produciendo el mismo resultado. Las dos tienen el efecto de poner en Alto (High) el bit PB3 LED2 dejando los demás bits tal como estaban.</p>
+                        <p>Después de la compilación, ambas formas terminan produciendo el mismo resultado. Las dos tienen el efecto de poner en Alto (High) el bit PB3 LED2 dejando los demás bits tal como estaban.</p>
+                    </section>
+            
 
+                       
+            <section>
+            <h2>4.  AND (&)</h2>
 
-                        </p>
-
-            <h3>2.2.  AND (&)</h3>
+             <p>Recordemos cómo funciona el operador <strong>AND</strong> a nivel de bits:</p>
+        
+            <h3>4.1. Caso 1: Hacer AND de un bit con cero (<code>0</code>)</h3>
+            <ul>
+                <li><code>0 AND 0 &rarr; 0</code></li>
+                <li><code>1 AND 0 &rarr; 0</code></li>
+            </ul>
+            <p>Como puedes observar, <strong>el resultado siempre es cero (<code>0</code>)</strong>.</p>
+            <p>
+                Si hacemos AND entre cualquier bit y <code>0</code>, el resultado está garantizado en <code>0</code>. No hay manera de que ambos bits sean 1 si uno de ellos era 0 desde el principio. Esto es lo que utilizaremos para apagar bits.
+            </p>
+       
+            <h3>4.2. Caso 2: Hacer AND de un bit con uno (<code>1</code>)</h3>
+            <ul>
+                <li><code>0 AND 1 &rarr; 0</code></li>
+                <li><code>1 AND 1 &rarr; 1</code></li>
+            </ul>
+            <p>En este caso, <strong>el estado del bit original no cambia </strong>. Se conserva el dato existente</p>
+       
+            <p><strong>Conclusión:</strong> Esto sugiere utilizar AND con una máscara de bits para apagar bits. La máscara deberá tener:</p>    
+                <ul>
+                    <li><code>1</code> donde queremos conservar el dato existente.</li>
+                    <li><code>0</code> donde queremos limpiar el bit.</li>
+                </ul>
+        
+            
+            <h3>4.3. AND entre binarios</h3>
                 <p>
                     El operador AND a nivel de bit compara dos binarios y devuelve un binario donde cada bit es el resultado de la operación AND entre los bits correspondientes de los binarios  de entrada.
                 </p>
@@ -274,8 +302,276 @@ REGISTRO = REGISTRO | 1 << 3
                 & 11001100    
                 = 10001000
                 </code></pre>
+        
+            <h3>4.4. Limpiando un Bit con AND y NOT </h3>
+                <p>
+                    Limpiar un bit (clearing a bit), es decir, establecerlo en cero (<code>0</code>), es algo que quizá resulte poco intuitivo al principio, pero lo utilizaremos tan frecuentemente que terminará siendo natural.
+                </p>
+                <p>
+                    Hasta ahora hemos utilizado <code>OR</code> para establecer bits. No debería sorprendernos entonces que utilicemos <code>AND</code> para limpiar bits.
+                </p>
+
+                <p>
+                    Ya hemos concluido que si hacemos AND entre cualquier bit y <code>0</code>, el resultado está garantizado en <code>0</code> (limpia el bit). Y si hacemos AND entre esos mismos bit y <code>1</code>, los bits originales no cambian. Por ejemplo, para apagar PINB2 utilizaremos: </p>
+                    
+                    <pre><code> PORTB = 0b11111011      //Apaga PINB2 </code></pre> 
+                
+                <p>
+                    Esta máscara es exactamente lo contrario de las máscaras que utilizamos anteriormente: contiene unos donde aquellas contenían ceros y viceversa.
+                </p>
+                <p>
+                    La forma sencilla de crearla consiste en crear primero una máscara con un 1 en la posición que queremos modificar y después utilizar NOT para invertir todos sus bits. Para crear la máscara que apagará PINB2, primero desplazaremos <code>1</code> al bit2 y uego aplicaremos <code>NOT</code> a toda la máscara:
+                </p>
+<pre><code>
+(1 << 2)  -> 0b00000100
+~(1 << 2) -> 0b11111011
+</code></pre>
+
+                <p>Después hacemos AND entre esta máscara y el valor original.</p>
+
+            <h3>4.5. Ejemplos usando AND y NOT para limpiar un bit</h3> 
+
+<pre><code class="language-c">
+...
+#define LED_PORT    PORTB    //El puerto B está ocupado por 8 leds
+#define LED_PIN     PINB    // En cada pin hay un LED
+#define LED_DDR     DDRB
+...
+</code></pre>
+           <p> Si LED2 está inicialmente apagado: </p>     
+<pre><code>
+PORTB =     0b11000011
+~(1 << 2) = 0b11111011
+& =         0b11000011
+/* LED2 permanece apagado y ninguno de los demás cambia.*/
+</code></pre>
+            
+<p> Si LED2 está inicialmente encendido: </p>    
+<pre><code>
+PORTB =     0b11000111
+~(1 << 2) = 0b11111011
+& =         0b11000011
+/* LED2 queda apagado y ninguno de los demás cambia.*/
+</code></pre> 
+
+            <p>Reasignando a PORTB y escribiendolo en una sola línea:</p>
+<pre><code> PORTB = PORTB & ~(1 << 2) </code></pre>
+<p>O:</p>
+<pre><code> PORTB &= ~(1 << 2) </code></pre>
+
+<p> También podemos apagar varios bits simultáneamente:</p>
+
+<pre><code>
+PORTB &= ~((1 << 2) | (1 << 4));
+</code></pre>
+
+                <p>
+                    Hay que prestar atención al NOT situado fuera de los paréntesis, porque queremos obtener dos ceros en nuestra máscara de bits.
+                </p>
+
             </section>
 
+            <section>
+            <h2>5. CONMUTAR BITS MEDIANTE XOR</h2>
+
+            <p>En la programación de microcontroladores AVR, además de activar o desactivar bits de un registro, necesitamos cambiar su estado actual sin modificar los demás. Esta operación se denomina <strong>conmutación de bits</strong> (<em>bit toggling</em>).</p>
+
+            <p>Por ejemplo, podemos querer hacer parpadear un LED conectado al pin correspondiente al bit 2 del puerto B, manteniendo sin cambios los estados de los demás LED. Para conseguirlo, utilizaremos el operador XOR y una máscara de bits.</p>
+
+            <h3>5.1. Fundamento de la conmutación de bits</h3>
+
+                <h4>5.1.1. ¿Qué significa conmutar un bit?</h4>
+
+                    <p>Conmutar un bit significa invertir su estado lógico: si vale <code>0</code>, pasa a <code>1</code>; si vale <code>1</code>, pasa a <code>0</code>. A diferencia de las operaciones para establecer o limpiar bits, no necesitamos conocer previamente el estado del bit que queremos modificar.</p>
+
+                    <p>La operación se puede resumir de la siguiente manera:</p>
+
+                    <ul> <li>Si el bit está en 0, la conmutación lo lleva a 1.</li> <li>Si el bit está en 1, la conmutación lo lleva a 0.</li> </ul>
+
+                    <p>Esta operación resulta útil, por ejemplo, para hacer parpadear un LED, invertir el estado de una salida digital o alternar entre dos estados lógicos.</p>
+
+                <h4>5.1.2. Funcionamiento del operador XOR</h4>
+
+                    <p>El operador <code>XOR</code> (<em>exclusive OR</em>, u OR exclusivo) en C se representa mediante el símbolo <code>^</code>. </p>
+
+                    <p>Recordemos cómo funciona el operador <code>^</code> a nivel de bits:</p>
+        
+                    <h5>5.1.2.1. Caso 1: Hacer ^ de un bit con cero (<code>0</code>)</h5>
+                        <ul>
+                            <li><code>0 ^ 0 &rarr; 0</code></li>
+                            <li><code>1 ^ 0 &rarr; 1</code></li>
+                        </ul>
+                        <p>Como puedes observar, <strong>el resultado siempre mantiene el estado original del bit</strong>.</p>
+                        <p>
+                            Si hacemos <code>^</code> entre cualquier bit y <code>0</code>, el resultado devuelve el mismo bit.
+                        </p>
+            
+                    <h5>5.1.2.2. Caso 2: Hacer ^ de un bit con uno (<code>1</code>)</h5>
+                        <ul>
+                            <li><code>0 ^ 1 &rarr; 1</code></li>
+                            <li><code>1 ^ 1 &rarr; 0</code></li>
+                        </ul>
+                        <p>En este caso, <strong>el estado del bit original cambia </strong>. El dato existente se invierte</p>
+                
+                        <p><strong>Conclusión:</strong> si queremos conmutar determinados bits de un registro, basta con aplicar <code>XOR</code> mediante una máscara que contenga unos en las posiciones que deseamos invertir y ceros en las demás.</p>    
+                            <ul>
+                                <li><code>0</code> donde queremos conservar el dato existente.</li>
+                                <li><code>1</code> donde queremos invertir el bit.</li>
+                            </ul>
+
+                        <p>Por tanto, si queremos conmutar determinados bits de un registro, basta con aplicar XOR mediante una máscara que contenga unos en las posiciones que deseamos invertir y ceros en las demás.</p> 
+            
+            <h3>5.2. Conmuutación de un bit mediante una máscara</h3>
+
+                <h4>5.2.1. Construcción de la máscara de bits</h4>
+
+                    <p>Para seleccionar el bit que queremos conmutar, utilizamos el desplazamiento a la izquierda (<code>&lt;&lt;</code>). La expresión <code>(1 &lt;&lt; n)</code> genera una máscara con un único bit en 1, situado en la posición <code>n</code>, contando desde cero.</p>
+
+                    <p>Por ejemplo, para seleccionar el bit 2:</p>
+
+                    <pre><code class="language-c">1 &lt;&lt; 2</code></pre>
+
+                    <p>El resultado es:</p>
+
+                    <pre><code>00000100</code></pre>
+
+                    <p>Esta máscara selecciona el bit 2, mientras que los demás bits contienen ceros. Al aplicar <code>XOR</code>, el bit 2 se invierte y los restantes conservan sus valores.</p>
+
+                <h4>5.2.2. Ejemplo. Utilizar XOR para conmutar un bit</h3>
+
+                <p>Supongamos que LED2 está conectado al pin <code>PB2</code> del microcontrolador AVR y que el registro <code>PORTB</code> contiene inicialmente el valor <code>0b11000011</code>.</p>
+
+                    <h5>5.2.2.1. LED2 inicialmente apagado</h4>
+
+                        <p>Partimos del siguiente estado del registro:</p>
+
+<pre><code>
+PORTB =         0b11000011 
+Máscara =       0b00000100  
+XOR Resultado=  0b11000111
+</code></pre>
+
+                        <p>El bit 2 cambia de 0 a 1. Los demás bits mantienen sus valores originales. Por tanto, si el hardware utiliza una salida activa en nivel alto, LED2 se enciende sin alterar los estados lógicos de los demás pines.</p>
+
+                    <h5>5.2.2.2. LED2 inicialmente encendido</h5>
+
+                        <p>Ahora partimos del valor <code>0b11000111</code>:</p>
+
+    <pre><code>
+PORTB =         0b11000111 
+Máscara =       0b00000100  
+XOR Resultado = 0b11000011
+    </code></pre>
+
+                        <p>En este caso, el bit 2 cambia de 1 a 0. LED2 se apaga, mientras que los demás bits permanecen sin cambios.</p>
+
+                        <p>Estos dos casos demuestran que no necesitamos comprobar previamente el estado de LED2. La misma operación invierte el bit en ambas situaciones.</p>
+
+                <h3>5.2.3. Expresión en C</h3>
+
+                    <p>La operación de conmutación puede escribirse de dos formas equivalentes.</p>
+
+                    <p><strong>Forma explícita:</strong></p>
+
+<pre><code class="language-c">
+PORTB = PORTB ^ (1 &lt;&lt; 2);
+</code></pre>
+
+                    <p><strong>Forma abreviada:</strong></p>
+
+<pre><code class="language-c">
+PORTB ^= (1 &lt;&lt; 2);
+</code></pre>
+
+                    <p>El operador <code>^=</code> combina XOR con la asignación. En este caso, se aplica la máscara al valor actual de <code>PORTB</code> y se asigna el resultado al registro.</p>
+
+                    <p>Ambas expresiones tienen el mismo propósito: conmutar el bit 2 de <code>PORTB</code> sin modificar los demás bits del valor utilizado en la operación.</p> 
+                
+                <h3>5.3. Conmutación simultánea de varios bits</h3>
+
+                    <h4>5.3.1. Construcción de una máscara múltiple</h4>
+
+                        <p>También podemos conmutar varios bits en una sola operación. Para ello, combinamos mediante OR (<code>|</code>) las máscaras individuales de los bits que queremos invertir.</p>
+
+                        <p>Por ejemplo, para conmutar simultáneamente los bits 2 y 4:</p>
+
+                        <pre><code class="language-c">(1 &lt;&lt; 2) | (1 &lt;&lt; 4)</code></pre>
+
+                        <p>La máscara resultante es:</p>
+
+                        <pre><code>00010100</code></pre>
+
+                        <p>Los bits 2 y 4 contienen unos, mientras que las demás posiciones contienen ceros.</p>
+
+                    <h4>5.3.2. Aplicación de la máscara múltiple</h4>
+
+                        <p>La instrucción para conmutar ambos bits de <code>PORTB</code> es:</p>
+
+<pre><code class="language-c">
+PORTB ^= ((1 &lt;&lt; 2) | (1 &lt;&lt; 4));
+</code></pre>
+
+                        <p>Al ejecutar esta instrucción:</p>
+
+                            <ul> 
+                                <li>El bit 2 invierte su estado.</li> 
+                                <li>El bit 4 invierte su estado.</li> 
+                                <li>Los demás bits conservan sus valores en el resultado de la operación.</li> 
+                            </ul>
+
+                        <p>Si alguno de los bits seleccionados estaba en 0, pasará a 1. Si estaba en 1, pasará a 0. Ambos cambios se producen en una misma operación de lectura, modificación y escritura expresada en C.</p> 
+                    
+                    <h3>5.4. Aplicación práctica: Hacer parpadear un led</h2>
+
+                    <h4>5.4.1. Conmutación periódica de una salida</h4>
+
+                    <p>Para hacer parpadear un LED, podemos conmutar periódicamente el bit correspondiente a su pin, dejando un intervalo de tiempo entre cada operación.</p>
+
+                    <p>El siguiente ejemplo ilustra el procedimiento para un AVR compatible con la biblioteca <code>&lt;avr/io.h&gt;</code> y con <code>_delay_ms()</code> disponible en <code>&lt;util/delay.h&gt;</code>:</p>
+
+<pre><code class="language-c">
+#define F_CPU 16000000UL 
+#include &lt;avr/io.h&gt; 
+#include &lt;util/delay.h&gt; 
+
+int main(void) 
+    { DDRB |= (1 &lt;&lt; DDB2); // Configurar PB2 como salida 
+        while (1) 
+            { PORTB ^= (1 &lt;&lt; PB2); // Conmutar PB2 
+                _delay_ms(500); // Esperar 500 ms 
+            } 
+    }
+</code></pre>
+
+                    <p>En este ejemplo, PB2 se configura como salida mediante el registro <code>DDRB</code>. Después, el bucle infinito conmuta su estado cada 500 ms. En condiciones normales, el LED permanece aproximadamente 500 ms en cada estado, por lo que completa un ciclo de encendido y apagado en aproximadamente un segundo.</p>
+
+                    <p><strong>Nota:</strong> <code>F_CPU</code> debe coincidir con la frecuencia de reloj utilizada por el microcontrolador. Además, el comportamiento visual del LED depende de cómo esté conectado: el ejemplo supone una salida activa en nivel alto.</p> 
+                    
+                    <h3>5.5 Consideraciones importantes en los microcontroladores AVR</h3>
+
+                        <h4>5.5.1. Disponiobilidad del operador XOR </h4>
+
+                            <p>En muchos microcontroladores AVR clásicos, escribir un 1 en un bit del registro <code>PINx</code> permite conmutar el bit correspondiente del registro <code>PORTx</code>. Su disponibilidad y comportamiento deben confirmarse en la hoja de datos del microcontrolador concreto.</p>
+
+                        <h4>5.5.2. Precaución con las operaciones de lectura, modificación y escritura</h4>
+
+                            <p>La expresión <code>PORTB ^= (1 &lt;&lt; 2)</code> expresa una operación de lectura, modificación y escritura del registro. Si una interrupción u otra parte del programa modifica el mismo registro entre esas operaciones, puede producirse una interferencia.</p>
+
+                            <p>En aplicaciones donde varios contextos de ejecución modifican el mismo puerto, conviene evaluar el uso de instrucciones específicas del dispositivo, secciones críticas o mecanismos de sincronización apropiados.</p> 
+                        
+                    <h3>5.6. Resumen</h3>
+
+                            <p>El operador <strong>XOR</strong> permite conmutar bits de manera selectiva mediante una máscara:</p>
+
+                            <ul> 
+                                <li>Un <code>0</code> en la máscara conserva el bit correspondiente.</li> 
+                                <li>Un <code>1</code> en la máscara invierte el bit correspondiente.</li> 
+                                <li>La expresión <code>PORTB ^= (1 &lt;&lt; n)</code> permite conmutar el bit <code>n</code> en el valor del registro.</li> 
+                                <li>La combinación de máscaras mediante OR permite conmutar varios bits simultáneamente.</li> 
+                            </ul>
+
+                            <p>La principal ventaja de esta técnica es que invierte el estado de los bits seleccionados sin necesidad de comprobar previamente si están activados o desactivados.</p> 
+                </section>
         
 
         </article>
