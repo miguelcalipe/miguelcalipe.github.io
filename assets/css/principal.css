@@ -237,6 +237,61 @@ nav ul ul a:hover {
 }
 
 
+/* =========================================
+   MENÚ PRINCIPAL RESPONSIVE
+   ========================================= */
+
+/* Evitar que el menú exceda el ancho de la pantalla */
+nav {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Permitir que las categorías pasen a otra fila */
+nav > ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Evitar que las categorías se compriman */
+nav > ul > li {
+    flex-shrink: 0;
+}
+
+/* Ajustes específicos para móviles */
+@media (max-width: 768px) {
+
+    nav > ul {
+        justify-content: flex-start;
+        gap: 0;
+    }
+
+    nav > ul > li > a {
+        padding: 10px 8px;
+        font-size: 14px;
+        white-space: normal;
+    }
+
+    /* Ajustar el ancho de los submenús */
+    nav ul ul {
+        min-width: 200px;
+        max-width: calc(100vw - 20px);
+        box-sizing: border-box;
+    }
+
+    /* Permitir que los textos largos se distribuyan */
+    nav ul ul a {
+        white-space: normal;
+        overflow-wrap: break-word;
+    }
+}
+
+
+
 
 /* ===========================
    FOOTER
