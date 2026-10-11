@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Niveles de abstracción del hardware | MC Mundo Tech</title>
+    <meta name="description" content="Con el paso del tiempo han aparecido distintos niveles de abstracción cuyo objetivo es simplificar el desarrollo de software. Mientras mayor es la abstracción, menor es la cantidad de detalles del hardware que el programador necesita conocer, a costa de perder algo de control y eficiencia ">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>MANIPULACIÓN DE BITS EN MICROCONTROLADORES AVR</h1>
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   -->
+            
+            
+<article class="articulo">
+
+            
+
+            <section>
+                <h2>1. DEMOSTRACIÓN DE MANIPULACIÓN DE BITS</h2>
+
+                <p>
+                    En <a href= "/electronica-digital/operadorBits/">este enlace</a> hemos aprendido a manipular bits individualmente. Ahora podemos crear un pequeño programa de demostración para experimentar con diferentes patrones de encendido y apagado de LED, secuencias de LED.
+                </p>
+
+                <p>
+                    La capacidad de establecer, limpiar y conmutar bits individuales proporciona mucha más flexibilidad que la asignación directa (<a href="/microcontroladores/avr/programacion/codificacion/controlBitsC/index.html#seccion-2">ver este enlace</a>)  y constituye una base suficiente para comenzar a experimentar con las operaciones a nivel de bit.
+                </p>
+
+                <h3>1.1. Código fuente de <code>showingOffBits.c</code></h3>
+
+                <p>
+                    El siguiente programa utiliza ocho LED conectados al puerto B del microcontrolador AVR. Ejecuta tres animaciones: encendido y apagado progresivo de los LED en ambos sentidos y conmutación aparentemente aleatoria de LED individuales.
+                </p>
+
+<pre><code>/* Showing off some patterns to practice our bit-twiddling */
+
+// ------- Preamble -------- //
+#include &lt;avr/io.h&gt;
+#include &lt;util/delay.h&gt;
+#include &lt;avr/power.h&gt;
+
+#define DELAYTIME 85 /* milliseconds */
+#define LED_PORT PORTB
+#define LED_DDR DDRB
+
+int main(void) {
+
+    clock_prescale_set(clock_div_8);
+
+    uint8_t i;
+    uint8_t repetitions;
+    uint8_t whichLED;
+    uint16_t randomNumber = 0x1234;
+
+    // -------- Inits --------- //
+    LED_DDR = 0xff; /* all LEDs configured for output */
+
+    // ------ Event loop ------ //
+    while (1) {
+
+        /* Go Left */
+        for (i = 0; i &lt; 8; i++) {
+            LED_PORT |= (1 &lt;&lt; i); /* turn on the i'th pin */
+            _delay_ms(DELAYTIME); /* wait */
+        }
+
+        for (i = 0; i &lt; 8; i++) {
+            LED_PORT &amp;= ~(1 &lt;&lt; i); /* turn off the i'th pin */
+             _delay_ms(DELAYTIME); /* wait */
+                }
+
+        _delay_ms(5 * DELAYTIME); /* pause */
+
+        /* Go Right */
+        for (i = 7; i &lt; 255; i--) {
+            LED_PORT |= (1 &lt;&lt; i); /* turn on the i'th pin */
+            _delay_ms(DELAYTIME); /* wait */
+        }
+
+        for (i = 7; i &lt; 255; i--) {
+            LED_PORT &amp;= ~(1 &lt;&lt; i); /* turn off the i'th pin */
+            _delay_ms(DELAYTIME); /* wait */
+        }
+
+        _delay_ms(5 * DELAYTIME); /* pause */
+
+        /* Toggle "random" bits for a while */
+        for (repetitions = 0; repetitions &lt; 75; repetitions++) {
+
+            /* "random" number generator */
+            randomNumber = 2053 * randomNumber + 13849;
+
+            /* low three bits from high byte */
+            whichLED = (randomNumber &gt;&gt; 8) &amp; 0b00000111;
+
+            LED_PORT ^= (1 &lt;&lt; whichLED); /* toggle our LED */
+             _delay_ms(DELAYTIME);
+        }
+
+        LED_PORT = 0; /* all LEDs off */
+        _delay_ms(5 * DELAYTIME); /* pause */
+
+    } /* End event loop */
+
+    return (0); /* This line is never real
+}</code></pre>
+
+                <h3>1.2. Inclusión de bibliotecas y definición de constantes</h3>
+
+                <p>
+                    El programa comienza incluyendo tres archivos de cabecera:
+                </p>
+
+                <ul>
+                    <li>
+                        <code>&lt;avr/io.h&gt;</code>: contiene las definiciones de los registros de entrada y salida, como <code>DDRB</code> y <code>PORTB</code>, correspondientes al microcontrolador AVR seleccionado.
+                    </li>
+                    <li>
+                        <code>&lt;util/delay.h&gt;</code>: proporciona las funciones de retardo, como <code>_delay_ms()</code>.
+                    </li>
+                    <li>
+                        <code>&lt;avr/power.h&gt;</code>: proporciona macros para configurar el prescaler del reloj mediante funciones como <code>clock_prescale_set()</code>.
+                    </li>
+                </ul>
+
+                <p>
+                    A continuación, se definen constantes mediante la directiva <code>#define</code>:
+                </p>
+
+                <pre><code>#define DELAYTIME 85
+#define LED_PORT PORTB
+#define LED_DDR DDRB</code></pre>
+
+                <p>
+                    <code>DELAYTIME</code> establece el tiempo de espera en 85 milisegundos. Las constantes <code>LED_PORT</code> y <code>LED_DDR</code> permiten acceder a los registros <code>PORTB</code> y <code>DDRB</code> mediante nombres más descriptivos.
+                </p>
+
+                <p>
+                    Esta organización facilita la modificación del programa. Por ejemplo, si se desea utilizar otro puerto, pueden cambiarse las definiciones correspondientes sin modificar todas las instrucciones del código.
+                </p>
+
+                <h3>1.3. Inicialización del programa</h3>
+
+                <p>
+                    Dentro de <code>main()</code>, el programa configura el prescaler del reloj:
+                </p>
+
+                <pre><code>clock_prescale_set(clock_div_8);</code></pre>
+
+                <p>
+                    Esta instrucción establece un divisor de frecuencia de ocho para el reloj del sistema, siempre que la configuración y el dispositivo AVR sean compatibles con esta función.
+                </p>
+
+                <p>
+                    Después se declaran las variables utilizadas durante las animaciones:
+                </p>
+
+                <pre><code>uint8_t i;
+uint8_t repetitions;
+uint8_t whichLED;
+uint16_t randomNumber = 0x1234;</code></pre>
+
+                <p>
+                    Los tipos <code>uint8_t</code> y <code>uint16_t</code>, definidos en las bibliotecas estándar correspondientes, representan enteros sin signo de 8 y 16 bits, respectivamente.
+                </p>
+
+                <p>
+                    La variable <code>i</code> controla la posición del LED; <code>repetitions</code> cuenta las repeticiones de la tercera animación; <code>whichLED</code> almacena el índice del LED seleccionado, y <code>randomNumber</code> mantiene el estado del generador de números seudoaleatorios.
+                </p>
+
+                <p>
+                    A continuación, se configura el registro de dirección de datos:
+                </p>
+
+                <pre><code>LED_DDR = 0xff;</code></pre>
+
+                <p>
+                    El valor hexadecimal <code>0xFF</code> equivale a 255 en decimal y a la siguiente representación binaria:
+                </p>
+
+                <pre><code>0b11111111</code></pre>
+
+                <p>
+                    Cada uno de los ocho bits vale uno. Por tanto, todos los pines del puerto B se configuran como salidas, siempre que se trate de un puerto de ocho bits y que dichos pines admitan esa función.
+                </p>
+
+                <h3>1.4. Estructura del bucle principal</h3>
+
+                <p>
+                    El programa utiliza un bucle infinito:
+                </p>
+
+                <pre><code>
+    while (1) {
+        // Animaciones
+    }</code></pre>
+
+                <p>
+                    Como la condición <code>1</code> siempre es verdadera, las instrucciones contenidas en el bucle se ejecutan continuamente. De esta manera, las tres animaciones vuelven a comenzar cada vez que termina la secuencia completa.
+                </p>
+
+                <p>
+                    El bucle principal se divide en tres partes:
+                </p>
+
+                <ol>
+                    <li>Encender progresivamente los LED y apagarlos en el mismo sentido.</li>
+                    <li>Repetir el proceso en sentido inverso.</li>
+                    <li>Conmutar LED individuales mediante una secuencia seudoaleatoria.</li>
+                </ol>
+
+                <h3>1.5. Primera animación: encendido y apagado progresivo</h3>
+
+                <p>
+                    La rutina denominada <code>Go Left</code> utiliza un bucle <code>for</code> para recorrer los ocho bits del puerto:
+                </p>
+
+                <pre><code>
+        for (i = 0; i &lt; 8; i++) {
+            LED_PORT |= (1 &lt;&lt; i);
+            _delay_ms(DELAYTIME);
+        }
+                </code></pre>
+
+                <p>
+                    La expresión <code>(1 &lt;&lt; i)</code> desplaza un uno binario hacia la posición indicada por <code>i</code>. La operación OR a nivel de bit, representada por <code>|</code>, permite establecer ese bit en el registro <code>LED_PORT</code> sin modificar los demás bits.
+                </p>
+
+                <p>
+                    Como el programa no apaga los LED durante este primer recorrido, cada iteración deja encendido el LED anterior y activa el siguiente. Al terminar, los ocho LED están encendidos.
+                </p>
+
+                <p>
+                    El siguiente bucle apaga los LED uno por uno:
+                </p>
+
+                <pre><code>
+        for (i = 0; i &lt; 8; i++) {
+            LED_PORT &amp;= ~(1 &lt;&lt; i);
+            _delay_ms(DELAYTIME);
+        }</code></pre>
+
+                <p>
+                    En este caso, el desplazamiento genera una máscara que identifica el bit que debe limpiarse. El operador NOT, representado por <code>~</code>, invierte todos los bits de la máscara, y la operación AND a nivel de bit, representada por <code>&amp;</code>, limpia el bit seleccionado sin alterar los demás.
+                </p>
+
+                <p>
+                    El resultado es una secuencia en la que los LED se apagan progresivamente, comenzando por el LED de índice cero.
+                </p>
+
+                <p>
+                    Al finalizar la secuencia, se introduce una pausa:
+                </p>
+
+                <pre><code>_delay_ms(5 * DELAYTIME);</code></pre>
+
+                <p>
+                    Con un retardo de 85 milisegundos, esta pausa corresponde a 425 milisegundos.
+                </p>
+
+                <h3>1.6. Segunda animación: recorrido en sentido inverso</h3>
+
+                <p>
+                    La rutina <code>Go Right</code> recorre los LED en orden descendente, comenzando por el bit 7:
+                </p>
+
+                <pre><code>
+        for (i = 7; i &lt; 255; i--) {
+            LED_PORT |= (1 &lt;&lt; i);
+            _delay_ms(DELAYTIME);
+        }
+                </code></pre>
+
+                <p>
+                    El código “go right” es algo más interesante y presenta una posible trampa al programar microcontroladores. Conceptualmente, resulta sencillo imaginar que comenzamos con: <code>i = 7</code>, y vamos restando uno hasta llegar a cero (<code>0</code>).
+                </p>
+                <p>
+                    El problema está en cómo comprobamos la condición de finalización. Queremos que el bucle <code>for </code> se ejecute cuando <code>i = 0</code>, de manera que pueda apagar <code>LED0.</code>
+                </p>
+
+                <p>Si escribimos:</p>
+                <pre><code>
+for (i=7; i&gt;0; i--){}
+                </code></pre>
+
+                <p>el bucle se detendrá en cuanto <code>i</code> sea cero, por lo que nunca establecerá ni desactivará LED0.</p>
+
+                <p>Podríamos intentar solucionarlo comparando con mayor o igual:</p>
+                <pre><code>for (i=7; i&gt;=0; i--){}</code></pre>
+
+                <p>pero entonces obtenemos un sorprendente bucle infinito.</p>
+
+                <p>La razón es que <code>i</code> está definida como un entero sin signo (<em>unsigned integer</em>), que cuenta de 0 a 255; solamente está definida para valores positivos.</p>
+
+                <p>Cuando restas uno a cero, el valor vuelve a recorrer el rango y pasa al valor máximo, que es 255 en el caso de un entero de 8 bits.</p>
+
+                <p>Por lo tanto, la condición:</p>
+                <pre><code>i &gt;= 0</code></pre>
+
+                <p>siempre es verdadera.</p>
+
+                <p>Como queremos que el bucle <code>for</code> se ejecute cuando <code>i</code> sea 0 y se detenga posteriormente cuando <code>i</code> sea 255, podemos comprobar:</p>
+                <pre><code>i &lt; 255</code></pre>
+
+                <p>que es exactamente lo que hace el código presentado.</p>
+                <
+                    El siguiente bucle utiliza la misma secuencia descendente, pero limpia los bits en lugar de establecerlos:
+                </p>
+
+                <pre><code>
+        for (i = 7; i &lt; 255; i--) {
+            LED_PORT &amp;= ~(1 &lt;&lt; i);
+            _delay_ms(DELAYTIME);
+        }
+                </code></pre>
+
+                <p>
+                    De este modo, los LED se apagan en el orden inverso al de la primera animación.
+                </p>
+
+                <p>
+                    El uso de <code>i &lt; 255</code> como condición de continuación se explica en la sección 3, ya que depende del comportamiento de los enteros sin signo.
+                </p>
+
+                <h3>1.7. Tercera animación: conmutación de LED individuales</h3>
+
+                <p>
+                    La tercera parte del programa conmuta LED individuales durante 75 iteraciones:
+                </p>
+
+                <pre><code>
+        for (repetitions = 0; repetitions &lt; 75; repetitions++) {
+            randomNumber = 2053 * randomNumber + 13849;
+            whichLED = (randomNumber &gt;&gt; 8) &amp; 0b00000111;
+            LED_PORT ^= (1 &lt;&lt; whichLED);
+            _delay_ms(DELAYTIME);
+        }
+                </code></pre>
+
+                <p>
+                    Finalmente, observemos brevemente la sección de conmutación “aleatoria” del código. El número «aleatorio» en realidad no es verdaderamente aleatorio, pero produce una apariencia suficientemente cercana, por lo que resulta adecuado para este propósito. 
+                </p>
+                <p>
+                    Podemos observar cómo se utiliza una máscara de bits para tomar un número aleatorio de 16 bits y convertirlo en un número dentro del intervalo de cero a siete, que corresponde a los números de nuestros LED. Volveremos a utilizar estas técnicas más adelante, pero conviene introducirlas aquí.
+                </p>
+                <p>    
+                    Primero convertimos la variable de 16 bits <code>randomNumber</code> en un número de 8 bits desplazándola ocho posiciones: <code>whichLED = (randomNumber &gt;&gt; 8);</code>. Esto conserva los 8 bits más significativos,que son los más aleatorios según este algoritmo rápido y sencillo.
+                </p>
+                <p>
+                    Después necesitamos limitar el número aleatorio al intervalo de cero a siete. ¿Cuál es el número máximo que podemos representar con tres bits? Siete. Por lo tanto, el truco consiste en conservar solamente los tres bits inferiores y poner a cero los cinco superiores. La forma más rápida y sencilla es utilizar <strong>AND</strong> junto con una máscara: <code>whichLED = whichLED &amp; 0b00000111 </code>. Ahora nuestra variable <code>whichLED</code> estará dentro del intervalo correspondiente al número de LED que realmente tenemos.
+                </p>
+
+                <p>
+                    Si <code>whichLED</code> contiene un número como cero, tres o siete, todo lo que queda es utilizar <strong>XOR</strong> y un desplazamiento de bits para conmutar el bit seleccionado aleatoriamente. 
+                </p>
+
+
+                <p>
+                    En cada iteración se actualiza el número seudoaleatorio, se obtiene un índice entre cero y siete y se conmuta el LED correspondiente mediante XOR.
+                </p>
+
+                <p>
+                    La operación XOR cambia el estado del bit seleccionado: si estaba en cero, pasa a uno; si estaba en uno, pasa a cero. Los demás bits del puerto permanecen sin cambios.
+                </p>
+
+                <p>
+                    Una vez completadas las 75 iteraciones, se apagan todos los LED:
+                </p>
+
+                <pre><code>LED_PORT = 0;</code></pre>
+
+                <p>
+                    La asignación escribe ceros en todos los bits del registro. Después se introduce una pausa antes de que el bucle principal vuelva a comenzar.
+                </p>
+
+                <h3>1.8. Consideraciones para la ejecución del programa</h3>
+
+                <p>
+                    El ejemplo supone que los ocho LED están conectados al puerto B y que su lógica de encendido corresponde a escribir un uno en el bit de salida. La conexión eléctrica concreta puede modificar ese comportamiento.
+                </p>
+
+                <p>
+                    También es necesario comprobar que la frecuencia del reloj, la configuración del compilador y las características del microcontrolador sean compatibles con las funciones de retardo utilizadas.
+                </p>
+            </section>
+
+            <section>
+                <h2>2. BUCLES <code>for</code></h2>
+
+                <p>
+                    Los bucles <code>for</code> permiten repetir un conjunto de instrucciones mientras se cumpla una condición. Son especialmente útiles en la programación de microcontroladores cuando es necesario recorrer posiciones de bits, registros o elementos de una secuencia.
+                </p>
+
+                <h3>2.1. Estructura de un bucle <code>for</code></h3>
+
+                <p>
+                    En C, la estructura general es la siguiente:
+                </p>
+
+                <pre><code>for (inicialización; condición; actualización) {
+            // Instrucciones que se repiten
+        }</code></pre>
+
+                <p>
+                    Los tres componentes que aparecen entre paréntesis tienen funciones diferentes.
+                </p>
+
+                <ol>
+                    <li>
+                        <strong>Inicialización:</strong> establece el valor inicial de la variable de control. En el ejemplo, <code>i = 0</code>.
+                    </li>
+                    <li>
+                        <strong>Condición:</strong> determina si el bucle debe continuar. En el ejemplo, <code>i &lt; 8</code>.
+                    </li>
+                    <li>
+                        <strong>Actualización:</strong> modifica la variable de control al terminar cada iteración. En el ejemplo, <code>i++</code>.
+                    </li>
+                </ol>
+
+                <h3>2.2. Ejecución paso a paso</h3>
+
+                <p>
+                    Consideremos el siguiente bucle:
+                </p>
+
+                <pre><code>for (i = 0; i &lt; 8; i++) {
+            LED_PORT |= (1 &lt;&lt; i);
+        }</code></pre>
+
+                <p>
+                    El funcionamiento es el siguiente:
+                </p>
+
+                <ol>
+                    <li>Se inicializa <code>i</code> con el valor cero.</li>
+                    <li>Se comprueba si <code>i &lt; 8</code>.</li>
+                    <li>Si la condición es verdadera, se ejecuta la instrucción que está dentro de las llaves.</li>
+                    <li>Al terminar la iteración, se ejecuta <code>i++</code>, que incrementa <code>i</code> en uno.</li>
+                    <li>Se vuelve a comprobar la condición y el proceso se repite mientras sea verdadera.</li>
+                    <li>Cuando <code>i</code> alcanza el valor ocho, la condición resulta falsa y el bucle termina.</li>
+                </ol>
+
+                <p>
+                    Por tanto, el cuerpo del bucle se ejecuta ocho veces, con los valores de <code>i</code> comprendidos entre cero y siete.
+                </p>
+
+                <h3>2.3. Aplicación a la manipulación de bits</h3>
+
+                <p>
+                    En un puerto de ocho bits, los índices válidos van de cero a siete. Por eso, una condición como <code>i &lt; 8</code> permite recorrer todas las posiciones sin intentar acceder a un noveno bit.
+                </p>
+
+                <p>
+                    El incremento <code>i++</code> equivale a sumar uno a la variable. De forma similar, <code>i--</code> resta uno y permite recorrer las posiciones en sentido descendente.
+                </p>
+            </section>
+
+            <section>
+                <h2>3. EL PROBLEMA DE LOS ENTEROS SIN SIGNO</h2>
+
+                <p>
+                    La rutina <code>Go Right</code> introduce un caso importante en la programación de microcontroladores: el comportamiento de los enteros sin signo cuando se alcanza el límite inferior de su rango.
+                </p>
+
+                <h3>3.1. El problema de detener un bucle descendente</h3>
+
+                <p>
+                    Conceptualmente, parece sencillo comenzar con <code>i = 7</code> y restar uno en cada iteración hasta llegar a cero. Sin embargo, la condición del bucle determina si se procesará también el bit cero.
+                </p>
+
+                <p>
+                    Si se utiliza la siguiente condición:
+                </p>
+
+                <pre><code>for (i = 7; i &gt; 0; i--) {
+            // Operaciones con el bit i
+        }</code></pre>
+
+                <p>
+                    el bucle se ejecuta con los valores de <code>i</code> comprendidos entre siete y uno. Cuando <code>i</code> llega a cero, la condición <code>i &gt; 0</code> es falsa y el cuerpo no se ejecuta para ese valor. Por tanto, el bit cero queda sin procesar.
+                </p>
+
+                <h3>3.2. Por qué <code>i &gt;= 0</code> no funciona</h3>
+
+                <p>
+                    Una solución aparentemente lógica consiste en utilizar una comparación que incluya el cero:
+                </p>
+
+                <pre><code>for (i = 7; i &gt;= 0; i--) {
+            // Operaciones con el bit i
+        }</code></pre>
+
+                <p>
+                    Sin embargo, si <code>i</code> es una variable de tipo <code>uint8_t</code>, esta condición provoca que el bucle no termine normalmente.
+                </p>
+
+                <p>
+                    Un entero sin signo de ocho bits puede representar valores desde cero hasta 255. Cuando se resta uno a una variable cuyo valor es cero, el resultado vuelve al extremo superior del rango:
+                </p>
+
+                <pre><code>0 - 1 = 255</code></pre>
+
+                <p>
+                    Este comportamiento se debe a la aritmética modular de los enteros sin signo. Después de procesar el valor cero, <code>i</code> pasa a valer 255. La comparación <code>i &gt;= 0</code> continúa siendo verdadera porque todos los valores representables por un entero sin signo son mayores o iguales que cero.
+                </p>
+
+                <p>
+                    El resultado es un bucle que continúa recorriendo valores y que, además, podría producir desplazamientos inválidos para el registro de ocho bits.
+                </p>
+
+                <h3>3.3. Solución utilizada en el ejemplo</h3>
+
+                <p>
+                    El programa original utiliza la condición:
+                </p>
+
+                <pre><code>for (i = 7; i &lt; 255; i--) {
+            // Operaciones con el bit i
+        }</code></pre>
+
+                <p>
+                    Esta condición permite ejecutar el cuerpo con los valores de <code>i</code> desde siete hasta cero. Después de procesar el cero, el decremento hace que <code>i</code> pase a 255. En ese momento, la condición <code>i &lt; 255</code> es falsa y el bucle termina.
+                </p>
+
+                <p>
+                    La solución funciona con el tipo de variable utilizado en este ejemplo, pero no es necesariamente la forma más clara de escribir un bucle descendente.
+                </p>
+
+                <h3>3.4. Una alternativa más legible</h3>
+
+                <p>
+                    Para evitar depender de la comparación con 255, puede utilizarse un bucle con una condición de salida explícita:
+                </p>
+
+                <pre><code>uint8_t i = 8;
+
+        while (i &gt; 0) {
+            i--;
+            // Operaciones con el bit i
+        }</code></pre>
+
+                <p>
+                    En cada iteración se decrementa primero la variable y después se utiliza su valor. De esta manera, el cuerpo se ejecuta con los índices siete, seis, cinco, cuatro, tres, dos, uno y cero. Cuando <code>i</code> llega a cero, la condición del <code>while</code> impide una nueva iteración.
+                </p>
+
+                <p>
+                    Esta alternativa hace explícita la condición de finalización y evita el desbordamiento de la variable de control.
+                </p>
+            </section>
+
+            <section>
+                <h2>4. OPERACIONES FUNDAMENTALES DE MANIPULACIÓN DE BITS</h2>
+
+                <p>
+                    Las operaciones fundamentales para manipular bits en C son establecer un bit, limpiarlo y conmutarlo. Estas operaciones se construyen mediante desplazamientos y operadores lógicos a nivel de bit.
+                </p>
+
+                <h3>4.1. Establecer un bit</h3>
+
+                <p>
+                    Para establecer el bit <code>i</code> de un byte llamado <code>BYTE</code>, se utiliza:
+                </p>
+
+                <pre><code>BYTE |= (1 &lt;&lt; i);</code></pre>
+
+                <p>
+                    El desplazamiento <code>1 &lt;&lt; i</code> genera una máscara cuyo único bit activo se encuentra en la posición <code>i</code>. La operación OR establece ese bit en uno y conserva los valores de los demás bits.
+                </p>
+
+                <h3>4.2. Limpiar un bit</h3>
+
+                <p>
+                    Para poner a cero el bit <code>i</code>, se utiliza:
+                </p>
+
+                <pre><code>BYTE &amp;= ~(1 &lt;&lt; i);</code></pre>
+
+                <p>
+                    El desplazamiento genera la máscara y el operador NOT invierte sus bits. De esta forma, el bit seleccionado queda a cero en la máscara invertida, mientras que los demás quedan a uno. La operación AND limpia el bit seleccionado y conserva los demás.
+                </p>
+
+                <h3>4.3. Conmutar un bit</h3>
+
+                <p>
+                    Para invertir el estado del bit <code>i</code>, se utiliza:
+                </p>
+
+                <pre><code>BYTE ^= (1 &lt;&lt; i);</code></pre>
+
+                <p>
+                    La operación XOR conmuta el bit seleccionado. Si estaba a cero, pasa a uno; si estaba a uno, pasa a cero. Los demás bits permanecen sin cambios.
+                </p>
+
+                <h3>4.4. Modificar varios bits mediante máscaras</h3>
+
+                <p>
+                    Los desplazamientos no tienen que utilizarse necesariamente de forma aislada. Es posible combinar varias máscaras mediante OR para establecer varios bits en una sola operación.
+                </p>
+
+                <p>
+                    Por ejemplo, para establecer los bits <code>i</code> y <code>j</code>:
+                </p>
+
+                <pre><code>BYTE |= ((1 &lt;&lt; i) | (1 &lt;&lt; j));</code></pre>
+
+                <p>
+                    Primero se generan las dos máscaras y después se combinan con OR. La máscara resultante contiene unos en las posiciones que se desean establecer.
+                </p>
+
+                <p>
+                    El mismo principio puede utilizarse con otras operaciones lógicas cuando se necesita modificar un conjunto de bits.
+                </p>
+
+                <h3>4.5. Macros para facilitar la lectura del código</h3>
+
+                <p>
+                    Aunque las operaciones directas con desplazamientos y máscaras pueden parecer poco intuitivas al principio, forman parte del uso habitual del lenguaje C en la programación de microcontroladores. Es importante aprender a reconocerlas porque aparecen con frecuencia en bibliotecas, controladores y programas escritos por otros desarrolladores.
+                </p>
+
+                <p>
+                    Para hacer más legibles estas operaciones, pueden definirse macros:
+                </p>
+
+<pre><code>
+#define BV(bit) (1 &lt;&lt; bit)
+#define setBit(byte, bit) (byte |= BV(bit))
+#define clearBit(byte, bit) (byte &amp;= ~BV(bit))
+#define toggleBit(byte, bit) (byte ^= BV(bit))</code></pre>
+
+                <p>
+                    La macro <code>BV(bit)</code> genera una máscara con un uno en la posición indicada. Las otras tres macros utilizan esa máscara para establecer, limpiar o conmutar un bit.
+                </p>
+
+                <p>
+                    Por ejemplo, para establecer el bit 3 de un registro:
+                </p>
+
+                <pre><code>setBit(PORTB, 3);</code></pre>
+
+                <p>
+                    Para limpiarlo:
+                </p>
+
+                <pre><code>clearBit(PORTB, 3);</code></pre>
+
+                <p>
+                    Y para conmutarlo:
+                </p>
+
+                <pre><code>toggleBit(PORTB, 3);</code></pre>
+
+                <p>
+                    Estas macros facilitan la lectura, pero requieren cuidado: los argumentos deben ser adecuados para las operaciones que realizan y no conviene pasar expresiones que produzcan efectos secundarios al evaluarse.
+                </p>
+
+                <h3>4.6. Limitaciones y rendimiento</h3>
+
+                <p>
+                    Las macros anteriores están diseñadas para modificar un bit cada vez. En cambio, las operaciones directas con máscaras permiten establecer, limpiar o conmutar varios bits simultáneamente.
+                </p>
+
+                <p>
+                    En la mayoría de los casos, la diferencia principal es la claridad del código. Cuando es necesario modificar varios bits, resulta más conveniente construir una máscara que represente todas las posiciones requeridas.
+                </p>
+
+                <p>
+                    En situaciones en las que se ejecutan operaciones de manipulación de bits de forma muy frecuente o con requisitos estrictos de tiempo, el rendimiento debe comprobarse examinando el código generado por el compilador. No debe suponerse que una operación directa siempre será más rápida que una macro, puesto que el compilador puede generar instrucciones equivalentes.
+                </p>
+            </section>
+
+            <section>
+                <h2>5. CONMUTACIÓN APARENTEMENTE ALEATORIA DE BITS</h2>
+
+                <p>
+                    La tercera animación del programa utiliza una secuencia seudoaleatoria para seleccionar qué LED debe conmutarse en cada iteración.
+                </p>
+
+                <h3>5.1. Generación de un número seudoaleatorio</h3>
+
+                <p>
+                    La variable <code>randomNumber</code> se inicializa con el valor hexadecimal <code>0x1234</code>. En cada iteración se actualiza mediante la expresión:
+                </p>
+
+                <pre><code>randomNumber = 2053 * randomNumber + 13849;</code></pre>
+
+                <p>
+                    Se trata de una forma de generador congruencial lineal, que produce una secuencia determinista de valores a partir de un estado inicial. El resultado depende del valor anterior y de las constantes utilizadas.
+                </p>
+
+                <p>
+                    Como <code>randomNumber</code> es un entero sin signo de 16 bits, el resultado se almacena dentro del rango representable por ese tipo. La secuencia no es verdaderamente aleatoria: si se repite el mismo estado inicial y se utiliza el mismo algoritmo, se obtiene la misma secuencia.
+                </p>
+
+                <p>
+                    Para una animación de LED, esta aproximación suele ser suficiente, aunque no debe confundirse con un generador adecuado para aplicaciones criptográficas o para situaciones que exijan aleatoriedad real.
+                </p>
+
+                <h3>5.2. Obtener los ocho bits superiores</h3>
+
+                <p>
+                    El programa necesita extraer información del byte superior de <code>randomNumber</code>. Para ello, utiliza un desplazamiento hacia la derecha:
+                </p>
+
+                <pre><code>whichLED = (randomNumber &gt;&gt; 8);</code></pre>
+
+                <p>
+                    Al desplazar ocho posiciones a la derecha un valor de 16 bits, los ocho bits superiores pasan a ocupar las posiciones inferiores del resultado. En una asignación a una variable de ocho bits, se conserva el byte inferior de ese resultado.
+                </p>
+
+                <p>
+                    En el programa completo, esta operación se combina directamente con una máscara:
+                </p>
+
+                <pre><code>whichLED = (randomNumber &gt;&gt; 8) &amp; 0b00000111;</code></pre>
+
+                <h3>5.3. Limitar el índice al intervalo de cero a siete</h3>
+
+                <p>
+                    El puerto tiene ocho LED, numerados del cero al siete. Por tanto, el índice seleccionado debe estar dentro de ese intervalo.
+                </p>
+
+                <p>
+                    Tres bits permiten representar ocho valores distintos:
+                </p>
+
+                <pre><code>000 = 0
+        001 = 1
+        010 = 2
+        011 = 3
+        100 = 4
+        101 = 5
+        110 = 6
+        111 = 7</code></pre>
+
+                <p>
+                    Para conservar únicamente los tres bits inferiores, se utiliza la máscara:
+                </p>
+
+                <pre><code>0b00000111</code></pre>
+
+                <p>
+                    La operación AND:
+                </p>
+
+                <pre><code>whichLED = whichLED &amp; 0b00000111;</code></pre>
+
+                <p>
+                    pone a cero los cinco bits superiores y conserva los tres inferiores. De este modo, el resultado queda limitado al intervalo de cero a siete.
+                </p>
+
+                <p>
+                    En C, esta operación también puede escribirse mediante el operador AND compuesto:
+                </p>
+
+                <pre><code>whichLED &amp;= 0b00000111;</code></pre>
+
+                <h3>5.4. Conmutar el LED seleccionado</h3>
+
+                <p>
+                    Una vez obtenido el índice, el programa construye una máscara y conmuta el bit correspondiente:
+                </p>
+
+                <pre><code>LED_PORT ^= (1 &lt;&lt; whichLED);</code></pre>
+
+                <p>
+                    Si <code>whichLED</code> contiene cero, se conmuta el bit cero. Si contiene tres, se conmuta el bit tres; y si contiene siete, se conmuta el bit siete.
+                </p>
+
+                <p>
+                    La combinación de desplazamiento, máscara AND y operación XOR produce una secuencia de encendidos y apagados aparentemente aleatoria. La animación se completa después de 75 iteraciones y, a continuación, el programa apaga todos los LED antes de repetir el ciclo.
+                </p>
+
+                <h3>5.5. Resumen del procedimiento</h3>
+
+                <ol>
+                    <li>Actualizar el estado del generador seudoaleatorio.</li>
+                    <li>Desplazar el número para obtener información de sus ocho bits superiores.</li>
+                    <li>Aplicar una máscara para conservar únicamente tres bits.</li>
+                    <li>Utilizar el resultado como índice del LED que se va a seleccionar.</li>
+                    <li>Conmutar el bit correspondiente mediante XOR.</li>
+                </ol>
+
+                <p>
+                    Esta técnica combina varias operaciones fundamentales de manipulación de bits en una aplicación práctica.
+                </p>
+            </section>
+
+            <section>
+                <h2>6. RESUMEN DE LA MANIPULACIÓN DE BITS</h2>
+
+                <p>
+                    En este artículo se han estudiado las operaciones básicas de manipulación de bits (<em>bit twiddling</em>) y su aplicación al control de las salidas digitales de un microcontrolador AVR.
+                </p>
+
+                <h3>6.1. Registros de dirección de datos y registros de salida</h3>
+
+                <p>
+                    En un <a href="/microcontroladores/avr/Caracteristicas/RegistrosGPIO/index.html" target="_blank" rel="noopener" >artículo previo</a>se explicó que son los registros de E/S en un mcirocontrolador de la serie ATmega48A/PA/ 88A/PA/ 168A/PA/328/P; en <a href= "/microcontroladores/avr/programacion/codificacion/controlBitsC/index.html" target="_blank" rel="noopener"> este enlace</a>  se explió cómo manipular en C los registros de dirección de datos (<code>DDR</code>) para habilitar determinados pines como salidas. Ahí mismo también se estudió cómo escribir valores lógicos en los registros de salida para controlar el nivel eléctrico de los pines.
+                </p>
+
+                <p>
+                    El nivel de tensión asociado a un cero(<code>0</code>) o a un uno (<code>1</code>) lógico depende de la alimentación y de las características eléctricas del microcontrolador. Por ejemplo, en un sistema alimentado a 5 V, los niveles de salida suelen corresponder aproximadamente a 0 V y 5 V, respectivamente, dentro de las condiciones especificadas por el fabricante.
+                </p>
+
+                <h3>6.2. Operadores lógicos a nivel de bit</h3>
+
+                <p>
+                    Para modificar bits individuales o grupos de bits se utilizan los siguientes operadores:
+                </p>
+
+                <ul>
+                    <li><code>OR</code>, representado por <code>|</code>, permite establecer bits.</li>
+                    <li><code>XOR</code>, representado por <code>^</code>, permite conmutar bits.</li>
+                    <li><code>AND</code>, representado por <code>&amp;</code>, permite conservar o limpiar bits según la máscara utilizada.</li>
+                    <li><code>NOT</code>, representado por <code>~</code>, invierte los bits de un valor.</li>
+                </ul>
+
+                <p>
+                    También se ha estudiado el desplazamiento de bits, que permite situar un uno en una posición determinada para construir una máscara.
+                </p>
+
+                <h3>6.3. Las tres operaciones fundamentales</h3>
+
+                <h4>6.3.1. Establecer un bit</h4>
+
+                <pre><code>BYTE |= (1 &lt;&lt; i);</code></pre>
+
+                <p>
+                    Establece el bit <code>i</code> en uno sin modificar los demás bits.
+                </p>
+
+                <h4>6.3.2. Limpiar un bit</h4>
+
+                <pre><code>BYTE &amp;= ~(1 &lt;&lt; i);</code></pre>
+
+                <p>
+                    Establece el bit <code>i</code> en cero y conserva el estado de los demás bits.
+                </p>
+
+                <h4>6.3.3. Conmutar un bit</h4>
+
+                <pre><code>BYTE ^= (1 &lt;&lt; i);</code></pre>
+
+                <p>
+                    Invierte el estado del bit <code>i</code>: cambia de cero a uno o de uno a cero.
+                </p>
+
+                <h3>6.4. Máscaras de bits y aplicación práctica</h3>
+
+                <p>
+                    Una máscara de bits (<em>bitmask</em>) es un valor binario que permite seleccionar las posiciones que deben intervenir en una operación. Combinada con los operadores lógicos, permite modificar bits específicos, tanto individualmente como en grupos.
+                </p>
+
+                <p>
+                    Estas técnicas son útiles para configurar registros de periféricos, controlar salidas digitales, consultar estados, modificar campos de configuración y trabajar con los recursos internos de los microcontroladores.
+                </p>
+
+                <p>
+                    Aunque al principio los desplazamientos y las operaciones lógicas pueden parecer difíciles de leer, su dominio es fundamental para comprender programas de sistemas embebidos y trabajar con código escrito por otros desarrolladores.
+                </p>
+
+                <p>
+                    Los fundamentos estudiados en este capítulo servirán como base para el resto del aprendizaje y para el desarrollo de aplicaciones con microcontroladores AVR.
+                </p>
+            </section>
+
+        </article>
+ 
+            
+            
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>
