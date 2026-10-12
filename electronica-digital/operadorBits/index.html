@@ -186,37 +186,37 @@
 
             <section>
                                                 
-                <h2>3. OR (|) </h2>
+            <h2>3. OR (|) </h2>
 
                 <p>Recordemos cómo funciona el operador <strong>OR</strong>:</p>
         
-            <h3>3.1. Caso 1: Hacer OR de un bit con cero (<code>0</code>)</h4>
-            <ul>
-                <li><code>0 | 0 &rarr; 0</code></li>
-                <li><code>1 | 0 &rarr; 1</code></li>
-            </ul>
-            <p>Como puedes observar, <strong>el bit original no cambia</strong>.</p>
-       
-            <h3>3.2. Caso 2: Hacer OR de un bit con uno (<code>1</code>)</h3>
-            <ul>
-                <li><code>0 | 1 &rarr; 1</code></li>
-                <li><code>1 | 1 &rarr; 1</code></li>
-            </ul>
-            <p>En este caso, <strong>el resultado siempre es 1</strong>.</p>
+                <h3>3.1. Caso 1: Hacer OR de un bit con cero (<code>0</code>)</h4>
+                    <ul>
+                        <li><code>0 | 0 &rarr; 0</code></li>
+                        <li><code>1 | 0 &rarr; 1</code></li>
+                    </ul>
+                    <p>Como puedes observar, <strong>el bit original no cambia</strong>.</p>
         
-            <p><strong>Conclusión:</strong> Este comportamiento constituye la base para utilizar el operador OR para <strong>activar bits específicos</strong> mediante el uso de máscaras de bits (<em>bitmasks</em>).</p>
-        
-            <h3>3.3 OR (|) entre binarios</h3>
-                <p>
-                    El operador OR a nivel de bit compara dos binarios (el registro de entrada en su estado actual y una máscara) y devuelve un binario donde cada bit es el resultado de la operación OR entre los bits correspondientes de los binarios  de entrada.
-                </p>
-                <p>
-                    Para cada posición de bit, un OR a nivel de bit devuelve 1 si cualquiera de los dos bits comparados es 1. Devuelve 0 únicamente cuando ambos bits son 0:
-                </p>
-                <p>
-                    Por ejemplo, si tenemos los bytes 10101010 y 11001100, la operación OR a nivel de bit devolverá 11101110.
-                </p>
-                <pre><code>
+                <h3>3.2. Caso 2: Hacer OR de un bit con uno (<code>1</code>)</h3>
+                    <ul>
+                        <li><code>0 | 1 &rarr; 1</code></li>
+                        <li><code>1 | 1 &rarr; 1</code></li>
+                    </ul>
+                    <p>En este caso, <strong>el resultado siempre es 1</strong>.</p>
+                
+                    <p><strong>Conclusión:</strong> Este comportamiento constituye la base para utilizar el operador OR para <strong>activar bits específicos</strong> mediante el uso de máscaras de bits (<em>bitmasks</em>).</p>
+            
+                <h3>3.3 OR (|) entre binarios</h3>
+                    <p>
+                        El operador OR a nivel de bit compara dos binarios (el registro de entrada en su estado actual y una máscara) y devuelve un binario donde cada bit es el resultado de la operación OR entre los bits correspondientes de los binarios  de entrada.
+                    </p>
+                    <p>
+                        Para cada posición de bit, un OR a nivel de bit devuelve 1 si cualquiera de los dos bits comparados es 1. Devuelve 0 únicamente cuando ambos bits son 0:
+                    </p>
+                    <p>
+                        Por ejemplo, si tenemos los bytes 10101010 y 11001100, la operación OR a nivel de bit devolverá 11101110.
+                    </p>
+                    <pre><code>
 Registro (entrada, en su estado actual): b010101010
 Máscara:                                 b011001100
 
@@ -226,37 +226,37 @@ Máscara:                                 b011001100
                 </code></pre>   
             
                 <h3>3.4. OR (|) para Establecer en 1, Bits de un Registro (SET BIT)</h3>
-                <p>
-                    La operación <code>OR</code> a nivel de bit (OR bitwise) se puede utilizar para establecer en 1 (<strong>SET BIT</strong>) bits individuales en un registro. Por ejemplo, si queremos establecer el bit 3 de un registro sin afectar los demás bits, podemos hacer una operación OR con un valor que tenga el bit 3 establecido en 1 (<code>1 << 3</code> ) y todos los demás bits establecidos en 0.
-                </p>
+                    <p>
+                        La operación <code>OR</code> a nivel de bit (OR bitwise) se puede utilizar para establecer en 1 (<strong>SET BIT</strong>) bits individuales en un registro. Por ejemplo, si queremos establecer el bit 3 de un registro sin afectar los demás bits, podemos hacer una operación OR con un valor que tenga el bit 3 establecido en 1 (<code>1 << 3</code> ) y todos los demás bits establecidos en 0.
+                    </p>
 
 <pre><code>
 REGISTRO = REGISTRO | 1 << 3
 </code></pre>
-                <p>
-                    Usando registros reales:
-                </p>                
+                    <p>
+                        Usando registros reales:
+                    </p>                
 <pre><code>PORTB = PORTB | 1 << 3 </code></pre>
-<p>
-    Leemos el estado original del registro <code>PORTB</code> y hacemos <code>OR</code> con la máscara de bits (<code>1 << 3</code>>). Esto produce un nuevo byte que posteriormente escribimos en <code>PORTB</code>. El nuevo byte conserva el contenido original de PORTB allí donde la máscara tenía 0, y contiene 1 allí donde la máscara tenía 1 (<code>PB3</code>).
-</p>
-<p>
-    Escribimos nuevamente el resultado en <code>PORTB</code> y tendremos todos los bits originales intactos, excepto aquellos correspondientes a los 1 de la máscara, que habrán sido activados.
-</p>
-                    <h3>3.5. Forma abreviada para establecer bits </h3>
-                        <p>
-                            Acabamos de ver cómo obtener una copia del byte actualmente almacenado en PORTB y cómo poner en 1 PB3, utilizando OR y una máscara de bits. Esto produce un nuevo byte que luego escribimos en <code>PORTB</code>.
-                        </p>
-                        <p>En lenguaje C lo hemos expresado así:</p>
+                    <p>
+                        Leemos el estado original del registro <code>PORTB</code> y hacemos <code>OR</code> con la máscara de bits (<code>1 << 3</code>>). Esto produce un nuevo byte que posteriormente escribimos en <code>PORTB</code>. El nuevo byte conserva el contenido original de PORTB allí donde la máscara tenía 0, y contiene 1 allí donde la máscara tenía 1 (<code>PB3</code>).
+                    </p>
+                    <p>
+                        Escribimos nuevamente el resultado en <code>PORTB</code> y tendremos todos los bits originales intactos, excepto aquellos correspondientes a los 1 de la máscara, que habrán sido activados.
+                    </p>
+                <h3>3.5. Forma abreviada para establecer bits </h3>
+                    <p>
+                        Acabamos de ver cómo obtener una copia del byte actualmente almacenado en PORTB y cómo poner en 1 PB3, utilizando OR y una máscara de bits. Esto produce un nuevo byte que luego escribimos en <code>PORTB</code>.
+                    </p>
+                    <p>En lenguaje C lo hemos expresado así:</p>
 <pre><code>PORTB = PORTB | 1 << 3 </code></pre>
 
-                        <p> Este tipo de operación es tan común que C dispone de una forma abreviada:</p>
-                        <pre><code>PORTB |= (1 << 3); </code></pre>
+                    <p> Este tipo de operación es tan común que C dispone de una forma abreviada:</p>
+<pre><code>PORTB |= (1 << 3); </code></pre>
 
-                        <p>Después de la compilación, ambas formas terminan produciendo el mismo resultado. Las dos tienen el efecto de poner en Alto (High) el bit PB3 LED2 dejando los demás bits tal como estaban.</p>
-                    </section>
-            
-
+                    <p>Después de la compilación, ambas formas terminan produciendo el mismo resultado. Las dos tienen el efecto de poner en Alto (High) el bit PB3 LED2 dejando los demás bits tal como estaban.</p>
+                    
+            <img src="img/operador_or_resumen.png" alt="Operador Lógico OR. Resumen" class="imagen-centrada">
+            </section>
                        
             <section>
             <h2>4.  AND (&)</h2>
@@ -368,6 +368,8 @@ PORTB &= ~((1 << 2) | (1 << 4));
                 <p>
                     Hay que prestar atención al NOT situado fuera de los paréntesis, porque queremos obtener dos ceros en nuestra máscara de bits.
                 </p>
+            
+            <img src="img/operador_and_resumen.png" alt="Operador Lógico AND. Resumen" class="imagen-centrada">   
 
             </section>
 
@@ -520,7 +522,7 @@ PORTB ^= ((1 &lt;&lt; 2) | (1 &lt;&lt; 4));
                             </ul>
 
                         <p>Si alguno de los bits seleccionados estaba en 0, pasará a 1. Si estaba en 1, pasará a 0. Ambos cambios se producen en una misma operación de lectura, modificación y escritura expresada en C.</p> 
-                    
+     <img src="img/operador_xor_resumen.png" class="imagen-centrada">              
                     <h3>5.4. Aplicación práctica: Hacer parpadear un led</h2>
 
                     <h4>5.4.1. Conmutación periódica de una salida</h4>
