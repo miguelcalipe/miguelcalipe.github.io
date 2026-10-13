@@ -42,7 +42,11 @@
 <h2>INTRODUCCIÓN</h2>
 <p>La comunicación entre dispositivos digitales consiste, en esencia, en intercambiar información representada mediante bits. Un microcontrolador necesita comunicarse con sensores, memorias, convertidores, otros microcontroladores, módulos de comunicación y numerosos periféricos. Para hacerlo existen diferentes técnicas de transmisión de datos, entre ellas la comunicación paralela y la comunicación serial.</p>
 
-<p>La comunicación serial ocupa un lugar especialmente importante en los sistemas embebidos porque permite intercambiar información utilizando un número reducido de conexiones físicas. Sin embargo, comprenderla correctamente requiere ir más allá de la idea simplificada de que «los bits se envían uno detrás de otro». Hay que entender cómo se almacenan y desplazan los bits, cómo se establece la sincronización temporal y cómo el receptor determina dónde comienza y termina una transmisión.</p>
+<p>
+    Básicamente, un dispositivo transmite información generando pulsos de tensión alta y baja sobre un conductor que lo conecta con otro dispositivo. El dispositivo receptor, configurado como entrada, observa los niveles de tensión presentes en ese conductor y los interpreta para recuperar la información transmitida.
+</p>
+
+<p>La comunicación serial permite intercambiar información utilizando un número reducido de conexiones físicas. Para comprenderla correctamente hay que entender cómo se almacenan y desplazan los bits, cómo se establece la sincronización temporal y cómo el receptor determina dónde comienza y termina una transmisión.</p>
 
 <p>En este artículo se desarrolla la comunicación serial desde sus fundamentos digitales hasta la distinción entre comunicación síncrona y asíncrona, conceptos que posteriormente permiten comprender interfaces como SPI y UART.</p>
 </section>  
@@ -100,6 +104,10 @@ D0 ─────────────────────────�
 <p>La ventaja evidente es la reducción del número de conexiones. Esta característica resulta especialmente útil en sistemas embebidos, donde el número de pines de un microcontrolador es limitado y donde el espacio disponible en la placa puede ser reducido.</p>
 
 <p>Sin embargo, reducir el número de líneas implica resolver otro problema: el receptor necesita saber <strong>cuándo debe interpretar la señal eléctrica como un bit</strong>. Esta cuestión conduce directamente al concepto de sincronización.</p>
+
+<p>
+    Las reglas utilizadas para codificar los datos mediante pulsos eléctricos y, posteriormente, decodificarlos para recuperar la información se denominan <strong>protocolo de comunicación serial </strong>.
+</p>
 </section>
 
 <section>

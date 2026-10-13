@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comunicación UART | MC Mundo Tech</title>
+    <meta name="description" content="Con el paso del tiempo han aparecido distintos niveles de abstracción cuyo objetivo es simplificar el desarrollo de software. Mientras mayor es la abstracción, menor es la cantidad de detalles del hardware que el programador necesita conocer, a costa de perder algo de control y eficiencia ">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>COMUNICACIÓN SERIAL ASÍNCRONA - UART</h1>
+            
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   -->
+            
+            <section> 
+        <h2>1. INTRODUCCIÓN</h2>   
+            <p>
+            Existen diferentes formas de transmitir información en serie.
+            En este capítulo nos centraremos en una de las más utilizadas
+            en sistemas embebidos: la comunicación serial asíncrona mediante
+            <strong>UART (Universal Asynchronous Receiver and
+            Transmitter)</strong>, es decir, Receptor y Transmisor
+            Asíncrono Universal.
+        </p>
+
+        <p>
+            UART permite transmitir y recibir datos mediante líneas de
+            comunicación digital sin necesidad de compartir una señal de
+            reloj entre los dispositivos. Para que la comunicación funcione,
+            ambos extremos deben utilizar una configuración compatible,
+            especialmente en lo referente a la velocidad de transmisión
+            y al formato de los datos.
+        </p>
+
+        <p>
+            Para comprender cómo funciona este mecanismo, imaginemos a dos
+            personas que quieren comunicarse enviando señales eléctricas
+            a través de un conductor.
+        </p>
+
+    </section>
+
+    <section>
+        <h2>2. REPRESENTACIÓN DE LOS DATOS MEDIANTE SEÑALES ELÉCTRICAS</h2>
+
+        <h3>2.1. Un ejemplo sencillo: Alice y Bob</h3>
+
+        <p>
+            Supongamos que Alice quiere enviarle el número 10 a su amigo
+            Bob utilizando un conductor eléctrico.
+        </p>
+
+        <p>
+            Para concretar el ejemplo, imaginemos que el conductor dispone
+            de una resistencia de elevación <strong>pull-up</strong>,
+            conectada a una alimentación de 5 V. Por tanto, cuando nadie
+            fuerza la línea a un nivel bajo, esta permanece normalmente
+            a unos 5 V.
+        </p>
+
+        <p>
+            En el extremo de Alice hay un interruptor conectado a tierra.
+            Cuando Alice lo presiona, conecta el conductor a 0 V. En el
+            extremo de Bob hay un LED que le permite observar el estado
+            eléctrico de la línea.
+        </p>
+
+        <p>
+            En este montaje, al presionar el interruptor, la línea pasa
+            a nivel bajo y el LED se apaga. Cuando Alice suelta el
+            interruptor, la resistencia pull-up devuelve la línea al
+            nivel alto y el LED se enciende.
+        </p>
+
+        <p>
+            De esta manera, Alice puede transmitir información modificando
+            el estado eléctrico del conductor y Bob puede interpretarla
+            observando el LED.
+        </p>
+
+        <img src="img/Alice-Bob.png" alt="Configuración eléctrica para UART" class="imagen-centrada">
+
+        <h3>2.2. Por qué se utiliza el sistema binario</h3>
+
+        <p>
+            Alice podría enviar el número 10 haciendo parpadear el LED
+            diez veces. Sin embargo, este procedimiento se volvería poco
+            práctico al transmitir números mayores, como 253 o 64 123.
+        </p>
+
+        <p>
+            Una alternativa mucho más eficiente consiste en representar
+            los números mediante el sistema binario, en el que cada dígito
+            puede tomar únicamente dos valores: 0 o 1.
+        </p>
+
+        <p>
+            El número decimal 10 se representa en binario mediante ocho bits
+            de la siguiente manera:
+        </p>
+
+        <pre><code>0b00001010</code></pre>
+
+        <p>
+            El prefijo <code>0b</code> indica que el valor está escrito en
+            binario. Los ocho bits restantes constituyen el dato que Alice
+            quiere transmitir.
+        </p>
+
+        <p>
+            Para enviar esta secuencia, Alice debe generar un patrón de
+            niveles eléctricos que represente cada uno de los bits.
+            Bob tendrá que observar esos niveles y reconstruir el valor
+            original.
+        </p>
+
+        <h3>2.3. La necesidad de establecer un protocolo</h3>
+
+        <p>
+            Para que la transmisión funcione, Alice y Bob deben ponerse
+            de acuerdo previamente sobre cómo interpretar las señales.
+            Ese conjunto de reglas es precisamente el protocolo de
+            comunicación serial.
+        </p>
+
+        <p>
+            Como mínimo, deben establecer 
+        </p>
+
+            <ul>
+                <li>La correspondencia entre los niveles eléctricos y los bits.</li>
+                <li>El orden de transmisión de los bits.</li>
+                <li>La velocidad de comunicación </li>
+                <li>La forma de identificar el comienzo y el final de cada trama.</li>
+            </ul>
+       
+    </section>
+
+    <section>
+        <h2>3. REGLAS BÁSICAS DEL PROTOCOLO UART</h2>
+
+        <h3>3.1. Correspondencia entre niveles eléctricos y bits</h3>
+
+        <p>
+            Alice y Bob acuerdan que una tensión de 0 V representa un
+            cero lógico y que una tensión de 5 V representa un uno lógico.
+        </p>
+
+        <p>
+            Esta correspondencia es válida para el ejemplo didáctico.
+            En un sistema real, los niveles de tensión que representan
+            un cero y un uno dependen de las características eléctricas
+            de los dispositivos utilizados.
+        </p>
+
+        <p>
+            También acuerdan transmitir primero el
+            <strong>bit menos significativo (LSB, Least Significant Bit)</strong>.
+            Esto significa que el bit de menor peso se transmite antes
+            que los bits de mayor peso.
+        </p>
+
+        <p>
+            Para el número 10, cuyo valor binario de ocho bits es
+            <code>00001010</code>, el orden de transmisión será:
+        </p>
+
+        <pre><code>Orden de bits transmitidos:  0 1 0 1 0 0 0 0
+Peso de los bits:           LSB           MSB</code></pre>
+
+        <p>
+            Por tanto, aunque el número se escribe habitualmente con el
+            bit más significativo a la izquierda, UART transmite primero
+            el bit menos significativo. El receptor debe tener en cuenta
+            este orden para reconstruir correctamente el dato.
+        </p>
+
+        <h3>3.2. Velocidad de transmisión y duración de los bits</h3>
+
+        <p>
+            Alice y Bob también deben acordar la velocidad con la que
+            se transmitirán los bits. Supongamos que deciden enviar un
+            bit por segundo.
+        </p>
+
+        <p>
+            En este ejemplo, cada bit ocupa un intervalo de un segundo.
+            La duración de cada intervalo debe ser conocida por el
+            receptor para que pueda muestrear la señal en los instantes
+            adecuados.
+        </p>
+
+        <p>
+            En UART se utiliza habitualmente el término
+            <strong>velocidad en baudios (baud rate)</strong> para
+            especificar la velocidad de señalización. En una comunicación
+            UART convencional, cada símbolo representa un bit, por lo
+            que el valor numérico de la velocidad en baudios coincide
+            con la tasa de bits por segundo.
+        </p>
+
+        <p>
+            Por ejemplo, a 9600 baudios, cada intervalo de bit dura
+            aproximadamente:
+        </p>
+
+        <pre><code>Tbit = 1 / 9600 ≈ 104,17 µs</code></pre>
+
+        <p>
+            El receptor utiliza esta duración para determinar cuándo
+            debe leer el nivel de la línea y decidir si el bit recibido
+            es un cero o un uno.
+        </p>
+
+        <h3>3.3. Identificación del comienzo y el final de una trama</h3>
+
+        <p>
+            Una pregunta importante es cómo sabe Bob cuándo comienza
+            una transmisión y cuándo termina.
+        </p>
+
+        <p>
+            Para resolverlo, Alice y Bob acuerdan rodear los ocho bits
+            de datos con dos bits adicionales: un
+            <strong>bit de inicio (start bit)</strong> y un
+            <strong>bit de parada (stop bit)</strong>.
+        </p>
+
+        <ul>
+            <li>
+                <strong>Bit de inicio:</strong> siempre tiene valor
+                lógico 0 e indica el comienzo de la trama.
+            </li>
+            <li>
+                <strong>Bits de datos:</strong> contienen la información
+                que se desea transmitir. En este ejemplo son ocho.
+            </li>
+            <li>
+                <strong>Bit de parada:</strong> tiene valor lógico 1
+                e indica el final de la trama y devuelve la línea al
+                estado de reposo.
+            </li>
+        </ul>
+
+        <p>
+            En una configuración UART habitual, la línea permanece
+            en nivel alto cuando está en reposo. La transición desde
+            el nivel alto al nivel bajo permite detectar el bit de
+            inicio y comenzar la temporización de recepción.
+        </p>
+
+        <p>
+            La trama del ejemplo contiene diez intervalos de bit:
+            uno de inicio, ocho de datos y uno de parada.
+        </p>
+
+        <pre><code>Reposo | Inicio | D0 D1 D2 D3 D4 D5 D6 D7 | Parada
+   1   |   0    |  0  1  0  1  0  0  0  0 |   1</code></pre>
+
+   <img src="img/protocolo.png" alt="Protocolo Serial" class="imagen-centrada">
+    </section>
+
+    <section>
+        <h2>4. RECEPCIÓN Y RECONSTRUCCIÓN DEL DATO</h2>
+
+        <h3>4.1. Detección del bit de inicio</h3>
+
+        <p>
+            Bob permanece en su extremo del conductor observando el LED.
+            Cuando el LED se apaga, identifica el nivel bajo correspondiente
+            al bit de inicio.
+        </p>
+
+        <p>
+            En una implementación real de UART, el receptor no depende
+            de una persona que observe un LED. El periférico detecta
+            eléctricamente el inicio de la trama y utiliza su propia
+            temporización para muestrear los bits siguientes.
+        </p>
+
+        <h3>4.2. Lectura de los ocho bits de datos</h3>
+
+        <p>
+            Después de detectar el bit de inicio, Bob observa el estado
+            de la línea una vez por segundo, según la velocidad acordada.
+            En el ejemplo, registra la siguiente secuencia de estados
+            del LED durante los ocho bits de datos:
+        </p>
+
+        <pre><code>apagado, encendido, apagado, encendido, apagado, apagado, apagado, apagado</code></pre>
+
+        <p>
+            De acuerdo con las reglas establecidas, un LED apagado
+            representa un cero y un LED encendido representa un uno.
+            La secuencia observada es, por tanto:
+        </p>
+
+        <pre><code>01010000</code></pre>
+
+<img src="img/AliceEnvia.png" alt="Envio de la trama de bits" class="imagen-centrada">        
+
+        <p>
+            Esta secuencia corresponde al orden en que se transmitieron
+            los bits, comenzando por el menos significativo. Para
+            interpretar el número en la forma binaria habitual,
+            Bob invierte el orden de los bits:
+        </p>
+
+        <pre><code>Bits recibidos en orden de transmisión: 01010000
+Representación binaria convencional:    00001010
+Valor decimal:                           10</code></pre>
+
+        <p>
+            Así, Bob recupera correctamente el número 10 enviado por Alice.
+        </p>
+
+<img src="img/inversion.png" alt="Inversion de los bits recibidos" class="imagen-centrada">
+
+        <h3>4.3. Interpretación de una señal real de osciloscopio</h3>
+
+        <p>
+            La Figura siguiente muestra un ejemplo real de un microcontrolador
+            AVR que transmite el número 10 a una computadora. En lugar
+            de utilizar un bit por segundo, la transmisión se realiza
+            a 9600 bits por segundo, de modo que cada bit dura
+            aproximadamente 104 microsegundos.
+        </p>
+
+        <p>
+            Aunque la señal es mucho más rápida que la del ejemplo
+            didáctico, todavía es posible reconocer el patrón transmitido.
+            La secuencia de niveles mostrada es:
+        </p>
+
+        <pre><code>1111100101000011111</code></pre>
+
+        <p>
+            Para interpretar la señal, hay que tener presente que los
+            niveles altos anteriores al inicio y posteriores a la trama
+            pueden corresponder al estado de reposo de la línea.
+        </p>
+
+        <ol>
+            <li>Identificar la transición al nivel bajo que marca el bit de inicio.</li>
+            <li>Contar los ocho bits de datos en el orden de transmisión.</li>
+            <li>Comprobar que el bit de parada se encuentra en nivel alto.</li>
+            <li>Invertir el orden de los ocho bits para escribir el valor binario convencional.</li>
+            <li>Convertir el valor binario a decimal, si es necesario.</li>
+        </ol>
+<img src="img/senal_osciloscopio_uart.png" alt="Envío del número 10 mediante comunicación serial" class="imagen-centrada">
+        
+
+        <p>
+            Este procedimiento permite relacionar la forma de onda observada
+            en un osciloscopio con la información digital que transmite
+            el microcontrolador.
+        </p>
+
+        <h3>4.4. Envío consecutivo de varios bytes</h3>
+
+        <p>
+            La figura <strong>Envío serial de los números 9 y 10</strong> muestra la señal correspondiente a la transmisión
+            consecutiva de dos bytes: primero el número 9 y después el número 10.
+        </p>
+
+        <p>
+            Observa que el bit de parada situado entre ambos datos
+            permanece en nivel alto durante un intervalo ligeramente
+            más largo. Esto puede ocurrir porque el microcontrolador
+            AVR está realizando otras tareas y tarda unos microsegundos
+            adicionales en comenzar la siguiente transmisión.
+        </p>
+
+        <p>
+            Esta pausa no supone necesariamente un problema para el
+            receptor. El bit de parada mantiene la línea en estado alto
+            y el receptor espera hasta detectar el siguiente bit de
+            inicio para comenzar la temporización de una nueva trama.
+        </p>
+
+        <p>
+            Por tanto, dos bytes consecutivos no tienen que transmitirse
+            necesariamente sin ninguna pausa entre ellos. Lo importante
+            es que cada nueva trama comience con un bit de inicio válido
+            y que se respeten las condiciones temporales del protocolo.
+        </p>
+<p><strong>Figura. Envío serial de los números 9 y 10.</strong>  </p>
+<img src="img/senal_osciloscopio_9_y_10.png" alt="Envío serial de los números 9 y 10" class="imagen-centrada">
+        
+        <p>
+            Si se desea practicar, se puede intentar identificar
+            directamente en la traza del osciloscopio el bit de inicio,
+            los ocho bits de datos y el bit de parada de cada trama.
+            Después, basta con reconstruir los valores binarios teniendo
+            en cuenta que el bit menos significativo se transmite primero.
+        </p>
+
+    </section>
+
+    <section>
+        <h2>5. COMUNICACIÓN EN AMBOS SENTIDOS</h2>
+
+        <h3>5.1. Incorporación de un segundo conductor</h3>
+
+        <p>
+            Si Bob quiere responder a Alice, la solución más sencilla
+            consiste en repetir la misma configuración física y el mismo
+            protocolo, pero en sentido inverso: colocar un interruptor
+            en el extremo de Bob y un LED en el de Alice.
+        </p>
+
+        <p>
+            De esta manera, cada persona dispone de una línea para enviar
+            información a la otra. En un sistema UART convencional se
+            utilizan dos líneas de señal:
+        </p>
+
+        <ul>
+            <li>
+                <strong>TX (Transmit):</strong> salida por la que un
+                dispositivo transmite los datos.
+            </li>
+            <li>
+                <strong>RX (Receive):</strong> entrada por la que un
+                dispositivo recibe los datos.
+            </li>
+        </ul>
+
+        <p>
+            Para conectar dos dispositivos UART, normalmente se conecta
+            TX de un dispositivo con RX del otro y TX del segundo con
+            RX del primero. Además, ambos deben compartir una referencia
+            eléctrica común, generalmente mediante la conexión de GND,
+            y sus niveles eléctricos deben ser compatibles.
+        </p>
+
+        <p>
+            Esta disposición permite que Alice y Bob envíen datos en
+            ambos sentidos. Si las dos líneas funcionan simultáneamente,
+            la comunicación puede ser bidireccional simultánea
+            (full-duplex).
+        </p>
+
+        
+
+    </section>
+
+    <section>
+        <h2>6. EL PERIFÉRICO USART EN LOS MICROCONTROLADORES AVR</h2>
+
+        <h3>6.1. Por qué se necesita hardware especializado</h3>
+
+        <p>
+            Codificar y decodificar los datos mediante software puede
+            resultar laborioso. Además, generar los pulsos eléctricos
+            con una temporización precisa y recibirlos correctamente
+            a velocidades de miles o decenas de miles de bits por segundo
+            exige controlar cuidadosamente los intervalos de tiempo.
+        </p>
+
+        <p>
+            Si el procesador tuviera que realizar todas estas operaciones
+            mediante instrucciones ordinarias, tendría que dedicar
+            una parte importante de su tiempo a generar y comprobar
+            cada bit.
+        </p>
+
+        <p>
+            Por esta razón, numerosos microcontroladores AVR incorporan
+            un periférico de hardware especializado que se encarga de
+            realizar automáticamente las operaciones básicas de transmisión
+            y recepción serial.
+        </p>
+
+        <h3>6.2. USART: transmisor y receptor universal</h3>
+
+        <p>
+            Muchos microcontroladores AVR de la familia Mega disponen
+            de uno o varios periféricos denominados
+            <strong>USART (Universal Synchronous and Asynchronous
+            Receiver and Transmitter)</strong>, es decir, receptor
+            y transmisor síncrono y asíncrono universal.
+        </p>
+
+        <p>
+            Como indica su nombre, USART admite comunicación asíncrona
+            y, en los dispositivos que implementan esa función,
+            comunicación síncrona. UART, en cambio, se refiere
+            específicamente al funcionamiento asíncrono.
+        </p>
+
+        <p>
+            El periférico USART puede encargarse de tareas como:
+        </p>
+
+        <ul>
+            <li>Generar la secuencia de bits de una trama de transmisión.</li>
+            <li>Detectar el inicio de una trama recibida.</li>
+            <li>Muestrear la señal y reconstruir los bits de datos.</li>
+            <li>Gestionar los bits de inicio y parada.</li>
+            <li>Indicar cuándo un dato está disponible para ser leído o cuándo se ha completado una transmisión.</li>
+        </ul>
+
+        <p>
+            De este modo, el programa puede escribir un dato en el
+            registro de transmisión y dejar que el periférico genere
+            la secuencia eléctrica correspondiente. Del mismo modo,
+            cuando se recibe un dato, el programa puede leerlo desde
+            el registro de recepción.
+        </p>
+
+        <p>
+            La configuración concreta de los registros, la selección
+            de la velocidad de transmisión y las funciones disponibles
+            dependen del modelo de AVR utilizado. Por ello, antes de
+            programar el periférico, es necesario consultar la hoja
+            de datos del microcontrolador correspondiente.
+        </p>
+
+    </section>
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>
