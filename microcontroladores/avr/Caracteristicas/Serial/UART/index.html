@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Niveles de abstracción del hardware | MC Mundo Tech</title>
+    <meta name="description" content="Con el paso del tiempo han aparecido distintos niveles de abstracción cuyo objetivo es simplificar el desarrollo de software. Mientras mayor es la abstracción, menor es la cantidad de detalles del hardware que el programador necesita conocer, a costa de perder algo de control y eficiencia ">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>IMPLEMENTACIÓN DE LA COMUNICACIÓN SERIAL EN EL AVR: PROYECTO LOOPBACK</h1>
+            
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   -->
+    <section>
+    <h2>INTRODUCCIÓN</h2>    
+        
+        <p>Es hora de conseguir que tus circuitos integrados se comuniquen con tu computadora de escritorio. Para ello utilizaremos el puerto serial  del chip</p>
+
+        <p>Lo primero que querrás hacer es asegurarte de que el enlace serial entre la computadora y el microcontrolador funciona correctamente y familiarizarte con su utilización.</p>
+
+        <p>La configuración tiene tres etapas diferentes:</p>
+
+        <ol>
+            <li>Configurar el AVR.</li>
+            <li>Instalar el software de terminal serial en la computadora.</li>
+            <li>Conectar ambos dispositivos.</li>
+        </ol>
+        </section> 
+
+    <section>
+        <h2>1. CONFIGURACIÓN: PROGRAMACIÓN DEL AVR</h2>
+
+        <p>Como los microprocesadores AVR disponen de circuitería USART dedicada en su interior, todo lo que tenemos que hacer para comunicarnos es configurar la interfaz y después colocar nuestros bytes en los registros especiales de hardware destinados a la transmisión y recepción.</p>
+
+        <p>El periférico de hardware se encargará del resto. Esto resulta extremadamente práctico.</p>
+
+        <p>Primero, para comprobar que todo funciona, cargaremos un pequeño programa de demostración.</p>
+
+        <p>Si todavía tienes conectados los LED de los capítulos anteriores, perfecto. De lo contrario, no podrás observar la representación numérica ASCII del valor de cada carácter mientras lo escribes.</p>
+
+        <p>Antes de entrar en los detalles de la configuración del hardware USART, veamos cómo utilizarlo mediante el Ejemplo 5-1.</p>
+
+        <h3>1.1. Ejemplo 5-1. Código <code>serialLoopback.c</code></h3>
+
+        <pre><code>/*
+  A simple test of serial-port functionality.
+  Takes in a character at a time and sends it right back out,
+  displaying the ASCII value on the LEDs.
+*/
+
+// ------- Preamble -------- //
+#include &lt;avr/io.h&gt;
+#include &lt;util/delay.h&gt;
+#include "pinDefines.h"
+#include "USART.h"
+
+int main(void) {
+    char serialCharacter;
+
+    // -------- Inits --------- //
+    LED_DDR = 0xff; /* set up LEDs for output */
+    initUSART();
+    printString("Hello World!\r\n"); /* to test */
+
+    // ------ Event loop ------ //
+    while (1) {
+        serialCharacter = receiveByte();
+        transmitByte(serialCharacter);
+        LED_PORT = serialCharacter;
+        /* display ascii/numeric value of character */
+    } /* End event loop */
+
+    return (0);
+}</code></pre>
+
+        <p>Ve directamente al <strong>bucle de eventos (<em>event loop</em>)</strong> y podrás ver que nuestro programa realiza solamente tres cosas.</p>
+
+        <p>Primero recibe un byte desde la línea serial mediante la función <code>receiveByte()</code>.</p>
+
+        <p>Después transmite nuevamente ese mismo byte mediante <code>transmitByte()</code>.</p>
+
+        <p>Finalmente, el LED muestra el byte que acaba de enviar, representado en ASCII.</p>
+
+        <p>En la sección de inicialización no debería sorprenderte encontrar que configuramos los LED como salidas, exactamente como hicimos en el capítulo anterior.</p>
+
+        <p>Lo nuevo son las funciones <code>initUSART()</code> y <code>printString()</code>.</p>
+
+        <p>Estas funciones deben estar definidas en algún lugar, pero ¿dónde?</p>
+
+        <p>Si subes hasta el preámbulo del programa, verás que he incluido un archivo nuevo:</p>
+
+        <pre><code>USART.h</code></pre>
+
+        <p>Si abres ese archivo encontrarás los prototipos de las funciones. Entraremos en detalle sobre la rutina de configuración en «Configuración de USART: los detalles importantes» en la página 88, y sobre la inclusión de módulos en «Módulos en C» en la página 94.</p>
+
+        <p>Por ahora, nos concentraremos en comprobar que todo funciona correctamente.</p>
+
+        <h3>1.2. Las funciones como verbos</h3>
+
+        <p>Es una cuestión de estilo, pero considero que si nombro todas mis funciones utilizando verbos que describen lo que hacen y todas las variables utilizando sustantivos descriptivos, el código C puede comenzar a leerse como una oración.</p>
+
+        <p>Es cierto que quizá tengas que escribir un poco más la primera vez, pero imagínate que vuelves a revisar este código dentro de seis meses.</p>
+
+        <p>¿Podrás recorrerlo y encontrar la sección que quieres modificar?</p>
+
+        <p>Podrás hacerlo si tus funciones y variables tienen nombres descriptivos.</p>
+
+        <p>Ese es el panorama general. Si todavía no lo has hecho, este es un buen momento para cargar el código del proyecto <strong>serial Loopback</strong> en tu AVR.</p>
+    </section>
+
+    <section>
+        <h2>2. CONFIGURACIÓN: LA COMPUTADORA</h2>
+
+        <p>En la computadora solo necesitas instalar el software adecuado.</p>
+
+        <p>En particular, necesitas conectarte a una aplicación de terminal que te permita escribir hacia el AVR y leer lo que este devuelve.</p>
+
+        <p>Si tienes una aplicación de terminal favorita, puedes utilizarla. De lo contrario, aquí tienes algunas sugerencias.</p>
+    </section>
+
+    <section>
+        <h2>3. CONFIGURACIÓN: ADAPTADOR USB-SERIAL</h2>
+
+        <p>Ya tienes el código <code>serialLoopback</code> cargado en el AVR y el nuevo software de terminal serial instalado y ejecutándose en la computadora.</p>
+
+        <p>Es momento de conectarlos.</p>
+
+        <p>Si tienes uno de los habituales cables FTDI, su distribución de pines (<em>pinout</em>) se resume en la Tabla 5-1.</p>
+
+        <h3>3.1. Tabla 5-1. Pinout del cable FTDI</h3>
+
+        <table>
+            <thead>
+                <tr><th>Color</th><th>Señal</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Negro</td><td>GND</td></tr>
+                <tr><td>Marrón</td><td>CTS#</td></tr>
+                <tr><td>Rojo</td><td>VCC</td></tr>
+                <tr><td>Naranja</td><td>TXD</td></tr>
+                <tr><td>Amarillo</td><td>RXD</td></tr>
+                <tr><td>Verde</td><td>RTS#</td></tr>
+            </tbody>
+        </table>
+
+        <p>Si no tienes un cable FTDI, las líneas que debes buscar tendrán etiquetas como <code>RX</code>, <code>TX</code>, <code>GND</code> y, opcionalmente, <code>VCC</code>.</p>
+
+        <p>Puedes elegir entre alimentar el proyecto mediante una fuente externa de 5 V, que es la forma correcta de hacerlo, o alimentar todo el circuito desde el cable USB, lo cual resulta conveniente pero probablemente hará que circule por el cable FTDI una corriente superior a la especificada para este.</p>
+    </section>
+
+    <section>
+        <h2>4. SOFTWARE EMULADOR DE TERMINAL</h2>
+
+        <h3>4.1. Linux</h3>
+
+        <p><code>gtkterm</code> es fácil de configurar y debería funcionar en la mayoría de las distribuciones Linux.</p>
+
+        <p>Otra opción es <code>screen</code>, disponible tanto en Mac OS como en Linux, aunque quizá no sepas que puede utilizarse como terminal serial.</p>
+
+        <p>Ejecutar:</p>
+
+        <pre><code>screen [portName] 9600</code></pre>
+
+        <p>debería permitirte comunicarte directamente con el AVR.</p>
+
+        <p><code>Ctrl-A</code> seguido de <code>Ctrl-?</code> muestra la ayuda.</p>
+
+        <p><code>Ctrl-A</code> y después <code>Ctrl-K</code> finaliza la sesión actual.</p>
+
+        <p>Los usuarios de Linux pueden averiguar qué puerto serial USB está conectado escribiendo:</p>
+
+        <pre><code>ls /dev/tty*</code></pre>
+
+        <h3>4.2. Mac OS</h3>
+
+        <p><code>CoolTerm</code> y <code>ZTerm</code> son buenas aplicaciones de terminal serial para Mac.</p>
+
+        <p>Si no detectan automáticamente el puerto serial, puedes encontrarlo abriendo una terminal normal y escribiendo:</p>
+
+        <pre><code>ls /dev/*usbserial*</code></pre>
+
+        <p>Debes buscar algo parecido a:</p>
+
+        <pre><code>/dev/cu.usbserial-XXXX</code></pre>
+
+        <h3>4.3. Windows</h3>
+
+        <p>Existen muchísimos programas de terminal para sistemas Windows.</p>
+
+        <p>Antiguamente, Hyperterminal era la opción predeterminada y se encontraba dentro de Accesorios.</p>
+
+        <p>En tiempos más recientes he utilizado Bray's Terminal, que es minimalista y cumple su función.</p>
+
+        <p>Si no estás seguro de qué puerto está conectado al USB serial, compruébalo en el <strong>Administrador de dispositivos (<em>Device Manager</em>)</strong>, dentro de:</p>
+
+        <p><strong>Puertos → USB Serial Port</strong></p>
+
+        <h3>4.4. Multiplataforma: Python</h3>
+
+        <p>Si ya tienes Python y la biblioteca serial instalados, puedes ejecutar el emulador de terminal serial incluido.</p>
+
+        <p>Escribe:</p>
+
+        <pre><code>python -m serial.tools.miniterm --cr [portName] 9600</code></pre>
+
+        <p>y deberías poder comunicarte con el AVR.</p>
+
+        <p>Ten en cuenta que debes utilizar <code>Ctrl-]</code> para salir y <code>Ctrl-T</code> seguido de <code>Ctrl-H</code> para obtener ayuda.</p>
+
+        <h3>4.5. Multiplataforma: Arduino</h3>
+
+        <p>Si tienes instalado Arduino IDE en tu computadora, encontrarás su programa de terminal serial en:</p>
+
+        <p><strong>Tools → Serial Monitor</strong></p>
+
+        <p>Este programa funciona suficientemente bien para recibir datos del AVR, pero requiere que pulses Enter después de cada carácter que escribas para enviarlo.</p>
+
+        <p>Para texto, puedes enviar una línea completa de esta manera, pero para cualquier aplicación interactiva resulta incómodo.</p>
+
+        <p>En resumen, no recomiendo el <strong>Serial Monitor de Arduino</strong> como programa de terminal de propósito general, aunque funciona correctamente si solamente necesitas recibir datos del AVR.</p>
+
+        <p>Comprueba nuevamente que hayas conectado el pin <code>RX</code> del cable de la computadora/FTDI al pin <code>TX</code> del AVR, y viceversa.</p>
+
+        <p>En la protoboard, con un cable FTDI representado por la tira de seis pines de colores, la conexión será como se muestra en la Figura 5-4.</p>
+    </section>
+
+    <section>
+        <h2>5. CONEXIÓN DE LOS PINES SERIAL</h2>
+
+        <p>Conectar el adaptador serial al AVR es tan sencillo como conectar tres conductores, y el primero es muy simple:</p>
+
+        <p><code>GND</code>.</p>
+
+        <p>Los otros dos son un poco más «complicados».</p>
+
+        <p>Debes conectar el <code>RX</code> de un dispositivo al <code>TX</code> del otro, y el <code>TX</code> de uno al <code>RX</code> del otro.</p>
+
+        <p>«Cruzar» los conductores de esta manera tiene sentido desde el punto de vista electrónico, pero observa que la convención de nombres es completamente diferente de la que utilizamos para los pines SPI del programador.</p>
+
+        <p>En aquel caso:</p>
+
+        <pre><code>MOSI del programador → MOSI del AVR
+SCK del programador  → SCK del AVR</code></pre>
+
+        <p>etc.</p>
+
+        <p>Casi todos los protocolos seriales modernos se especifican de esta manera: los pines que tienen el mismo nombre se conectan entre sí.</p>
+
+        <p>La convención más moderna también facilita especialmente el etiquetado del cable que conecta ambos dispositivos.</p>
+
+        <p>El conductor que conecta MOSI con MOSI debe etiquetarse como «MOSI».</p>
+
+        <p>Pero ¿cómo etiquetas el conductor que conecta RX con TX? ¿O el que conecta TX con RX?</p>
+
+        <p>Normalmente, la respuesta sería algo como:</p>
+
+        <pre><code>TXA - RXB
+RXA - TXB</code></pre>
+
+        <p>pero, además de ser nombres largos, tienes que recordar qué dispositivo es «A» y cuál es «B».</p>
+
+        <p>Es un verdadero desorden.</p>
+
+        <p>Los ingenieros aprendieron la lección después de la mala convención de nombres utilizada en los antiguos puertos seriales, pero eso no nos ayuda aquí, en el mundo USART.</p>
+
+        <p>Por lo tanto, simplemente recuerda:</p>
+
+        <p><strong>Cuando utilices comunicación serial USART tradicional, conecta RX con TX y TX con RX.</strong></p>
+
+        <p>Esquemáticamente, la configuración debería ser como se muestra en la Figura 5-1.</p>
+
+        <p><strong>Figura 5-4. Conexión de E/S serial en la protoboard.</strong></p>
+        <p><strong>Figura 5-5. Conexión RX-TX.</strong></p>
+    </section>
+
+    <section>
+        <h2>6. ASCII</h2>
+
+        <p>Al enviar bytes de 8 bits a través de una línea serial, es natural pensar en ellos como números.</p>
+
+        <p>Pero si quieres enviar letras, necesitamos establecer una correspondencia entre números y letras.</p>
+
+        <p>Aquí entra en escena el <strong>Código Estándar Estadounidense para el Intercambio de Información (ASCII, <em>American Standard Code for Information Interchange</em>)</strong>.</p>
+
+        <p>Puedes consultar una tabla ASCII en Internet o escribir:</p>
+
+        <pre><code>man ascii</code></pre>
+
+        <p>en Linux u OS X.</p>
+
+        <p>De lo contrario, bastará con saber que:</p>
+
+        <pre><code>'A' = 0x41
+'B' = 0x42
+'a' = 0x61
+'0' = 0x30</code></pre>
+
+        <p>Lo que se encuentra entre estos valores debería resultar bastante evidente.</p>
+
+        <p>C y ASCII funcionan muy bien juntos.</p>
+
+        <p>Puedes pasar de letras a números y viceversa de forma natural y, debido a que los caracteres están definidos siguiendo un orden alfabético y numérico correspondiente, existen todo tipo de trucos que puedes realizar con ASCII.</p>
+
+        <p>Por ejemplo:</p>
+
+        <pre><code>'A' + 2 = 'C'
+'0' + 3 = '3'</code></pre>
+
+        <p>Esto significa que si tienes la variable:</p>
+
+        <pre><code>a = 3;</code></pre>
+
+        <p>y quieres enviar dígitos individuales representados como caracteres ASCII, puedes enviar:</p>
+
+        <pre><code>'0' + a</code></pre>
+
+        <p>La función <code>printByte()</code> de mi biblioteca USART aprovecha este hecho para enviar un byte como su representación textual:</p>
+
+        <pre><code>void printByte(uint8_t number){
+    /* Hundreds */
+    transmitByte('0'+ (number/100));
+    /* Tens */
+    transmitByte('0'+ ((number/10) % 10));
+    /* Ones */
+    transmitByte('0'+ (number % 10));
+}</code></pre>
+
+        <p>Con todo esto en mente, carga el programa de demostración <code>serialLoopback.c</code>, escribe algunas letras en el teclado y observa cómo parpadean los LED mostrando su valor numérico binario en ASCII.</p>
+
+        <p>¡Estás observando el fantasma dentro de la máquina!</p>
+
+        <p>Nuevamente, observa que hemos conectado los conductores <code>RX</code> y <code>TX</code>, y que hemos conectado la tierra del cable FTDI a la tierra común del circuito AVR y del programador.</p>
+
+        <p>Y si todavía tienes conectados los LED del capítulo anterior, mucho mejor.</p>
+    </section>
+
+    <section>
+        <h2>7. INTEGRACIÓN COMPLETA: PRUEBA DEL LOOPBACK</h2>
+
+        <p>Si ya has cargado el código <code>serialLoopback</code> en el microcontrolador, conectado los pines <code>RX/TX</code> —y <code>GND</code>— al convertidor USB-Serial y conectado este a la computadora, ha llegado el momento de probar el sistema.</p>
+
+        <p>Abre el programa de terminal y asegúrate de que esté configurado con el puerto correcto —el correspondiente al convertidor USB— y con la velocidad correcta:</p>
+
+        <pre><code>9600 baudios</code></pre>
+
+        <p>Si el programa tiene una opción denominada <strong>«local echo»</strong>, configúrala como desactivada.</p>
+
+        <p>Nosotros vamos a recibir de vuelta desde el AVR los caracteres que enviemos.</p>
+
+        <p>Si el eco local está activado, verás dos veces todo lo que escribas, como esto:</p>
+
+        <pre><code>lliikkee tthhiiss</code></pre>
+
+        <p>Ahora escribe algo.</p>
+
+        <p>Los LED deberían mostrar los valores binarios correspondientes a la letra que escribiste, de acuerdo con su representación ASCII.</p>
+
+        <p>¡Éxito!</p>
+
+        <p>Y si desconectas y vuelves a conectar la alimentación del AVR —o conectas momentáneamente a tierra el pin <code>RESET</code>— deberías recibir el amistoso mensaje:</p>
+
+        <pre><code>Hello World!</code></pre>
+
+        <p>Si has llegado hasta este punto, todo está funcionando correctamente.</p>
+    </section>
+   
+        
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>
