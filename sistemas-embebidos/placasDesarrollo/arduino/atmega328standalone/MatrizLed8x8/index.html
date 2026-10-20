@@ -39,29 +39,28 @@
             <section> 
             <h2>1. INTRODUCCIÓN</h2>
 
-            <p>El proyecto consiste en construir una pequeña pantalla de mensajes utilizando ocho matrices LED de 8×8, controladas mediante circuitos integrados MAX7219, y tres pulsadores que permiten seleccionar diferentes mensajes.</p>
+            <p>El proyecto consiste en construir una pequeña pantalla de mensajes utilizando ocho matrices LED de 8×8, controladas mediante circuitos integrados <strong>MAX7219</strong>, y tres pulsadores que permiten seleccionar diferentes mensajes.</p>
 
-            <p>Desarrollaremos el programa en Arduino y lo grabaremos en un ATmega328P standalone: en una placa con el circutio mínimo para su funcionamiento. Durante el desarrollo utilizaremos una placa Arduino UNO Rev. 3 como plataforma de programación y prueba; en la versión final, el programa se ejecutará directamente sobre el ATmega328P en configuración standalone.</p>
+            <p>Desarrollaremos el programa en Arduino y lo grabaremos en un ATmega328P standalone: en una placa con el circutio mínimo para su funcionamiento. El circuito mínimo inlcuye un oscilador externo de 16 MHZ. Durante el desarrollo utilizaremos una placa <strong>Arduino UNO Rev. 3</strong> como plataforma de programación y prueba; </p>
 
             <p>La idea es sencilla: la pantalla muestra de forma continua un mensaje de bienvenida que se desplaza de derecha a izquierda. Cuando el usuario presiona uno de los tres botones, la pantalla abandona temporalmente el mensaje de bienvenida y muestra un mensaje asociado a ese botón. Una vez terminada la animación, el sistema vuelve automáticamente a la pantalla principal.</p>
 
             <p>El proyecto resulta interesante porque reúne varios conceptos importantes de sistemas embebidos:</p>
 
             <ul>
-            <li>control de matrices LED;</li>
-            <li>comunicación serie mediante SPI;</li>
-            <li>utilización de periféricos externos;</li>
-            <li>lectura de entradas digitales;</li>
-            <li>resistencias pull-up internas;</li>
-            <li>organización de datos mediante arreglos;</li>
-            <li>funciones para evitar repetir código;</li>
-            <li>animaciones no bloqueantes mediante <code>displayAnimate()</code>;</li>
-            <li>detección del final de una tarea para cambiar de estado.</li>
+                <li>control de matrices LED;</li>
+                <li>comunicación serie mediante <strong>SPI</strong>;</li>
+                <li>utilización de periféricos externos;</li>
+                <li>lectura de entradas digitales;</li>
+                <li>resistencias pull-up internas;</li>
+                <li>organización de datos mediante arreglos;</li>
+                <li>funciones para evitar repetir código;</li>
+                <li>animaciones no bloqueantes mediante <code>displayAnimate()</code>;</li>
+                <li>detección del final de una tarea para cambiar de estado.</li>
             </ul>
 
             <p>Aunque el resultado es una pantalla de mensajes relativamente sencilla, el programa permite estudiar una estructura que aparece con mucha frecuencia en sistemas embebidos: un microcontrolador supervisa entradas, controla un periférico y modifica su comportamiento según los eventos recibidos.</p>
             </section>
-
 
             <section>
             <h2>2. ARQUITECTURA GENERAL DEL SITEMA</h2>
@@ -78,14 +77,19 @@
 
             <p>En el proyecto usamos 8 matrices de 8x8 conectados en cascada, formando una pantalla de 64x8 leds. Cada matriz de 8x8 es controlada por un cicuito integrado MAX7219.</p>
 
+            <p>
+                A continuación el esquemático del proyecto:
+            </p>
+
+            <img src="img/Esquematico.png" alt="Esquemático ATmega328P controlando pantalla de matrices led. Con conectores SPI y 3 botones" class="imagen-centrada">
 
             <h3>2.1 ¿Por qué se utilizan MAX7219?</h3>
 
             <p>Una matriz de 8×8 contiene 8 × 8 = 64 LEDs.   Si se intentara controlar directamente una matriz de este tipo desde el microcontrolador, habría que ocuparse de las filas y columnas, además de gestionar el multiplexado de los LED.</p>
             
-            <p>el MAX7219 dispone de ocho registros de datos para ocho dígitos/filas de multiplexación, y en módulos matriciales comerciales se utiliza para controlar una matriz 8×8.</p>
+            <p>el CI <strong>MAX7219</strong> dispone de ocho registros de datos para ocho dígitos/filas de multiplexación, y en módulos matriciales comerciales se utiliza para controlar una matriz 8×8.</p>
 
-            <p>El MAX7219 simplifica considerablemente esta tarea.</p>
+            <p>El <strong>MAX7219</strong>  simplifica considerablemente esta tarea.</p>
 
             <p>En los módulos utilizados en este proyecto, el circuito integrado se encarga de controlar la matriz, realizar internamente el multiplexado y refresco de los LED, controlar la intensidad y recibir los datos mediante una interfaz serie.</p>
 
@@ -109,47 +113,57 @@
             <thead>
             <tr>
             <th>Señal</th>
-            <th>Pin ATmega328P</th>
+            <th>Pin del ATmega328P</th>
+            <th>Bit de PORTB</th>
+            <th>Pin de Arduino</th>
             </tr>
             </thead>
             <tbody>
             <tr>
             <td>MOSI</td>
-            <td>17 (PB3)</td>
+            <td>Pin 17</td>
+            <td>PB3</td>
+            <td>D11</td>
             <tr>
             <td>MISO</td>
-            <td>18 (PB4)</td>    
+            <td>Pin 18</td> 
+            <td>PB4</td>
+            <td>D12</td>   
             </tr>
             </tr>
             <tr>
             <td>SCK</td>
-            <td>19 (PB5)</td>
+            <td>19</td>
+            <td>PB5</td>
+            <td>D13</td> 
             </tr>
             <tr>
             <td>SS</td>
-            <td>16 (PB2)</td>
+            <td>16</td>
+            <td>PB2</td>
+            <td>D10</td> 
             </tr>
             </tbody>
             </table>
             </div>
 
-            <p>El MAX7219 no necesita devolver información al ATmega328P en este proyecto, por lo que MISO no participa en la comunicación utilizada. La interfaz empleada utiliza tres señales principales: datos, reloj y selección del dispositivo.</p>
+            <p>El <strong>MAX7219</strong> no necesita devolver información al <strong>ATmega328P</strong>en este proyecto, por lo que MISO no participa en la comunicación utilizada. La interfaz empleada utiliza tres señales principales: datos, reloj y selección del dispositivo.</p>
 
             <div class="table-container">
             <table>
             <thead>
                 <tr>
-                    <th>Espiga MAX7219</th>
+                    <th>Pin del Módulo MAX7219</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>DIN</td>
+                    <td>DIN (Datos de Entrada)</td>
                 <tr>
-                    <td>CLK</td>                      
+                    <td>CLK (Señal de Reloj)</td>                      
                 </tr>                
                 <tr>
-                    <td>CS</td>
+                    <td>CS (Selección de Chip)</td>
                 </tr>
                 <tr>
                     <td>GND</td>
@@ -165,36 +179,56 @@
                 <thead>
                     <tr>
                         <th>ATmega328P<br>
-                            SEÑAL (pin) - Puerto </th>
-                        <th>MAX7219</th>
+                            SEÑAL</th>
+                        <th>Pin</th>
+                        <th>Bit de PORTB</th>
+                        <th>Pin de Arduino</th>
+                        <th>Pin del módulo MAX7219</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td>MOSI (17) - PB3</td>
+                        <td>Pin 17</td>
+                        <td>PB3</td>
+                        <td>D11</td>
                         <td>DIN</td>
                     </tr>
                     <tr>
-                        <td>SCK (19) - PB5</td>
+                        <td>SCK</td>
+                        <td>19</td>
+                        <td>PB5</td>
+                        <td>D13</td> 
                         <td>CLK</td>
                     </tr>
                     <tr>
-                        <td>SS (16) - PB2</td>
+                        <td>SS </td>
+                        <td>16</td>
+                        <td>PB2</td>
+                        <td>D10</td> 
                         <td>CS</td>
                     </tr>
                     <tr>
                         <td>GND</td>
+                        <td>GND</td>
+                        <td> - </td>
+                        <td>GND</td> 
                         <td>GND</td>
                     </tr>
                 </tbody>
             </table>
             </div>
 
-            <p>Cuando existen varios MAX7219, los dispositivos se conectan en cascada. Esto permite enviar una secuencia de datos que se visualizarán en la pantalla formada por los ocho dispositivos.</p>
+            <p>Cuando existen varios <strong>MAX7219</strong>, los dispositivos se conectan en cascada. Esto permite enviar una secuencia de datos que se visualizarán en la pantalla formada por los ocho dispositivos.</p>
+
+            <p>
+                El detalle de una conexión de un dispositivo de la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> en configuración standalone on a breadboard es detallada en <a href="https://miguelcalipe.github.io/microcontroladores/avr/programacion/bare-metal/standalone/#seccin-9">este enlace</a>.
+                En una protoboard la conexión del <strong>módulo MAX7219</strong> con el <strong>ATmega328P standalone</strong>, sería como la siguiente imagen: 
+            </p>
 
             <img src="img/ATmegaConMax7219.png" alt="Conexionado del MAX7219 con el ATmega328P" class="imagen-centrada"> 
 
-            <p>La alimentación de una cadena de ocho módulos debe dimensionarse considerando la corriente total de los MAX7219 y de las matrices LED. La fuente utilizada debe proporcionar la tensión requerida y una corriente suficiente para la carga, manteniendo además una conexión de GND común con el microcontrolador.</p>
+            <p>La alimentación de una cadena de ocho módulos debe dimensionarse considerando la corriente total de los <strong>MAX7219</strong> y de las matrices LED. La fuente utilizada debe proporcionar la tensión requerida y una corriente suficiente para la carga, manteniendo además una conexión de <strong>GND</strong> común con el microcontrolador.</p>
 
             </section>
 
