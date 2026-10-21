@@ -61,11 +61,11 @@
         <section>
         <h2> CONEXION DEL MÓDULO FTDI A RASPBERRY PI 5 </h2>
         <p>
-            El <strong></strong>módulo FTDI FT232RL</strong> es un módulo adaptador de un puerto Serie USB a un puerto serial TTL. Es un dispositivo  que se usa proyectos que requieren comunicación serial entre el puerto serial TTL de un dispositivo y el puerto serial USB de una computadora. 
+            El <strong>módulo FTDI FT232RL</strong> es un módulo adaptador de un puerto serie USB a un puerto serial TTL (generalmente 3.3V o 5V seleccionables por jumper). Es un dispositivo  que se usa en proyectos que requieren comunicación serial entre el puerto serial TTL de un dispositivo y el puerto serial USB de una computadora. 
         </p>
 
         <p>
-            A diferencia de los entornos MacOS y Windows, en Raspberry Pi 5 y en general en entornos Linux, no se requiere instalar ni ejecutar ningún controlador. Basta conectar y usar.
+            A diferencia de los entornos MacOS y Windows, en la gran mayoría de distribuciones Linux modernas y en Raspberry Pi OS (incluida la Raspberry Pi 5), el driver del kernel llamado ftdi_sio viene integrado por defecto. Al conectar el módulo, el sistema lo reconoce de forma nativa y genera un puerto virtual (por ejemplo, <code>/dev/ttyUSB0</code>). Basta conectar y usar (plug and play).
         </p>
 
         <h4>Metodo 1 para comprobar que Raspberry Pi 5 reconoce el módulo FTDI</h4>
@@ -305,7 +305,7 @@ int main(void) {
                         está instalado y configurado correctamente.
                     </li>
                     <li>
-                        <code>un</code> indica que el paquete no está instalado.
+                        un <code>i</code> indica que el paquete no está instalado.
                     </li>
                     <li>
                         Si el paquete no aparece en la salida, comprueba su estado
@@ -550,14 +550,14 @@ screen:
     </section>
 
     <section>
-        <h2>3. CONFIGURACIÓN: ADAPTADOR USB-SERIAL</h2>
+        <h2>3. CONFIGURACIÓN: CONEXIÓN DEL ADAPTADOR USB-SERIAL AL AVR</h2>
 
         <p>Ya tienes el código <code>serialLoopback</code> cargado en el AVR y el nuevo software de terminal serial instalado y ejecutándose en la computadora.</p>
 
-        <p>Es momento de conectarlos.</p>
+        <p>Es momento de conectar el microcontrolador AVR <em>standalone</em> y el <strong>módulo FTDI FT232RL</strong> </p>
 
         <p>
-            El periférico <code>USART0</code> de la serie  de microcontroladores <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong> maneja niveles de tensión lógicos digitales estándar compatibles con <strong>TTL/CMOS</strong>, lo que significa que un 1 lógico es igual a su voltaje de alimentación ($V_{CC}$) y un 0 lógico es igual a 0V ($GND$). Sin embargo, hay un matiz técnico importante: en los manuales oficiales del fabricante, el puerto nunca se define explícitamente usando la sigla "<strong>TTL</strong>", sino simplemente como un periférico <strong>USART</strong>. Se asume que es <strong>TTL/CMOS</strong> porque todas las entradas y salidas de propósito general (<code>GPIO</code>) del chip operan bajo las especificaciones eléctricas de corriente continua (DC) nativas del silicio, las cuales se adaptan a los estándares lógicos <strong>TTL</strong> o <strong>CMOS</strong> según el voltaje al que alimentes el integrado.
+            El periférico <code>USART0</code> de la serie  de microcontroladores <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong> maneja niveles de tensión lógicos digitales estándar compatibles con <strong>TTL/CMOS</strong>, lo que significa que un 1 lógico es igual a su voltaje de alimentación ($V_{CC}$) y un 0 lógico es igual a 0V ($GND$). Sin embargo, hay un matiz técnico importante: en los manuales oficiales del fabricante, el puerto nunca se define explícitamente usando la sigla "<strong>TTL</strong>", sino simplemente como un periférico <strong>USART</strong>. Se asume que es <strong>TTL/CMOS</strong> porque todas las entradas y salidas de propósito general (<code>GPIO</code>) del chip operan bajo las especificaciones eléctricas de corriente continua (DC) nativas del microcontrolador, las cuales se adaptan a los estándares lógicos <strong>TTL</strong> o <strong>CMOS</strong> según el voltaje al que alimentes el integrado.
         </p>
 
         <div class="table-container">
