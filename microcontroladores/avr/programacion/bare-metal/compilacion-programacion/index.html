@@ -232,10 +232,13 @@
                         <p>
                             Aunque el archivo ELF ya contiene el programa compilado, normalmente todavía no es el archivo que se graba directamente en el microcontrolador. En el siguiente paso se extraerá de él un archivo en formato Intel HEX, que es el que habitualmente utiliza <code>avrdude</code> para programar la memoria Flash del dispositivo.
                         </p>
+
+                        <img src="img/compilacion.png" alt="Comando para compilar un AVR" class="imagen-centrada">
+                        
             </section>
             
             <section>
-                <h2>3. GENERAR EL ARCHIVO HEX</h2>
+                <h2>2. GENERAR EL ARCHIVO HEX</h2>
 
                 <pre><code class="language-bash">avr-objcopy -O ihex blink.elf blink.hex</code></pre>
 
@@ -333,12 +336,10 @@
                 <p>
                     En resumen, el archivo <code>blink.hex</code> es una representación textual del  contenido que debe escribirse en la memoria Flash del microcontrolador. Será el archivo que, en el siguiente paso, utilizaremos junto con <code>avrdude</code> y un programador como <code>USBasp</code> para transferir el programa al ATmega328P.
                 </p>
-            </section>
 
-            <section>
-                
-
-                <h2>4. COMPROBAR EL TAMAÑO DEL PROGRAMA</h2>
+                <img src="img/generarELF.png" alt="General el archivo ELF" class="imagen-centrada">
+            
+                <h3>Comprobar el tamaño del programa</h3>
                 <pre><code class="language-bash">avr-size blink.elf</code></pre>
 
                 <pre><code>text    data    bss    dec    hex
@@ -348,7 +349,7 @@
             </section>
 
             <section>
-                <h2>5. PROGRAMAR EL MICROCONTROLADOR</h2>
+                <h2>3. PROGRAMAR EL MICROCONTROLADOR</h2>
                     <pre><code class="language-bash">avrdude -c usbasp -p m328p -U flash:w:blink.hex</code></pre>
 
                     <p><code>avrdude</code> es la utilidad encargada de comunicarse con el programador y, a través de él, con el microcontrolador. Además de escribir la memoria Flash, también puede leer la EEPROM, consultar la firma del dispositivo y modificar los fusibles.</p>
@@ -402,14 +403,9 @@ t13        = ATtiny13
 t13a       = ATtiny13A
 ...
 </code></pre>
-                        <p>
-                            Una vez finalizada la grabación, el microcontrolador conserva el programa en su memoria Flash incluso aunque se desconecte la alimentación. Cuando vuelva a encenderse o se reinicie, comenzará a ejecutar el programa almacenado desde la dirección inicial de la memoria.
-                        </p>
-
-            </section>
-            
-            <section>
-                <h2>6. INTERPRETANDO LA SALIDA DE AVRDUDE</h2>
+                        
+        
+                <h3>Interpretando la salida de avrdude</h2>
                 <pre><code>avrdude: AVR device initialized and ready to accept instructions
 avrdude: device signature = 0x1e950f (probably m328p)
 avrdude: erasing chip
@@ -418,7 +414,16 @@ avrdude: verifying flash memory against blink.hex
 avrdude: 156 bytes of flash verified
 avrdude done. Thank you.</code></pre>
 
+
                     <p>Estos mensajes indican que la comunicación fue correcta, la firma del microcontrolador coincide con la esperada, la memoria Flash fue borrada, el programa se grabó correctamente y la verificación confirmó que los datos escritos coinciden exactamente con el archivo HEX.</p>
+                <img src="img/salidaavrdude.png" alt="Interpretación de la salida del comando de programación" class="imagen-centrada">
+            
+            <p>
+                Una vez finalizada la grabación, el microcontrolador conserva el programa en su memoria Flash incluso aunque se desconecte la alimentación. Cuando vuelva a encenderse o se reinicie, comenzará a ejecutar el programa almacenado desde la dirección inicial de la memoria.
+            </p>
+
+            <img src="img/grabacion.png" alt="Comando para ecribir el programa en la memoria flash del microcontrolador" class="imagen-centrada">
+            
             </section>
             
             

@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Niveles de abstracción del hardware | MC Mundo Tech</title>
-    <meta name="description" content="Con el paso del tiempo han aparecido distintos niveles de abstracción cuyo objetivo es simplificar el desarrollo de software. Mientras mayor es la abstracción, menor es la cantidad de detalles del hardware que el programador necesita conocer, a costa de perder algo de control y eficiencia ">
+    <title>Comunicación serial microcontrolador AVR con Raspbeery Pi usando el módulo FTDI FT232RL | MC Mundo Tech</title>
+    <meta name="description" content="Es hora de conseguir que tus circuitos integrados se comuniquen con tu computadora de escritorio. Para ello utilizaremos el módulo FTDI FT232RL el cual conectaremos del puerto serial USART (Universal Synchronous and Asynchronous serial Receiver and Transmitter) del chip a un puerto USB del Raspbeery Pi 5. El módulo FTDI FT232RL es un módulo adaptador de un puerto serie USB a un puerto serial TTL (generalmente 3.3V o 5V seleccionables por jumper). Es un dispositivo que se usa en proyectos que requieren comunicación serial entre el puerto serial TTL de un dispositivo y el puerto serial USB de una computadora. ">
     <link rel="stylesheet" href="/assets/css/principal.css">
     <link rel="stylesheet" href="/assets/css/articulo.css">
     
@@ -59,16 +59,16 @@
         </section>
 
         <section>
-        <h2> CONEXION DEL MÓDULO FTDI A RASPBERRY PI 5 </h2>
+        <h2> 1. CONEXION DEL MÓDULO FTDI A RASPBERRY PI 5 </h2>
         <p>
-            El <strong>módulo FTDI FT232RL</strong> es un módulo adaptador de un puerto serie USB a un puerto serial TTL (generalmente 3.3V o 5V seleccionables por jumper). Es un dispositivo  que se usa en proyectos que requieren comunicación serial entre el puerto serial TTL de un dispositivo y el puerto serial USB de una computadora. 
+            El <strong>módulo FTDI FT232RL</strong> es un módulo adaptador de un puerto serie USB a un puerto serial TTL (generalmente 3.3V o 5V seleccionables por jumper). Es un dispositivo  que se usa en proyectos que requieren comunicación serial entre el puerto serial TTL de un microcontrolador y el puerto serial USB de una computadora. 
         </p>
 
         <p>
             A diferencia de los entornos MacOS y Windows, en la gran mayoría de distribuciones Linux modernas y en Raspberry Pi OS (incluida la Raspberry Pi 5), el driver del kernel llamado ftdi_sio viene integrado por defecto. Al conectar el módulo, el sistema lo reconoce de forma nativa y genera un puerto virtual (por ejemplo, <code>/dev/ttyUSB0</code>). Basta conectar y usar (plug and play).
         </p>
 
-        <h4>Metodo 1 para comprobar que Raspberry Pi 5 reconoce el módulo FTDI</h4>
+        <h3>1.1. Método 1 para comprobar que Raspberry Pi 5 reconoce el módulo FTDI</h3>
         <p>
             Después de conectar el <strong>módulo FTDI FT232RL</strong> al puerto <strong>USB</strong> de la Raspberry pi 5 podemos comprobar que el sistema lo reconoce con el comando <code>lsusb</code>:
         </p>
@@ -98,16 +98,43 @@ Bus 004 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
             </ul>
         <p>La segunda etiqueta corresponde a un teclado inalámbrico y la primera etiqueta corresponde al <strong>Módulo FTDI</strong></p> 
         
+        <img src="img/Metodo1.png" alt="Metodo 1 para comprobar que Raspberry Pi 5 reconoce el módulo FTDI" class="imagen-centrada">
+        
+        <h3>1.2. Método 2 para comprobar que Raspberry Pi 5 reconoce el módulo FTDI </h3>
         <p>
-            Para saber en que puerto USB se ha conectado el módulo FTDI, abrimos una terminal y ejecutamos
+            Haremos una consulta de los mensajes del núcleo  filtrando por el dispositivo requerido, <strong>ftdi</strong>. En esta consulta utilizaremos dos comandos encadenados mediante el operador de pipeline o tubería <code> | </code>.
         </p>
+<pre><code class="language-bash">
+~ $ dmesg | grep -i ftdi
+
+[ 1960.503105] usb 1-1: Manufacturer: FTDI
+[ 1960.534781] usbcore: registered new interface driver ftdi_sio
+[ 1960.534806] usbserial: USB Serial support registered for FTDI USB Serial Device
+[ 1960.534867] ftdi_sio 1-1:1.0: FTDI USB Serial Device converter detected
+[ 1960.542374] usb 1-1: FTDI USB Serial Device converter now attached to ttyUSB0
+</code></pre>
+
+            <ul>
+                <li><code>dmesg</code>>: Abre el "Driver Message" (mensaje de controladores). Es un comando que muestra el historial de mensajes del núcleo (kernel) de Linux. Ahí se registra todo lo que pasa a nivel de hardware, especialmente cuando conectas o desconectas un dispositivo USB.</li>
+                <li><code> | </code> (pipe o tubería): Envía la salida del primer comando al siguiente. En este caso toma la salida de <code>dmesg</code> (que suele ser una lista enorme de miles de líneas) y se la pasa directamente como entrada al siguiente comando. </li>
+                <li><code></code>grep : Es una herramienta de búsqueda que filtra texto. Solo dejará pasar las líneas que contengan la palabra que le indiques (ftdi). De esta forma, ambos comandos trabajan conjuntamente para realizar una consulta filtrada de los paquetes instalados, una técnica muy utilizada en la administración de sistemas Linux.</li>
+                <li><code>-i</code>: Es una opción que le dice a grep que sea "insensible a mayúsculas" (ignore case). Buscará "ftdi", "FTDI", "Ftdi", etc.</li>
+
+            </ul>
+
+                <h3>1.3 Como saber en que puerto USB se conectó el módulo FTDI FT232RL</h3>
+
+                <h4>1.3.1. Buscando y filtrando por tty</h4>
+                <p>
+                    Para saber en que puerto USB se ha conectado el módulo FTDI, abrimos una terminal y ejecutamos
+                </p>
 <pre><code class="language-bash">~ $  dmesg | grep tty</code></pre>  
 
-        <p>
-            Si el sistema operativo  soporta el módulo <strong>módulo FTDI FT232RL</strong> de manera nativa, verás una entrada como <code>/dev/ttyUSB0</code>.
-        </p>
+                <p>
+                    Si el sistema operativo  soporta el módulo <strong>módulo FTDI FT232RL</strong> de manera nativa, verás una entrada como <code>/dev/ttyUSB0</code>.
+                </p>
 
-        <p>En mi caso me dio la siguiente salida:</p>
+                <p>En mi caso me dio la siguiente salida:</p>
 <pre><code class="language-bash">
 ~ $  dmesg | grep tty
 
@@ -139,28 +166,15 @@ is a Broadcom BCM7271 UART
                 <li>Última línea (usb 1-1: FTDI USB Serial Device...): Esta es la única que corresponde a nuestro dispositivo externo. Señala que se conectó un adaptador USB a serie FTDI y que el sistema le asignó el identificador <strong>ttyUSB0</strong>.</li>
             </ul>        
         
-        <h4>Método 2 para comprobar que Raspberry Pi 5 reconoce el módulo FTDI </h4>
-        <p>
-            Podemos también filtrar específicamente por FTDI en <code>dmesg</code>. En lugar de buscar <code>tty</code>, buscamos la palabra <strong>FTDI</strong>. Esto ignorará los puertos internos de la Raspberry Pi. 
-        </p>
+<img src="img/puerto.png" alt="dmesg | grep tty para saber el puerto donde está conectado el módulo FTDI" class="imagen-centrada">
 
-<pre><code class="language-bash">
-~ $ dmesg | grep -i ftdi
-
-[ 1960.503105] usb 1-1: Manufacturer: FTDI
-[ 1960.534781] usbcore: registered new interface driver ftdi_sio
-[ 1960.534806] usbserial: USB Serial support registered for FTDI USB Serial Device
-[ 1960.534867] ftdi_sio 1-1:1.0: FTDI USB Serial Device converter detected
-[ 1960.542374] usb 1-1: FTDI USB Serial Device converter now attached to ttyUSB0
-</code></pre>
-
+        <h4>1.3.2. Listando los archivos /dev/tty</h4>
         <p>También se puede averiguar en qué puerto serial USB está conectado el <strong>módulo FTDI</strong>, escribiendo:</p>
 <pre><code class="language-bash">
 ~ $ ls /dev/tty*
 </code></pre>
-
         <p>
-            En mi caso, el dispositivo FTDI se desconectaba y reconectaba constantemente (un problema conocido como USB disconnect loop). El sistema operativo detecta el convertidor serial correctamente y lo asigna a ttyUSB0, pero a los pocos segundos (entre 2 y 5 segundos después) se desconecta solo de forma abrupta. y durante varias veces. Lo solucioné actualizando la eeprom de Rasbperri OS
+            En mi caso, el dispositivo <strong>FTDI</strong> se desconectaba y reconectaba constantemente (un problema conocido como USB disconnect loop). El sistema operativo detecta el convertidor serial correctamente y lo asigna a <code>ttyUSB0</code>, pero a los pocos segundos (entre 2 y 5 segundos después) se desconecta solo de forma abrupta. y durante varias veces. Lo solucioné actualizando la <strong>eeprom</strong> de Rasbperri OS
         </p>
 
 <pre><code class="language-bash">
@@ -178,14 +192,16 @@ is a Broadcom BCM7271 UART
         <p>Después de conectar el módulo y sabemos que la estación de trabajo la reconoce, podemos configurar los elementos que harán posible la comunicación UART. La configuración tiene tres etapas diferentes:</p>
 
         <ol>
-            <li>Configurar el AVR.</li>
+            <li>Programación del AVR.</li>
             <li>Instalar el software de terminal serial en la computadora.</li>
-            <li>Conectar ambos dispositivos.</li>
+            <li>Conectar ambos dispositivos: <strong>módulo FTDI FT232RL</strong> y el microcontrolador.</li>
         </ol>
+
+           <img src="img/Configuración.png" alt="Configuración para la comunicación UART" class="imagen-centrada">
         </section> 
 
     <section>
-        <h2>1. CONFIGURACIÓN: PROGRAMACIÓN DEL AVR</h2>
+        <h2>2. CONFIGURACIÓN: PROGRAMACIÓN DEL AVR</h2>
 
         <p>Como los microprocesadores AVR disponen de circuitería USART dedicada en su interior, todo lo que tenemos que hacer para comunicarnos es configurar la interfaz y después colocar nuestros bytes en los registros especiales de hardware destinados a la transmisión y recepción.</p>
 
@@ -267,7 +283,7 @@ int main(void) {
     </section>
 
     <section>
-        <h2>2. CONFIGURACIÓN: LA COMPUTADORA</h2>
+        <h2>3. CONFIGURACIÓN: LA COMPUTADORA</h2>
 
         <p>En la computadora solo necesitas instalar el software emulador de terminal adecuado.</p>
 
@@ -275,20 +291,20 @@ int main(void) {
 
         <p>Si tienes una aplicación de terminal favorita, puedes utilizarla. De lo contrario, aquí tienes algunas sugerencias.</p>
 
-            <h3>2.1. Linux</h3>
+            <h3>3.1. Linux</h3>
 
             <p><code>gtkterm</code> es fácil de configurar y debería funcionar en la mayoría de las distribuciones Linux.</p>
 
             <p>Otra opción es <code>screen</code>, disponible tanto en Mac OS como en Linux, aunque quizá no sepas que puede utilizarse como terminal serial.</p>
 
-            <h4>2.1.1 GTKterm</h4>
+            <h4>3.1.1 GTKterm</h4>
                 <p><a href="https://github.com/wvdakker/gtkterm" target="_blank">GTKterm</a> es un emulador gráfico de terminal de puerto serie para sistemas operativos Linux y POSIX, creado por Julien Schmitt y licenciado bajo la GPL-3.0. Se puede usar para comunicarse con todo tipo de dispositivos con interfaz serie, como ordenadores integrados, microcontroladores, módems, receptores GPS, máquinas CNC y más.</p>
                 <p>
                     En Raspberry Pi OS, puedes comprobar si <strong>GTKTerm</strong> está instalado
                     mediante los siguientes comandos ejecutados en la terminal.
                 </p>
 
-                <h5>2.1.1.1. Comprobar si el paquete está instalado</h5>
+                <h5>3.1.1.1. Comprobar si el paquete está instalado</h5>
 
                 <p>
                     Ejecuta el siguiente comando para consultar el estado del paquete
@@ -313,7 +329,7 @@ int main(void) {
                     </li>
                 </ul>
 
-                <h5>2.1.1.2. Consultar la versión instalada</h5>
+                <h5>3.1.1.2. Consultar la versión instalada</h5>
 
                 <p>
                     Para consultar la versión instalada y la información disponible
@@ -328,7 +344,7 @@ int main(void) {
                     instalada en el sistema.
                 </p>
 
-                <h5>2.1.1.3. Comprobar si el ejecutable está disponible</h5>
+                <h5>3.1.1.3. Comprobar si el ejecutable está disponible</h5>
 
                 <p>
                     También puedes comprobar si el sistema encuentra el ejecutable
@@ -344,7 +360,7 @@ int main(void) {
                     <code>PATH</code>.
                 </p>
 
-                <h5>2.1.1.4. Instalar GTKterm</h5>
+                <h5>3.1.1.4. Instalar GTKterm</h5>
                 <p>
                     Si <strong>GTKTerm</strong> no está instalado, puedes intentar instalarlo desde
                     los repositorios configurados en Raspberry Pi OS:
@@ -419,7 +435,7 @@ gtkterm:
         100 /var/lib/dpkg/status
 </code></pre>
      
-                <h5>2.1.1.5. Configuración para la comunicación UART</h2>
+                <h5>3.1.1.5. Configuración para la comunicación UART</h2>
 
                 <p>
                     Una vez instalado y abierto <strong>GTKTerm</strong>, podrás configurarlo para
@@ -440,7 +456,7 @@ gtkterm:
                 </ul>
             
 
-            <h4>2.1.2. Screen</h4>
+            <h4>3.1.2. Screen</h4>
 
             <p>
                 Comprobaremos si tenemos instalado <strong>screen</strong>
@@ -465,7 +481,7 @@ screen:
                     <li>Repositorio: trixie/main arm64 indica de dónde se obtendría el paquete. </li>
                 </ul>          
                 
-                <h5>2.1.2.1. Instalación de screen</h5>
+                <h5>3.1.2.1. Instalación de screen</h5>
                     <p>
                        Si quieres utilizar <strong>screen</strong> como terminal serie para comunicarte con tu ATmega328P, ejecuta:
                     </p>
@@ -473,7 +489,7 @@ screen:
 ~ $ sudo apt install screen 
 </code></pre>
 
-                <h5>2.1.2.2. Usar screen para la comunicación UART</h5>
+                <h5>3.1.2.2. Usar screen para la comunicación UART</h5>
             
                <p>Una vez instalado, puedes abrir una conexión serie. Por ejemplo, si tu adaptador USB-UART aparece como <code>/dev/ttyUSB0</code> y el firmware del ATmega328P utiliza <code>9600</code> baudios:</p>
 
@@ -496,7 +512,7 @@ screen:
                 Para cerrar screen, pulsa <code>Ctrl+A</code> y, a continuación, <code>K</code>; después confirma con <code>Y</code>.
             </p>
 
-            <h3>2.2. Mac OS</h3>
+            <h3>3.2. Mac OS</h3>
 
             <p><code>CoolTerm</code> y <code>ZTerm</code> son buenas aplicaciones de terminal serial para Mac.</p>
 
@@ -508,7 +524,7 @@ screen:
 
             <pre><code>/dev/cu.usbserial-XXXX</code></pre>
 
-            <h3>2.3. Windows</h3>
+            <h3>3.3. Windows</h3>
 
             <p>Existen muchísimos programas de terminal para sistemas Windows.</p>
 
@@ -520,7 +536,7 @@ screen:
 
             <p><strong>Puertos → USB Serial Port</strong></p>
 
-            <h3>2.4. Multiplataforma: Python</h3>
+            <h3>3.4. Multiplataforma: Python</h3>
 
             <p>Si ya tienes Python y la biblioteca serial instalados, puedes ejecutar el emulador de terminal serial incluido.</p>
 
@@ -532,7 +548,7 @@ screen:
 
             <p>Ten en cuenta que debes utilizar <code>Ctrl-]</code> para salir y <code>Ctrl-T</code> seguido de <code>Ctrl-H</code> para obtener ayuda.</p>
 
-            <h3>2.5. Multiplataforma: Arduino</h3>
+            <h3>3.5. Multiplataforma: Arduino</h3>
 
             <p>Si tienes instalado Arduino IDE en tu computadora, encontrarás su programa de terminal serial en:</p>
 
@@ -550,7 +566,7 @@ screen:
     </section>
 
     <section>
-        <h2>3. CONFIGURACIÓN: CONEXIÓN DEL ADAPTADOR USB-SERIAL AL AVR</h2>
+        <h2>4. CONFIGURACIÓN: CONEXIÓN DEL ADAPTADOR USB-SERIAL AL AVR</h2>
 
         <p>Ya tienes el código <code>serialLoopback</code> cargado en el AVR y el nuevo software de terminal serial instalado y ejecutándose en la computadora.</p>
 
@@ -618,7 +634,7 @@ screen:
   </table>
 </div>
         
-        <h3>3.1. Pinout del cable FTDI</h3>
+        <h3>4.1. Pinout del cable FTDI</h3>
 
         <p>Si tienes uno de los habituales cables FTDI, su distribución de pines (<em>pinout</em>) se resume en la tabla siguiente.</p>
 
@@ -638,7 +654,7 @@ screen:
         </table>
         </div>
 
-        <h3>3.2. Pinout del módulo de comunicación serial FTDI FT232RL</h3>
+        <h3>4.2. Pinout del módulo de comunicación serial FTDI FT232RL</h3>
 
         <p>Si no tienes un cable FTDI, las líneas que debes buscar en el módulo tendrán etiquetas como <code>RX</code>, <code>TX</code>, <code>GND</code> y, opcionalmente, <code>VCC</code>.</p>
 
@@ -652,7 +668,7 @@ screen:
             La forma correcxta es alimentar el proyecto mediante una fuente externa de <strong>5 V</strong>, en este caso el microcontrolador <strong>AVR</strong>, el <strong>módulo FTDI FT232RL</strong> y la fuente externa deben compartir la misma conexión a <strong>GND</strong>.
         </p>                              
         
-        <h3>3.2 Conexión del módulo FTDI FT232RL y el microcontrolador AVR</h3>
+        <h3>4.3 Conexión del módulo FTDI FT232RL y el microcontrolador AVR</h3>
 
         <p>Conectar el adaptador serial al dispositivo AVR de la serie <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong> es tan sencillo como conectar tres conductores, y el primero es muy simple:</p>
 
@@ -695,14 +711,17 @@ RXA - TXB</code></pre>
 
         <p><strong>Cuando utilices comunicación serial USART tradicional, conecta RX de un dispositivo con TX del otro y TX con RX.</strong></p>
 
-        <p>Esquemáticamente, la configuración debería ser como se muestra en la Figura 5-1.</p>
+        <p>Esquemáticamente, la configuración debería ser como se muestra en la imagen siguiente.</p>
 
-        <p><strong>Figura 5-4. Conexión de E/S serial en la protoboard.</strong></p>
-        <p><strong>Figura 5-5. Conexión RX-TX.</strong></p>
+        <img src="img/conexion_FTDI_ATmega.png" alt="Conexión del módulo FTDI FT232RL y el microcontrolador AVR" class="imagen-centrada">
+
+        <p><strong> Esquemático de conexión de E/S serial UART de AVR con Módulo FTDI FT232RL.</strong></p>
+        <img src="img/esquematico.png" alt="Esquemático de conexión de E/S serial UART de AVR con Módulo FTDI FT232RL" class="imagen-centrada">
+        
     </section>
 
     <section>
-        <h2>6. ASCII</h2>
+        <h2>5. ASCII</h2>
 
         <p>Al enviar bytes de 8 bits a través de una línea serial, es natural pensar en ellos como números.</p>
 
@@ -763,7 +782,7 @@ RXA - TXB</code></pre>
     </section>
 
     <section>
-        <h2>7. INTEGRACIÓN COMPLETA: PRUEBA DEL LOOPBACK</h2>
+        <h2>6. INTEGRACIÓN COMPLETA: PRUEBA DEL LOOPBACK</h2>
 
         <p>Si ya has cargado el código <code>serialLoopback</code> en el microcontrolador, conectado los pines <code>RX/TX</code> —y <code>GND</code>— al convertidor USB-Serial y conectado este a la computadora, ha llegado el momento de probar el sistema.</p>
 
