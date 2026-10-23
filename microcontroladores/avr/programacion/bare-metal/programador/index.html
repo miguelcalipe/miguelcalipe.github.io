@@ -47,13 +47,10 @@
                 </p>
                     <strong>USBasp</strong> se conecta a la estación de trabajo por <strong>USB</strong> y al microcontrolador por el bus de comunicación serial <strong>SPI (interfaz perifericos serial)</strong>.                  
                 </p>
-                <p>
-                    <strong>USBasp</strong> usa la programación ISP (In-System Programming / Programación en el Sistema): método o técnica general que permite programar un chip de memoria  sin tener que retirarlo del circuito o de la placa. Microchip (y luego adoptaron otros fabricantes) introdujo  el término ICSP (In-Circuit Serial Programming / Programación Serial en Circuito) para llamar a la interfaz física y al conector de pines que hace posible esa programación ISP.
-
-                </p>
+            
 
                 <p>
-                    El software de programación o flasheo <strong>AVRDUDE</strong>, que utilizamos en este sitio, es compatible con USBasp desde la versión 5.2.
+                    El software de programación o flasheo <strong>AVRDUDE</strong> que utilizamos en este sitio, es compatible con USBasp desde la versión 5.2.
                 </p>
             </section>
             <section> 
@@ -108,7 +105,7 @@ avrdude done.  Thank you.
 </code></pre>
             </section>
             <section> 
-                <h2>2. PROGRAMACIÓN ISP E INTERFAZ ICSP. </h2>
+                <h2>2. PROGRAMACIÓN ISP, COMUNICACIÓN SPI E INTERFAZ ICSP. </h2>
                     <h3>2.1. Interfaz ICSP</h3>
                 <p>
                     La conexión del <strong>USBasp</strong> con el microcontrolador se realiza a través de un box header DIP (Dual In-line Package/ Encapsulado de Doble Línea) de 10 pines con un paso estándar de 2.54mm, llamado  conector <strong>ICSP</strong> o más comunmente, <strong>ISP</strong> el cual se conecta a los respectivos pines del microcontrolador. La conexión utiliza principalmente seis señales del bus de comunicación serial <strong>SPI</strong>: <code>MISO</code>, <code>MOSI</code>, <code>SCK</code>, <code>RESET</code>, <code>VCC</code> y <code>GND</code>. Se utiizan dos tipos de conectores
@@ -146,9 +143,15 @@ avrdude done.  Thank you.
                     <h3>2.2. La programación ISP</h3>
                 
                 <p>                    
-                   Para programar un dispositivo de la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> con el programador <strong>USBasp</strong>, usamos el método <strong>ISP (In System Programming)</strong> y utilizando la comunicación serial <strong>SPI</strong>
+                   Para programar un dispositivo de la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> con el programador <strong>USBasp</strong>, usamos el método <strong>ISP (In System Programming)</strong> y la comunicación serial <strong>SPI</strong>
                    </p>
+
+                <p>
+                   La programación <strong>ISP (In-System Programming / Programación en el Sistema)</strong> es un método o técnica general que permite programar un chip  sin tener que retirarlo del circuito o de la placa. Microchip (y luego adoptaron otros fabricantes) introdujo  el término ICSP (In-Circuit Serial Programming / Programación Serial en Circuito) para llamar a la interfaz física y al conector de pines que hace posible esa programación ISP.
+
+                </p>
                 
+                <h3>2.3. La comunicación serial síncrona SPI </h3>
                 <p>
                    El bus <strong>SPI (del inglés Serial Peripheral Interface)</strong> es un estándar de comunicaciones usado principalmente para la transferencia de información entre circuitos integrados. Al ser un bus de comunicación en serie,  los datos se transfieren bit a bit a través de un único canal de comunicación.   Para ello debemos  conectar seis señales entre el programador y el microcontrolador.
 
@@ -221,13 +224,20 @@ avrdude done.  Thank you.
             </section>
 
             <section> 
-            <h2>3. LA CONEXION USBasp - ATmega48A/PA/88A/PA/168A/PA/328/P</h2>
+            <h2>3. CONEXION USBasp con ATmega48A/PA/88A/PA/168A/PA/328/P</h2>
 
-             <p>Las conexiones con un AVR standalone de la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> es como sigue:</p>
+             <p>Las conexiones con un AVR standalone de la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> es como se detala en el grafico siguiente.  La alimentación del circuito y del microcontrolador es proporcionada por $V_{CC}$ procedente del <strong>USBasp</strong>. Esto es sólo conveniente cuando el circuito representa una carga de poco consumo</p>
+
              <img src="img/conexion_USBasp_ATmega_v2.png" class="imagen-centrada">
+            
+            <p>
+               En circuitos que requieren mayor consumo al que puede proporcioanr el puerto USB de la <strong>Raspberry Pi 5</strong>, es necesario alimentar el circuito y el microcontrolador con una fuente externa de potencia convceniente. El diagrama pictórico siguiente ilustra esto. 
+            </p>
+
+            <img src="img/conexion_USBasp_ATmega_cargador_realista.png" alt="Conexion del USBasp con fuente externa" class="imagen-centrada">
 
             <p>
-                El esquemático de las conexiones entre un programador <strong>USBasp</strong>  y un <strong>AVR</strong>> de la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> configurado con circuito mínimo es el siguiente:
+                El esquemático de las conexiones entre un programador <strong>USBasp</strong>  y un <strong>AVR</strong>> de la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> configurado con circuito mínimo alimentado a través de un puerto USB es el siguiente:
             </p>
                
             <img src="img/ATmega_USBasp.png" alt="Esquemático de  conexiones  de un AVR de la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> configurado con circuito mínimo con programador ISP USBasp" class="imagen-centrada">
