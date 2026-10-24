@@ -48,7 +48,7 @@
 
 <p>Todos los pines del puerto disponen de resistencias pull-up seleccionables individualmente, cuya resistencia es independiente de la tensión de alimentación.</p>
 
-<p>Todos los pines de E/S poseen diodos de protección conectados tanto a VCC como a Ground (GND), tal como se indica en la siguiente</p>
+<p>Todos los pines de E/S poseen diodos de protección conectados tanto a <code>V<sub>CC</sub></code> como a <code>GND</code> (Ground), tal como se indica en el siguiente esquema </p>
 
 <img src="img/esquema_equivalente_pines_ATmega.png" alt="Esquema equivalente de los pines de E/S del ATmega48A/PA/88A/PA/168A/PA/328/P" class="imagen-centrada">
 
@@ -307,7 +307,7 @@ i = PINB;
             <p>
                 El método más simple para garantizar un nivel definido en un pin no utilizado es habilitar la resistencia de <em>pull-up</em> interna. En este caso, la <em>pull-up</em> se deshabilitará durante el Reset. Si es importante mantener un bajo consumo de potencia durante el Reset, se recomienda utilizar una <em>pull-up</em> o <em>pull-down</em> externa. No se recomienda conectar los pines no utilizados directamente a $V_{CC}$ o GND, ya que esto puede causar corrientes excesivas si el pin se configura accidentalmente como salida.
             </p>
-
+            </section>
             <section>   
             <h2>3. FUNCIONES ALTERNATIVAS DEL PUERTO</h2>
             <p>
