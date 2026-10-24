@@ -43,7 +43,7 @@
                 <p>La carga del firmaware en el microcontrolador y la depuración la haremos a través del programador ICSP <a href="https://www.fischl.de/usbasp/" target="_blank">USBasp</a>. </p>
                     
                 <p> 
-                    <strong>USBasp</strong> es un programador de hardware libre y de bajo costo para microcontroladores <strong>Atmel AVR</strong>. Consta simplemente de un ATMega88 o un ATMega8 y un par de componentes pasivos. El programador utiliza un controlador USB basado únicamente en firmware; para Linux y Mac Os no se necesita instalar ningún controlador especial del puerto USB.
+                    <strong>USBasp</strong> es un programador de hardware libre y de bajo costo para microcontroladores <strong>Atmel AVR</strong>. El cerebro es un ATMega88 o un ATMega8. El programador utiliza un controlador USB basado únicamente en firmware; para Linux y Mac Os no se necesita instalar ningún controlador especial del puerto USB.
                 </p>
                     <strong>USBasp</strong> se conecta a la estación de trabajo por <strong>USB</strong> y al microcontrolador por el bus de comunicación serial <strong>SPI (interfaz perifericos serial)</strong>.                  
                 </p>
@@ -226,24 +226,314 @@ avrdude done.  Thank you.
             <section> 
             <h2>3. CONEXION USBasp con ATmega48A/PA/88A/PA/168A/PA/328/P</h2>
 
-             <p>Las conexiones con un AVR standalone de la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> es como se detala en el grafico siguiente.  La alimentación del circuito y del microcontrolador es proporcionada por $V_{CC}$ procedente del <strong>USBasp</strong>. Esto es sólo conveniente cuando el circuito representa una carga de poco consumo</p>
+             <p>Las conexiones con un AVR standalone de la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong>  detallan en el gráfico siguiente.  La alimentación del circuito y del microcontrolador es proporcionada por <code>V<sub>CC</sub></code> procedente del <strong>USBasp</strong>. Esto es sólo conveniente cuando el circuito representa una carga de poco consumo</p>
 
              <img src="img/conexion_USBasp_ATmega_v2.png" class="imagen-centrada">
             
             <p>
-               En circuitos que requieren mayor consumo al que puede proporcioanr el puerto USB de la <strong>Raspberry Pi 5</strong>, es necesario alimentar el circuito y el microcontrolador con una fuente externa de potencia convceniente. El diagrama pictórico siguiente ilustra esto. 
+               En circuitos que requieren mayor consumo al que puede proporcioanr el puerto USB de la <strong>Raspberry Pi 5</strong>, es necesario alimentar el circuito y el microcontrolador con una fuente externa de potencia conveniente, en cuyo caso es necesario que la fuente externa y el programador <strong>USBasp</strong> compartan la misma conexión a <code>GND</code>. El diagrama pictórico siguiente ilustra esto: 
             </p>
 
             <img src="img/conexion_USBasp_ATmega_cargador_realista.png" alt="Conexion del USBasp con fuente externa" class="imagen-centrada">
 
             <p>
-                El esquemático de las conexiones entre un programador <strong>USBasp</strong>  y un <strong>AVR</strong>> de la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> configurado con circuito mínimo alimentado a través de un puerto USB es el siguiente:
+                El esquemático de las conexiones entre un programador <strong>USBasp</strong>  y un <strong>AVR</strong> de la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> configurado con circuito mínimo con oscilador externo y alimentado por una fuente externa es el siguiente. Hay que notar que el pin <code>V<sub>CC</sub></code> del <strong>USBasp</strong> queda desconectado y que todos los elementos comparten la misma conexión a <code>GND</code>
             </p>
                
             <img src="img/ATmega_USBasp.png" alt="Esquemático de  conexiones  de un AVR de la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> configurado con circuito mínimo con programador ISP USBasp" class="imagen-centrada">
         
 
                 
+            </section>
+
+            <section>
+            <h2>4. INFORMACIÓN ÚTIL QUE SE PUEDE OBTENER DEL MICROCONTROLADOR CON USBasp y AVRDUDE</h2>
+
+            <p>
+                Al conectar el microcontrolador a un <strong>USBasp</strong> y comunicarte a través de <strong>AVRDUDE</strong>, se puede extraer un diagnóstico detallado del hardware y del estado de la memoria del chip. No solo sirve para "escribir" código; leer el microcontrolador te permite obtener la siguiente información crítica
+            </p>
+                <h3>4.1. La Firma Digital del Dispositivo (Device Signature) </h3>
+                <p>es un código binario único grabado de fábrica por el fabricante en una sección de memoria de solo lectura del chip. Conocer y utilizar este identificador es crucial por las siguientes razones prácticas:</p>
+                <ul>
+                    <li>
+                        <strong> Identificación del modelo exacto</strong>: Los entornos de desarrollo leen estos bytes antes de subir un programa. Si la firma detectada no coincide con el modelo de chip seleccionado en el proyecto, el sistema detiene la carga, evitando daños en el firmware o que la configuración incorrecta de los pines. Si compraste un chip etiquetado como ATmega328P pero tienes una copia falsificada o una variante distinta (como el ATmega328 sin la 'P'), la firma digital te lo dirá de inmediato 
+                    </li>
+                    <li>
+                        <strong>Seguridad y Criptografía</strong>: Sirve como base ("semilla") para generar claves criptográficas únicas por dispositivo. Esto permite que el microcontrolador se comunique de forma segura en redes (como el Internet de las Cosas - IoT), garantizando que los datos provienen de ese chip específico y no de un clon.
+                    </li>
+                    <li>
+                        <strong>Protección contra la piratería (Anti-clonación)</strong>: Puedes programar tu software para que verifique la firma digital del chip al arrancar. Si alguien copia tu código y lo graba en un microcontrolador clonado o pirata, el programa detectará una firma diferente y se bloqueará automáticamente.
+                    </li>
+                    <li>
+                        <strong>Gestión y trazabilidad en producción</strong>En la fabricación en masa, permite registrar de manera automatizada qué chip exacto se instaló en cada producto final. Esto facilita el rastreo de fallos en el control de calidad.
+                    </li>
+                </ul>
+            
+            <h4>4.1.1 Comando abreviado para leer la firma digital</h4>   
+<pre><code>
+~ $ avrdude -c usbasp -p m88pa
+
+avrdude: AVR device initialized and ready to accept instructions
+avrdude: device signature = 0x1e930f (probably m88pa)
+
+avrdude done.  Thank you.
+ </code></pre>           
+            <ul>
+                <li><strong>avrdude: AVR device initialized and ready to accept instructions</strong></li>
+                <li> El programador <strong>USBasp</strong> logró enviar la señal de "atención" (secuencia de inicio por el pin RESET) y el microcontrolador <strong>ATmega88PA</strong> respondió correctamente a través de las líneas de comunicación SPI (<code>MOSI</code>, <code>MISO</code> y <code>SCK</code>).</li>
+            </ul> 
+            <ul>
+                <li><strong>avrdude: device signature = 0x1e930f (probably m88pa)</strong></li>
+                <li><stronng>0x1e930f</stronng>: Son los 3 bytes exactos que AVRDUDE leyó desde la memoria interna del chip físico.</li>
+                <li><strong>(probably m88pa)</strong>: El software buscó en su archivo de configuración (avrdude.conf) a qué chip le pertenece el código 1E 93 0F. Encontró que coincide perfectamente con el ATmega88PA. Te dice "probablemente" (probably) por pura precaución técnica de los desarrolladores, pero la coincidencia es exacta.</li>
+            </ul>
+            <p>
+                A veces el <strong>USBasp</strong> intenta comunicarse a una velocidad superior al chip a programar surgiendo errores de lectura. Si el  microcontrolador es nuevo de fábrica, viene configurado con su oscilador interno a 1 MHz.</p>
+            </p>
+            <p>
+                Para estabilizar la comunicación y evitar que la escritura de archivos corrompa la lectura, se puede usar el parámetro <code>-B</code>. Fuerza a AVRDUDE a usar un periodo de reloj más lento usando el parámetro -B, un valor de 4 a 10 microsegundos suele ser ideal para chips lentos:
+            </p>
+
+            <h4>4.1.2.Comando para leer la firma digital en forma detallada</h4>
+            <p>
+                Una manera mas detallada de leer las caracteristicas del chip es utilizando el parámetro <code>-v</code>, de verbose ()
+            </p>
+<pre><code>
+~ $ avrdude -c usbasp -p m88pa -B 10 -v
+avrdude: Version 7.1
+         Copyright the AVRDUDE authors;
+         see https://github.com/avrdudes/avrdude/blob/main/AUTHORS
+
+         System wide configuration file is /etc/avrdude.conf
+         User configuration file is /home/miguel/.avrduderc
+         User configuration file does not exist or is not a regular file, skipping
+
+         Using Port                    : usb
+         Using Programmer              : usbasp
+         Setting bit clk period        : 10.0
+         AVR Part                      : ATmega88PA
+         Chip Erase delay              : 9000 us
+         PAGEL                         : PD7
+         BS2                           : PC2
+         RESET disposition             : possible i/o
+         RETRY pulse                   : SCK
+         Serial program mode           : yes
+         Parallel program mode         : yes
+         Timeout                       : 200
+         StabDelay                     : 100
+         CmdexeDelay                   : 25
+         SyncLoops                     : 32
+         PollIndex                     : 3
+         PollValue                     : 0x53
+         Memory Detail                 :
+
+                                           Block Poll               Page                       Polled
+           Memory Type Alias    Mode Delay Size  Indx Paged  Size   Size #Pages MinW  MaxW   ReadBack
+           ----------- -------- ---- ----- ----- ---- ------ ------ ---- ------ ----- ----- ---------
+           eeprom                 65    20     4    0 no        512    4      0  3600  3600 0xff 0xff
+           flash                  65     6    64    0 yes      8192   64    128  4500  4500 0xff 0xff
+           lfuse                   0     0     0    0 no          1    1      0  4500  4500 0x00 0x00
+           hfuse                   0     0     0    0 no          1    1      0  4500  4500 0x00 0x00
+           efuse                   0     0     0    0 no          1    1      0  4500  4500 0x00 0x00
+           lock                    0     0     0    0 no          1    1      0  4500  4500 0x00 0x00
+           signature               0     0     0    0 no          3    1      0     0     0 0x00 0x00
+           calibration             0     0     0    0 no          1    1      0     0     0 0x00 0x00
+
+         Programmer Type : usbasp
+         Description     : USBasp, http://www.fischl.de/usbasp/
+
+avrdude: set SCK frequency to 93750 Hz
+avrdude: AVR device initialized and ready to accept instructions
+avrdude: device signature = 0x1e930f (probably m88pa)
+
+avrdude done.  Thank you.
+
+</code></pre>
+
+            <p>
+            A continuación lo que significa cada bloque de la salida del comando:
+            </p>
+            <h5>1. Datos del software y archivos de configuración</h3>
+<pre><code>
+avrdude: Version 7.1
+         Copyright the AVRDUDE authors;
+         see https://github.com/avrdudes/avrdude/blob/main/AUTHORS
+
+         System wide configuration file is /etc/avrdude.conf
+         User configuration file is /home/miguel/.avrduderc
+         User configuration file does not exist or is not a regular file, skipping
+</code></pre>
+                <ul>
+                    <li>Indica que se está ejecutando la versión 7.1 del software AVRDUDE.</li>
+                    <li>Confirma la carga del archivo maestro <code>/etc/avrdude.conf</code>, el cual funciona como el catálogo de referencia global donde el programa almacena los mapas de memoria y las firmas digitales de los microcontroladores soportados.</li>
+                    <li>Muestra la búsqueda de configuraciones personalizadas en el archivo <code>.avrduderc</code> dentro del directorio del usuario, procediendo a omitirlo al constatar que este no existe en el sistema.</li>
+                </ul>
+    
+
+    <!-- Bloque 2: Parámetros de Conexión -->
+            <h5>2. Parámetros de conexión y del chip objetivo</h5>
+<pre><code>
+Using Port                    : usb
+Using Programmer              : usbasp
+Setting bit clk period        : 10.0
+AVR Part                      : ATmega88PA
+</code></pre>
+        <ul>
+            <li><strong>Port / Programmer:</strong> Ratifica el uso de un programador por hardware USBasp conectado a través de un puerto USB.</li>
+            <li><strong>Setting bit clk period : 10.0:</strong> Establece un periodo de reloj más amplio, lo que incrementa el tiempo de espera entre la transferencia de cada bit y otorga el margen necesario para la correcta respuesta del integrado.</li>
+            <li><strong>AVR Part : ATmega88PA:</strong> Valida que el software ha configurado los parámetros específicos de destino para un microcontrolador ATmega88PA.</li>
+        </ul>
+    
+    <!-- Bloque 3: Tabla Memory Detail -->
+        <h5>3. La tabla "Memory Detail" (El mapa del chip)</h5>
+        <p>Esta tabla describe la radiografía y la estructura interna de la memoria del ATmega88PA, definiendo los parámetros de lectura y escritura del dispositivo:</p>
+        <ul>
+            <li><strong>flash (8192 bytes / 8 KB):</strong> Representa el espacio total disponible para el almacenamiento del programa principal, detallando que la escritura se segmenta en páginas de 64 bytes.</li>
+            <li><strong>eeprom (512 bytes):</strong> Identifica el bloque de memoria no volátil destinado a preservar variables permanentes tras la pérdida de alimentación del circuito.</li>
+            <li><strong>lfuse, hfuse, efuse (Fusibles):</strong> Corresponde a los tres bytes dedicados a la configuración física del hardware, determinando aspectos como la fuente de reloj o los sistemas de protección contra caídas de tensión.</li>
+            <li><strong>signature (3 bytes):</strong> Especifica el sector de solo lectura asignado al almacenamiento de la firma digital de identidad del microcontrolador.</li>
+        </ul>
+   
+    <!-- Bloque 4: Enlace Técnico -->
+        <h5>4. El resultado final del enlace técnico</h5>
+<pre><code>
+avrdude: set SCK frequency to 93750 Hz
+avrdude: AVR device initialized and ready to accept instructions
+avrdude: device signature = 0x1e930f (probably m88pa)
+</code></pre>
+        <ul>
+            <li>Señala que, al aplicar un periodo de clock de 10.0, el hardware adaptó la frecuencia de comunicación SPI a 93750 Hz, un valor seguro para procesadores que operan con bajas frecuencia.</li>
+            <li><strong>device signature = 0x1e930f:</strong> Confirma la lectura exitosa y sin interferencias de la firma digital grabada en el chip, verificando que coincide plenamente con las especificaciones del ATmega88PA seleccionado.</li>
+        </ul>
+<img src= "img/salidaExplicada.png" alt="Explicación de la salida "verbose" del comando para leer la firma del microcontroladorm AVR" class="imagen-centrada">
+
+
+            <h3>4.2. Configuración del Reloj y Hardware (Fuses / Fusibles)</h3>
+
+            <p>
+            Los términos <code>lfuse</code> (Low Fuse), <code>hfuse</code> (High Fuse) y <code>efuse</code> (Extended Fuse) corresponden a los tres bytes de fusibles de configuración de hardware en los microcontroladores AVR.
+            </p> 
+            <p>Con estos bytes podemos configurar:</p>
+            <ul>
+                <li><strong>Frecuencia y Oscilador</strong>: Si está usando el oscilador interno (8 MHz o 128 kHz) o un cristal de cuarzo externo.</li>
+                <li><strong>Divisor de Reloj (<code>CKDIV8</code>)</strong>Si la velocidad real está dividida entre 8. </li>
+                <li><strong>Reset alternativo</strong>: Si el pin de RESET está deshabilitado para usarse como una entrada/salida digital más.</li>
+                <li><strong>Detector de caída de voltaje (BOD - Brown-out Detection)</strong>El nivel exacto de voltaje (ej. 2.7V o 4.3V) en el que el chip se auto-reiniciará para prevenir que el código se corrompa si la batería se está agotando.</li>
+            </ul>
+
+            <h3>4.3 Lectura de los fuses</h3>
+
+            <p>
+                Para diagnosticar el estado del chip y posteriormente configurarlo, conviene saber cómo está configurado. Para ello leemos los fuses
+            </p>
+
+            <p>
+                Los fuses son bits de configuración que se almacenan dentro del microcontrolador y que conservan su valor aunque desconectes la alimentación.
+            </p>
+
+            <p>Mediante el  siguiente comando solicitaremos la lectura de los tres bytes de fuses: <code>lfuse</code>, <code>hfuse</code> y <code>efuse</code>. Los argumentos utilizados son: <code>r</code> que significa leer; <code> - </code> indica que el resultado se envía a la salida estándar; <code>h</code> solicita que se muestre en hexadecimal.</p>
+
+<pre><code>
+~ $ avrdude -c usbasp -p m88p -U lfuse:r:-:h -U hfuse:r:-:h -U efuse:r:-:h
+
+avrdude: AVR device initialized and ready to accept instructions
+avrdude: device signature = 0x1e930f (probably m88p)
+avrdude: reading lfuse memory ...
+avrdude: writing output file <stdout>
+0xe2
+avrdude: reading hfuse memory ...
+avrdude: writing output file <stdout>
+0xd5
+avrdude: reading efuse memory ...
+avrdude: writing output file <stdout>
+0xff
+
+avrdude done.  Thank you.
+</code></pre>
+
+            <p>
+                A continuación, se presenta la explicación técnica del comando de lectura y la salida obtenida en la consola de comandos, 
+            </p>
+
+            <!-- Bloque 1: Interpretación del Comando -->
+            <h4>4.3.1. Interpretación del Comando de Lectura</h4>
+            <p>El comando ejecutado instruye a AVRDUDE a conectarse mediante el programador USBasp para realizar tres operaciones consecutivas de lectura (<code>:r</code>). Los parámetros utilizados configuran el sistema para redirigir los datos directamente a la salida estándar de la consola (<code>:-</code>) y mostrarlos codificados en formato hexadecimal (<code>:h</code>), evitando la creación de archivos físicos en el disco.</p>
+        
+        <!-- Bloque 2: Inicialización -->
+            <h4>4.3.2. Inicialización y Sincronización con el Hardware</h4>
+            <p>El programador establece exitosamente el enlace de comunicación SPI con el integrado. Tras el reinicio físico, se extrae la firma digital del dispositivo (<code>0x1e930f</code>), validando que corresponde de forma exacta al microcontrolador seleccionado y garantizando que el canal de datos es estable para proceder con la inspección de los registros de configuración.</p>       
+
+        <!-- Bloque 3: lfuse -->        
+            <h4>4.3.3. Análisis del Fusible Bajo (lfuse = 0xE2)</h4>
+            <p>El sistema reporta un valor hexadecimal de <strong><code>0xE2</code></strong> para el byte bajo de configuración. Al desglosar este valor binario, se determina que el microcontrolador está configurado para operar con su <strong>oscilador interno calibrado de 8 MHz</strong> como fuente de reloj principal y con el divisor interno desactivado (Clock Divide by 8 deshabilitado), permitiendo que el chip trabaje a su máxima velocidad interna de fábrica.</p>        
+
+        <!-- Bloque 4: hfuse -->        
+            <h4>4.3.4. Análisis del Fusible Alto (hfuse = 0xD5)</h4>
+            <p>El registro de funciones altas devuelve el valor hexadecimal <strong><code>0xD5</code></strong>. Esta configuración específica indica que el pin físico de <em>Reset</em> se mantiene activo para futuras reprogramaciones, el circuito SPI está habilitado y la casilla <code>EESAVE</code> se encuentra activa, lo que protege el contenido de la memoria EEPROM para que no sea destruido cuando se reescriba el firmware principal.</p>
+        
+        <!-- Bloque 5: efuse -->
+        
+            <h4>4.3.5. Análisis del Fusible Extendido (efuse = 0xFF)</h4>
+            <p>El byte extendido arroja un valor hexadecimal de <strong><code>0xFF</code></strong>. En la arquitectura del ATmega88P, los bits superiores de este registro no se utilizan (permanecen en 1), y el valor obtenido confirma que el circuito detector de caídas de tensión (<em>Brown-out Detector</em> o BOD) se encuentra completamente <strong>deshabilitado</strong>, disminuyendo al mínimo el consumo de corriente en modo de reposo.</p>
+
+        <h3>4.4. Escritura de los fuses</h3>
+
+            <p>Por ejemplo, podemos configurar el microcontrolador para que:</p>
+            <ul>
+                <li>Utilice el oscilador interno.
+                <li>Utilice un cristal externo.</li>
+                <li>Utilice una señal de reloj externa procedente de otro circuito.</li>
+            </ul> 
+            
+            <p>Estas opciones no se seleccionan escribiendo una instrucción normal de C en un programa. Se configuran mediante un procedimiento de programación, por ejemplo, con tu USBasp y AVRDUDE y desde la línea de comandos, escribiendo directamente en el microcontrolador.</p>
+
+            <p>A modo de ilustración, el siguiente comando ejecuta una acción directa de modificación sobre la configuración física del integrado:</p>
+
+<pre><code>avrdude -c usbasp -p m88p -U lfuse:w:0xe2:m</code></pre>
+
+            <h4>4.4.1. Propósito General del Comando</h4>
+            <p>Este comando se utiliza para <strong>escribir o modificar físicamente la configuración del Fusible Bajo (<code>lfuse</code>)</strong> en el microcontrolador. A diferencia de las instrucciones orientadas a la lectura, esta línea altera permanentemente los parámetros de hardware del chip mediante una operación de escritura (<code>:w</code>).</p>
+
+            <h4>4.4.2. Desglose de los Parámetros Utilizados</h4>
+            <p>La directiva principal se concentra en el argumento <code>-U lfuse:w:0xe2:m</code>, el cual se divide internamente de la siguiente manera:</p>
+            <ul>
+                <li><strong>lfuse:</strong> Especifica que el objetivo de la operación es el byte del Fusible Bajo (Low Fuse).</li>
+                <li><strong>w:</strong> Indica que se va a ejecutar una acción de escritura (<em>write</em>) en dicha memoria.</li>
+                <li><strong>0xe2:</strong> Determina el valor hexadecimal exacto que se va a grabar en el registro.</li>
+                <li><strong>m:</strong> Establece el modo "inmediato" (<em>immediate mode</em>), indicando al software que el valor proporcionado es un dato numérico directo y no un archivo de texto en el disco.</li>
+            </ul>
+
+            <h4>4.4.3. Efectos Físicos en el Microcontrolador</h4>
+            <p>Al aplicar el valor <code>0xE2</code> en el microcontrolador, el hardware reconfigura de inmediato sus propiedades fundamentales al arrancar:</p>
+            <ul>
+                <li><strong>Selección de Reloj:</strong> Configura el chip para que funcione utilizando su <strong>oscilador interno calibrado de 8 MHz</strong>, prescindiendo de la necesidad de conectar un cristal de cuarzo externo en los pines físicos.</li>
+                <li><strong>Desactivación del Divisor (CKDIV8):</strong> Deshabilita la división interna por ocho del reloj de fábrica. Esto hace que el procesador trabaje directamente a los 8 MHz completos en lugar de los 1 MHz con los que viene configurado por defecto al salir de la línea de producción.</li>
+            </ul>
+            
+
+            <h3>4.5. Estado de Protección y Seguridad (Lock Bits)</h3>
+            <p> 
+                Los Lock bits determinan los permisos de lectura y escritura de la memoria.
+            </p>
+            <p>
+                Dice si el microcontrolador está protegido contra clonación. Si recuperas un chip de un aparato comercial, leer este byte te indicará si puedes extraer el firmware que tiene dentro o si el fabricante bloqueó la lectura para proteger su propiedad intelectual.
+            </p>
+
+            <h3>4.6 Volcado Completo del Firmware (Flash y EEPROM)</h3>
+            <p>Puedes descargar todo lo que reside en el almacenamiento del chip directo a tu computadora.</p>
+            <ul>
+                <li><strong>Memoria Flash:</strong> Puedes extraer el software ejecutable completo compilado (en un archivo <code>.hex</code>) para duplicarlo en otros chips o hacer una copia de seguridad.</li>
+                <li><strong>Memoria EEPROM:</strong> Puedes leer los datos guardados por el usuario a largo plazo (configuraciones, calibraciones de sensores, contraseñas de red guardadas, etc.).</li>
+            </ul>
+            <p>Comando para respaldar la Flash:</p>
+            <pre><code>avrdude -c usbasp -p m328p -U flash:r:respaldo.hex:i</code></pre>
+
+            <h3>4.7. Byte de Calibración del Oscilador Interno (Calibration Byte)</h3>
+            <p>El oscilador interno de fábrica (RC) no es 100% preciso y varía con la temperatura.</p>
+            <ul>
+                <li><strong>Para qué sirve:</strong> Al leer este byte (<code>calibration</code>), obtienes el valor exacto que la fábrica calculó a 25 °C para calibrar la frecuencia. Tu código en C puede leer este valor al iniciar y cargar el registro <code>OSCCAL</code> para corregir la velocidad del reloj y hacer que protocolos sensibles como la comunicación UART funcionen a la perfección sin desfasarse.</li>
+            </ul>
+            
             </section>
 
         </article>

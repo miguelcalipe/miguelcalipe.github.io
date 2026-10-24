@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Niveles de abstracción del hardware | MC Mundo Tech</title>
+    <meta name="description" content="Con el paso del tiempo han aparecido distintos niveles de abstracción cuyo objetivo es simplificar el desarrollo de software. Mientras mayor es la abstracción, menor es la cantidad de detalles del hardware que el programador necesita conocer, a costa de perder algo de control y eficiencia ">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>ABSTRACCIÓN DEL HARDWARE</h1>
+            
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   -->
+            
+            <section> 
+                <!-- Bloque 1: lfuse -->
+    
+        <h4>1. lfuse (Low Fuse - Fusible Bajo)</h4>
+        <p>Este byte se encarga primordialmente de la configuración del sistema de reloj y los tiempos de arranque del microcontrolador. Controla los siguientes aspectos críticos:</p>
+        <ul>
+            <li><strong>Fuente del reloj (Clock Source):</strong> Determina si el chip funcionará con su oscilador interno (por defecto a 8 MHz o 1 MHz) o si requerirá un cristal de cuarzo externo conectado a sus pines.</li>
+            <li><strong>Divisor de reloj (Clock Divide by 8):</strong> Define si la frecuencia del reloj seleccionado se dividirá internamente entre ocho, una configuración de fábrica común instalada para reducir el consumo energético inicial.</li>
+            <li><strong>Tiempo de arranque (Start-up Time):</strong> Configura los milisegundos de retardo que el chip debe esperar tras recibir energía para permitir que el voltaje de la fuente de alimentación se estabilice antes de iniciar la ejecución del programa.</li>
+        </ul>
+    </article>
+
+    <!-- Bloque 2: hfuse -->
+    <article class="fuse-specification-block">
+        <h4>2. hfuse (High Fuse - Fusible Alto)</h4>
+        <p>Este registro administra las funciones de alto nivel del sistema, el cargador de arranque (Bootloader) y ciertos mecanismos de depuración física:</p>
+        <ul>
+            <li><strong>Habilitación del Bootloader (BOOTRST):</strong> Determina el vector de inicio del microcontrolador, obligando al chip a arrancar desde la dirección de memoria reservada para el gestor de arranque en lugar de iniciar desde la dirección cero de la memoria Flash.</li>
+            <li><strong>Tamaño de la sección de arranque (BOOTSZ):</strong> Asigna el tamaño físico en bytes de la sección reservada para el cargador de arranque dentro del mapa de memoria del integrado.</li>
+            <li><strong>Habilitación del pin Reset (RSTDISBL):</strong> Permite deshabilitar la función de reinicio del pin físico RESET para convertirlo en un pin de entrada/salida digital de propósito general (operación crítica que impide la reprogramación posterior por métodos ISP estándar).</li>
+            <li><strong>Retención de EEPROM (EESAVE):</strong> Configura el chip para impedir que la memoria EEPROM se borre automáticamente cada vez que se realiza un borrado general de la memoria Flash.</li>
+        </ul>
+    </article>
+
+    <!-- Bloque 3: efuse -->
+    <article class="fuse-specification-block">
+        <h4>3. efuse (Extended Fuse - Fusible Extendido)</h4>
+        <p>Este tercer byte contiene funciones adicionales y especializadas de protección eléctrica para el resguardo de la integridad de los datos:</p>
+        <ul>
+            <li><strong>Detector de caídas de tensión (Brown-out Detector - BOD):</strong> Configura un circuito interno que monitorea constantemente el voltaje de alimentación. Si el voltaje cae por debajo de un umbral crítico de seguridad (por ejemplo, 1.8V, 2.7V o 4.3V), el chip se reinicia automáticamente para evitar el comportamiento errático del software o la corrupción de los datos almacenados.</li>
+        </ul>
+            
+            </section>
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>
