@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistemas de Reloj y Opciones del Reloj | MC Mundo Tech</title>
+    <meta name="description" content=" ">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>SISTEMAS DE RELOJ Y OPCIONES</h1>
+            
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   -->
+        
+            <section>
+                <h2>1. SISTEMAS DE RELOJ Y SU DISTRIBUCIÓN </h2>
+                <p>La Figura 9-1 detalla los subsistemas de reloj en el AVR y cómo se distribuyen entre ellos. No es necesario que todas las fuentes de reloj estén activas en un momento dado. La flexibilidad de la arquitectura del reloj ayuda a reducir el consumo de energía  al conectar únicamente los subsistemas de reloj periféricos necesarios para la aplicación en ejecución.</p>
+                <p><strong>[Nota: Aquí se encuentra el gráfico de la Figura 9-1: "Diagrama de bloques del sistema de distribución de reloj (Clock Distribution)"]</strong></p>
+
+                <h3>1.1. Reloj de la CPU (CPU Clock) – clk_{CPU}</h3>
+                <p>El reloj de la CPU se encarga de dirigir los circuitos principales del núcleo (core), los cuales operan en los registros de trabajo de propósito general (general purpose working registers), la unidad lógica aritmética (ALU) y la memoria de datos (SRAM). El acceso a la memoria Flash y a la EEPROM también depende del reloj de la CPU.</p>
+
+                <h3>1.2. Reloj de E/S (I/O Clock) – clk_{I/O}</h3>
+                <p>El reloj de E/S se utiliza para la mayoría de los periféricos, tales como los temporizadores/contadores (Timer/Counters), la interfaz serial universal (USART), la interfaz periférica serial (SPI) y el convertidor analógico-digital (ADC). El reloj de E/S también es utilizado por el subsistema de interrupciones externas (external interrupts).</p>
+                <p><em>Nota: Para minimizar el consumo de energía en los modos de suspensión (sleep modes), el reloj de E/S puede detenerse para determinados periféricos.</em></p>
+
+                <h3>1.3. Reloj del Flash (Flash Clock) – clk_{FLASH}</h3>
+                <p>El reloj del Flash controla la interfaz del bus de la memoria Flash (Flash memory bus interface). El reloj del Flash opera normalmente al mismo ritmo que el reloj de la CPU (clk_{CPU}).</p>
+
+                <h3>1.4. Reloj Asíncrono (Asynchronous Clock) – clk_{ASY}</h3>
+                <p>El reloj asíncrono permite que determinados periféricos (como el Temporizador/Contador2) operen de forma independiente del reloj principal de la CPU (clk_{CPU}). Esto es especialmente útil cuando se utiliza un oscilador externo de baja frecuencia (como un cristal de reloj de 32.768 kHz) para el conteo en tiempo real (RTC).</p>
+
+                <h3>1.5. Reloj del ADC (ADC Clock) – clk_{ADC}</h3>
+                <p>El convertidor analógico-digital (ADC) cuenta con su propio reloj dedicado para permitir la conversión de señales analógicas mientras el reloj de E/S se encuentra detenido o ralentizado (por ejemplo, en el modo de reducción de ruido del ADC - ADC Noise Reduction Mode).</p>
+            </section>
+
+            <section>
+                <h2>2. FUENTES DE RELOJ (CLOCK SOURCES)</h2>
+                <p>El dispositivo cuenta con varias opciones de fuentes de reloj para el oscilador principal (main oscillator), las cuales se seleccionan mediante los bits de los fusibles (fuse bits) de la memoria de configuración:</p>
+                <p><strong>[Nota: Aquí se encuentra la tabla de configuración de los bits de fusible para las opciones de fuente de reloj (Clock Options)]</strong></p>
+            </section>
+                
+            
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>

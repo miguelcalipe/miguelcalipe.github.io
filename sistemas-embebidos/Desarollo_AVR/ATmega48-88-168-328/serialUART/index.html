@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Niveles de abstracción del hardware | MC Mundo Tech</title>
+    <meta name="description" content="Con el paso del tiempo han aparecido distintos niveles de abstracción cuyo objetivo es simplificar el desarrollo de software. Mientras mayor es la abstracción, menor es la cantidad de detalles del hardware que el programador necesita conocer, a costa de perder algo de control y eficiencia ">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>COMUNICACIÓN SERIAL Y E/S DIGITAL</h1>
+            
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   -->
+            
+        
+    <section>
+        <h2>1. INTRODUCCIÓN Y FUNDAMENTOS DEL PROYECTO</h2>
+        <p>El código que analizamos a continuación es un clásico programa de prueba ("loopback"):</p>
+        <ul>
+            <li>El microcontrolador recibe un carácter byte a byte a través de su interfaz serial (USART).</li>
+            <li>Reenvía inmediatamente ese mismo byte de vuelta a la terminal de la computadora.</li>
+            <li>Muestra simultáneamente el valor numérico del carácter en formato binario mediante 8 LEDs conectados a un puerto de salida, en este caso <code>PORTB</code></li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>2. EL CÓDIGO FUENTE PRINCIPAL (<code>serialLoopback.c</code>)</h2>
+        <p>El siguiente código es el punto de entrada de la aplicación:</p>
+        <pre><code>/*
+  A simple test of serial-port functionality.
+  Takes in a character at a time and sends it right back out,
+  displaying the ASCII value on the LEDs.
+*/
+
+// ------- Preamble -------- //
+#include &lt;avr/io.h&gt;
+#include &lt;util/delay.h&gt;
+#include "pinDefines.h"
+#include "USART.h"
+
+int main(void) {
+    char serialCharacter;
+
+    // -------- Inits --------- //
+    LED_DDR = 0xff; /* set up LEDs for output */
+    initUSART();
+    printString("Hello World!\r\n"); /* to test */
+
+    // ------ Event loop ------ //
+    while (1) {
+        serialCharacter = receiveByte();
+        transmitByte(serialCharacter);
+        LED_PORT = serialCharacter;
+        /* display ascii/numeric value of character */
+    } /* End event loop */
+
+    return (0);
+}</code></pre>
+    </section>
+
+    <section>
+        <h2>3. Arquitectura de Archivos: ¿Por qué existen archivos <code>.h</code> y <code>.c</code>?</h2>
+        <p>Para entender cómo estructurar un proyecto en C para microcontroladores, es fundamental comprender la diferencia entre <strong>declaración</strong> e <strong>implementación</strong>:</p>
+        
+        <h3>A. Archivos de Cabecera (<code>.h</code>)</h3>
+        <p>Sirven exclusivamente para <strong>declarar</strong> qué funciones, macros o estructuras existen. Le dicen al compilador: <em>"Confía en que estas funciones existen y tienen esta forma"</em>.</p>
+        <ul>
+            <li><strong><code>pinDefines.h</code></strong>: Contiene únicamente macros de preprocesador (<code>#define</code>). Al ser solo sustituciones de texto para mapear nombres (por ejemplo, transformar <code>LED_PORT</code> en <code>PORTD</code>), <strong>no genera código máquina por sí mismo</strong>, por lo que <strong>no lleva ni necesita un archivo <code>pinDefines.c</code></strong>.</li>
+            <li><strong><code>USART.h</code></strong>: Contiene los prototipos de las funciones de comunicación (por ejemplo, <code>void initUSART(void);</code>).</li>
+        </ul>
+
+        <h3>B. Archivos de Implementación (<code>.c</code>)</h3>
+        <p>Contienen el <strong>código real y ejecutable</strong> que manipula los registros de hardware del microcontrolador.</p>
+        <ul>
+            <li><strong><code>USART.c</code></strong>: Es el archivo obligatorio que contiene la lógica interna de cómo se configuran los registros de baudios (<code>UBRR</code>), control (<code>UCSR0A/B/C</code>) y datos (<code>UDR0</code>) del USART.</li>
+        </ul>
+        <blockquote>
+            <strong>Regla de oro:</strong> Si incluyes una cabecera como <code>#include "USART.h"</code>, el compilador sabrá usar las funciones, pero si olvidas compilar y enlazar el archivo fuente <code>USART.c</code>, el enlazador (<em>linker</em>) fallará con un error de referencia indefinida (<code>undefined reference</code>).
+        </blockquote>
+        
+        <p>Por lo tanto en este proyecto, para programar el microcontrolador   debemos tener en la carpeta local no solo el archivo <strong>.serialLoopback.c</strong> con el código fuente principal, también debemos tener los archivos de cabecera declarados <strong>pinDefines.h</strong>,USART.h y  el archivo de implementación <strong>USART.c</strong> </p>
+    </section>
+
+    <section>
+        <h2>4. Desglose Lógico del Programa por Bloques</h2>
+            <h3>4.1. Preámbulo y Cabeceras</h3>
+<pre><code class="language-c">
+#include &lt;avr/io.h&gt;
+#include &lt;util/delay.h&gt;
+#include "pinDefines.h"
+#include "USART.h"
+</code></pre>
+
+            <ul>
+                <li>&lt;avr/io.h&gt;: Es la cabecera fundamental de <strong>AVR-GCC</strong>. Al compilar para un microcontrolador específico (por ejemplo, el ATmega88PA), este archivo mapea los nombres simbólicos de los registros (como DDRB o PORTD) a sus direcciones físicas de memoria RAM/I/O correspondientes.</li>
+
+                <li>&lt;util/delay.h&gt;: Provee rutinas de retardo por software basadas en ciclos de reloj (<code>_delay_ms</code>, <code>_delay_us</code>). Aunque no se usa de forma explícita dentro del main en este ejemplo, suele incluirse por estandarización en las plantillas de proyectos iniciales.</li>
+
+                <li><code>"pinDefines.h"</code> y <code>"USART.h"</code>: Al entrecomillarlo, se le está indicando al compilador que esos archivos no forman parte de la librería estándar del sistema, sino que son archivos locales del proyecto. El primero abstrae los nombres físicos de los pines y puertos (traduciendo <code>LED_DDR</code> y <code>LED_PORT</code> al puerto real, como <code>DDRB</code> y <code>PORTB</code>). El segundo encapsula la configuración de los registros del USART (baud rate, habilitación de TX/RX, formato de trama).</li>
+            </ul>
+
+                       
+            <h3>4.2. Inicialización (<code>Inits</code>)</h3>
+            <ul>
+                <li>Configuración del puerto de LEDs: <code>LED_DDR = 0xff;</code>: Configura el puerto de los LEDs como salida completa escribiendo unos (<code>0xff</code>) en el registro de dirección de datos. Esto configura los 8 pines del puerto como salidas digitales, preparándolos para drenar o suministrar corriente a los LEDs.</li>
+                <li>Inicialización serial: <code>initUSART();</code> y <code>printString(...)</code>: Configuran el hardware USART interno del microcontrolador y envían un mensaje inicial de prueba a la terminal. Esto implica programar los registros UBRR (baud rate register), UCSR0A, UCSR0B y UCSR0C para establecer la velocidad de transmisión (por ejemplo, 9600 baudios), el tamaño de palabra (8 bits), sin paridad y 1 bit de parada.</li>
+                <li>Mensaje de prueba: <code>printString("Hello World!\r\n")</code>; envía una cadena de caracteres byte por byte a través del transmisor UART. La secuencia \r\n asegura el retorno de carro y el avance de línea en la consola de la PC.</li>
+            </ul>
+
+
+
+        <h3>4.3. El Bucle Infinito (<code>Event Loop</code>)</h3>
+<pre><code>while (1) {
+serialCharacter = receiveByte();
+transmitByte(serialCharacter);
+LED_PORT = serialCharacter;
+}</code></pre>
+
+            <p>Una vez inicializado el sistema, el microcontrolador entra en un ciclo cerrado de ejecución (Super Loop):</p>
+
+            <ul>
+                <li><strong>Recepción</strong> (<code>receiveByte()</code>): Esta función se queda bloqueada (esperando activamente) hasta que el búfer de recepción del UART (UDR) recibe un nuevo byte proveniente de la computadora. Una vez completada la recepción, el valor se almacena en la variable serialCharacter. </li>
+                <li><strong> Transmisión</strong> (<code>transmitByte(serialCharacter);</code>): Inmediatamente toma el byte recibido y lo retransmite hacia el puerto serie. Esto genera el efecto de eco (echo) en la terminal.</li>
+                <li><strong>Reflejo en Hardware</strong> (<code>LED_PORT = serialCharacter;</code>): Asigna el valor del carácter recibido directamente al registro de salida del puerto (PORTD o PORTB). Como cada bit del puerto controla un LED, el número ASCII del carácter se visualiza instantáneamente en binario. Por ejemplo, si presionas la tecla A (código ASCII 65 decimal, 01000001 en binario), los LEDs encenderán exactamente en esa esa combinación de bits. </li>
+            </ul>
+
+            
+        </section>
+
+        <section>
+            <h2>5. Proceso de Compilación y Enlazado</h2>
+            <p>Para generar el archivo ejecutable para el <strong>ATmega88PA</strong> a una frecuencia de reloj de 8 MHz, se debe compilar el archivo principal junto con la implementación real del USART:</p>
+            <pre><code>avr-gcc -mmcu=atmega88pa -DF_CPU=8000000UL -Os serialLoopback.c USART.c -o serialLoopback.elf</code></pre>
+            <ul>
+                <li><strong><code>-mmcu=atmega88pa</code></strong>: Define la arquitectura del microcontrolador.</li>
+                <li><strong><code>-DF_CPU=8000000UL</code></strong>: Establece la frecuencia de reloj para calcular los retardos y velocidades de baudios.</li>
+                <li><strong><code>-Os</code></strong>: Optimiza el código para reducir el tamaño en la memoria Flash.</li>
+                <li><strong><code>serialLoopback.c USART.c</code></strong>: Compila y une ambos módulos de código fuente para evitar errores de enlace.</li>
+            </ul>
+            <p>Posteriormente, se extrae el formato binario puro (<code>.hex</code>) apto para ser grabado:</p>
+            <pre><code>avr-objcopy -j .text -j .data -O ihex serialLoopback.elf serialLoopback.hex</code></pre>
+        </section>
+
+        <section>
+            <h2>6. Flasheo en el Hardware</h2>
+            <p>Una vez obtenido el archivo <code>serialLoopback.hex</code>, los archivos de código fuente y cabeceras ya cumplieron su propósito. El archivo binario se transfiere a la memoria Flash del ATmega88PA mediante un programador ISP (como un USBasp):</p>
+            <pre><code>avrdude -c usbasp -p m88p -U flash:w:serialLoopback.hex</code></pre>
+            <ul>
+                <li><strong><code>-c usbasp</code></strong>: Define el programador físico USB.</li>
+                <li><strong><code>-p m88p</code></strong>: Identificador interno en AVRDUDE compatible con la familia ATmega88P/PA.</li>
+                <li><strong><code>-U flash:w:...</code></strong>: Ordena escribir el archivo hexadecimal directamente en la memoria Flash del microcontrolador.</li>
+            </ul>
+        </section>
+</article>
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>
