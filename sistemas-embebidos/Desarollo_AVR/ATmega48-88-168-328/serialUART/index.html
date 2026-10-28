@@ -230,14 +230,8 @@ avr-objcopy -j .text -j .data -O ihex serialLoopback.elf serialLoopback.hex
 <pre><code>
 avrdude -c usbasp -p m88p -U flash:w:serialLoopback.hex
 </code></pre>
-            <ul>
-                <li><strong><code>-mmcu=atmega88pa</code></strong>: Define la arquitectura del microcontrolador.</li>
-                <li><strong><code>-DF_CPU=8000000UL</code></strong>: Establece la frecuencia de reloj para calcular los retardos y velocidades de baudios.</li>
-                <li><strong><code>-Os</code></strong>: Optimiza el código para reducir el tamaño en la memoria Flash.</li>
-                <li><strong><code>serialLoopback.c USART.c</code></strong>: Compila y une ambos módulos de código fuente para evitar errores de enlace.</li>
-            </ul>
 
-            <h3>6.2. La forma extendida (Con verificación y control de memoria)</h3>
+            <h3>6.2. La forma extendida (Con verificación y control de memoria)</h2>
             <p>
                 Agrega parámetros adicionales para garantizar la integridad del proceso y consultar el estado del chip:
             </p>
