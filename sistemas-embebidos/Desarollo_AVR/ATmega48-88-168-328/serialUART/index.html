@@ -224,8 +224,8 @@ avr-objcopy -j .text -j .data -O ihex serialLoopback.elf serialLoopback.hex
 
 <p>para el flasheo del microcontrolador ATmega88PA utilizando un programador <strong>USBasp</strong>, existen  una forma extendida (que incluye opciones de seguridad y configuración de fusibles o verificación) y una forma breve (la instrucción mínima indispensable).</p>
 
-<h3>6.1. Forma breve (comando directo)</h3>
-<p>Es la instrucción mínima necesaria para tomar el archivo .hex y grabarlo directamente en la memoria Flash del microcontrolador. Se usa en pruebas rápidas del día a día en la mesa de trabajo cuando ya se sabe que el hardware y los fusibles están configurados correctamente.</p>
+            <h3>6.1. Forma breve (comando directo)</h3>
+            <p>Es la instrucción mínima necesaria para tomar el archivo .hex y grabarlo directamente en la memoria Flash del microcontrolador. Se usa en pruebas rápidas del día a día en la mesa de trabajo cuando ya se sabe que el hardware y los fusibles están configurados correctamente.</p>
 
 <pre><code>
 avrdude -c usbasp -p m88p -U flash:w:serialLoopback.hex

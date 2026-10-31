@@ -57,15 +57,42 @@
                 <p>
                     Debemos escoger un dispositivo de la serie ATmega48A/PA/88A/PA/168A/PA/328/P. En este ejemplo trabajaremos con un <strong>ATmega328P</strong>, el mismo microcontrolador que incorpora la placa Arduino Uno. Si utilizas otro AVR, no hay ningún problema: el procedimiento será exactamente el mismo. Lo único que cambiará será el modelo de microcontrolador que indicaremos al compilador y al programa de grabación.
                 </p>
-            
-    <pre><code class="language-bash">avr-gcc -mmcu=atmega328p -DF_CPU=1000000UL -Os blink.c -o blink.elf</code></pre>
-                <p>
-                    Este es el comando que transforma el archivo <code>blink.c</code> en un programa ejecutable para un microcontrolador AVR. Aunque solemos decir que <code>avr-gcc</code> compila el programa, en realidad hace bastante más. 
-                </p>
 
+                    <h3>1.1. Compilación en dos pasos</h3>
+                        <p>
+                            Haremos la compilación del código escrito en <strong>lenguaje C</strong> en dos pasos: primero compilando el arcivo .c y luego generando un archivo objeto (<code>.o</code>) y a continuación  ejecutaremoss el enlazador. 
+                        </p>
+
+<pre><code class="language-bash">
+# 1. Compilar el archivo principal. 
+avr-gcc -Os -DF_CPU=1000000UL -mmcu=atmega328p -c blink.c -o blink.o
+
+# 2. Enlazar el archivo objeto para generar el ejecutable .elf
+avr-gcc -mmcu=atmega328p blink.o -o blink.elf
+</code></pre>
+                    <p>Para entender el flujo completo, así es como interactúan los dos comandos:</p>
+
+                    <ol>
+                        <li><code>avr-gcc ... -c blink.c -o blink.o</code><br>
+                        Compila el archivo principal y genera un archivo binario intermedio llamado <code>blink.o</code>. La bandera <code>-c</code>: compile only (solo compilar) le indica al compilador que traduzca el archivo de código fuente en C (<strong>.c</strong>) a código de máquina, pero que no ejecute la fase de enlazado (linking). El resultado es un archivo objeto intermedio con extensión <strong>.o</strong>. La bandera <code>-c</code> permite compilar cada archivo fuente de forma independiente antes de unirlos en un solo paso posterior.</li>
+                        <li><code>avr-gcc -mmcu=atmega328p blink.o -o blink.elf</code><br>
+                        El Enlazador (Linker). Toma el archivo <code>.o</code> anterior y genera un archivo ejecutable llamado <code>blink.elf</code>.</li>
+
+                    </ol>
+
+                    <h3>1.2. Compilación en un solo paso directo</h3>
+                        <p>
+                            También se puede hacer la compilación  de forma rápida desde la terminal ejecutando una sola línea antes del flasheo, se puede combinar la compilación y el enlazado directamente:
+                        </p>
+<pre><code class="language-bash">
+# Compilar y enlazar todo en un solo comando
+avr-gcc -mmcu=atmega328p -DF_CPU=1000000UL -Os blink.c -o blink.elf
+</code></pre>
+
+                        <p>Es totalmente válido, correcto y mucho más cómodo para proyectos pequeños o pruebas rápidas. </p>
                 <p>
-                    Primero ejecuta el <strong>preprocesador</strong>, que procesa las directivas como
-                    <code>#include</code> y <code>#define</code>. Después traduce el código C a lenguaje ensamblador.
+                    Lo que hace primero es ejecutar el <strong>preprocesador</strong>, que procesa las directivas como
+                    <code>#include</code> y <code>#define</code>. Después traduce el código <strong>C</strong> a lenguaje <strong></strong>.
                     A continuación, el ensamblador convierte ese código en instrucciones máquina para la arquitectura AVR. Finalmente, el enlazador (<em>linker</em>) une el programa con las bibliotecas necesarias y genera un archivo ejecutable en formato <strong>ELF</strong>.
                 </p>
 
@@ -73,7 +100,7 @@
                     Veamos con más detalle qué hace cada uno de los parámetros utilizados.
                 </p>
 
-                    <h3>Parámetro <code>-mmcu=atmega328p</code></h3>
+                    <h4>Parámetro <code>-mmcu=atmega328p</code></h4>
 
                         <p>
                             Este parámetro indica el modelo exacto del microcontrolador para el cual se está compilando el programa. En este caso, se trata de un <code>ATmega328P</code>.
@@ -107,11 +134,9 @@
 
                         <pre><code class="language-bash"></code>avr-gcc --target-help </code></pre>
 
-                        <p>Líneas abajo en la misma salida veremos una sección llamada <code>Nombres MCU conocidos:</code>. Si tu sistema aún está en inglés, aparecerá como <code>Known MCU names:</code>. Allí se listan todos los microcontroladores que el compilador reconoce y para los cuales puede generar código.</p>     
-</p>
+                        <p>Líneas abajo en la misma salida veremos una sección llamada <code>Nombres MCU conocidos:</code>. Si tu sistema aún está en inglés, aparecerá como <code>Known MCU names:</code>. Allí se listan todos los microcontroladores que el compilador reconoce y para los cuales puede generar código.</p>
 
-
-                    <h3>Parámetro <code>-DF_CPU=1000000UL</code></h3>
+                    <h4>Parámetro <code>-DF_CPU=1000000UL</code></h4>
 
                         <p>
                             Este parámetro define la constante <code>F_CPU</code>, que representa la
@@ -121,7 +146,7 @@
                         <p>
                             En este ejemplo, <code>1000000</code> significa que el microcontrolador funciona a
                             <strong>1&nbsp;000&nbsp;000 ciclos por segundo</strong>, es decir,
-                            <strong>1&nbsp;MHz</strong>.
+                            <strong>1&nbsp;MHz</strong>. Es la configuración de fábrica del microcontrolador ATmega328 y se la debe usar cuando el chip es nuevo y no se hyan tocado los <strong>fuses</strong> del dispositivo
                         </p>
 
                         <p>
@@ -131,7 +156,7 @@
                         <p>
                             Muchas bibliotecas de AVR utilizan esta constante. Un ejemplo muy conocido es
                             <code>&lt;util/delay.h&gt;</code>, donde funciones como <code>_delay_ms()</code> y
-                            <code>_delay_us()</code> calculan el número de ciclos de reloj necesarios para producir el retardo                             solicitado.
+                            <code>_delay_us()</code> calculan el número de ciclos de reloj necesarios para producir el retardo solicitado.
                         </p>
 
                         <p>
@@ -192,7 +217,7 @@
                             <code>1000000UL</code>.
                         </p>
 
-                    <h3>Parámetro <code>-Os</code></h3>
+                    <h4>Parámetro <code>-Os</code></h4>
 
                         <p>
                             Esta opción solicita al compilador que optimice el programa para reducir su tamaño.
@@ -209,7 +234,7 @@
                             <code>-O2</code> y <code>-O3</code>, pero <code>-Os</code> suele ofrecer un buen equilibrio entre tamaño del programa y rendimiento, por lo que es una de las opciones más habituales en proyectos AVR.
                         </p>
 
-                    <h3>Resultado de la compilación</h3>
+                    <h4>Resultado de la compilación</h4>
 
                         <p>
                             Si el proceso termina correctamente, el producto obtenido será el archivo
@@ -239,9 +264,7 @@
             
             <section>
                 <h2>2. GENERAR EL ARCHIVO HEX</h2>
-
-                <pre><code class="language-bash">avr-objcopy -O ihex blink.elf blink.hex</code></pre>
-
+            
                 <p>
                     Una vez que el programa ha sido compilado, el resultado es un archivo
                     <code>blink.elf</code>. Sin embargo, este todavía no es el archivo que normalmente
@@ -270,8 +293,35 @@
                     resultado es un archivo mucho más simple, que contiene únicamente los datos que
                     deben escribirse en la memoria del dispositivo.
                 </p>
+                    <h3>2.1. Comando extenso</h3>
+<pre><code class="language-bash">
+# Extraer el formato Intel Hex para flasheo
+avr-objcopy -j .text -j .data -O ihex blink.elf blink.hex
+</code></pre>
+                    <ul>
+                        <li><code>avr-objcopy ... ihex blink.elf blink.hex</code><br>
+                            Este comando toma el archivo <code>.elf</code>, extrae exclusivamente las secciones de código y datos (<code>-j</code>), y las convierte a formato estándar Intel Hex (<code>-O ihex</code>), resultando en el archivo <code>blink.hex</code> que finalmente se flasheará en el microcontrolador.
+                        </li>
+                        <li>
+                            Con <code>-j .text -j .data</code> se indica explícitamente a <code>avr-objcopy</code> que filtre y extraiga únicamente las secciones de código ejecutable (.text) y datos inicializados (.data). Cualquier sección de depuración o metadatos generada por el compilador es descartada automáticamente. Se utiliza por seguridad y control estricto del espacio. En sistemas embebidos, la memoria Flash es muy limitada. Especificar exactamente qué secciones se van a grabar garantiza que ningún byte sobrante o metadato de depuración termine flotando en el archivo .hex que se enviará al microcontrolador.
+                        </li>
+                    </ul>
 
-                <h3>Parámetro <code>-O ihex</code></h3>
+
+                    <h3>2.2. Comando simplificado</h3>
+                        <p>Técnicamente, también se puede usar un comando simplificado para extraer el archivo <code>.hex</code> y funcionará en la gran mayoría de los casos para proyectos básicos de microcontroladores AVR:</p>
+
+<pre><code class="language-bash">avr-objcopy -O ihex blink.elf blink.hex</code></pre>
+
+                        <p>Diferencia prática</p>
+                        <ol>
+                            
+                            <li> En la Forma directa, <code>avr-objcopy</code> toma todo el archivo <code>.elf</code> y traduce a formato Intel Hex casi todo lo que encuentra (excluyendo por defecto secciones de depuración puras conocidas como no cargables, pero conservando tablas de símbolos o secciones especiales si estuvieran presentes). Para un programa sencillo como <strong>blink</strong>, ambas opciones generan exactamente el mismo resultado práctico en la memoria Flash del ATmega328P
+                            </li>
+                        </ol>
+                
+
+                <h4>Parámetro <code>-O ihex</code></h4>
 
                 <p>
                     La opción <code>-O</code> indica el formato de salida (<em>Output format</em>)
@@ -310,7 +360,7 @@
                     Esto suele generar cierta confusión. El programa que finalmente ejecutará el microcontrolador sí está formado por instrucciones binarias almacenadas en la memoria Flash. Sin embargo, antes de ser grabadas, esas instrucciones se representan mediante líneas de texto en formato Intel HEX para facilitar su almacenamiento, transporte y programación.
                 </p>
 
-                <h3>Dónde se genera el archivo .hex</h3>
+                <h4>Dónde se genera el archivo .hex</h4>
 
                 <p>
                     En el comando anterior, el último argumento indica el nombre del archivo de salida:
