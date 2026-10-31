@@ -60,7 +60,7 @@
 
                     <h3>1.1. Compilación en dos pasos</h3>
                         <p>
-                            Haremos la compilación del código escrito en <strong>lenguaje C</strong> en dos pasos: primero compilando el arcivo .c y luego generando un archivo objeto (<code>.o</code>) y a continuación  ejecutaremoss el enlazador. 
+                            Haremos la compilación del código escrito en <strong>lenguaje C</strong> en dos pasos: primero compilando el arcivo .c y luego generando un archivo objeto (<code>.o</code>) y a continuación  ejecutaremos el enlazador. 
                         </p>
 
 <pre><code class="language-bash">
@@ -70,6 +70,18 @@ avr-gcc -Os -DF_CPU=1000000UL -mmcu=atmega328p -c blink.c -o blink.o
 # 2. Enlazar el archivo objeto para generar el ejecutable .elf
 avr-gcc -mmcu=atmega328p blink.o -o blink.elf
 </code></pre>
+
+
+                        <p><code>avr-gcc</code> es el compilador <strong>GCC</strong> configurado para generar código para microcontroladores <strong>AVR</strong>. Pero su función va mucho más alla: lee los archivos y las banderas que se le da en la linea de comandos, decide qué etapas hay que ejecutar y llama a las herramientas que hacen cada una. Las etapas posibles son:</p>
+                            <ol>
+                                <li> <strong>Preprocesar</strong>: expande los <code>#include</code> y los <code>#define</code>, y aplica las definiciones de la línea de comandos como -DF_CPU=.... </li>
+                                <li><strong>Compilar</strong>: traduce el código C a lenguaje ensamblador de AVR, optimizado según la bandera <code>-Os</code>.</li>
+                                <li> <strong>Ensamblar</strong>: convierte el ensamblador en código máquina dentro de un archivo objeto (<code>.o</code>).</li>
+                                <li> <strong>Enlazar</strong>: une uno o más archivos objeto con el código de arranque y las bibliotecas, y genera el ejecutable (<code>.elf</code>).</li>
+                            </ol>
+
+                        <p><code>avr-gcc</code>elige hasta dónde llegar según lo que recibe. Un archivo <strong>.c</strong> empieza en el paso 1 y un <strong>.o</strong> ya viene del paso 3. La bandera <code>-c</code>  indica  solo llegar hasta ensamblar.</p>
+
                     <p>Para entender el flujo completo, así es como interactúan los dos comandos:</p>
 
                     <ol>
@@ -77,8 +89,9 @@ avr-gcc -mmcu=atmega328p blink.o -o blink.elf
                         Compila el archivo principal y genera un archivo binario intermedio llamado <code>blink.o</code>. La bandera <code>-c</code>: compile only (solo compilar) le indica al compilador que traduzca el archivo de código fuente en C (<strong>.c</strong>) a código de máquina, pero que no ejecute la fase de enlazado (linking). El resultado es un archivo objeto intermedio con extensión <strong>.o</strong>. La bandera <code>-c</code> permite compilar cada archivo fuente de forma independiente antes de unirlos en un solo paso posterior.</li>
                         <li><code>avr-gcc -mmcu=atmega328p blink.o -o blink.elf</code><br>
                         El Enlazador (Linker). Toma el archivo <code>.o</code> anterior y genera un archivo ejecutable llamado <code>blink.elf</code>.</li>
-
                     </ol>
+
+                    <img src="img/compilacion_en_dos_pasos.png" alt=" Uso de los dos comandos para compilación y enlazado" class="imagen-centrada">
 
                     <h3>1.2. Compilación en un solo paso directo</h3>
                         <p>
@@ -307,6 +320,7 @@ avr-objcopy -j .text -j .data -O ihex blink.elf blink.hex
                         </li>
                     </ul>
 
+                    <img src="img/generar_hex_avr_objcopy_j.png" alt="Comando extenso para general el arcivo .hex" class="imagen-centrada">
 
                     <h3>2.2. Comando simplificado</h3>
                         <p>Técnicamente, también se puede usar un comando simplificado para extraer el archivo <code>.hex</code> y funcionará en la gran mayoría de los casos para proyectos básicos de microcontroladores AVR:</p>
@@ -314,11 +328,11 @@ avr-objcopy -j .text -j .data -O ihex blink.elf blink.hex
 <pre><code class="language-bash">avr-objcopy -O ihex blink.elf blink.hex</code></pre>
 
                         <p>Diferencia prática</p>
-                        <ol>
+                        <ul>
                             
                             <li> En la Forma directa, <code>avr-objcopy</code> toma todo el archivo <code>.elf</code> y traduce a formato Intel Hex casi todo lo que encuentra (excluyendo por defecto secciones de depuración puras conocidas como no cargables, pero conservando tablas de símbolos o secciones especiales si estuvieran presentes). Para un programa sencillo como <strong>blink</strong>, ambas opciones generan exactamente el mismo resultado práctico en la memoria Flash del ATmega328P
                             </li>
-                        </ol>
+                        </ul>
                 
 
                 <h4>Parámetro <code>-O ihex</code></h4>
