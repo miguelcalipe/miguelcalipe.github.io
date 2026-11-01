@@ -31,7 +31,7 @@
         <article>            
             <header class="article-header">
             <h1>INSTALACIÓN DE LA GNU AVR TOOLCHAIN Y AVRDUDE EN ENTORNO LINUX (RASPBERRY PI 5)</h1>
-            <p>Guía paso a paso para instalar la GNU AVR Toolchain y AVRDUDE en Raspberry Pi 5</p>
+            <p>Guía paso a paso para la instalación</p>
             </header>
                         
             <aside id="indice"></aside>    
@@ -60,63 +60,93 @@
             <h2>2. VERIFICACIÓN Y PREPARACIÓN DEL ENTORNO NATIVO (BUILD-ESSENTIAL)</h2>
                 
                 <p>
-                    Aunque <code>gcc</code> nativo no compila para AVR, la instalación de las herramientas de compilación de la Raspberry Pi proporciona utilidades de enlazado, cabeceras del sistema y herramientas de gestión de binarios necesarias como base.
+                    Aunque <code>gcc</code> nativo no compila para AVR, la instalación de las herramientas de compilación de la Raspberry Pi proporciona utilidades de enlazado, cabeceras del sistema y herramientas de gestión de binarios necesarias como base. Por lo tanto, prepraremos la plataforma Host (la Raspberry Pi 5) que posteriormente ejecutará la cross-compiler toolchain (como avr-gcc y avrdude) para compilar y flashear los microcontroladores.
                 </p>
 
-                <p>
-                    En entornos de desarrollo basados en Debian, no se recomienda instalar el compilador de forma aislada. Lo óptimo es validar la presencia del metapaquete <code>build-essential</code>, el cual agrupa de forma automática el compilador de C (<code>gcc</code>), el de C++ (<code>g++</code>), el gestor de automatización <code>make</code> y las librerías de desarrollo nativas fundamentales (<code>libc6-dev</code>).
-                </p>
+                <p> Raspberry Pi OS incluye <code>build-essential</code> por defecto en su versión completa (la versión con escritorio y software recomendado). Este paquete es fundamental porque agrupa herramientas clave como el compilador de C (<code>gcc</code>), el de C++ (<code>g++</code>), el gestor de automatización <code>make</code> y las librerías de desarrollo nativas fundamentales (<code>libc6-dev</code>). Los desarrolladores del sistema operativo lo preinstalan para asegurar que los usuarios puedan compilar código en <code>C/C++</code> o instalar módulos de software adicionales (como ciertos módulos de Python o controladores) nada más arrancar la placa, sin necesidad de configuraciones previas o conexión a internet.</p>
+
+                <p>Si instalaste la versión Lite (sin entorno gráfico), es probable que no venga preinstalado.</p>
 
                 <h3>2.1. Verificación del metapaquete build-essential</h3>
+                    
                     <p>
-                        Haremos una consulta de los paquetes instalados filtrando por el paquete requerido, <code>build-essential</code>. En esta consulta utilizaremos dos comandos encadenados mediante el operador de pipeline o tubería <code>|</code>:
-                    </p>  
-
-                    <ul>
-                        <li><code>dpkg -l</code>: Nos presenta una lista todos los paquetes instalados en el sistema.</li>
-                        <li><code> | </code>(pipe o tubería): Envía la salida del primer comando al siguiente.</li>
-                        <li><code>grep build-essential</code>: Filtra la salida del comando anterior y muestra únicamente las líneas que contienen la cadena "build-essential".</li>
-                    </ul>    
-
-                    <p>
-                        De esta forma, ambos comandos trabajan conjuntamente para realizar una consulta filtrada de los paquetes instalados, una técnica muy utilizada en la administración de sistemas Linux.                    
+                        Para comprobar si el paquete <code>build-essential</code> está presente en el sistema, podemos usar el comando <code>apt list --installed</code> que nos permite listar los paquetes instalados y filtrar por el nombre exacto del paquete. Ejecutamos:
                     </p>
+                                
+<pre><code class="language-bash">~ $  apt list --installed build-essential</code></pre>
 
-                    <pre><code class="bash">dpkg -l | grep build-essential</code></pre>
+                    <p>Si el paquete está instalado, se mostrará una línea con la información del paquete:</p>
 
-                    <p>Si el paquete ya está instalado en la Raspberry Pi 5, la terminal mostrará un registro con el estado <code>ii</code> (installs ok, installed):</p>
+<pre><code class="language-bash">build-essential/stable,now 12.12 arm64 [instalado]</code></pre>
 
-                    <pre><code>ii  build-essential   12.12   arm64   Informational list of build-essential packages</code></pre>
-                
+                    <h4>2.1.1. Forma alternativa de comprobar la instalación de build-essential </h4>
+                    <pre><code class="language-bash">
+~ $ dpkg -l build-essential
+
+Deseado=desconocido(U)/Instalar/eliminaR/Purgar/retener(H)
+| Estado=No/Inst/ficheros-Conf/desempaqUetado/medio-conF/medio-inst(H)/espera-disparo(W)/pendienTe-disparo
+|/ Err?=(ninguno)/requiere-Reinst (Estado,Err: mayúsc.=malo)
+||/ Nombre          Versión      Arquitectura Descripción
++++-===============-============-============-==============================================
+ii  build-essential 12.12        arm64        Informational list of build-essential packages
+
+</code></pre>
+
+<p>Si el paquete ya está instalado en la Raspberry Pi 5, la terminal mostrará un registro con el estado <code>ii</code> (installs ok, installed):</p>
+                    
+                    <h4>2.1.2. Forma alternativa de comprobar la instalación de build-essential </h4>
+                    <p>
+                            Haremos una consulta de los paquetes instalados filtrando por el paquete requerido, <code>build-essential</code>. En esta consulta utilizaremos dos comandos encadenados mediante el operador de pipeline o tubería <code>|</code>:
+                        </p>  
+
+                        <ul>
+                            <li><code>dpkg -l</code>: Nos presenta una lista todos los paquetes instalados en el sistema.</li>
+                            <li><code> | </code>(pipe o tubería): Envía la salida del primer comando al siguiente.</li>
+                            <li><code>grep -w "build-essential"</code>: Filtra la salida del comando anterior busca la palabra exacta  y muestra únicamente las líneas que contienen la cadena "build-essential".</li>
+                        </ul>    
+
+                        <p>
+                            De esta forma, ambos comandos trabajan conjuntamente para realizar una consulta filtrada de los paquetes instalados, una técnica muy utilizada en la administración de sistemas Linux.                    
+                        </p>
+
+<pre><code class="language-bash">~ $ dpkg -l | grep -w "build-essential"</code></pre>
+
+                        <p>si el paquete no está instalado, no devuelve nada.</p>
+                        <p>Si el paquete ya está instalado en la Raspberry Pi 5, la terminal mostrará un registro con el estado <code>ii</code> (installs ok, installed):</p>
+
+<pre><code class="language-bash">ii  build-essential   12.12   arm64   Informational list of build-essential packages</code></pre>
+
+                   
                 <h3>2.2. Instalación del metapaquete build-essential</h3>
 
                     <p>
                         En caso de que el comando no devuelva ninguna línea de texto, el entorno de compilación base está ausente. Debe instalarlo inmediatamente ejecutando:
                     </p>
 
-                    <pre><code class="bash">sudo apt update && sudo apt install build-essential -y</code></pre>
+                    <pre><code class="language-bash">~ $ sudo apt update && sudo apt install build-essential -y</code></pre>
 
                     <p>Luego de la instalación, para verificar si el compilador nativo básico se encuentra en el sistema, ejecute:</p>
 
-                    <pre><code class="bash">gcc --version</code></pre>
+                    <pre><code class="language-bash">~ $ gcc --version</code></pre>
 
                     <p>Si el sistema tiene el compilador instalado, se imprimirá un mensaje parecido al siguiente:</p>
 
-                <pre><code>gcc (Debian 14.2.0-19) 14.2.0;
-Copyright (C) 2022 Free Software Foundation, Inc.
+<pre><code>
+gcc (Debian 14.2.0-19) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
 This is free software; see the source for copying conditions.  There is NO
-warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE..
 </code></pre>
 
-                    <p>
-                        Para conocer la ruta exacta donde se aloja este binario ejecutable, emplee el comando <code>which</code>:
+                    <<p>
+                        Para conocer la ruta exacta donde se aloja este binario ejecutable, emplee el comando <code>command</code>:
                     </p>
 
-                    <pre><code class="bash">which gcc</code></pre>
+                    <pre><code class="language-bash">~ $ command -v gcc </code></pre>
 
                     <p>Por regla general, la salida estándar devolverá la ruta absoluta: <code>/usr/bin/gcc</code>.</p>
 
-                    <p>Si el sistema operativo responde con un error del tipo "command not found", el paquete no está presente. </p>   
+                    <p>Si el comando which gcc no devuelve ninguna ruta y la terminal se queda en blanco, significa que el binario no está en el PATH y el paquete no está presente. </p>   
             </section>
             
             <section>
@@ -158,11 +188,11 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
                     
                     <p>Para comprobar que el compilador cruzado está operativo y reconocer su versión de compilación, debemos ejecutar:</p>
 
-                    <pre><code class="bash">avr-gcc --version</code></pre>
+                    <pre><code class="language-bash">avr-gcc --version</code></pre>
 
                     <p>Determinamos la localización exacta del binario ejecutable para certificar que se encuentra mapeado dentro de las variables de entorno del sistema (<code>$PATH</code>):</p>
 
-                    <pre><code class="bash">which avr-gcc</code></pre>
+                    <pre><code class="language-bash">which avr-gcc</code></pre>
 
                     <p>La salida estándar esperada en sistemas operativos limpios debe apuntar a la ruta: <code>/usr/bin/avr-gcc</code>.</p>
 
@@ -171,7 +201,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
                         A diferencia de los programas normales, las cabeceras de <code>avr-libc</code> deben estar ubicadas en un directorio aislado para que el compilador cruzado las localice durante la fase de preprocesamiento. Utilizamos el comando <code>ls</code> para auditar el directorio raíz de inclusión de AVR:
                     </p>
 
-                        <pre><code class="bash">ls /usr/lib/avr/include</code></pre>
+                        <pre><code class="language-bash">ls /usr/lib/avr/include</code></pre>
 
                         <p>
                             El sistema debe listar carpetas troncales como <code>avr/</code> y <code>util/</code>, así como archivos de cabecera estándar indispensables, por ejemplo, <code>stdio.h</code>.
@@ -181,20 +211,20 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
                             Para verificar las librerías de temporización e instrucciones de retardo de hardware, que son críticas en sistemas embebidos, se debe constatar la existencia del archivo de cabecera <code>delay.h</code> dentro de la subcarpeta de utilidades mediante el siguiente comando:
                         </p>
 
-                        <pre><code class="bash">ls /usr/lib/avr/include/util</code></pre>
+                        <pre><code class="language-bash">ls /usr/lib/avr/include/util</code></pre>
 
                 <h3>4.3. Verificación de las utilidades de binarios (GNU Binutils para AVR)</h3>
                     <p>
                         Para asegurar que las herramientas de bajo nivel para manipulación de binarios (como el extractor de símbolos o el conversor de objetos) se instalaron correctamente, auditamos el estado del paquete mediante el gestor de bajo nivel:
                     </p>
 
-                    <pre><code class="bash">dpkg -l binutils-avr</code></pre>
+                    <pre><code class="language-bash">dpkg -l binutils-avr</code></pre>
 
                     <p>
                         Para un control de calidad exhaustivo y automatizado de la Toolchain, se puede comprobar si cada una de las herramientas individuales empaquetadas dentro de <code>binutils-avr</code> en la ruta de ejecutables responde correctamente al llamado del sistema operativo. Ejecutamos el siguiente bucle en Bash:
                     </p>
 
-                    <pre><code class="bash">for cmd in $(dpkg -L binutils-avr | grep '^/usr/bin/'); do $cmd --version | head -n 1; done</code></pre>
+                    <pre><code class="language-bash">for cmd in $(dpkg -L binutils-avr | grep '^/usr/bin/'); do $cmd --version | head -n 1; done</code></pre>
 
                     <p>Este comando iterará sobre cada binario instalado (como <code>avr-objcopy</code>, <code>avr-size</code>, <code>avr-nm</code>), imprimiendo únicamente la primera línea de su respuesta técnica para validar que no existan librerías dinámicas rotas.</p>
 
@@ -223,13 +253,13 @@ GNU strip (GNU Binutils) 2.43.90.20250122
                     
                     <p>Finalmente, comprobamos que la herramienta de flasheo o programación esté operativa y cargue de forma correcta sus archivos de configuración de hardware predeterminados (<code>avrdude.conf</code>):</p>
 
-                    <pre><code class="bash">avrdude -v</code></pre>
+                    <pre><code class="language-bash">avrdude -v</code></pre>
 
                     <p>Este comando detallado mostrará en la terminal la versión de software activa y un listado exhaustivo de todos los programadores e interfaces de comunicación soportados de manera nativa, confirmando la compatibilidad con dispositivos de desarrollo populares como <code>usbasp</code>, clones directos USBasp, y configuraciones de depuración embebida como <code>arduinoisp</code>.</p>
 
                     <p>Validamos la ruta de instalación del binario con:</p>
 
-                    <pre><code class="bash">which avrdude</code></pre>
+                    <pre><code class="language-bash">which avrdude</code></pre>
 
                     <p>El sistema devolverá la ruta estandarizada de operación: <code>/usr/bin/avrdude</code>.</p>
 

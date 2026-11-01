@@ -137,8 +137,119 @@ return a + b;
                 
         </section>
 
+        <section>
+        <h2>5. INSTALACIÓN DE LA TOOLCHAIN DE COMPILACIÓN NATIVA DE LA RASPBERRY PI 5</h2>
+            <p>
+                Antes de instalar cualquier paquete, es obligatorio actualizar las listas de los repositorios para asegurar que el gestor de paquetes de Debian/Raspberry Pi OS descargue las versiones compatibles más recientes de la Toolchain.
+            </p>
+
+<pre><code class="bash">sudo apt update && sudo apt upgrade -y</code></pre>
+
+                <p>
+                    Para comprobar que el proceso de actualización finalizó correctamente sin errores en segundo plano, podemos evaluar la variable de estado de salida del shell con el siguiente comando inmediatamente después de que termine la ejecución:
+                </p>
+
+                <pre><code class="bash">echo $?</code></pre>
+
+                <p>
+                    Si la terminal devuelve un valor de <code>0</code>, significa que el sistema se ha actualizado correctamente. Cualquier valor distinto de cero indica un fallo o interrupción en el gestor de paquetes.
+                </p>
+            
+            <p>
+                La instalación de las herramientas de compilación nativa proporcionan utilidades de enlazado, cabeceras del sistema y herramientas de gestión de binarios necesarias como base.
+             </p>
+
+                <p> Raspberry Pi OS incluye <code>build-essential</code> por defecto en su versión completa (la versión con escritorio y software recomendado). Este paquete es fundamental porque agrupa herramientas clave como el compilador de C (<code>gcc</code>), el de C++ (<code>g++</code>), el gestor de automatización <code>make</code> y las librerías de desarrollo nativas fundamentales (<code>libc6-dev</code>). Los desarrolladores del sistema operativo lo preinstalan para asegurar que los usuarios puedan compilar código en <code>C/C++</code> o instalar módulos de software adicionales (como ciertos módulos de Python o controladores) nada más arrancar la placa, sin necesidad de configuraciones previas o conexión a internet.</p>
+
+                <p>Si instalaste la versión Lite (sin entorno gráfico), es probable que no venga preinstalado.</p>
+
+                <h3>5.1. Verificación del metapaquete build-essential</h3>
+                    
+                    <p>
+                        Para comprobar si el paquete <code>build-essential</code> está presente en el sistema, podemos usar el comando <code>apt list --installed</code> que nos permite listar los paquetes instalados y filtrar por el nombre exacto del paquete. Ejecutamos:
+                    </p>
+                                
+<pre><code class="language-bash">~ $  apt list --installed build-essential</code></pre>
+
+                    <p>Si el paquete está instalado, se mostrará una línea con la información del paquete:</p>
+
+<pre><code class="language-bash">build-essential/stable,now 12.12 arm64 [instalado]</code></pre>
+                    
+                    <h4>5.1.1. Forma alternativa de comprobar la instalación de build-essential </h4>
+<pre><code class="language-bash">
+~ $ dpkg -l build-essential
+
+Deseado=desconocido(U)/Instalar/eliminaR/Purgar/retener(H)
+| Estado=No/Inst/ficheros-Conf/desempaqUetado/medio-conF/medio-inst(H)/espera-disparo(W)/pendienTe-disparo
+|/ Err?=(ninguno)/requiere-Reinst (Estado,Err: mayúsc.=malo)
+||/ Nombre          Versión      Arquitectura Descripción
++++-===============-============-============-==============================================
+ii  build-essential 12.12        arm64        Informational list of build-essential packages
+
+</code></pre>
+
+<p>Si el paquete ya está instalado en la Raspberry Pi 5, la terminal mostrará un registro con el estado <code>ii</code> (installs ok, installed):</p>
+
+
+                    
+                    <h4>5.1.2. Forma alternativa de comprobar la instalación de build-essential </h4>
+                        <p>
+                            Haremos una consulta de los paquetes instalados filtrando por el paquete requerido, <code>build-essential</code>. En esta consulta utilizaremos dos comandos encadenados mediante el operador de pipeline o tubería <code>|</code>:
+                        </p>  
+
+                        <ul>
+                            <li><code>dpkg -l</code>: Nos presenta una lista todos los paquetes instalados en el sistema.</li>
+                            <li><code> | </code>(pipe o tubería): Envía la salida del primer comando al siguiente.</li>
+                            <li><code>grep -w "build-essential"</code>: Filtra la salida del comando anterior busca la palabra exacta  y muestra únicamente las líneas que contienen la cadena "build-essential".</li>
+                        </ul>    
+
+                        <p>
+                            De esta forma, ambos comandos trabajan conjuntamente para realizar una consulta filtrada de los paquetes instalados, una técnica muy utilizada en la administración de sistemas Linux.                    
+                        </p>
+
+<pre><code class="language-bash">~ $ dpkg -l | grep -w "build-essential"</code></pre>
+
+                        <p>si el paquete no está instalado, no devuelve nada.</p>
+                        <p>Si el paquete ya está instalado en la Raspberry Pi 5, la terminal mostrará un registro con el estado <code>ii</code> (installs ok, installed):</p>
+
+<pre><code class="language-bash">ii  build-essential   12.12   arm64   Informational list of build-essential packages</code></pre>
+
+
+                <h3>5.2. Instalación del metapaquete build-essential</h3>
+
+                    <p>
+                        En caso de que el entorno de compilación nativa está ausente, debe instalarlo inmediatamente ejecutando:
+                    </p>
+
+                    <pre><code class="language-bash">~ $ sudo apt update && sudo apt install build-essential -y</code></pre>
+
+                    <p>Luego de la instalación, para verificar si el compilador nativo básico se encuentra en el sistema, ejecute:</p>
+
+                    <pre><code class="language-bash">~ $ gcc --version</code></pre>
+
+                    <p>Si el sistema tiene el compilador instalado, se imprimirá un mensaje parecido al siguiente:</p>
+
+<pre><code>
+gcc (Debian 14.2.0-19) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+</code></pre>
+<p><strong>Nota tecnológica:</strong> La presencia de GCC 14 indica que el sistema opera sobre una base moderna (Debian Trixie o superior), lo que significa que el compilador utiliza por defecto el estándar <code>C23 (GNU23)</code>, ofreciendo soporte nativo para características avanzadas de tipado y optimizaciones específicas para la arquitectura ARM Cortex-A76 de la Raspberry Pi 5.</p>
+
+                    <p>
+                        Para conocer la ruta exacta donde se aloja este binario ejecutable, emplee el comando <code>command</code>:
+                    </p>
+
+                    <pre><code class="language-bash">~ $ command -v gcc </code></pre>
+
+                    <p>Por regla general, la salida estándar devolverá la ruta absoluta: <code>/usr/bin/gcc</code>.</p>
+
+                    <p>Si el comando which gcc no devuelve ninguna ruta y la terminal se queda en blanco, significa que el binario no está en el PATH y el paquete no está presente. </p>   
+            </section>
+            
         <section>       
-        <h2>5. LA NECESIDAD DE UTILIZAR UN COMPILADOR CRUZADO</h2>
+        <h2>6. LA NECESIDAD DE UTILIZAR UN COMPILADOR CRUZADO</h2>
             <p>
                 Aunque todos los procesadores ejecutan instrucciones binarias, cada arquitectura de procesador define su propio conjunto de instrucciones (<em>Instruction Set Architecture o ISA</em>). Pero no existe un único lenguaje máquina. Cada familia de procesadores posee su propio conjunto de instrucciones (Instruction Set Architecture o ISA).Por ello, el compilador debe generar un código específico para la arquitectura del procesador donde se ejecutará el programa.
             </p>
@@ -173,9 +284,12 @@ return a + b;
             <p>En consecuencia, un programa compilado para una arquitectura no puede ejecutarse sobre otra distinta.</p>
             
             <p>
-                Cuando el desarrollo se realiza en una computadora cuya arquitectura es diferente de la del microcontrolador de destino, se utiliza un <strong>compilador cruzado</strong> <em>cross compiler</em>y requerimos  una <strong>toolchain de compilación cruzada</strong> (<em>cross-compilation toolchain</em>). Esta no solo genera código máquina para otra arquitectura, sino que también proporciona el conjunto de herramientas, bibliotecas y utilidades necesarias para construir aplicaciones destinadas al sistema embebido objetivo.
+                En el desarrollo de sistemas embebidos, la compilación cruzada es un proceso mediante el cual un compilador genera un programa destinado a ejecutarse en una arquitectura diferente a la del sistema donde se está ejecutando dicho compilador.
             </p>
-            
+
+            <p>
+                Cuando desarrollamos código en una computadora cuya arquitectura es diferente a la del microcontrolador de destino, se utiliza un <strong>compilador cruzado</strong> (<em>cross compiler</em>) y requerimos una <strong>toolchain de compilación cruzada</strong> (<em>cross-compilation toolchain</em>). Esta no solo genera código máquina para otra arquitectura, sino que también proporciona el conjunto de herramientas, bibliotecas y utilidades necesarias para construir aplicaciones destinadas al sistema embebido objetivo.
+            </p>               
             
             <p>
                 Comprender estas diferencias nos permite comprender por qué no basta con el compilador nativo de la PC donde escribimos el código para programar nuestro microcontrolador, que implica una compilación cruzada y por qué existen compiladores específicos como <code><strong>AVR-GCC</strong></code>, <code><strong>ARM-GCC</strong></code>, <code><strong>xtensa-esp32-elf</strong></code> o <code><strong>riscv32-esp-elf</strong></code>
