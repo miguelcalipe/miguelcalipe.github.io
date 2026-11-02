@@ -177,10 +177,11 @@
                 <p>
                     Los pines <code>XTAL1</code> y <code>XTAL2</code> son la entrada y la salida, respectivamente, de un amplificador inversor (<em>inverting amplifier</em>) que puede configurarse para su uso como un oscilador en el chip (<em>On-chip Oscillator</em>), tal como se muestra en la figura adjunta. Se puede utilizar tanto un cristal de cuarzo (<em>quartz crystal</em>) como un resonador cerámico (<em>ceramic resonator</em>).
                 </p>
+                <p>Este oscilador de cristal es un oscilador de baja potencia (<em>low power oscillator</em>), con una oscilación de voltaje reducida (<em>reduced voltage swing</em>) en la salida <code>XTAL2</code>. Proporciona el menor consumo de energía (<em>power consumption</em>), pero no es capaz de controlar otras entradas de reloj (<em>clock inputs</em>) y puede ser más susceptible al ruido en entornos ruidosos (<em>noisy environments</em>). En estos casos, consulte la sección <a href="#seccion-11">Oscilador de Cristal de Oscilación Completa</a> (<em>Full Swing Crystal Oscillator</em>).</p>
                     </div>
-                <img src="img/crystal_oscillator_connections.png" alt="Conexión de un oscilador de baja potencia" class="imagen-derecha">
+                <img src="img/crystal_oscillator_low_power_v3.png" alt="Conexión de un oscilador de baja potencia" class="imagen-derecha">
                 </div>
-                <p>Este oscilador de cristal es un oscilador de baja potencia (<em>low power oscillator</em>), con una oscilación de voltaje reducida (<em>reduced voltage swing</em>) en la salida <code>XTAL2</code>. Proporciona el menor consumo de energía (<em>power consumption</em>), pero no es capaz de controlar otras entradas de reloj (<em>clock inputs</em>) y puede ser más susceptible al ruido en entornos ruidosos (<em>noisy environments</em>). En estos casos, consulte la sección &laquo;Oscilador de Cristal de Oscilación Completa&raquo; (<em>Full Swing Crystal Oscillator</em>) en la página 39.</p>
+                
                 <p><code>C1</code> y <code>C2</code> deben ser siempre iguales tanto para los cristales como para los resonadores. El valor óptimo de los condensadores depende del cristal o resonador en uso, de la cantidad de capacitancia parásita (<em>stray capacitance</em>) y del ruido electromagnético del entorno. En la Tabla siguiente se ofrecen algunas directrices iniciales para elegir los condensadores que se utilizarán con los cristales. Para los resonadores cerámicos, se deben utilizar los valores de los condensadores indicados por el fabricante.</p>
 
                 <p>El oscilador de baja potencia (<emp>Low Power Oscillator</emp>) puede operar en tres modos diferentes, cada uno optimizado para un rango de frecuencia específico.</p>
@@ -352,7 +353,7 @@
 </table>
 </div>
 
-<img src="img/crystal_oscillator_connections.png" alt="Conexión de un oscilador de cristal de oscilación completa" class="imagen-centrada">
+<img src="img/crystal_oscillator_full_swing.png" alt="Conexión de un oscilador de cristal de oscilación completa" class="imagen-centrada">
 
 <div class="table-container">
 <table>
@@ -586,9 +587,182 @@
         </div>
       </section>
 
-               
-            
+      <section>
+        <h2>6. OSCILADOR RC CALIBRADO INTERNO (<emp>Calibrated Internal RC Oscillator</emp>)</h2>
+<p>Por defecto, el oscilador RC interno (<emp>Internal RC Oscillator</emp>) proporciona un reloj de aproximadamente 8.0 MHz. Aunque depende del voltaje y de la temperatura, este reloj puede ser calibrado con mucha precisión por el usuario. Consulte la Tabla 29-9 en la página 313 para más detalles. El dispositivo se suministra con el fusible <code>CKDIV8</code> programado (<emp>programmed</emp>). Consulte la sección &laquo;Preescalador del Reloj del Sistema&raquo; (<emp>System Clock Prescaler</emp>) en la página 45 para más detalles.</p>
+<p>Este reloj se puede seleccionar como el reloj del sistema programando los fusibles <code>CKSEL</code> como se muestra en la Tabla <strong>Modos de Operación del Oscilador RC Calibrado Interno</strong>. Si se selecciona, operará sin componentes externos. Durante el <emp>reset</emp>, el <emp>hardware</emp> carga el valor de calibración preprogramado en el registro <code>OSCCAL</code> y, por lo tanto, calibra automáticamente el oscilador RC. La precisión de esta calibración se muestra como Calibración de fábrica (<emp>Factory calibration</emp>) en la Tabla 29-9 de la página 313.</p>
+<p>Al cambiar el registro <code>OSCCAL</code> desde el <emp>software</emp> (consulte la sección &laquo;<code>OSCCAL</code> – Registro de Calibración del Oscilador&raquo; [<emp>OSCCAL – Oscillator Calibration Register</emp>] en la página 46), es posible obtener una mayor precisión de calibración que utilizando la calibración de fábrica. La precisión de esta calibración se muestra como Calibración del usuario (<emp>User calibration</emp>) en la Tabla 29-9 de la página 313.</p>
+<p>Cuando este oscilador se utiliza como el reloj del chip, el oscilador del Perro Guardián (<emp>Watchdog Oscillator</emp>) se seguirá utilizando para el temporizador Perro Guardián (<emp>Watchdog Timer</emp>) y para el tiempo de espera del <emp>reset</emp> (<emp>Reset Time-out</emp>). Para obtener más información sobre el valor de calibración preprogramado, consulte la sección &laquo;Byte de Calibración&raquo; (<emp>Calibration Byte</emp>) en la página 293.</p>
 
+<div class="table-container">
+<table>
+  <caption><strong>Modos de Operación del Oscilador RC Calibrado Interno</strong> </caption>
+  <thead>
+    <tr>
+      <th>Rango de Frecuencia <sup>(2)</sup> [MHz] (<emp>Frequency Range</emp>)</th>
+      <th><code>CKSEL3...0</code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>7.3 - 8.1</td>
+      <td>0010 <sup>(1)</sup></td>
+    </tr>
+  </thead>
+  <tfoot>
+    <tr>
+      <td colspan="2">
+        <strong>Notas:</strong><br>
+        1. El dispositivo se suministra de fábrica con esta opción seleccionada (<emp>The device is shipped with this option selected</emp>).<br>
+        2. Si la frecuencia de 8 MHz excede la especificación del dispositivo (depende de V<sub>CC</sub>), se puede programar el fusible <code>CKDIV8</code> para dividir la frecuencia interna por 8.
+      </td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+
+<p>Cuando se selecciona este oscilador, los tiempos de arranque (<emp>start-up times</emp>) son determinados por los fusibles <code>SUT</code> como se muestra en la Tabla siguiente.</p>
+
+<p><strong>Tabla 9-12. Tiempos de arranque para la selección del reloj del oscilador RC calibrado interno</strong> (<emp>Start-up times for the internal calibrated RC Oscillator clock selection</emp>)</p>
+<table>
+  <thead>
+    <tr>
+      <th>Condiciones de potencia (<emp>Power Conditions</emp>)</th>
+      <th>Tiempo de arranque desde <emp>Power-down</emp> y <emp>Power-save</emp></th>
+      <th>Retardo adicional desde <emp>reset</emp> (V<sub>CC</sub> = 5.0V) <sup>(1)</sup> (<emp>Additional Delay from Reset</emp>)</th>
+      <th><code>SUT1...0</code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>BOD habilitado (<emp>BOD enabled</emp>)</td>
+      <td>6 CK</td>
+      <td>14 CK</td>
+      <td>00</td>
+    </tr>
+    <tr>
+      <td>Potencia de subida rápida (<emp>Fast rising power</emp>)</td>
+      <td>6 CK</td>
+      <td>14 CK + 4.1 ms</td>
+      <td>01</td>
+    </tr>
+    <tr>
+      <td>Potencia de subida lenta (<emp>Slowly rising power</emp>)</td>
+      <td>6 CK</td>
+      <td>14 CK + 65 ms <sup>(2)</sup></td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <td colspan="3">Reservado (<emp>Reserved</emp>)</td>
+      <td>11</td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="4">
+        <strong>Notas:</strong><br>
+        1. Si el fusible <code>RSTDISBL</code> está programado, este tiempo de arranque se incrementará a 14CK + 4.1ms para asegurar que se pueda ingresar al modo de programación (<emp>If the RSTDISBL fuse is programmed, this start-up time will be increased to 14CK + 4.1ms to ensure programming mode can be entered</emp>).<br>
+        2. El dispositivo se suministra con esta opción seleccionada (<emp>The device is shipped with this option selected</emp>).
+      </td>
+    </tr>
+  </tfoot>
+</table>
+
+<h3>Oscilador Interno de 128kHz (<emp>128kHz Internal Oscillator</emp>)</h3>
+<p>El oscilador interno de 128 kHz es un oscilador de baja potencia (<emp>low power Oscillator</emp>) que proporciona un reloj de 128 kHz. La frecuencia es nominal a 3V y 25&nbsp;&deg;C. Este reloj se puede seleccionar como el reloj del sistema programando los fusibles <code>CKSEL</code> en &laquo;0011&raquo;, como se muestra en la Tabla 9-13.</p>
+
+<p><strong>Tabla 9-13. Modos de Operación del Oscilador Interno de 128kHz</strong> (<emp>128kHz Internal Oscillator Operating Modes</emp>)</p>
+<table>
+  <thead>
+    <tr>
+      <th>Frecuencia Nominal <sup>(1)</sup> (<emp>Nominal Frequency</emp>)</th>
+      <th><code>CKSEL3...0</code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>128 kHz</td>
+      <td>0011</td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="2">
+        <strong>Nota:</strong><br>
+        1. Tenga en cuenta que el oscilador de 128 kHz es una fuente de reloj de muy baja potencia y no está diseñada para alta precisión (<emp>Note that the 128kHz oscillator is a very low power clock source, and is not designed for high accuracy</emp>).
+      </td>
+    </tr>
+  </tfoot>
+</table>
+
+<p>Cuando se selecciona esta fuente de reloj, los tiempos de arranque son determinados por los fusibles <code>SUT</code> como se muestra en la Tabla 9-14.</p>
+
+<p><strong>Tabla 9-14. Tiempos de Arranque para el Oscilador Interno de 128kHz</strong> (<emp>Start-up Times for the 128kHz Internal Oscillator</emp>)</p>
+<table>
+  <thead>
+    <tr>
+      <th>Condiciones de potencia (<emp>Power Conditions</emp>)</th>
+      <th>Tiempo de arranque desde <emp>Power-down</emp> y <emp>Power-save</emp></th>
+      <th>Retardo adicional desde <emp>reset</emp> <sup>(1)</sup> (<emp>Additional Delay from Reset</emp>)</th>
+      <th><code>SUT1...0</code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>BOD habilitado (<emp>BOD enabled</emp>)</td>
+      <td>6 CK</td>
+      <td>14 CK</td>
+      <td>00</td>
+    </tr>
+    <tr>
+      <td>Potencia de subida rápida (<emp>Fast rising power</emp>)</td>
+      <td>6 CK</td>
+      <td>14 CK + 4 ms</td>
+      <td>01</td>
+    </tr>
+    <tr>
+      <td>Potencia de subida lenta (<emp>Slowly rising power</emp>)</td>
+      <td>6 CK</td>
+      <td>14 CK + 64 ms</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <td colspan="3">Reservado (<emp>Reserved</emp>)</td>
+      <td>11</td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="4">
+        <strong>Nota:</strong><br>
+        1. Si el fusible <code>RSTDISBL</code> está programado, este tiempo de arranque se incrementará a 14CK + 4.1ms para asegurar que se pueda ingresar al modo de programación (<emp>If the RSTDISBL fuse is programmed, this start-up time will be increased to 14CK + 4.1ms to ensure programming mode can be entered</emp>).
+      </td>
+    </tr>
+  </tfoot>
+</table>
+
+<h3>Reloj Externo (<emp>External Clock</emp>)</h3>
+<p>Para controlar el dispositivo desde una fuente de reloj externa (<emp>external clock source</emp>), el pin <code>XTAL1</code> debe ser pilotado como se muestra en la Figura 9-4. Para ejecutar el dispositivo con un reloj externo, los fusibles <code>CKSEL</code> deben programarse en &laquo;0000&raquo; (consulte la Tabla 9-15).</p>
+
+<p><strong>Tabla 9-15. Frecuencia de Reloj del Oscilador de Cristal</strong> (<emp>Crystal Oscillator Clock Frequency</emp>)</p>
+<table>
+  <thead>
+    <tr>
+      <th>Frecuencia (<emp>Frequency</emp>)</th>
+      <th><code>CKSEL3...0</code></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0 - 20 MHz</td>
+      <td>0000</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>[Nota: Figura 9-4. Configuración de Control de Reloj Externo - <emp>External Clock Drive Configuration</emp>]</p>         
+            
+</section>
         </article>
         
     </main>
