@@ -659,6 +659,17 @@
           </table>
           </div>
 
+        <p>Cómo interpretar esta tabla:</p>
+
+        <ul>
+          <li>La capacitancia de carga CL y la ESR son datos del cristal: los especifica su fabricante, en la hoja de datos del cristal.</li>
+          <li>La tabla no dice qué ESR debe tener el cristal, sino la ESR máxima recomendada según su CL.</li>
+          <li>La ESR del cristal debe ser igual o menor que el valor de la fila que corresponde a su CL: hasta 75 kΩ con 6.5 pF, hasta 65 kΩ con 9.0 pF y hasta 30 kΩ con 12.5 pF.</li>
+          <li>A mayor CL, menor es la ESR máxima recomendada.</li>
+          <li>Es un valor típico basado en la caracterización, según la nota (1).</li>
+          <li>Ejemplo con valores supuestos: un cristal de 12.5 pF con ESR de 25 kΩ cumple la recomendación (25 es menor que 30); con ESR de 40 kΩ no la cumple (40 es mayor que 30).</li>
+        </ul>
+        
         <p>El oscilador de cristal de baja frecuencia proporciona una capacitancia de carga interna  en cada pin <code>TOSC</code>. Consulte la Tabla siguiente</p>
 
         <div class="table-container">
@@ -692,13 +703,59 @@
           <p>$$C = 2 \cdot C_L - C_S$$</p>
           <p>donde:</p>
           <ul>
-            <li>C<sub>e</sub> - son los condensadores externos opcionales como se describe en <a href="#seccion-10"> 3. OSCILADOR DE CRISTAL DE BAJA POTENCIA.</a></li>
+            <li>C<sub>e</sub> - son los condensadores externos opcionales como se describe en <a href="#seccion-13"> 5. OSCILADOR DE CRISTAL DE BAJA POTENCIA.</a></li>
             <li>C<sub>i</sub> - es la capacitancia del pin en la Tabla <strong>Capacitancia de Carga Interna para el Oscilador de Cristal de Baja Frecuencia</strong>>.</li>
             <li>C<sub>L</sub> - es la capacitancia de carga para un cristal de 32.768 kHz especificada por el fabricante del cristal.</li>
             <li>C<sub>S</sub> - es la capacitancia parásita total para un pin <code>TOSC</code>.</li>
           </ul>
 
           <p>Los cristales que especifican una capacitancia de carga (C<sub>L</sub>) superior a 6 pF requieren condensadores externos aplicados como se describe en la <a href="#seccion-10"> Crystal Oscillator Connections</a></li>.</p>
+
+          <p>erificar lo siguiente</p>
+
+          <p>La selección final dependerá estrictamente del cristal que hayas comprado:</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Si el cristal es de (C<sub>L</sub>)</th>
+                <th>Cálculo estimado (C = 2 · C<sub>L</sub> - 8 pF)</th>
+                <th>Valor comercial recomendado</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>6 pF</strong></td>
+                <td>2 · 6 - 6 = 6 pF <br><small style="color: #666;">(o menos con parásitos)</small></td>
+                <td><span class="highlight">No requiere capacitores externos</span><br><small>(la capacitancia interna del microcontrolador es suficiente)</small></td>
+            </tr>
+            <tr>
+                <td><strong>9 pF</strong></td>
+                <td>2 · 9 - 8 = 10 pF</td>
+                <td><strong>10 pF</strong></td>
+            </tr>
+            <tr>
+                <td><strong>12.5 pF</strong></td>
+                <td>2 · 12.5 - 8 = 17 pF</td>
+                <td><strong>15 pF</strong> o <strong>18 pF</strong></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Consejos de diseño en el PCB</h3>
+    <ul>
+        <li><strong>Cercanía:</strong> Coloca el cristal y los capacitores lo más cerca posible de los pines TOSC1 y TOSC2 del chip.</li>
+        <li><strong>Pistas cortas:</strong> Minimiza la longitud de las pistas para evitar que aumente la capacitancia parásita (C<sub>S</sub>) y altere la precisión del reloj.</li>
+        <li><strong>Plano de masa:</strong> Rodea la zona del oscilador con un plano de tierra para proteger la señal de ruidos electromagnéticos externos.</li>
+    </ul>
+
+    <div class="footer-text">
+        <p>Si tienes dudas sobre las especificaciones, puedes consultar la <strong>Hoja de datos de Microchip para ATmega328P</strong> en la sección <em>Low Frequency Crystal Oscillator</em>.</p>
+        <p><strong>¿Tienes a la mano el modelo exacto del cristal o su hoja de datos para verificar su capacitancia de carga?</strong> Si me lo compartes, te puedo indicar el valor comercial exacto que necesitas.</p>
+    </div>
+<p>verificar hasta aquí</p>
+
+
 
           <p>El oscilador de cristal de baja frecuencia debe seleccionarse configurando los fusibles <code>CKSEL</code> en &laquo;0110&raquo; o &laquo;0111&raquo;, como se muestra en la tabla subsiguiente <strong>Tiempos de Arranque para la Selección del Reloj del Oscilador de Cristal de Baja Frecuencia</strong>. Los tiempos de arranque (<emp>start-up times</emp>) son determinados por los fusibles <code>SUT</code> como se muestra en la Tabla siguiente.</p>
           
