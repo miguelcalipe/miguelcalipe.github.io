@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración y uso de temporizadores AVR | MC Mundo Tech</title>
+    <meta name="description" content="Esta nota de aplicación describe cómo utilizar los diferentes temporizadores  de los microcontroladores Atmel AVR. La intención de este documento es ofrecer una visión general de los temporizadores, mostrar sus posibilidades y explicar cómo configurarlos. Los ejemplos de código aclararán estos conceptos y pueden utilizarse como guía para otras aplicaciones. El Atmel ATmega328PB se utiliza como ejemplo en este documento para explicar los temporizadores.">
+    <link rel="stylesheet" href="/assets/css/principal.css">
+    <link rel="stylesheet" href="/assets/css/articulo.css">
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+
+    <script async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="inicio" class="articulo">
+    <header id="site-header"> </header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>        
+        <article>            
+            <header class="article-header">
+            <h1>CONFIGURACIÓN Y USO DE TEMPORIZADORES AVR</h1>
+
+<p><strong>Nota de Aplicación AVR130</strong></p>
+
+            
+            </header>
+                        
+            <aside id="indice"></aside>    
+            <!-- CONTENIDO DEL ARTÍCULO   -->
+            
+            <section> 
+            
+            <h2>1. INTRODUCCIÓN</h2>
+                <p>Esta nota de aplicación describe cómo utilizar los diferentes temporizadores (<em>timers</em>) de los microcontroladores Atmel $AVR^{\otimes}$. La intención de este documento es ofrecer una visión general de los temporizadores, mostrar sus posibilidades y explicar cómo configurarlos. Los ejemplos de código aclararán estos conceptos y pueden utilizarse como guía para otras aplicaciones. El Atmel ATmega328PB se utiliza como ejemplo en este documento para explicar los temporizadores.</p>
+
+                <p>A partir de una visión general de los temporizadores, varios ejemplos mostrarán cómo funcionan y cómo se configurarán. Los usuarios experimentados pueden comenzar directamente con la sección <strong>4. CONFIGURACIÓN DE LOS TEMPORIZADORES</strong>. La última sección es una breve descripción del modo PWM. Un archivo .zip se encuentra disponible con esta nota de aplicación, el cual contiene código en C y Ensamblador (<em>Assembly</em>) para todos estos ejemplos. Puede descargarse desde el sitio web de Atmel.</p>
+
+                <p>Información adicional está disponible en las hojas de datos (<em>datasheets</em>) y notas de aplicación para dispositivos específicos.</p>
+            </section>
+
+            <section>
+  <h2>1. VISIÓN GENERAL</h2>
+  <p>En principio, un temporizador es un contador simple. Su ventaja radica en que el reloj de entrada y la operación del temporizador son independientes de la ejecución del programa. El reloj determinista permite medir el tiempo contando los ciclos transcurridos y teniendo en cuenta la frecuencia de entrada del temporizador.</p>
+
+  <h3>1.1. Acerca de los Temporizadores</h3>
+  <p>Generalmente, los microcontroladores megaAVR poseen dos temporizadores de 8 bits y uno de 16 bits. Un temporizador con resolución de 16 bits es ciertamente más flexible de usar que uno con resolución de 8 bits. Sin embargo, el dicho "mientras más grande, mejor" no se aplica necesariamente al mundo de los microcontroladores. Para muchas aplicaciones, es suficiente contar con una resolución de 8 bits. Usar una resolución mayor implica una mayor sobrecarga de programa (<em>program overhead</em>), lo cual cuesta tiempo de procesamiento y debe evitarse en código optimizado en velocidad. También implica un mayor costo del dispositivo.</p>
+  <p>Debido a la flexibilidad de los temporizadores AVR, estos pueden ser utilizados para diferentes propósitos. El número de temporizadores determina la cantidad de configuraciones independientes. A continuación, las diferentes opciones de configuración se describirán más detalladamente.</p>
+
+  <h3>1.2. Eventos del Temporizador</h3>
+  <p>El temporizador del AVR puede especificarse para monitorear diversos eventos. Las banderas de estado (<em>status flags</em>) en el registro <code>TIMSK</code> muestran si ha ocurrido un evento. El ATmega328PB puede configurarse para monitorear hasta tres eventos para los temporizadores de 8 bits TC0 y TC2. También cuenta con tres temporizadores de 16 bits (TC1, TC3 y TC4), cada uno de los cuales admite cuatro eventos.</p>
+
+  <h4>1.2.1. Desbordamiento del Temporizador (<em>Timer Overflow</em>)</h4>
+  <p>Un desbordamiento del temporizador significa que el contador ha contado hasta su valor máximo y se reinicia a cero en el siguiente ciclo de reloj del temporizador. La resolución del temporizador determina el valor máximo de dicho temporizador. Existen dos temporizadores con resolución de 8 bits y tres temporizadores con resolución de 16 bits en el ATmega328PB. El valor máximo hasta el cual puede contar un temporizador se puede calcular mediante la Ecuación 1. Aquí $Res$ es la resolución en bits.</p>
+
+  <p>$$MaxVal = 2^{Res} - 1 \tag{1}$$</p>
+
+  <p>El evento de desbordamiento del temporizador hace que la bandera de desbordamiento (<em>Timer Overflow Flag</em> - <code>TOVx</code>) se active en el Registro de Banderas de Interrupción del Temporizador (<code>TIFRn</code>).</p>
+
+  <h4>1.2.2. Coincidencia de Comparación (<em>Compare Match</em>)</h4>
+  <p>En casos donde no sea suficiente monitorear un desbordamiento del temporizador, se puede utilizar la interrupción por coincidencia de comparación. El Registro de Comparación de Salida (<em>Output Compare Register</em> - <code>OCRx</code>) se puede cargar con un valor $[0 \dots MaxVal]$ contra el cual se comparará el registro <code>TCNTn</code> en cada ciclo del temporizador. Cuando el temporizador alcanza el valor de comparación, se establece la correspondiente bandera de comparación de salida (<em>Output Compare Flag</em> - <code>OCFx</code>) en el registro <code>TIFRn</code>. El temporizador se puede configurar para limpiar el registro de conteo a cero ante una coincidencia de comparación.</p>
+  <p>Los pines de salida relacionados se pueden configurar para activarse (<em>set</em>), limpiarse (<em>clear</em>) o conmutarse (<em>toggle</em>) automáticamente al ocurrir una coincidencia de comparación. Esta característica es muy útil para generar señales de onda cuadrada de diferentes frecuencias. Ofrece un amplio abanico de posibilidades, lo que permite implementar un DAC. El modo PWM es un modo especial que se adapta aún mejor a la generación de formas de onda. Consulte la hoja de datos del dispositivo para obtener detalles.</p>
+
+  <h4>1.2.3. Captura de Entrada (<em>Input Capture</em>)</h4>
+  <p>Los temporizadores en el AVR tienen pines de entrada para disparar el evento de captura de entrada. Un cambio de señal en dicho pin provoca que el valor del temporizador sea leído y guardado en el Registro de Captura de Entrada (<em>Input Capture Register</em> - <code>ICRx</code>). Al mismo tiempo, se activará la bandera de captura de entrada (<em>Input Capture Flag</em> - <code>ICFx</code>) en el registro <code>TIFRn</code>. Esto es útil para medir el ancho de pulsos externos.</p>
+</section>
+
+<section>
+  <h2>2. NOTIFICACIÓN DE EVENTOS DEL TEMPORIZADOR</h2>
+  <p>El temporizador opera de forma independiente a la ejecución del programa. Para cada evento del temporizador existe una bandera de estado correspondiente en el Registro de Banderas de Interrupción del Temporizador (<code>TIFRn</code>). La ocurrencia de eventos requiere una notificación del procesador para activar la ejecución de las acciones correspondientes. Esto se realiza mediante el establecimiento de la bandera de estado del evento ocurrido.</p>
+
+  <p>Existen tres formas diferentes de monitorear los eventos del temporizador y responder a ellos:</p>
+  <ol>
+    <li>Sondeo constante (<em>polling</em>) de las banderas de estado - banderas de interrupción y ejecución del código correspondiente.</li>
+    <li>Interrupción del flujo del programa y ejecución de Rutinas de Servicio de Interrupción (<em>Interrupt Service Routines</em> - ISR).</li>
+    <li>Cambio automático del nivel de los pines de salida.</li>
+  </ol>
+
+  <h3>2.1. Sondeo de Banderas de Interrupción (<em>Polling of Interrupt Flags</em>)</h3>
+  <p>Este método hace uso del hecho de que el procesador marca los eventos del temporizador activando las banderas de interrupción correspondientes. El programa principal puede verificar con frecuencia el estado de estas banderas para ver si ocurrió alguno de estos eventos. Requiere cierta sobrecarga de programa, lo que consumirá tiempo de procesamiento adicional. La ventaja de esta solución es el tiempo de respuesta muy corto cuando se utilizan bucles cerrados.</p>
+  <p>La implementación en Ensamblador para el Timer0 puede verse como el siguiente ejemplo de código. Estas tres líneas de código deben estar ubicadas en el bucle principal para que se ejecuten con frecuencia.</p>
+
+  <pre><code>loop:
+    lds  r16, TIFRn    ; Etiqueta. Carga TIFRn en r16
+    sbrs r16, TOV0     ; Omite la siguiente instrucción si el bit (cero) en el registro (r16) está activo
+    rjmp loop          ; Salta a 'loop'
+; El código de servicio del evento comienza aquí</code></pre>
+
+  <h3>2.2. Notificación Controlada por Interrupciones (<em>Interrupt Controlled Notification</em>)</h3>
+  <p>El AVR se puede configurar para ejecutar interrupciones si ha ocurrido un evento de temporizador (cuando la bandera de interrupción correspondiente en <code>TIFRn</code> esté activa). La ejecución normal del programa se interrumpirá casi de inmediato y el procesador ejecutará el código de la Rutina de Servicio de Interrupción. La ventaja en comparación con el sondeo de banderas de interrupción es la cero sobrecarga en el bucle principal. Esto ahorra tiempo de procesamiento. La sección <strong>4. CONFIGURACIÓN DE LOS TEMPORIZADORES</strong> muestra algunos ejemplos de cómo se puede implementar esto.</p>
+  <p>Las interrupciones del temporizador se habilitan configurando el bit correspondiente en el Registro de Máscara de Interrupción del Temporizador (<code>TIMSKn</code>). El siguiente ejemplo muestra los pasos para habilitar la interrupción por coincidencia de comparación de salida en el canal A del Timer2:</p>
+
+  <pre><code>ldi r16, 1&lt;&lt;OCIE2A
+sts TIMSK2, r16        ; Habilita la interrupción por coincidencia de comparación de salida del temporizador
+sei                    ; Habilita las interrupciones globales</code></pre>
+
+  <h3>2.3. Reacción Automática ante Eventos (<em>Automatic Reaction on Events</em>)</h3>
+  <p>Los temporizadores en este dispositivo soportan la posibilidad de reaccionar a los eventos de interrupción sobre una base puramente de hardware, sin la necesidad de ejecutar código. Los pines de salida relacionados se pueden configurar para activarse, limpiarse o conmutarse automáticamente al ocurrir una coincidencia de comparación. En contraste con las otras dos soluciones, esto sucede en paralelo a la ejecución normal del código y no requiere tiempo de procesamiento.</p>
+  <p>El siguiente ejemplo de código muestra los pasos para establecer el valor de comparación y habilitar la conmutación del pin. La configuración del Timer2 puede ser la siguiente:</p>
+
+  <pre><code>ldi r16, (1&lt;&lt;COM2A1) | (1&lt;&lt;WGM21) | (1&lt;&lt;WGM20)
+sts TCCR2A, r16        ; Conmutación de OC2A en coincidencia de comparación / reloj del sistema
+ldi r16, 32
+sts OCR2A, r16         ; Establece el valor de comparación de salida en 32</code></pre>
+
+  <p>Para habilitar la conmutación del pin, el bit del registro de dirección de datos correspondiente a <code>OCx</code> debe configurarse para convertirlo en un pin de salida.</p>
+</section>
+
+<section>
+  <h2>3. OPCIONES DE RELOJ</h2>
+  <p>La unidad de reloj de los temporizadores AVR consiste en un preescalador conectado a un multiplexor. Un preescalador puede considerarse como un divisor de reloj. Generalmente, se implementa como un contador con varias señales de salida en diferentes etapas de conteo. En el caso del ATmega328PB, se utiliza un contador de 10 bits para dividir el reloj de entrada en cuatro (seis en el caso del Timer2) relojes preescalados distintos. El multiplexor se utiliza para seleccionar qué señal de reloj preescalada usar como señal de entrada para el temporizador. Alternativamente, el multiplexor se puede utilizar para omitir el preescalador y configurar un pin externo para ser utilizado como entrada para el temporizador.</p>
+  <p>Existen dos bloques preescaladores disponibles en el dispositivo. Dado que Timer0 y Timer1 son temporizadores síncronos y utilizan el reloj del sistema (reloj de la CPU) como fuente de entrada, pueden usar el mismo bloque preescalador (siempre que cada temporizador se pueda configurar por separado utilizando los bits <code>CSxx</code> correspondientes). Sin embargo, el Timer2, que funciona con reloj asíncrono, necesita su propio preescalador para ser independiente del reloj del sistema.</p>
+  <p>La siguiente figura muestra el preescalado y la unidad de configuración para Timer0/1. Las hojas de datos contienen dibujos más detallados que muestran todos los preescaladores y multiplexores. Una visión general de los posibles ajustes de reloj se da en la Tabla 3-1. En las siguientes secciones, estos ajustes se describirán más claramente.</p>
+
+  <p><strong>Nota:</strong></p>
+  <ol>
+    <li>El preescalador funciona continuamente durante la operación. En casos donde el temporizador deba contar con mucha precisión, se debe asegurar que el preescalador comience a contar desde cero.</li>
+    <li>En dispositivos con preescalador compartido, ejecutar un reinicio del preescalador afectará a todos los temporizadores conectados a él.</li>
+  </ol>
+
+  <p><strong>Figura 3-1. Preescalador para Timer0/1</strong></p>
+  <pre><code>              +---------------------------------------------------+
+  clk_I/O ---&gt;|              PREESCALADOR T/C DE 10 BITS          |
+      |       +---------------------------------------------------+
+      |          | CK/8      | CK/64     | CK/256    | CK/1024
+      |          v           v           v           v
+      |       +-----------------------------------------------+
+      |------&gt;| 0                                             |
+      |       |                                               |
+  T0 -&gt;[Sync]-&gt;| (Detector de flanco)                         |
+              |                                               |
+              |                     MULTIPLEXOR               |
+              +-----------------------------------------------+
+                                     |
+                                     v (CS02, CS01, CS00)
+                         FUENTE DE RELOJ DE TIMER/COUNTER0
+                                   clk_T0</code></pre>
+
+  <h3>3.1. Resumen de las Configuraciones de Reloj</h3>
+
+  <p><strong>Tabla 3-1. Resumen de las Configuraciones de Reloj</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th><code>TCCRx</code> Bit 2 (<code>CSx2</code>)</th>
+        <th>Bit 1 (<code>CSx1</code>)</th>
+        <th>Bit 0 (<code>CSx0</code>)</th>
+        <th>Timer0 y Timer1 Síncronos<br>$P_{CK} = \text{CK}$<br>$T_{CK0/1}$</th>
+        <th>Timer2 Síncrono/Asíncrono<br>$P_{CK2} = f(\text{AS2})$<br>$T_{CK2}$</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>0 (Temporizador detenido)</td>
+        <td>0 (Temporizador detenido)</td>
+      </tr>
+      <tr>
+        <td>0</td>
+        <td>0</td>
+        <td>1</td>
+        <td>$P_{CK}$ (Reloj del sistema)</td>
+        <td>$P_{CK2}$ (Reloj del sistema / Reloj asíncrono)</td>
+      </tr>
+      <tr>
+        <td>0</td>
+        <td>1</td>
+        <td>0</td>
+        <td>$P_{CK} / 8$</td>
+        <td>$P_{CK2} / 8$</td>
+      </tr>
+      <tr>
+        <td>0</td>
+        <td>1</td>
+        <td>1</td>
+        <td>$P_{CK} / 64$</td>
+        <td>$P_{CK2} / 32$</td>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>0</td>
+        <td>0</td>
+        <td>$P_{CK} / 256$</td>
+        <td>$P_{CK2} / 64$</td>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>0</td>
+        <td>1</td>
+        <td>$P_{CK} / 1024$</td>
+        <td>$P_{CK2} / 128$</td>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>1</td>
+        <td>0</td>
+        <td>Reloj externo en el pin $T_n$ (Flanco de bajada)</td>
+        <td>$P_{CK2} / 256$</td>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>1</td>
+        <td>1</td>
+        <td>Reloj externo en el pin $T_n$ (Flanco de subida)</td>
+        <td>$P_{CK2} / 1024$</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>3.2. Temporización por Reloj del Sistema</h3>
+  <p>En este caso, el reloj del sistema se utiliza como señal de entrada para el preescalador. Incluso si se elige un valor preescalado en lugar del reloj del sistema, este reloj se basa en el reloj del sistema. El reloj del temporizador es por lo tanto síncrono al reloj del sistema. Todos los cinco temporizadores del ATmega328PB y la mayoría de los temporizadores en otros componentes AVR soportan esta opción. Se pueden implementar o monitorear marcos de tiempo pequeños debido a la alta frecuencia del reloj del sistema. La frecuencia de desbordamiento del temporizador es una buena indicación del tamaño del marco de tiempo que cubre un temporizador. La Ecuación 2 muestra la correlación entre la frecuencia de desbordamiento del temporizador $TOV_{CK}$, el valor máximo ($MaxVal$) del temporizador, el reloj del sistema ($\text{CK}$) y el factor de división del preescalador ($PVal$).</p>
+
+  <p>$$TOV_{CK} = \frac{f_{CK}}{MaxVal} = \frac{(P_{CKx} / PVal)}{MaxVal} = \frac{P_{CKx}}{(PVal \cdot MaxVal)} \tag{2}$$</p>
+
+  <p>Asuma que la CPU está funcionando con $f_{CPU} = 1\text{ MHz}$ y la resolución del temporizador es de 8 bits ($MaxVal = 256$). Un valor de preescalador de 64 hará que el temporizador reciba un reloj de $T_{CK} = 1\text{ MHz} / 64$, de modo que habrá alrededor de 61 desbordamientos de temporizador por segundo. Consulte la Ecuación 2 para la descripción matemática correcta.</p>
+
+  <p>Obtener 61 eventos de desbordamiento de temporizador por segundo significa que cada 16 ms ocurre un desbordamiento. El valor máximo del preescalador generará un desbordamiento de temporizador cada ~262 ms mientras que el valor mínimo del preescalador genera un desbordamiento de temporizador cada 256 µs.</p>
+
+  <p>En la mayoría de los casos se utilizará un enfoque diferente para determinar los ajustes. Los requerimientos de la aplicación especificarán la frecuencia de los desbordamientos del temporizador. Con base en esto y en la frecuencia de reloj dada de la CPU junto con la resolución del temporizador, las configuraciones del preescalador se calcularán de acuerdo con la siguiente ecuación.</p>
+
+  <p>$$PVal = \frac{P_{CKx}}{(TOV \cdot MaxVal)} \tag{3}$$</p>
+
+  <p>La implementación en Ensamblador para Timer0 puede verse como el siguiente ejemplo de código. Estas líneas establecen los valores del preescalador en <code>TCCR0B</code> a un factor de división de reloj de 1024.</p>
+
+  <pre><code>ldi r16, (1&lt;&lt;CS02) | (1&lt;&lt;CS00)
+sts TCCR0B, r16        ; Reloj del temporizador = reloj del sistema/1024</code></pre>
+
+  <h3>3.3. Temporización por Reloj Asíncrono</h3>
+  <p>En contraste con los otros dos temporizadores, que no soportan esta opción, el Timer2 del ATmega328PB se puede alimentarse mediante un reloj externo asíncrono. Para este propósito, un cristal o un resonador cerámico se puede conectar al oscilador integrado a través de los pines TOSC1 y TOSC2. El oscilador está optimizado para un cristal de reloj de 32.768 kHz. Esta frecuencia es muy adecuada para la implementación de Relojes en Tiempo Real (RTC). Para más información, consulte <em>AVR134: Real Time Clock (RTC) using the Asynchronous Timer</em>. La ventaja principal de un reloj separado es que es independiente del reloj del sistema. Esto permite hacer funcionar el dispositivo a una alta frecuencia de procesamiento mientras el temporizador funciona con un reloj externo con una frecuencia optimizada para una temporización precisa. El soporte adicional del modo de ahorro de energía permite poner el dispositivo en modo de suspensión mientras el temporizador asíncrono sigue en servicio.</p>
+
+  <p>La operación asíncrona requiere alguna consideración adicional. Debido a que el reloj del Timer2 es asíncrono, los eventos del temporizador tienen que ser sincronizados por la CPU. Esto requiere una frecuencia de reloj del temporizador que sea al menos cuatro veces menor que el reloj del sistema. Por otro lado, deben evitarse los conflictos entre el acceso síncrono y el asíncrono. Esto se hace usando registros temporales. Los bits de estado señalizan cuándo está en proceso una actualización de los registros de configuración. Consulte la descripción del Registro de Estado Asíncrono (<code>ASSR</code>) en la hoja de datos para obtener detalles.</p>
+
+  <p>El $TOV_{CK}$ se calcula de acuerdo con la Ecuación 2, pero usando la frecuencia del oscilador en lugar del reloj del sistema. Los ajustes de <code>TCCR2B</code> se dan en la Tabla 3-1. El reloj de entrada del preescalador $P_{CK2}$ es una función del bit `AS2` en el registro `ASSR`. Si este bit se limpia, el temporizador funciona en modo síncrono con el reloj del sistema como frecuencia de entrada. Si este bit se establece, la señal de reloj asíncrona en los pines TOSC1 y TOSC2 se usa como señal de entrada del preescalador.</p>
+
+  <p>La implementación en Ensamblador para Timer2 puede verse como el siguiente ejemplo de código. Estas dos líneas establecen los valores del preescalador en <code>TCCR2B</code> a un factor de división de reloj de 1024 (consulte la Tabla 3-1).</p>
+
+  <pre><code>ldi r16, (1&lt;&lt;CS22) | (1&lt;&lt;CS21) | (1&lt;&lt;CS20)
+sts TCCR2B, r16        ; Reloj del temporizador = reloj del sistema/1024</code></pre>
+
+  <h3>3.4. Temporización Externa</h3>
+  <p>La temporización externa es soportada únicamente por Timer0 y Timer1. Este modo permite el uso de una amplia gama de señales externas como señales de reloj del temporizador. Esta es una temporización síncrona, lo que significa que la CPU detecta el estado del pin y aplica el reloj al temporizador síncronamente con el reloj del sistema si se detectó una señal de reloj externa. El pin T1/T0 se muestrea una vez cada ciclo de reloj del sistema mediante la lógica de sincronización de pines. La señal sincronizada (muestreada) pasa luego a través de un detector de flancos. Esta opción de reloj se selecciona en <code>TCCRx</code>, la configuración de los bits <code>CS00</code>, <code>CS01</code> y <code>CS02</code> se puede encontrar en la Tabla 3-1.</p>
+
+  <p>La implementación en Ensamblador para el Timer0 puede verse como el siguiente ejemplo de código. Estas líneas establecen el pin T0 como pin de entrada para el reloj del temporizador con el flanco de subida como el flanco activo de reloj.</p>
+
+  <pre><code>ldi r16, (1&lt;&lt;CS02) | (1&lt;&lt;CS01) | (1&lt;&lt;CS00)
+sts TCCR0B, r16        ; Reloj del temporizador = pin externo T0, flanco de subida</code></pre>
+
+  <p><strong>Nota:</strong> Es importante asegurarse de que el pin T0 sea un pin de entrada en el Registro de Dirección de Datos del Puerto B (<code>DDRB</code>). La configuración del registro de dirección no será sobrescrita por la configuración del temporizador, porque también se permite implementar un temporizador con reloj por software en el AVR. T0 y T1 son entradas por defecto.</p>
+
+  <h3>3.5. Cómo Detener el Temporizador</h3>
+  <p>Detener el temporizador para que no siga contando es simple. Un valor de cero como valores de preescalador en <code>TCCRx</code> detiene el temporizador correspondiente (consulte la Tabla 3-1). Sin embargo, recuerde que el preescalador sigue funcionando.</p>
+
+  <p>La implementación en Ensamblador para el Timer0 puede verse como el siguiente ejemplo de código.</p>
+  <pre><code>clr r16
+sts TCCR0B, r16        ; Escribir cero en TCCR0B detiene el Timer 0</code></pre>
+
+  <p><strong>Nota:</strong> Otros <code>TCCRx</code> pueden contener bits de configuración además de los bits de selección de reloj (<code>CSxx</code>). Las líneas de comando anteriores limpiarán estos bits. Esto debe evitarse si estos bits estaban establecidos. Eso cuesta una línea extra de código, como se muestra en el siguiente fragmento de código.</p>
+
+  <pre><code>lds  r16, TCCR0B       ; Carga el valor actual de TCCR0B
+andi r16, ~((1&lt;&lt;CS02) | (1&lt;&lt;CS01) | (1&lt;&lt;CS00)) ; Limpia CS02, CS01, CS00
+sts  TCCR0B, r16       ; Escribir cero en CS02, CS01 y CS00 en TCCR0B detiene el Timer0. Los otros bits no se ven afectados</code></pre>
+
+</section>
+
+<section>
+  <h2>4. CONFIGURACIÓN DE LOS TEMPORIZADORES</h2>
+  <p>Esta sección muestra ejemplos concretos de cómo configurar los diferentes temporizadores. La hoja de datos y las notas de aplicación enumeradas en la sección final de este documento deben leerse además. Especialmente al transformar las configuraciones a otros componentes diferentes del ATmega328PB.</p>
+  <p>El uso de interrupciones es la forma más común de reaccionar a los eventos del temporizador. Los ejemplos descritos a continuación utilizan interrupciones.</p>
+  <p>Independientemente de las diferentes características de estos temporizadores, todos tienen dos cosas en común. El temporizador debe iniciarse seleccionando la fuente de reloj y, si se usan interrupciones, estas deben habilitarse.</p>
+
+  <h3>4.1. Registros Compartidos</h3>
+  <p>Si se utilizan los mismos registros en las rutinas de servicio de interrupción que en el código principal, estos registros deben guardarse al principio de la ISR y restaurarse al final de la ISR. Si no se necesitan los 32 registros en la aplicación, las operaciones de guardado y restauración se pueden evitar utilizando registros separados en el código principal y en la ISR.</p>
+  <p>También es muy importante recordar almacenar el Registro de Estado (<code>SREG</code>), ya que esto no lo hace automáticamente el manejador de interrupciones.</p>
+  <p><strong>Nota:</strong> El compilador C maneja esto automáticamente. Si se usa lenguaje Ensamblador, debe hacerse manualmente usando instrucciones <code>push</code> y <code>pop</code>.</p>
+
+  <h3>4.2. Ejemplo 1: Interrupción por Desbordamiento del Timer0</h3>
+  <p>El Timer0 de 8 bits es un temporizador síncrono. Esto significa que recibe su reloj del reloj del sistema, un reloj del sistema preescalado, o un reloj externo que está sincronizado con el reloj del sistema (consulte la sección <strong>3. OPCIONES DE RELOJ</strong> para más detalles sobre esto). Este temporizador es el menos complejo de los tres. Solo deben realizarse unos pocos ajustes para ponerlo en funcionamiento.</p>
+  <p>El siguiente ejemplo mostrará cómo se puede usar el Timer0 para generar una Interrupción por Desbordamiento del Temporizador. Con cada interrupción, el pin PB5 en el Puerto B se conmutará. Para observar esto, se puede utilizar la tarjeta de desarrollo $STK^{\otimes}600$ o la ATmega328PB Xplained Mini. En la STK600, PB5 debe conectarse a un LED. El LED parpadeará con una frecuencia ($f_{LED}$) determinada por la siguiente fórmula:</p>
+
+  <p>$$f_{LED} = \frac{f_{CK}}{MaxVal} = \frac{(CK / PVal)}{2 \cdot MaxVal} = \frac{CK}{2(PVal \cdot MaxVal)}$$</p>
+
+  <p>Un sistema que consta de un temporizador de 8 bits ($MaxVal = 256$) y un reloj del sistema de $CK = 1\text{ MHz}$, que es dividido por un valor de preescalador de $PVal = 1024$, hará que el LED parpadee con una frecuencia ($f_{LED}$) de aproximadamente 3.8 Hz. La siguiente rutina de inicialización muestra cómo configurar tal sistema:</p>
+
+  <pre><code>init_Ex1:
+    ldi r16, (1&lt;&lt;CS02) | (1&lt;&lt;CS00)  ; Reloj del temporizador = reloj del sistema / 1024
+    out TCCR0B, r16
+    ldi r16, 1&lt;&lt;TOV0                ; Limpia TOV0 / Limpia interrupciones pendientes
+    out TIFR0, r16
+    ldi r16, 1&lt;&lt;TOIE0               ; Habilita Interrupción por Desbordamiento de Timer/Counter0
+    sts TIMSK0, r16
+    ret</code></pre>
+
+  <p>El código C correspondiente se ve así:</p>
+  <pre><code>void init_Ex1(void)
+{
+    /* Reloj del temporizador = reloj I/O / 1024 */
+    TCCR0B = (1&lt;&lt;CS02) | (1&lt;&lt;CS00);
+    /* Limpia bandera de desbordamiento */
+    TIFR0 = 1&lt;&lt;TOV0;
+    /* Habilita Interrupción por Desbordamiento */
+    TIMSK0 = 1&lt;&lt;TOIE0;
+}</code></pre>
+
+  <p>En el siguiente paso, la rutina de servicio de interrupción debe ser implementada. Esta rutina se ejecutará con cada desbordamiento del temporizador. El propósito de la rutina en este ejemplo es conmutar PB5.</p>
+
+  <pre><code>ISR_TOV0:
+    push r16
+    in   r16, SREG
+    push r16
+    call TOGGLEPIN
+    pop  r16
+    out  SREG, r16
+    pop  r16
+    reti
+
+
+TOGGLEPIN:
+    sbic portb, PORTB5
+    rjmp CLEARPIN
+    nop
+    sbi  portb, PORTB5
+    jmp  RETI
+
+
+CLEARPIN:
+    cbi  portb, PORTB5
+
+
+RETI:
+    ret</code></pre>
+
+  <p>El código C correspondiente:</p>
+  <pre><code>ISR(TIMER0_OVF_vect)
+{
+    /* Conmuta un pin al desbordarse el temporizador */
+    PORTB ^= (1 &lt;&lt; USER_LED);
+}</code></pre>
+
+  <h3>4.3. Ejemplo 2: Interrupción por Captura de Entrada del Timer1</h3>
+  <p>El Timer1 de 16 bits es un temporizador síncrono. Esto significa que recibe su reloj del reloj del sistema, un reloj del sistema preescalado o un reloj externo que está sincronizado con el reloj del sistema. Para asegurar que los registros de 16 bits del Timer1 se escriban y lean simultáneamente, se utiliza un registro temporal (Temp). Esto hace necesario acceder a estos registros en un orden específico. Consulte la nota de aplicación <em>AVR072: Accessing 16-bit I/O Registers</em> y la hoja de datos del dispositivo para obtener detalles. La forma correcta de acceder a los registros se muestra en la siguiente tabla.</p>
+
+  <p><strong>Tabla 4-1. Acceso a Registros de 16 bits</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Operación</th>
+        <th>1.er Acceso</th>
+        <th>2.º Acceso</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Lectura</td>
+        <td>Byte Bajo (Low Byte)</td>
+        <td>Byte Alto (High Byte)</td>
+      </tr>
+      <tr>
+        <td>Escritura</td>
+        <td>Byte Alto (High Byte)</td>
+        <td>Byte Bajo (Low Byte)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>De acuerdo con esto, una operación de lectura de un registro de 16 bits se ve así:</p>
+  <pre><code>lds r16, TCNT1L
+lds r17, TCNT1H</code></pre>
+
+  <p>Una operación de escritura en este registro debe acceder a los registros en orden inverso:</p>
+  <pre><code>sts TCNT1H, r17
+sts TCNT1L, r16</code></pre>
+
+  <p>El compilador de C maneja automáticamente las operaciones de lectura y escritura de E/S de 16 bits en el orden correcto.</p>
+  <p>Este ejemplo mostrará la implementación de un uso muy simple del evento e interrupción de captura de entrada. El pin de puerto PB0 es el pin de captura de entrada (ICP1). Si el valor de este pin cambia, se disparará una captura; el valor de 16 bits del contador (<code>TCNT1</code>) se escribe en el Registro de Captura de Entrada (<code>ICR1</code>).</p>
+  <p>La medición del ciclo de trabajo de una señal externa requiere que el flanco de disparo cambie después de cada captura. El cambio en la detección de flanco debe realizarse tan pronto como sea posible después de que el registro <code>ICR1</code> haya sido leído. Esto es para asegurarse de que el cambio en la configuración de detección se realice antes de que ocurra el siguiente flanco descendente. Después de un cambio de flanco, la Bandera de Captura de Entrada (<code>ICF1</code>) debe ser limpiada por software (escribiendo un uno lógico en la ubicación del bit de E/S). Solo para medir la frecuencia, no se requiere la limpieza de la bandera <code>ICF1</code> (si se utiliza un manejador de interrupciones).</p>
+
+  <p>La siguiente rutina de inicialización muestra cómo configurar tal sistema:</p>
+  <pre><code>init_Ex2:
+    ldi  r16, (1&lt;&lt;CS11)|(1&lt;&lt;CS10) ; Reloj del temporizador = reloj del sistema/64
+    sts  TCCR1B, r16
+    ldi  r16, 1&lt;&lt;ICF1            ; Limpia ICF1 / Limpia interrupciones pendientes
+    out  TIFR1, r16
+    ldi  r16, 1&lt;&lt;ICIE1           ; Interrupción por Evento de Captura de Timer/Counter1
+    sts  TIMSK1, r16
+    ldi  r16, 1&lt;&lt;ICNC1           ; Habilita cancelador de ruido
+    sts  TCCR1B, r16
+    cbi  DDRB, PORTB0            ; Establece PB0/ICP1 como entrada
+    ret</code></pre>
+
+  <p>El código C correspondiente se ve así:</p>
+  <pre><code>void init_Ex2(void)
+{
+    /* Reloj del temporizador = reloj I/O / 64 */
+    TCCR1B = (1&lt;&lt;CS11) | (1&lt;&lt;CS10);
+    /* Limpia ICF1. Limpia interrupciones pendientes */
+    TIFR1 = 1&lt;&lt;ICF1;
+    /* Habilita Interrupción por Evento de Captura de Timer 1 */
+    TIMSK1 = 1&lt;&lt;ICIE1;
+}</code></pre>
+
+  <p>En el siguiente paso, la rutina de servicio de interrupción debe ser implementada. Esta rutina se ejecutará con cada evento de captura de entrada. La ISR conmutará PB5 en cada evento de captura y limpiará el registro <code>TCNT</code> antes para la siguiente medición.</p>
+
+  <pre><code>ISR_TIM1_CAPT:
+    push r16
+    in   r16, SREG
+    push r16
+    clr  r16
+    sts  TCNT1H, r16            ; Escribe registro Temp
+    sts  TCNT1L, r16            ; Limpia el registro de 16 bits
+    call TOGGLEPIN
+    pop  r16
+    out  SREG, r16
+    pop  r16
+    reti</code></pre>
+
+  <p>El código C correspondiente se ve así:</p>
+  <pre><code>ISR(TIMER1_CAPT_vect)
+{
+    /* Conmuta un pin después de la captura de entrada */
+    PORTB ^= (1 &lt;&lt; USER_LED);
+    /* Limpia el contador para reiniciar el conteo */
+    TCNT1 = 0;
+}</code></pre>
+
+  <p><strong>Nota:</strong> Esta implementación tiene una desventaja: No se detecta un desbordamiento del temporizador. Por lo tanto, si el ciclo de trabajo de la onda tiene un período más largo de lo que puede cubrir el contador de 16 bits, ocurrirá un desbordamiento antes de que ocurra el siguiente flanco. Una variable global que se establece en una ISR de desbordamiento de temporizador se puede utilizar para detectar si ha ocurrido un desbordamiento de temporizador antes de que se realice la captura. Si esta variable está establecida, entonces el valor de captura efectivo será (0xFFFF + contenido de <code>ICR1</code>).</p>
+
+  <h3>4.4. Ejemplo 3: Operación Asíncrona del Timer2</h3>
+  <p>El Timer2 se puede utilizar en modo síncrono como Timer0 y Timer1. Además, se puede utilizar un modo asíncrono. Consulte la descripción de la temporización asíncrona en la sección <strong>3.3. Temporización por Reloj Asíncrono</strong> o la hoja de datos para obtener detalles.</p>
+
+  <p><strong>Ejemplo - Interrupción por Coincidencia de Comparación de Salida del Temporizador</strong></p>
+  <p>Este ejemplo muestra cómo usar la interrupción por coincidencia de comparación de salida del Timer2. El temporizador se configurará para que el evento de coincidencia de comparación ocurra cada segundo. Esta característica podría utilizarse para implementar un RTC. En este ejemplo, sin embargo, los pines de puerto se invertirán con cada evento de coincidencia de comparación para que PB5 parpadee con una frecuencia de 0.5 Hz.</p>
+
+  <p>De forma similar al ejemplo anterior, PB5 debe conectarse a un LED. Además, un cristal de 32.768 kHz debe montarse en los pines TOSC1/PB6 y TOSC2/PB7 del Puerto B.</p>
+
+  <p>La configuración del temporizador se puede calcular de acuerdo con la Ecuación 2. Como valor máximo del temporizador ($MaxVal$) se debe utilizar el valor del <code>OCR2</code> en su lugar. El reloj del preescalador ($P_{CKx}$) es en este caso la señal de reloj del cristal de reloj ($F_{OSCCK}$). $TOV_{CK}$ es la frecuencia de desbordamiento especificada por la aplicación en 1 segundo. La descripción matemática de esta relación se muestra mediante la siguiente ecuación:</p>
+
+  <p>$$1 = TOV_{CK} = \frac{f_{OSCCK}}{PVal \cdot OCR2} = \frac{32.768\text{ kHz}}{PVal \cdot OCR2}$$</p>
+
+  <p>Se selecciona un valor de preescalador de 1024 más un valor de <code>OCR2</code> correspondiente de 32 para obtener el tiempo de retardo de un segundo entre dos eventos de coincidencia de comparación del temporizador.</p>
+
+  <p>La siguiente rutina de inicialización muestra cómo configurar tal sistema:</p>
+  <pre><code>init_Ex3:
+    ldi  r16, (1&lt;&lt;AS2)
+    sts  ASSR, r16             ; Habilita modo asíncrono
+    ; Limpia temporizador en coincidencia de comparación. Conmuta OC2A en Coincidencia de Comparación
+    ldi  r16, (1&lt;&lt;COM2A0) | (1&lt;&lt;WGM21)
+    sts  TCCR2A, r16
+    ldi  r16, (1&lt;&lt;CS22) | (1&lt;&lt;CS21) | (1&lt;&lt;CS20) ; Reloj del temporizador 32768/1024
+    sts  TCCR2B, r16
+    ldi  r16, 32
+    sts  OCR2A, r16            ; Establece valor de comparación de salida en 32
+    lds  r16, ASSR             ; Consulte sección de hoja de datos ATmega328PB
+    sbi  DDRB, PORTB3          ; Establece pin OC2A como salida
+    andi r16, ((1&lt;&lt;OCR2AUB) | (1&lt;&lt;OCR2BUB) | (1&lt;&lt;TCR2AUB) | (1&lt;&lt;TCR2BUB) | (1&lt;&lt;TCN2UB))
+    brne PC-0x03
+    ldi  r16, (1&lt;&lt;TOV2) | (1&lt;&lt;OCF2A) | (1&lt;&lt;OCF2B)
+    sts  TIFR2, r16            ; Limpia interrupciones pendientes
+    ldi  r16, 1&lt;&lt;OCIE2A
+    sts  TIMSK2, r16           ; Habilita interrupción por coincidencia de comparación del temporizador
+    ret</code></pre>
+
+  <p>El código C correspondiente puede ser el siguiente:</p>
+  <pre><code>void init_Ex3(void)
+{
+    /* Selecciona fuente de reloj como cristal en pines TOSCn */
+    ASSR = 1 &lt;&lt; AS2;
+    /* Limpia temporizador en coincidencia de comparación. Conmuta OC2A en coincidencia */
+    TCCR2A = (1&lt;&lt;COM2A0) | (1&lt;&lt;WGM21);
+    /* Reloj del temporizador = 32768 Hz / 1024 */
+    TCCR2B = (1&lt;&lt;CS22) | (1&lt;&lt;CS21) | (1&lt;&lt;CS20);
+    /* Establece valor de comparación de salida en 32. El pin de salida se conmutará cada segundo */
+    OCR2A = 32;
+    /* Espera hasta que los registros estén listos
+     * Consulte sección de la hoja de datos de ATmega328PB
+     * 'Asynchronous Operation of Timer/Counter2' */
+    while ((ASSR &amp; ((1 &lt;&lt; OCR2AUB) | (1 &lt;&lt; OCR2BUB) | (1 &lt;&lt; TCR2AUB) | (1 &lt;&lt; TCR2BUB) | (1 &lt;&lt; TCN2UB))));
+    /* Limpia interrupciones pendientes */
+    TIFR2 = (1 &lt;&lt; TOV2) | (1 &lt;&lt; OCF2A) | (1 &lt;&lt; OCF2B);
+    /* Habilita Interrupción por Coincidencia de Comparación de Salida de Timer 2 */
+    TIMSK2 = (1 &lt;&lt; OCIE2A);
+    /* Establece pin OC2A como salida */
+    DDRB |= (1 &lt;&lt; OC2A_PIN);
+}</code></pre>
+
+  <p>En el siguiente paso, la rutina de servicio de interrupción debe ser implementada. Esta rutina se ejecutará con cada evento de coincidencia de comparación de salida. El propósito en este ejemplo es conmutar un LED conectado a PB5.</p>
+
+  <pre><code>ISR_OCIE2A:
+    push r16
+    in   r16, SREG
+    call TOGGLEPIN
+    out  SREG, r16
+    pop  r16
+    reti</code></pre>
+
+  <p>El código C correspondiente puede ser el siguiente:</p>
+  <pre><code>ISR(TIMER2_COMPA_vect)
+{
+    /* Conmuta un pin para indicar la interrupción de comparación */
+    PORTB ^= (1 &lt;&lt; USER_LED);
+}</code></pre>
+</section>
+
+<section>
+  <h2>5. FUNDAMENTOS DE PWM</h2>
+  <p>PWM es una abreviatura de Modulación por Ancho de Pulsos (<em>Pulse Width Modulation</em>). En este modo, el temporizador actúa como un contador ascendente/descendente. Esto significa que el contador cuenta hasta su valor máximo y luego se limpia a cero. La ventaja del PWM es que la relación del ciclo de trabajo se puede cambiar de manera consistente en fase.</p>
+  <p>Si el PWM está configurado para conmutar el pin de Comparación de Salida (<code>OCx</code>), la señal en este pin puede verse como se muestra en la siguiente figura.</p>
+
+  <p><strong>Figura 5-1. Señal de Salida de PWM</strong></p>
+  <pre><code>   V ^
+     |  +-------+       +-------+       +-------+
+  VH |  |       |       |       |       |       |
+ VAV |--+-------+-------+-------+-------+-------+--- Nivel de Voltaje Promedio de Salida
+  VL |  |       |       |       |       |       |
+     +--+-------+-------+-------+-------+-------+----&gt; t
+        |&lt;--x--&gt;|&lt;--y--&gt;|</code></pre>
+
+  <ul>
+    <li>$V_H$: Nivel alto de voltaje de salida</li>
+    <li>$V_L$: Nivel bajo de voltaje de salida</li>
+    <li>$V_{AV}$: Nivel de voltaje promedio de salida</li>
+    <li>$x$: Nivel alto del ciclo de trabajo</li>
+    <li>$y$: Nivel bajo del ciclo de trabajo</li>
+  </ul>
+
+  <p>Un filtro paso bajo en el pin de salida combinado con la velocidad relativamente alta del PWM causará un nivel de voltaje constante en lugar de una señal de onda cuadrada como señal de salida. La Ecuación 4 muestra cómo se puede calcular este nivel de voltaje:</p>
+
+  <p>$$V_{AV} = \frac{(V_H \cdot x + V_L \cdot y)}{(x + y)} \tag{4}$$</p>
+
+  <p>donde</p>
+  <p>$$x = OCRx \cdot 2$$</p>
+  <p>$$y = (MaxVal - OCRx) \cdot 2$$</p>
+
+  <p>$$V_{AV} = \frac{(V_H \cdot OCRx + V_L \cdot (MaxVal - OCRx))}{MaxVal} \tag{5}$$</p>
+
+  <p>El hecho de que este método permita al temporizador generar niveles de voltaje entre $V_{CC}$ y GND significa que se puede implementar un DAC utilizando el PWM. Los detalles sobre esto se describen en las notas de aplicación <em>AVR314: DTMF Transmitter</em> y <em>AVR335: Digital Sound Recorder with AVR and Serial DataFlash</em>.</p>
+
+  <h3>5.1. Ejemplo 4: Generación de PWM con Timer2</h3>
+  <p>Este ejemplo muestra cómo generar voltajes entre $V_{CC}$ y GND en el pin de salida del PWM (PB3/OC2A). Para observar esto, PB3 debe conectarse a un LED. Esta señal de salida de PWM tiene una relación de trabajo de $1/8$ a $7/8$ ($OCR2A = \text{0xE0}$).</p>
+
+  <p>La siguiente rutina de inicialización muestra cómo configurar tal sistema:</p>
+  <pre><code>init_Ex4:
+    ; PWM de 8 bits no invertido
+    ldi  r16, (1&lt;&lt;COM2A1) | (1&lt;&lt;WGM21) | (1&lt;&lt;WGM20)
+    sts  TCCR2A, r16           ; PWM de 8 bits no invertido
+    ldi  r16, 1&lt;&lt;CS20
+    sts  TCCR2B, r16           ; Reloj del temporizador = reloj I/O
+    ldi  r16, 0xE0
+    sts  OCR2A, r16            ; Establece valor de comparación / relación del ciclo de trabajo
+    sbi  DDRB, PORTB3          ; Establece pin OC2A como salida
+    ret</code></pre>
+
+  <p>El código C correspondiente se ve así:</p>
+  <pre><code>void init_Ex4(void)
+{
+    /* Habilita PWM de 8 bits no invertido */
+    TCCR2A = (1&lt;&lt;COM2A1) | (1&lt;&lt;WGM21) | (1&lt;&lt;WGM20);
+    /* Reloj del temporizador = reloj I/O */
+    TCCR2B = (1&lt;&lt;CS20);
+    /* Establece el valor de comparación para controlar el ciclo de trabajo */
+    OCR2A = 0xE0;
+    /* Habilita Interrupción por Coincidencia de Comparación de Salida de Timer 2 */
+    TIMSK2 = (1 &lt;&lt; OCIE2A);
+    /* Establece pin OC2A como salida */
+    DDRB |= (1 &lt;&lt; OC2A_PIN);
+}</code></pre>
+</section>
+
+<section>
+  <h2>6. LECTURAS ADICIONALES</h2>
+  <ol>
+    <li>AVR072: Accessing 16-bit I/O Registers</li>
+    <li>AVR134: Real Time Clock (RTC) using the Asynchronous Timer</li>
+    <li>AVR314: DTMF Transmitter</li>
+    <li>AVR335: Digital Sound Recorder with AVR and Serial DataFlash</li>
+    <li>AVR131: Using the 8-bit AVR High-speed PWM</li>
+  </ol>
+</section>
+
+<section>
+  <h2>7. HISTORIAL DE REVISIONES</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Rev. Doc.</th>
+        <th>Fecha</th>
+        <th>Comentarios</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>2505B</td>
+        <td>03/2016</td>
+        <td>Actualizado para dispositivo más reciente</td>
+      </tr>
+      <tr>
+        <td>2505A</td>
+        <td>02/2002</td>
+        <td>Lanzamiento inicial del documento</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+        </article>
+        
+    </main>
+
+<div id="articulo-nav"> </div>
+
+<div id="footer"></div>
+<script src="/assets/js/componentes.js"></script>
+<script src="/assets/js/menu-direction.js"></script>
+<script src="/assets/js/indice.js"></script>
+
+<!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+
+</body>
+
+</html>
