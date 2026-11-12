@@ -828,7 +828,7 @@
       </section>
 
       <section>
-        <h2>6. OSCILADOR RC CALIBRADO INTERNO (<emp>Calibrated Internal RC Oscillator</emp>)</h2>
+        <h2>8. OSCILADOR RC CALIBRADO INTERNO (<emp>Calibrated Internal RC Oscillator</emp>)</h2>
 <p>Por defecto, el oscilador RC interno (<emp>Internal RC Oscillator</emp>) proporciona un reloj de aproximadamente 8.0 MHz. Aunque depende del voltaje y de la temperatura, este reloj puede ser calibrado con mucha precisión por el usuario. Consulte la Tabla 29-9 en la página 313 para más detalles. El dispositivo se suministra con el fusible <code>CKDIV8</code> programado (<emp>programmed</emp>). Consulte la sección &laquo;Preescalador del Reloj del Sistema&raquo; (<emp>System Clock Prescaler</emp>) en la página 45 para más detalles.</p>
 <p>Este reloj se puede seleccionar como el reloj del sistema programando los fusibles <code>CKSEL</code> como se muestra en la Tabla <strong>Modos de Operación del Oscilador RC Calibrado Interno</strong>. Si se selecciona, operará sin componentes externos. Durante el <emp>reset</emp>, el <emp>hardware</emp> carga el valor de calibración preprogramado en el registro <code>OSCCAL</code> y, por lo tanto, calibra automáticamente el oscilador RC. La precisión de esta calibración se muestra como Calibración de fábrica (<emp>Factory calibration</emp>) en la Tabla 29-9 de la página 313.</p>
 <p>Al cambiar el registro <code>OSCCAL</code> desde el <emp>software</emp> (consulte la sección &laquo;<code>OSCCAL</code> – Registro de Calibración del Oscilador&raquo; [<emp>OSCCAL – Oscillator Calibration Register</emp>] en la página 46), es posible obtener una mayor precisión de calibración que utilizando la calibración de fábrica. La precisión de esta calibración se muestra como Calibración del usuario (<emp>User calibration</emp>) en la Tabla 29-9 de la página 313.</p>
@@ -907,8 +907,10 @@
     </tr>
   </tfoot>
 </table>
+</section>
 
-<h3>Oscilador Interno de 128kHz (<emp>128kHz Internal Oscillator</emp>)</h3>
+<section>
+<h2>9. OSCILADOR INTERNO DE 128kHz</h2>
 <p>El oscilador interno de 128 kHz es un oscilador de baja potencia (<emp>low power Oscillator</emp>) que proporciona un reloj de 128 kHz. La frecuencia es nominal a 3V y 25&nbsp;&deg;C. Este reloj se puede seleccionar como el reloj del sistema programando los fusibles <code>CKSEL</code> en &laquo;0011&raquo;, como se muestra en la Tabla 9-13.</p>
 
 <p><strong>Tabla 9-13. Modos de Operación del Oscilador Interno de 128kHz</strong> (<emp>128kHz Internal Oscillator Operating Modes</emp>)</p>
@@ -980,8 +982,10 @@
     </tr>
   </tfoot>
 </table>
+</section>  
 
-<h3>Reloj Externo (<emp>External Clock</emp>)</h3>
+<section>
+<h2>10. RELOJ EXTERNO</h2>
 <p>Para controlar el dispositivo desde una fuente de reloj externa (<emp>external clock source</emp>), el pin <code>XTAL1</code> debe ser pilotado como se muestra en la Figura 9-4. Para ejecutar el dispositivo con un reloj externo, los fusibles <code>CKSEL</code> deben programarse en &laquo;0000&raquo; (consulte la Tabla 9-15).</p>
 
 <p><strong>Tabla 9-15. Frecuencia de Reloj del Oscilador de Cristal</strong> (<emp>Crystal Oscillator Clock Frequency</emp>)</p>
