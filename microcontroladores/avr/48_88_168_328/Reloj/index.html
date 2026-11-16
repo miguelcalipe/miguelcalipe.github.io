@@ -1211,7 +1211,7 @@ Los <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> utilizan el mismo oscilad
 Los <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> comparten los pines del Oscilador del Temporizador/Contador (<code>TOSC1</code> y <code>TOSC2</code>) con <code>XTAL1</code> y <code>XTAL2</code>. Al utilizar el Oscilador del Temporizador/Contador, el reloj del sistema debe ser cuatro veces la frecuencia del oscilador. Debido a esto y a la compartición de pines, el Oscilador del Temporizador/Contador solo se puede utilizar cuando el Oscilador RC Interno Calibrado (Calibrated Internal RC Oscillator) está seleccionado como la fuente de reloj del sistema.
 </p>
 
-<p>Se puede aplicar una fuente de reloj externa a <code></code>TOSC1</code> si el bit <code>EXTCLK</code> en el registro <code>ASSR</code> se configura a uno lógico. Consulte la sección "Operación Asíncrona del Temporizador/Contador2" en la página 160 para obtener una descripción más detallada sobre cómo seleccionar el reloj externo como entrada en lugar de un cristal de reloj de 32.768 kHz. </p>
+<p>Se puede aplicar una fuente de reloj externa a <code>TOSC1</code> si el bit <code>EXTCLK</code> en el registro <code>ASSR</code> se configura a uno lógico (<code>1</code>). Consulte la sección "Operación Asíncrona del Temporizador/Contador2" en la página 160 para obtener una descripción más detallada sobre cómo seleccionar el reloj externo como entrada en lugar de un cristal de reloj de 32.768 kHz. </p>
 </section>
 
 
