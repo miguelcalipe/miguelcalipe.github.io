@@ -1120,10 +1120,18 @@
 
 <section>
 <h2>10. RELOJ EXTERNO</h2>
-<p>Para controlar el dispositivo desde una fuente de reloj externa (<em>external clock source</em>), el pin <code>XTAL1</code> debe ser pilotado como se muestra en la Figura. Para ejecutar el dispositivo con un reloj externo, los fusibles <code>CKSEL</code> deben programarse en &laquo;0000&raquo; (consulte la Tabla 9-15).</p>
+<div class="imagen-derecha">
+    <div class="texto">
+        <p>El <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> puede ser controlado por un reloj externo (<em>external clock</em>).</p>
+<p>Para controlar el dispositivo desde una fuente de reloj externa (<em>external clock source</em>), esta debe conectarse directamente al pin <code>XTAL1</code> como se muestra en la Figura. mientras que el pin <code>XTAL2</code> debe dejarse sin conectar </p>
+</div>
+<img src="img/external_clock_drive_configuration.png" alt="Configuración de Control de Reloj Externo" class="imagen-derecha">
+</div>
 
-<p><strong>Tabla 9-15. Frecuencia de Reloj del Oscilador de Cristal</strong> (<em>Crystal Oscillator Clock Frequency</em>)</p>
+<p>Para ejecutar el dispositivo con un reloj externo, los fusibles <code>CKSEL</code> deben programarse en <code>0000</code></p>
+<div class="table-container">
 <table>
+  <caption><strong>Fuses CKSEL para la selección del Reloj Externo</strong></caption>
   <thead>
     <tr>
       <th>Frecuencia (<em>Frequency</em>)</th>
@@ -1136,15 +1144,80 @@
       <td>0000</td>
     </tr>
   </tbody>
+  
+</table>
+</div>
+
+<p>Cuando se selecciona esta fuente de reloj, los tiempos de arranque son determinados por los fusibles <code>SUT</code>, tal como se muestra en la Tabla siguiente:</p>
+<div class="table-container">
+<table>
+  <caption><strong>Fuses para la Selección de Tiempos de Arranque del Reloj Externo</strong></caption>
+  <thead>
+    <tr>
+      <th>Tiempo de arranque desde <em>Power-down</em> y <em>Power-save</em></th>
+      <th>Retraso adicional desde el <em>Reset</em> (V<sub>CC</sub>> = 5.0 V) <sup>(a)</sup></th>
+      <th>SUT1...0</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>6 CK</td>
+      <td>19 CK <sup>(1)</sup></td>
+      <td>00</td>
+    </tr>
+    <tr>
+      <td>6 CK</td>
+      <td>19 CK + 4.1 ms</td>
+      <td>01</td>
+    </tr>
+    <tr>
+      <td>6 CK</td>
+      <td>19 CK + 65 ms<sup>(2)</sup></td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <td><em>Reservado</em></td>
+      <td><em>Reservado</em></td>
+      <td>11</td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="3">
+        <strong>Nota:</strong><br>
+        <sup>(a)</sup> Datos de columna actualizados según <strong>DS80000855C</strong>. <em>Silicon Errata and Data Sheet Clarifications ATmega48A/PA/88A/PA/168A/PA/328/P</em>, pag. 7.<br>
+        <sup>(1)</sup>. Si el fusible RSTDISBL está programado, este tiempo de arranque se incrementará a 19 CK + 4 ms para asegurar que se pueda ingresar al modo de programación.<br>
+        <sup>(2)</sup>. El dispositivo se envía de fábrica con esta opción seleccionada. 
+      </td>
+    </tr>
+  </tfoot>
 </table>
 
-<img src="img/external_clock_drive_configuration.png" alt="Configuración de Control de Reloj Externo" class="imagen-centrada">
+<p>Al aplicar un reloj externo, es necesario evitar cambios repentinos en la frecuencia de la señal aplicada para garantizar un funcionamiento estable del microcontrolador (MCU). Una variación en la frecuencia superior al 2% de un ciclo de reloj al siguiente puede provocar un comportamiento errático o impredecible. Si se requieren modificaciones mayores al 2%, asegúrese de mantener el MCU en estado de <em>Reset</em> mientras se realizan dichos cambios.</p>
+
+<p>
+  Nótese que el <strong>preescalador del reloj del sistema (<em>System Clock Prescaler</em>)</strong> se puede utilizar para implementar cambios en tiempo de ejecución de la frecuencia del reloj interno garantizando al mismo tiempo un funcionamiento estable. Consulte la sección «Preescalador del reloj del sistema» (System Clock Prescaler) .
+</p>
                 
 </section>
 
 <section>
+<h2>11. OSCILADOR DEL TEMPORIZADOR/CONTADOR (<em>Timer/Counter Oscillator</em>)</h2>
+<p>
+Los <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> utilizan el mismo oscilador de cristal para el Oscilador de Baja Frecuencia y el Oscilador del Temporizador/Contador (Timer/Counter Oscillator).
+</p>
 
-<h2>Preescalador del reloj del sistema (<emp>System Clock Prescaler</emp>)</h2>
+<p>
+Los <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> comparten los pines del Oscilador del Temporizador/Contador (<code>TOSC1</code> y <code>TOSC2</code>) con <code>XTAL1</code> y <code>XTAL2</code>. Al utilizar el Oscilador del Temporizador/Contador, el reloj del sistema debe ser cuatro veces la frecuencia del oscilador. Debido a esto y a la compartición de pines, el Oscilador del Temporizador/Contador solo se puede utilizar cuando el Oscilador RC Interno Calibrado (Calibrated Internal RC Oscillator) está seleccionado como la fuente de reloj del sistema.
+</p>
+
+<p>Se puede aplicar una fuente de reloj externa a <code></code>TOSC1</code> si el bit <code>EXTCLK</code> en el registro <code>ASSR</code> se configura a uno lógico. Consulte la sección "Operación Asíncrona del Temporizador/Contador2" en la página 160 para obtener una descripción más detallada sobre cómo seleccionar el reloj externo como entrada en lugar de un cristal de reloj de 32.768 kHz. </p>
+</section>
+
+
+<section>
+
+<h2>12. PREESCALADOR DEL RELOJ DEL SISTEMA (<emp>System Clock Prescaler</emp>)</h2>
 
 <p>El ATmega48A/PA/88A/PA/168A/PA/328/P cuenta con un preescalador del reloj del sistema, y el reloj del sistema se puede dividir configurando el registro <code>CLKPR</code> (<emp>CLKPR – Clock Prescale Register</emp>) descrito en la sección más abajo. Esta característica se puede utilizar para disminuir la frecuencia del reloj del sistema y el consumo de energía cuando los requerimientos de potencia de procesamiento son bajos. Esto se puede emplear con todas las opciones de fuentes de reloj, afectando la frecuencia de reloj de la CPU y de todos los periféricos síncronos. Los relojes <code>clkI/O</code>, <code>clkADC</code>, <code>clkCPU</code> y <code>clkFLASH</code> se dividen por un factor tal como se muestra en la Tabla 29-11 de la página 314.</p>
 
