@@ -621,3 +621,141 @@ pre code {
   fill: #fef3c7;
   stroke: #b45309;
 }
+
+/* ==========================================
+   EXTENSIONES TÉCNICAS: FUSES Y NOTAS (ATmega)
+   ========================================== */
+
+/* Rejilla de 2 columnas adaptativa */
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin: 1.25rem 0;
+}
+
+@media (max-width: 768px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Tarjeta técnica interna */
+.tech-card-item {
+  background-color: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #cbd5e1);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+/* Insignias de valores de bits */
+.badge-val {
+  display: inline-block;
+  min-width: 24px;
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-weight: 600;
+  text-align: center;
+  margin-right: 6px;
+  font-size: 0.88rem;
+}
+
+.badge-val.badge-warn {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.badge-val.badge-yellow {
+  background-color: #fef08a;
+  color: #713f12;
+}
+
+.badge-val.badge-danger {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.badge-val.badge-success {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.badge-val.badge-accent {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+/* Fila destacada en tablas técnicas */
+.table-row-highlight td {
+  border-top: 3px solid var(--primary-color, #1e3a8a) !important;
+  border-bottom: 3px solid var(--primary-color, #1e3a8a) !important;
+  background-color: #eef2ff !important;
+}
+
+.table-row-highlight td:first-child {
+  border-left: 3px solid var(--primary-color, #1e3a8a) !important;
+}
+
+.table-row-highlight td:last-child {
+  border-right: 3px solid var(--primary-color, #1e3a8a) !important;
+}
+
+/* Cajas de notas explicativas técnicas (Nota 1 y 2) */
+.note-box {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 1rem;
+  align-items: start;
+  border-radius: 10px;
+  padding: 1.25rem;
+  margin: 1.25rem 0;
+  border: 2px solid;
+}
+
+.note-box .note-icon {
+  font-style: normal;
+  font-weight: 700;
+  font-size: 1.25rem;
+  text-align: center;
+  border-radius: 8px;
+  padding: 0.4rem 0;
+  line-height: 1;
+}
+
+.note-box.note-primary {
+  background-color: #eef2ff;
+  border-color: var(--primary-color, #1e3a8a);
+  color: var(--primary-color, #1e3a8a);
+}
+
+.note-box.note-primary .note-icon {
+  background-color: var(--primary-color, #1e3a8a);
+  color: #ffffff;
+}
+
+.note-box.note-warning {
+  background-color: #fff7ed;
+  border-color: #c2410c;
+  color: #7c2d12;
+}
+
+.note-box.note-warning .note-icon {
+  background-color: #c2410c;
+  color: #ffffff;
+}
+
+.note-sublist {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1.5px dashed currentColor;
+}
+
+.note-sublist ul {
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.note-sublist li {
+  margin-bottom: 0.35rem;
+}
