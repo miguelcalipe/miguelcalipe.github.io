@@ -3,442 +3,621 @@
    ===================================== */
 
 body.articulo {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.6;
-    color: var(--text-color);
-    background-color: var(--bg-color); /* Aplica el fondo suave en los artículos */
-    margin: 0;
-    padding: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: var(--text-color, #1e293b);
+  background-color: var(--bg-color, #f8fafc);
+  margin: 0;
+  padding: 0;
 }
 
 /* ==========================================
-   CONTENIDO DEL ARTÍCULO
+   CONTENIDO DEL ARTÍCULO Y CONTENEDORES
    ========================================== */
 .articulo main {
-    width: 100%;
-    max-width: 1080px;
-    margin: 2rem auto;
-    padding: 0 1rem;
+  width: 100%;
+  max-width: 1080px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  box-sizing: border-box;
 }
 
-/* Secciones del artículo */
+.article-header,
 .articulo main section {
-    background-color: var(--card-bg);
-    border: 2px solid var(--border-color);
-    border-radius: 10px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.386);
-    overflow: hidden;
+  background-color: var(--card-bg, #ffffff);
+  border: 2px solid var(--border-color, #e2e8f0);
+  border-radius: 10px;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
 }
 
-/* Cabecera del artículo */
-.articulo .article-header {
-    border-radius: 10px;
-    margin-bottom: 2rem;
-    box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.386);
-    overflow: hidden;
+.articulo main section {
+  padding: 2rem;
 }
 
-/* Párrafos dentro de las secciones */
+/* ==========================================
+   TIPOGRAFÍA Y LISTAS
+   ========================================== */
 .articulo main section p {
-    margin: 0.8rem 0;
-    text-align: justify;
+  margin: 0.8rem 0;
+  text-align: justify;
 }
 
 .articulo main section h2 {
-    color: var(--primary-color);
-    border-bottom: 2px solid var(--secondary-color);
-    padding-bottom: 0.5rem;
-    margin-top: 0;
-    font-size: 1.5rem;
-    }
+  color: var(--primary-color, #1e3a8a);
+  border-bottom: 2px solid var(--secondary-color, #2563eb);
+  padding-bottom: 0.5rem;
+  margin-top: 0;
+  font-size: 1.5rem;
+}
 
-.articulo main section  h3 {
-    color: var(--secondary-color);
-    font-size: 1.2rem;
-    margin-top: 1.5rem;
-    }
-    
+.articulo main section h3 {
+  color: var(--secondary-color, #2563eb);
+  font-size: 1.2rem;
+  margin-top: 1.5rem;
+}
+
 .articulo main ul,
 .articulo main ol {
-    padding-left: 1.5rem;
-    }
+  padding-left: 1.5rem;
+}
 
 .articulo main li {
-    margin-bottom: 0.5rem;
-    }
+  margin-bottom: 0.5rem;
+}
 
-/* ===========================
+/* ==========================================
+   ÍNDICE DE CONTENIDOS
+   ========================================== */
+#indice {
+  background-color: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-left: 4px solid var(--secondary-color, #2563eb);
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+#indice h2 {
+  color: var(--primary-color, #1e3a8a);
+  margin: 0 0 0.6rem 0;
+  font-size: 1.3rem;
+}
+
+.lista-indice {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 1rem;
+}
+
+.lista-indice li {
+  margin: 0.5rem 0;
+}
+
+.lista-indice li.subnivel {
+  margin-left: 1.25rem;
+}
+
+.lista-indice a {
+  text-decoration: none;
+  color: var(--secondary-color, #0f4fa8);
+}
+
+.lista-indice a:hover {
+  text-decoration: underline;
+}
+
+.boton-indice {
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+/* ==========================================
    TABLAS
-   =========================== */
-
+   ========================================== */
 .articulo main .table-container {
-    overflow-x: auto;
-    margin: 2rem 0;
+  overflow-x: auto;
+  margin: 1.5rem 0;
 }
 
 .articulo main .table-container table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 1.5rem 0;
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
 }
 
 .articulo main .table-container th,
 .articulo main .table-container td {
-    border: 1px solid var(--border-color);
-    padding: 0.75rem;
-    text-align: left;
+  border: 1px solid var(--border-color, #cbd5e1);
+  padding: 0.75rem;
+  text-align: left;
 }
 
 .articulo main .table-container th {
-    background-color: var(--bg-color);
-    color: var(--primary-color);
-    font-weight: 600;
+  background-color: var(--bg-color, #f1f5f9);
+  color: var(--primary-color, #1e3a8a);
+  font-weight: 600;
 }
 
 .articulo main .table-container tr:nth-child(even) {
-    background-color: #fafafa;
+  background-color: #f8fafc;
 }
 
-/* ===========================
-   FÓRMULAS
-   =========================== */
+/* ==========================================
+   CAJAS ESPECIALES (FÓRMULAS Y ALERTAS)
+   ========================================== */
 .formula-box {
-    background-color: var(--bg-color);
-    border-left: 4px solid var(--secondary-color);
-    padding: 1rem;
-    margin: 1.5rem 0;
-    overflow-x: auto;
-    border-radius: 0 4px 4px 0;
+  background-color: var(--bg-color, #f8fafc);
+  border-left: 4px solid var(--secondary-color, #2563eb);
+  padding: 1rem;
+  margin: 1.5rem 0;
+  overflow-x: auto;
+  border-radius: 0 6px 6px 0;
 }
 
 .alert-box {
-    background-color: #fff7ed;
-    border-left: 4px solid #ea580c;
-    color: #7c2d12;
-    padding: 1rem;
-    margin: 1.5rem 0;
-    border-radius: 0 4px 4px 0;
+  background-color: #fff7ed;
+  border-left: 4px solid #ea580c;
+  color: #7c2d12;
+  padding: 1rem;
+  margin: 1.5rem 0;
+  border-radius: 0 6px 6px 0;
 }
 
-/* ===========================
-   BLOQUES DE CÓDIGO
-   =========================== */
-
+/* ==========================================
+   BLOQUES DE CÓDIGO Y CÓDIGO EN LÍNEA
+   ========================================== */
 pre {
-    background: #1f2937;
-    color: #f8fafc;
-    padding: 18px;
-    margin: 25px 0;
-    border-left: 5px solid #2563EB;
-    border-radius: 10px;
-    box-shadow: 0 3px 10px rgba(0,0,0,.15);
-
-
-     /* Tipografía */
-    font-family: Consolas, "Courier New", monospace;
-    font-size: .95rem;
-    line-height: 1.6;
-
-    /* Permite desplazamiento horizontal si el código es muy largo */
-    overflow-x: auto;
-
-    /* Evita que el código se parta en varias líneas */
-    white-space: pre;
-
-    /* Suaviza el desplazamiento en iPhone/iPad */
-    -webkit-overflow-scrolling: touch;
-
-    /* Sombra */
-    box-shadow: 0 3px 10px rgba(0,0,0,.15);
+  background: #1f2937;
+  color: #f8fafc;
+  padding: 1.15rem;
+  margin: 1.5rem 0;
+  border-left: 5px solid var(--secondary-color, #2563eb);
+  border-radius: 8px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  overflow-x: auto;
+  white-space: pre;
+  -webkit-overflow-scrolling: touch;
 }
 
 pre code {
-    background: transparent;
-    color: inherit;
-    padding: 0;
-    border: none;
-    border-radius: 0;
-    font: inherit;
-    display: block;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  font: inherit;
+  display: block;
 }
 
-/* ===========================
-   CÓDIGO DENTRO DE UN PÁRRAFO
-   =========================== */
 :not(pre) > code {
-    background: #eef4ff;
-    color: #1e3a8a;
-    padding: 2px 6px;
-    border: 1px solid #c7d2fe;
-    border-radius: 4px;
-    font-family: Consolas, "Courier New", monospace;
-    font-size: 0.95em;
+  background: #eef4ff;
+  color: #1e3a8a;
+  padding: 2px 6px;
+  border: 1px solid #c7d2fe;
+  border-radius: 4px;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 0.92em;
 }
 
-/* ===========================
-   DOS COLUMNAS
-   =========================== */
+/* ==========================================
+   DISTRIBUCIÓN MULTICOLUMNA
+   ========================================== */
 .dos-columnas {
-    column-count: 2;
-    column-gap: 2rem;
+  column-count: 2;
+  column-gap: 2rem;
 }
-
-@media (max-width: 768px) {
-    .dos-columnas {
-        column-count: 1;
-    }
-}
-
-/* ===========================
-   TRES COLUMNAS
-   =========================== */
 .tres-columnas {
-    column-count: 3;
-    column-gap: 2rem;
+  column-count: 3;
+  column-gap: 2rem;
 }
-
-@media (max-width: 768px) {
-    .tres-columnas {
-        column-count: 1;
-    }
-}
-
-/* ===========================
-   CUATRO COLUMNAS
-   =========================== */
 .cuatro-columnas {
-    column-count: 4;
-    column-gap: 2rem;
+  column-count: 4;
+  column-gap: 2rem;
 }
-
-@media (max-width: 768px) {
-    .cuatro-columnas {
-        column-count: 1;
-    }
-}
-
-/* ===========================
-   CINCO COLUMNAS
-   =========================== */
 .cinco-columnas {
-    column-count: 5;
-    column-gap: 2rem;
+  column-count: 5;
+  column-gap: 2rem;
 }
 
 @media (max-width: 768px) {
-    .cinco-columnas {
-        column-count: 1;
-    }
+  .dos-columnas,
+  .tres-columnas,
+  .cuatro-columnas,
+  .cinco-columnas {
+    column-count: 1;
+  }
 }
 
-
-
-
-/* ===========================
-   MARCADOR DE POSICIÓN
-   =========================== */
-
+/* ==========================================
+   IMÁGENES, GALERÍAS Y MARCADORES
+   ========================================== */
 .image-placeholder {
-    background-color: var(--code-bg);
-    border: 2px dashed #cbd5e1;
-    padding: 3rem 1rem;
-    text-align: center;
-    color: #64748b;
-    margin: 1.5rem 0;
-    border-radius: 6px;
-    font-style: italic;
+  background-color: var(--code-bg, #f1f5f9);
+  border: 2px dashed #cbd5e1;
+  padding: 3rem 1rem;
+  text-align: center;
+  color: #64748b;
+  margin: 1.5rem 0;
+  border-radius: 6px;
+  font-style: italic;
 }
 
-/* ===========================
-   MENU DE NAVEGACIÓN ENTRE ARTÍCULOS (EN LA PARTE INFERIOR)
-   =========================== */
-.articulo-nav{
-
-display:flex;
-justify-content:space-between;
-margin-top:60px;
-padding-top:25px;
-border-top:1px solid #ccc;
-
-}
-
-.articulo-nav a{
-text-decoration:none;
-font-weight:bold;
-}
-
-.volver-arriba{
-    display:inline-block;
-    margin-top:30px;
-    padding:10px 18px;
-    background:#2563EB;
-    color:#fff;
-    text-decoration:none;
-    border-radius:6px;
-    font-weight:bold;
-    transition:.3s;
-}
-
-.volver-arriba:hover{
-    background:#1D4ED8;
-}
-
-/* ===========================
-   IMAGEN INDIVIDUAL CENTRADA (centra la imagen en <main>)
-   =========================== */
 .imagen-centrada {
-    display: block;
-    max-width: 100%;
-    height: auto;
-    margin: 1.5rem auto;
-}
-
-
-/* ===========================
-   IMAGEN INDIVIDUAL CENTRADA (centra la imagen en la sección del artículo)
-   =========================== */
-.articulo main .imagen-centrada {
-    display: block;
-    max-width: 100%;
-    height: auto;
-    margin: 1.5rem auto;
-}
-
-/* ===========================
-   GALERÍA DE IMÁGENES
-   =========================== */
-
-.galeria {
-    display: flex;
-    justify-content: center;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-}
-
-.galeria figure {
-    flex: 0 1 320px;
-    max-width: 320px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.galeria img {
-    max-width: 100%;
-    height: 200px;
-    display: block;
-    margin: 0 auto;
-    object-fit: contain;
-}
-.galeria figcaption {
-    margin-top: 0.5rem;
-    font-size: 0.95rem;
-    color: #555;
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 1.5rem auto;
 }
 
 .imagen-derecha {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin: 1.5rem 0;
 }
 
 .imagen-derecha .texto {
-    flex: 1;
+  flex: 1;
 }
 
 .imagen-derecha img {
-    max-width: 50%;
-    height: auto;
+  max-width: 50%;
+  height: auto;
 }
 
 @media (max-width: 768px) {
-    .imagen-derecha {
-        flex-direction: column;
-    }
+  .imagen-derecha {
+    flex-direction: column;
+  }
+  .imagen-derecha img {
+    max-width: 100%;
+  }
 }
 
-/*==========================================================
-    ÍNDICE
-==========================================================*/
-
-#indice {
-    background: #ffffff; /* Fondo blanco en lugar de gris pálido */
-    border: 1px solid var(--border-color);
-    border-left: 4px solid var(--secondary-color); /* Detalle visual acorde al sitio */
-    border-radius: 8px;
-    padding: 18px;
-    margin-bottom: 30px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-#indice h2 {
-    color: var(--primary-color);
-    margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 1.3rem;
-}
-
-.lista-indice{
-    list-style:none;
-    padding-left:0;
-    margin-top:15px;
-}
-
-.lista-indice li{
-    margin:8px 0;
-}
-
-.lista-indice li.subnivel{
-    margin-left:20px;
-}
-
-.lista-indice a{
-    text-decoration:none;
-    color:#0f4fa8;
-}
-
-.lista-indice a:hover{
-    text-decoration:underline;
-}
-
-.boton-indice{
-    padding:6px 12px;
-    cursor:pointer;
-}
-
-
-/*
 .galeria {
-    display: flex;
-    justify-content: center;
-    gap: 1.5rem;
-    margin: 2rem 0;
-    flex-wrap: wrap;
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin: 1.5rem 0;
 }
 
 .galeria figure {
-    flex: 0 1 320px;
-    max-width: 350px;
-    text-align: center;
-    margin: 0;
+  flex: 0 1 320px;
+  max-width: 320px;
+  margin: 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .galeria img {
-    width: 100%;
-    max-height: 250px;
-    height: auto;
-    display: block;
-    margin: 0 auto;
-    border-radius: 8px;
+  max-width: 100%;
+  height: 200px;
+  display: block;
+  margin: 0 auto;
+  object-fit: contain;
 }
 
 .galeria figcaption {
-    margin-top: 0.5rem;
-    font-size: 0.95rem;
-    color: #555;
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+  color: #555;
 }
 
-*/
+/* ==========================================
+   NAVEGACIÓN INFERIOR Y BOTÓN RETORNO
+   ========================================== */
+#articulo-nav {
+  width: 100%;
+  max-width: 1080px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+
+.articulo-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #2563eb;
+  padding: 15px 25px;
+  margin-top: 60px;
+  border-radius: 8px;
+}
+
+.articulo-nav a {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 8px 14px;
+  border-radius: 6px;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.articulo-nav a:hover {
+  background-color: #1d4ed8;
+  color: #facc15;
+}
+
+.volver-arriba {
+  display: inline-block;
+  margin-top: 30px;
+  padding: 10px 18px;
+  background-color: #2563eb;
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: bold;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.volver-arriba:hover {
+  background-color: #1d4ed8;
+  color: #facc15;
+}
+
+/* ==========================================
+   COMPONENTES TÉCNICOS E INFOGRAFÍAS (AVR)
+   ========================================== */
+
+/* Encabezado interno de infografía / sección técnica */
+.tech-header {
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+
+.tech-header h2 {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0.25rem;
+  font-size: 1.35rem;
+}
+
+.tech-subtitle {
+  color: #64748b;
+  font-size: 0.92rem;
+  margin: 0;
+}
+
+/* Rejilla de 8 bits (Fuses / Registros) */
+.bits-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 6px;
+  margin: 1rem 0;
+}
+
+.bit-box {
+  border-radius: 8px;
+  padding: 8px 4px;
+  text-align: center;
+  border: 1px solid var(--border-color, #cbd5e1);
+  line-height: 1.3;
+}
+
+.bit-box small {
+  display: block;
+  font-size: 0.72rem;
+  opacity: 0.85;
+}
+
+.bit-box strong {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.bit-warn {
+  background-color: #fef3c7;
+  border-color: #f59e0b;
+  color: #92400e;
+}
+
+.bit-yellow {
+  background-color: #fef08a;
+  border-color: #eab308;
+  color: #713f12;
+}
+
+.bit-accent {
+  background-color: #dbeafe;
+  border-color: #3b82f6;
+  color: #1e40af;
+}
+
+.bit-danger {
+  background-color: #fee2e2;
+  border-color: #ef4444;
+  color: #991b1b;
+}
+
+@media (max-width: 640px) {
+  .bits-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Tarjetas técnicas y cuadrícula de 3 columnas */
+.tech-card {
+  background-color: var(--bg-color, #f8fafc);
+  border: 1px solid var(--border-color, #cbd5e1);
+  border-radius: 10px;
+  padding: 0.9rem 1.1rem;
+  margin: 0.85rem 0;
+  font-size: 0.95rem;
+}
+
+.tech-card-title {
+  font-weight: 600;
+  color: var(--primary-color, #1e3a8a);
+  margin-bottom: 0.45rem;
+  display: block;
+}
+
+.tech-card ul {
+  margin: 0.5rem 0 0;
+  padding-left: 1.35rem;
+}
+
+.tech-card li {
+  margin-bottom: 0.35rem;
+}
+
+.tech-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.85rem;
+  margin: 1rem 0;
+}
+
+.tech-grid-3 .tech-card {
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .tech-grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Ecuación destacada */
+.tech-equation {
+  text-align: center;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 1.35rem;
+  font-weight: 700;
+  padding: 1rem 0.75rem;
+  border: 2px solid #4338ca;
+  background-color: #eef2ff;
+  color: #312e81;
+  border-radius: 10px;
+  margin: 1rem 0;
+}
+
+/* Barras comparativas horizontales */
+.tech-bar-row {
+  display: grid;
+  grid-template-columns: 75px 1fr;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.tech-bar-fill {
+  display: block;
+  height: 24px;
+  border-radius: 6px;
+  background-color: #93c5fd;
+  color: #1e3a8a;
+  font-weight: 600;
+  font-size: 0.82rem;
+  line-height: 24px;
+  padding-left: 10px;
+  white-space: nowrap;
+}
+
+/* Títulos de tabla/figura y términos en inglés */
+.table-caption {
+  font-weight: 600;
+  color: var(--primary-color, #1e3a8a);
+  margin: 1rem 0 0.4rem;
+}
+
+.en-term {
+  color: #64748b;
+  font-size: 0.88em;
+  font-weight: 400;
+}
+
+/* Variantes de alineación y resaltado en tablas técnicas */
+.articulo main .table-container.table-compact th,
+.articulo main .table-container.table-compact td {
+  padding: 0.5rem 0.65rem;
+  text-align: center;
+  font-size: 0.92rem;
+}
+
+.articulo main .table-container td.text-left {
+  text-align: left;
+}
+
+.articulo main .table-container th.col-accent,
+.articulo main .table-container td.col-accent {
+  background-color: #dbeafe;
+  color: #1e40af;
+  font-weight: 600;
+}
+
+.articulo main .table-container th.col-danger,
+.articulo main .table-container td.col-danger {
+  background-color: #fee2e2;
+  color: #991b1b;
+  font-weight: 600;
+}
+
+/* ==========================================
+   DIAGRAMAS SVG TÉCNICOS
+   ========================================== */
+.tech-svg {
+  display: block;
+  width: 100%;
+  max-width: 680px;
+  height: auto;
+  margin: 1rem auto;
+}
+
+.tech-svg .th {
+  font-size: 14px;
+  font-weight: 600;
+  fill: var(--text-color, #1e293b);
+}
+
+.tech-svg .ts {
+  font-size: 12px;
+  fill: #475569;
+}
+
+.tech-svg .wire {
+  stroke: var(--text-color, #1e293b);
+  stroke-width: 1.5;
+  fill: none;
+  stroke-linecap: round;
+}
+
+.tech-svg .node-dot {
+  fill: var(--text-color, #1e293b);
+}
+
+.tech-svg .c-gray {
+  fill: #f1f5f9;
+  stroke: #64748b;
+}
+
+.tech-svg .c-teal {
+  fill: #ccfbf1;
+  stroke: #0f766e;
+}
+
+.tech-svg .c-blue {
+  fill: #dbeafe;
+  stroke: #1d4ed8;
+}
+
+.tech-svg .c-amber {
+  fill: #fef3c7;
+  stroke: #b45309;
+}
