@@ -110,10 +110,35 @@
             <section>
                 <h2>3. BITS DE CONFIGURACIÓN DE RELOJ EN REGISTROS DE FUSIBLES</h2>
                 <p>
-                  Los bits de configuración de reloj se encuentran en los registros de fusibles <code>lfuse</code> (LOW FUSE) del microcontrolador. Estos bits determinan la fuente de reloj principal, el divisor de frecuencia y otros parámetros relacionados con el reloj. La configuración adecuada de estos bits es esencial para garantizar un funcionamiento estable y eficiente del microcontrolador en diversas aplicaciones. Los bits de fusibles son celdas de memoria no volátil independientes del espacio de programa Flash. No se pueden modificar mediante instrucciones normales de ejecución de código en C o ensamblador (a menos que se use programación paralela, SPI de alto voltaje o bootloaders dedicados).
+                  Los bits de configuración de reloj se encuentran en los registros de fusibles <code>lfuse</code> (LOW FUSE) del microcontrolador. La forma de establecer la fuente y la frecuencia de la señal de reloj del microcontrolador es modificando ese fusible. El <code>lfuse</code> de un <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong> consta de 8 bits, donde un bit en <code>0</code> significa programado/activo y en <code>1</code> significa no programado/inactivo.
+                </p>
+<div class="tech-header">
+  <h2>BYTE lfuse </h2>
+  <p class="tech-subtitle">(Low Fuse Byte) · Arquitectura AVR</p>
+</div>
+<div class="bits-grid">
+            <div class="bit-box bit-warn"><small>Bit 7</small><strong>CKDIV8</strong></div>
+            <div class="bit-box bit-yellow"><small>Bit 6</small><strong>CKOUT</strong></div>
+            <div class="bit-box bit-accent"><small>Bit 5</small><strong>SUT1</strong></div>
+            <div class="bit-box bit-accent"><small>Bit 4</small><strong>SUT0</strong></div>
+            <div class="bit-box bit-danger"><small>Bit 3</small><strong>CKSEL3</strong></div>
+            <div class="bit-box bit-danger"><small>Bit 2</small><strong>CKSEL2</strong></div>
+            <div class="bit-box bit-danger"><small>Bit 1</small><strong>CKSEL1</strong></div>
+            <div class="bit-box bit-accent"><small>Bit 0</small><strong>CKSEL0</strong></div>
+          </div>
+
+          <div class="grid-2">
+            <div class="tech-card-item">
+              <span class="tech-card-title">CKDIV8</span>
+              <p><span class="badge-val badge-warn">0</span> Dividir por 8. Habilitado (Programado). $F_{cpu} = F_{osc}/8$</p>
+              <p><span class="badge-val badge-warn">1</span> NO división. Deshabilitado (No programado). $F_{cpu} = F_{osc}$</p>
+            </div>
+
+                
+                    Estos bits determinan la fuente de reloj principal, el divisor de frecuencia y otros parámetros relacionados con el reloj. La configuración adecuada de estos bits es esencial para garantizar un funcionamiento estable y eficiente del microcontrolador en diversas aplicaciones. Los bits de fusibles son celdas de memoria no volátil independientes del espacio de programa Flash. No se pueden modificar mediante instrucciones normales de ejecución de código en C o ensamblador (a menos que se use programación paralela, SPI de alto voltaje o bootloaders dedicados).
                 </p>
                 <p>
-                  El byte lfuse de un <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong> consta de 8 bits, donde un bit en <code>0</code> significa programado/activo y en <code>1</code> significa no programado/inactivo. La forma de establecer la fuente y la frecuencia de la señal de reloj del microcontrolador es modificando el <strong>lfuse (Low Fuse)</strong>. 
+                  El byte   <strong>lfuse (Low Fuse)</strong>. 
                 </p>
                 <div class="table-container">
                   <table>
