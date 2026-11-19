@@ -109,12 +109,18 @@
 
             <section>
                 <h2>3. BITS DE CONFIGURACIÓN DE RELOJ EN REGISTROS DE FUSIBLES</h2>
+                <p >
+                  Los bits de fusibles son celdas de memoria no volátil independientes del espacio de programa Flash. No se pueden modificar mediante instrucciones normales de ejecución de código en C o ensamblador (a menos que se use programación paralela, SPI de alto voltaje o bootloaders dedicados). Aqui los configuraremos por la línea de comandos usando el softaware <strong>AVR-DUDE</strong> y el programador <strong>USBasp</strong>.
+            </p>
                 <p>
-                  Los bits de configuración de reloj se encuentran en los registros de fusibles <code>lfuse</code> (LOW FUSE) del microcontrolador. La forma de establecer la fuente y la frecuencia de la señal de reloj del microcontrolador es modificando ese fusible. El <code>lfuse</code> de un <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong> consta de 8 bits, donde un bit en <code>0</code> significa programado/activo y en <code>1</code> significa no programado/inactivo.
+                  Los bits de configuración de reloj se encuentran en los registros de fusibles <code>lfuse</code> (LOW FUSE) del microcontrolador. Estos bits determinan la fuente de reloj principal, el divisor de frecuencia y otros parámetros relacionados con el reloj. La configuración adecuada de estos bits es esencial para garantizar un funcionamiento estable y eficiente del microcontrolador en diversas aplicaciones. 
+                </p>
+                <p>
+                  El <code>lfuse</code> de un <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong> consta de 8 bits, donde un bit en <code>0</code> significa programado/activo y en <code>1</code> significa no programado/inactivo.
                 </p>
 <div class="tech-header">
-  <h2>BYTE lfuse </h2>
-  <p class="tech-subtitle">(Low Fuse Byte) · Arquitectura AVR</p>
+  <h3>BYTE FUSIBLE  BAJO: lfuse (LOW FUSE) </h3>
+  <p class="tech-subtitle">lfuse en ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P· </p>
 </div>
 <div class="bits-grid">
             <div class="bit-box bit-warn"><small>Bit 7</small><strong>CKDIV8</strong></div>
@@ -124,81 +130,32 @@
             <div class="bit-box bit-danger"><small>Bit 3</small><strong>CKSEL3</strong></div>
             <div class="bit-box bit-danger"><small>Bit 2</small><strong>CKSEL2</strong></div>
             <div class="bit-box bit-danger"><small>Bit 1</small><strong>CKSEL1</strong></div>
-            <div class="bit-box bit-accent"><small>Bit 0</small><strong>CKSEL0</strong></div>
+            <div class="bit-box bit-danger"><small>Bit 0</small><strong>CKSEL0</strong></div>
           </div>
 
           <div class="grid-2">
             <div class="tech-card-item">
-              <span class="tech-card-title">CKDIV8</span>
+              <span class="tech-card-title">CKDIV8. Divisor de reloj por 8</span><strong>Bit 7</strong>
+              <p><span class="badge-val badge-warn">CKDIV8</span>: permite dividir la frecuencia del reloj del sistema entre 8, al arrancar. Esto es útil para reducir el consumo de energía en aplicaciones que no requieren un alto rendimiento.</p>
+              <p>Si está en <code>0</code> (programado), por defecto divide el reloj del sistema entre 8 al arrancar</p>
+              <p>Si está en <code>1</code> (no programado), el reloj del sistema permanece en su frecuencia original.</p>
               <p><span class="badge-val badge-warn">0</span> Dividir por 8. Habilitado (Programado). $F_{cpu} = F_{osc}/8$</p>
-              <p><span class="badge-val badge-warn">1</span> NO división. Deshabilitado (No programado). $F_{cpu} = F_{osc}$</p>
+              <p><span class="badge-val badge-warn">1</span> Sin división. Deshabilitado (No programado). $F_{cpu} = F_{osc}$</p>
             </div>
+            <div class="tech-card-item">
+              <span class="tech-card-title">CKOUT. Salida de reloj del sistema por PBO</span> <strong>Bit 6</strong>
+              <p><span class="badge-val badge-yellow">CKOUT</span>: permite que el reloj del sistema se emita a  su frecuencia exacta por el pin <code>PB0/CLKO</code> del dispositivo, pin 14 en el encapsulado DIP28 de la serie, dejando  de funcionar como un pin digital común y corriente y se convierte automáticamente en una <strong>salida de hardware</strong>.  La señal de reloj estará presente en la salida durante el estado de <em>reset</em>.  </p>
+              <p><span class="badge-val badge-yellow">0</span> Habilitado (Programado). El pin PB0/CLKO emite la señal de reloj del sistema.</p>
+              <p><span class="badge-val badge-yellow">1</span> Deshabilitado (No programado). El pin PB0/CLKO funciona como un pin digital normal. Se puede seleccionar cualquier fuente de reloj, incluido el <strong>oscilador RC interno</strong>, para emitir la señal de reloj a través de <code>CLKO</code>. Si se utiliza el preescalador del reloj del sistema (<em>System Clock Prescaler</em>), la señal obtenida en la salida será el reloj del sistema ya dividido</p>
+            </div>
+          </div>
 
-                <p>
-                    Estos bits determinan la fuente de reloj principal, el divisor de frecuencia y otros parámetros relacionados con el reloj. La configuración adecuada de estos bits es esencial para garantizar un funcionamiento estable y eficiente del microcontrolador en diversas aplicaciones. Los bits de fusibles son celdas de memoria no volátil independientes del espacio de programa Flash. No se pueden modificar mediante instrucciones normales de ejecución de código en C o ensamblador (a menos que se use programación paralela, SPI de alto voltaje o bootloaders dedicados).
-                </p>
-                <p>
-                  El byte   <strong>lfuse (Low Fuse)</strong>. 
-                </p>
-                <div class="table-container">
-                  <table>
-  <thead>
-    <tr>
-      <th>Byte</th>
-      <th colspan="8" style="text-align: center;" >Low Fuse (lfuse)</th>
-    </tr>
-    <tr>
-      <th>Bit</th>
-      <th>7</th>
-      <th>6</th>
-      <th>5</th>
-      <th>4</th>
-      <th>3</th>
-      <th>2</th>
-      <th>1</th>
-      <th>0</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><strong>Memonico</strong></td>
-      <td>CKDIV8</td>
-      <td>CKOUT</td>
-      <td>SUT1</td>
-      <td>SUT0</td>
-      <td>CKSEL3</td>
-      <td>CKSEL2</td>
-      <td>CKSEL1</td>
-      <td>CKSEL0</td>
-    </tr>
-  </tbody>
-</table>
-                </div>
+
 
 <img src="img/lfuse.png" alt="Bits de configuración de reloj en el registro lfuse" class="imagen-centrada">
-            <ul>
-                <li> <strong><code>CKDIV8</code>(Bit 7)</strong>: Es el bit más significativo (MSB). Si está en <code>0</code> (programado), por defecto  divide el reloj del sistema entre 8 al arrancar. Si está en <code>1</code> (no programado) el reloj del sistema permanece en su frecuencia original.
+             
             
-<img src="img/CKDIV8.png" alt="Bit CKDIV8 del registro lfuse" class="imagen-centrada">
-                </li>
-            
-                <li><strong><code>CKOUT</code> (Bit 6)</strong>: permite que el reloj del sistema se emita por el puerto <code>PORTB0</code>. 
-                  <ul>
-                    <li>Si el bit se pone en <code>1</code> (no programado), el pin <code>PORTB0/CLKO</code> del dispositivo (pin 14 en el encapsulado DIP28 y pin digital 8 en Arduino) funciona como un pin digital normal. </li>
-                    <li>Cuando se activa el fusible <code>CKOUT</code> (poniéndolo en <code>0</code>), este pin deja de funcionar como un pin digital común y corriente y se convierte automáticamente en una <strong>salida de hardware</strong> que emite la frecuencia exacta a la que está funcionando el oscilador del microcontrolador. Este modo resulta adecuado cuando el reloj del chip se utiliza para excitar o gobernar a otros circuitos dentro del sistema. Asimismo, la señal de reloj estará presente en la salida durante el estado de <em>reset</em>, y el funcionamiento normal del pin de E/S quedará anulado (<em>overridden</em>) cuando el fusible esté programado. Se puede seleccionar cualquier fuente de reloj, incluido el <strong>oscilador RC interno</strong>, para emitir la señal de reloj a través de <code>CLKO</code>. Si se utiliza el preescalador del reloj del sistema (<em>System Clock Prescaler</em>), la señal obtenida en la salida será el reloj del sistema ya dividido.</li>
-                  </ul>
-                <img src="img/CKOUT.png" alt="Bit CKOUT del registro lfuse" class="imagen-centrada">  
-                </li>
-              
-              </p>
-              
-              <p>
-                
-              </p>
-            
-            <img src="img/CKDIV8-CKOUT.png" alt="Bits de lfuse y significado de CKDIV8 y CKOUT" class="imagen-centrada">    
-            
-            <p>Los otros fusibles <code>SUT1...0</code> y <code>CKSEL3...0</code> se utilizan para seleccionar la fuente de reloj y el tiempo de arranque del oscilador. La combinación de estos bits determina el comportamiento del sistema de reloj del microcontrolador al arrancar y durante su operación normal.</p>
+            <p>Los otros fusibles <code>SUT1...0</code> y <code>CKSEL3...0</code> se utilizan para seleccionar la fuente de reloj, el tipo de oscilador  y el tiempo de arranque del oscilador. La combinación de estos bits determina el comportamiento del sistema de reloj del microcontrolador al arrancar y durante su operación normal.</p>
             <img src="img/CKSEL-SUT.png" alt="Bits de lfuse y significado de SUT1...0 y CKSEL3...0" class="imagen-centrada">
 
             </section>

@@ -38,434 +38,571 @@
       <article>
         <!-- 1. CABECERA DEL ARTÍCULO (.article-header) -->
         <header class="article-header">
-          <h1>BIBLIOTECA VISUAL DE COMPONENTES CSS</h1>
+          <h1>
+            BIBLIOTECA VISUAL DE COMPONENTES CSS (<code>articulo.css</code>)
+          </h1>
         </header>
 
         <!-- 2. ÍNDICE DINÁMICO (#indice) -->
         <aside id="indice"></aside>
 
+        <!-- <!-- ==========================================================
+             SECCIÓN 1: ESTRUCTURA, TIPOGRAFÍA Y COLUMNAS
+             ========================================================== -->
         <section>
-          <h2>ÍNDICE DE CONTENIDOS</h2>
+          <h2>1. Estructura, Tipografía y Distribución Multicolumna</h2>
+
+          <h3>Bloque de sección, títulos, párrafos y código en línea</h3>
           <p>
-            <em
-              >Nota: Este contenedor se puebla automáticamente mediante
-              <code>/assets/js/indice.js</code>, pero aquí se muestran las
-              clases base <code>.lista-indice</code>, <code>.subnivel</code> y
-              <code>.boton-indice</code>:</em
-            >
+            Todo el contenido de un artículo se divide en tarjetas
+            <code>&lt;section&gt;</code> dentro de <code>&lt;article&gt;</code>.
+            Los párrafos se justifican automáticamente y los términos técnicos
+            en línea se encierran en <code>&lt;code&gt;</code>, como
+            <code>DDRB |= (1 &lt;&lt; PB5);</code>.
           </p>
-          <button class="boton-indice" type="button">
-            Mostrar / Ocultar Índice
-          </button>
-          <ul class="lista-indice">
-            <li>
-              <a href="#tipografia">1. Tipografía, Encabezados y Listas</a>
-            </li>
-            <li class="subnivel">
-              <a href="#sub-listas">1.1. Listas Ordenadas y No Ordenadas</a>
-            </li>
-            <li>
-              <a href="#cajas-especiales"
-                >2. Cajas de Fórmulas y Alertas (.formula-box, .alert-box)</a
-              >
-            </li>
-            <li>
-              <a href="#codigo"
-                >3. Bloques de Código y Código en Línea (pre, code)</a
-              >
-            </li>
-            <li>
-              <a href="#tablas">4. Tablas Responsivas (.table-container)</a>
-            </li>
-            <li>
-              <a href="#columnas"
-                >5. Distribución Multicolumna (.dos-columnas a
-                .cinco-columnas)</a
-              >
-            </li>
-            <li>
-              <a href="#multimedia"
-                >6. Imágenes, Galerías y Marcadores (.imagen-centrada,
-                .imagen-derecha, .galeria, .image-placeholder)</a
-              >
-            </li>
-            <li>
-              <a href="#navegacion-pie"
-                >7. Navegación Inferior y Retorno (.articulo-nav,
-                .volver-arriba)</a
-              >
-            </li>
-          </ul>
-        </section>
-
-        <!-- SECCIÓN 1: TIPOGRAFÍA Y LISTAS -->
-        <section id="tipografia">
-          <h2>1. TIPOGRAFÍA, ENCABEZADOS Y LISTAS</h2>
-          <p>
-            Este bloque demuestra el comportamiento estándar de un contenedor
-            <code>&lt;section&gt;</code> dentro de
-            <code>body.articulo main</code>. Los párrafos aplican
-            automáticamente <code>text-align: justify;</code> y un espaciado
-            vertical de <code>0.8rem</code> para facilitar la lectura de
-            documentación técnica extensa.
-          </p>
-
-          <h3 id="sub-listas">
-            1.1. Encabezado de Nivel 3 (<code>&lt;h3&gt;</code>) y Listas
-          </h3>
-          <p>
-            El estilo <code>h3</code> utiliza
-            <code>var(--secondary-color)</code> para jerarquizar subtemas dentro
-            de una misma sección:
-          </p>
-
-          <ul>
-            <li>
-              <strong>Lista no ordenada (<code>&lt;ul&gt;</code>):</strong>
-              Ideal para enumerar características de hardware, pines o
-              periféricos.
-            </li>
-            <li>
-              <strong>Margen inferior (<code>li</code>):</strong> Cada elemento
-              conserva <code>margin-bottom: 0.5rem</code> para evitar
-              apelotonamiento visual.
-            </li>
-          </ul>
-
-          <ol>
-            <li>
-              <strong>Lista ordenada (<code>&lt;ol&gt;</code>):</strong> Paso 1
-              para configurar un registro (ej. habilitar el bit
-              <code>CLKPCE</code>).
-            </li>
-            <li>
-              <strong>Secuencia crítica:</strong> Paso 2 dentro de los
-              siguientes 4 ciclos de reloj.
-            </li>
-          </ol>
-        </section>
-
-        <!-- SECCIÓN 2: FÓRMULAS Y ALERTAS -->
-        <section id="cajas-especiales">
-          <h2>2. CAJAS DE FÓRMULAS Y ALERTAS</h2>
-          <p>
-            Utilizadas para resaltar ecuaciones matemáticas (renderizadas con
-            MathJax) y advertencias críticas de hardware o programación.
-          </p>
-
-          <h3>2.1. Contenedor de Fórmulas (<code>.formula-box</code>)</h3>
-          <div class="formula-box">
-            <p>
-              <strong
-                >Cálculo de capacitancia externa para cristal de 32.768
-                kHz:</strong
-              >
-            </p>
-            $$C = 2 \cdot C_L - C_S$$
-            <p>
-              Donde $C_L$ es la capacitancia de carga nominal del cristal y
-              $C_S$ la capacitancia parásita de las pistas del PCB.
-            </p>
-          </div>
-
-          <h3>2.2. Caja de Alerta o Precaución (<code>.alert-box</code>)</h3>
-          <div class="alert-box">
-            <strong>⚠️ Advertencia de Hardware (Fusibles AVR):</strong> Nunca
-            deshabilites el fusible <code>SPIEN</code> ni programes
-            <code>RSTDISBL</code> si vas a seguir utilizando un programador ISP
-            estándar (como USBasp), ya que perderás el acceso de programación
-            serial al microcontrolador.
-          </div>
-        </section>
-
-        <!-- SECCIÓN 3: CÓDIGO -->
-        <section id="codigo">
-          <h2>3. BLOQUES DE CÓDIGO Y CÓDIGO EN LÍNEA</h2>
-
-          <h3>3.1. Código en línea (<code>:not(pre) &gt; code</code>)</h3>
-          <p>
-            Cuando mencionas registros como <code>DDRB</code>,
-            <code>PORTB</code>, macros como <code>_BV(PB0)</code> o comandos de
-            terminal como <code>avrdude -c usbasp -p m328p</code> dentro de un
-            párrafo, se estilizan automáticamente con fondo azul suave y
-            tipografía monoespaciada.
-          </p>
+          <pre><code>&lt;section&gt;
+  &lt;h2&gt;Título principal de sección&lt;/h2&gt;
+  &lt;p&gt;Texto normal con &lt;strong&gt;negrita&lt;/strong&gt; y &lt;code&gt;código en línea&lt;/code&gt;.&lt;/p&gt;
+  &lt;h3&gt;Subtítulo dentro de la sección&lt;/h3&gt;
+  &lt;p&gt;Segundo párrafo de desarrollo.&lt;/p&gt;
+&lt;/section&gt;</code></pre>
 
           <h3>
-            3.2. Bloque de código completo
-            (<code>&lt;pre&gt;&lt;code&gt;</code>)
+            Distribución multicolumna (<code>.dos-columnas</code>,
+            <code>.tres-columnas</code>, <code>.cuatro-columnas</code>,
+            <code>.cinco-columnas</code>)
           </h3>
-          <p>
-            Soporta desplazamiento horizontal automático (<code
-              >overflow-x: auto</code
-            >) sin romper las líneas en pantallas móviles:
-          </p>
-          <pre><code>#include &lt;avr/io.h&gt;
-#include &lt;util/delay.h&gt;
-
-int main(void) {
-    // Configurar PB0 (Pin 14 DIP-28) como salida
-    DDRB |= (1 &lt;&lt; DDB0);
-
-    while (1) {
-        PORTB ^= (1 &lt;&lt; PORTB0); // Conmutar estado lógico del pin
-        _delay_ms(500);
-    }
-    return 0;
-}</code></pre>
+          <ul class="tres-columnas">
+            <li><code>PB0 (ICP1 / CLKO)</code></li>
+            <li><code>PB1 (OC1A)</code></li>
+            <li><code>PB2 (SS / OC1B)</code></li>
+            <li><code>PB3 (MOSI / OC2A)</code></li>
+            <li><code>PB4 (MISO)</code></li>
+            <li><code>PB5 (SCK)</code></li>
+            <li><code>PB6 (XTAL1 / TOSC1)</code></li>
+            <li><code>PB7 (XTAL2 / TOSC2)</code></li>
+            <li><code>PC0 (ADC0)</code></li>
+          </ul>
+          <pre><code>&lt;ul class="tres-columnas"&gt;
+  &lt;li&gt;&lt;code&gt;PB0 (ICP1 / CLKO)&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;PB1 (OC1A)&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;PB2 (SS / OC1B)&lt;/code&gt;&lt;/li&gt;
+  &lt;!-- En pantallas &lt;= 768px colapsa a 1 columna --&gt;
+&lt;/ul&gt;</code></pre>
         </section>
 
-        <!-- SECCIÓN 4: TABLAS -->
-        <section id="tablas">
-          <h2>4. TABLAS RESPONSIVAS (<code>.table-container</code>)</h2>
-          <p>
-            Envolver las etiquetas <code>&lt;table&gt;</code> dentro de un
-            <code>&lt;div class="table-container"&gt;</code> garantiza el scroll
-            horizontal en dispositivos estrechos y aplica filas alternas (zebra
-            striping).
-          </p>
+        <!-- ==========================================================
+             SECCIÓN 2: CAJAS ESPECIALES, FÓRMULAS Y CÓDIGO
+             ========================================================== -->
+        <section>
+          <h2>2. Cajas Especiales, Ecuaciones y Bloques de Código</h2>
 
+          <h3>
+            Caja de Fórmula con MathJax (<code
+              >&lt;div class="formula-box"&gt;</code
+            >)
+          </h3>
+          <div class="formula-box">
+            $$f_{\text{PWM}} = \frac{f_{\text{clk\_I/O}}}{N \cdot (1 +
+            \text{TOP})}$$
+          </div>
+          <pre><code>&lt;div class="formula-box"&gt;
+  $$f_{\text{PWM}} = \frac{f_{\text{clk\_I/O}}}{N \cdot (1 + \text{TOP})}$$
+&lt;/div&gt;</code></pre>
+
+          <h3>
+            Ecuación Técnica Destacada (<code
+              >&lt;div class="tech-equation"&gt;</code
+            >)
+          </h3>
+          <div class="tech-equation">
+            C<sub>e</sub> + C<sub>i</sub> = 2 · C<sub>L</sub> − C<sub>S</sub>
+          </div>
+          <pre><code>&lt;div class="tech-equation"&gt;
+  C&lt;sub&gt;e&lt;/sub&gt; + C&lt;sub&gt;i&lt;/sub&gt; = 2 · C&lt;sub&gt;L&lt;/sub&gt; − C&lt;sub&gt;S&lt;/sub&gt;
+&lt;/div&gt;</code></pre>
+
+          <h3>
+            Caja de Alerta o Advertencia (<code
+              >&lt;div class="alert-box"&gt;</code
+            >)
+          </h3>
+          <div class="alert-box">
+            <strong>¡Precaución con los fusibles!</strong> Programar el bit
+            <code>RSTDISBL = 0</code> desactiva el pin físico de RESET (PC6) y
+            lo convierte en GPIO, impidiendo volver a programar el ATmega328P
+            mediante ISP convencional.
+          </div>
+          <pre><code>&lt;div class="alert-box"&gt;
+  &lt;strong&gt;¡Precaución con los fusibles!&lt;/strong&gt; Programar el bit
+  &lt;code&gt;RSTDISBL = 0&lt;/code&gt; desactiva el pin físico de RESET (PC6)...
+&lt;/div&gt;</code></pre>
+
+          <h3>
+            Bloque de Código Multilínea (<code>&lt;pre&gt;&lt;code&gt;</code>)
+          </h3>
+          <pre><code>#define F_CPU 16000000UL
+#include &lt;avr/io.h&gt;
+
+int main(void) {
+    DDRB |= (1 &lt;&lt; PB5);
+    while (1) {
+        PORTB ^= (1 &lt;&lt; PB5);
+    }
+}</code></pre>
+          <pre><code>&lt;pre&gt;&lt;code&gt;#define F_CPU 16000000UL
+#include &amp;lt;avr/io.h&amp;gt;
+
+int main(void) {
+    DDRB |= (1 &amp;lt;&amp;lt; PB5);
+}&lt;/code&gt;&lt;/pre&gt;</code></pre>
+        </section>
+
+        <!-- ==========================================================
+             SECCIÓN 3: TABLAS ESTÁNDAR Y TABLAS TÉCNICAS COMPACTAS
+             ========================================================== -->
+        <section>
+          <h2>3. Tablas Estándar y Tablas Técnicas Compactas</h2>
+
+          <h3>
+            Tabla Estándar (<code>&lt;div class="table-container"&gt;</code>)
+          </h3>
           <div class="table-container">
             <table>
-              <caption>
-                <strong
-                  >Ejemplo: Estructura del Byte Low Fuse (lfuse) en
-                  ATmega328P</strong
-                >
-              </caption>
               <thead>
                 <tr>
-                  <th>Bit</th>
-                  <th>Nombre</th>
-                  <th>Valor Fábrica</th>
-                  <th>Función Principal</th>
+                  <th>Microcontrolador</th>
+                  <th>Memoria Flash</th>
+                  <th>SRAM</th>
+                  <th>EEPROM</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>7</td>
-                  <td><code>CKDIV8</code></td>
-                  <td>0 (Programado)</td>
-                  <td>Divide el reloj del sistema entre 8 al arrancar.</td>
+                  <td>ATmega88PA</td>
+                  <td>8 KB</td>
+                  <td>1 KB</td>
+                  <td>512 Bytes</td>
                 </tr>
                 <tr>
-                  <td>6</td>
-                  <td><code>CKOUT</code></td>
-                  <td>1 (No programado)</td>
-                  <td>
-                    Habilita la salida de reloj por el pin
-                    <code>PB0/CLKO</code>.
+                  <td>ATmega328P</td>
+                  <td>32 KB</td>
+                  <td>2 KB</td>
+                  <td>1 KB</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <pre><code>&lt;div class="table-container"&gt;
+  &lt;table&gt;
+    &lt;thead&gt;
+      &lt;tr&gt;
+        &lt;th&gt;Microcontrolador&lt;/th&gt;
+        &lt;th&gt;Memoria Flash&lt;/th&gt;
+        &lt;th&gt;SRAM&lt;/th&gt;
+        &lt;th&gt;EEPROM&lt;/th&gt;
+      &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+      &lt;tr&gt;
+        &lt;td&gt;ATmega88PA&lt;/td&gt;
+        &lt;td&gt;8 KB&lt;/td&gt;
+        &lt;td&gt;1 KB&lt;/td&gt;
+        &lt;td&gt;512 Bytes&lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/tbody&gt;
+  &lt;/table&gt;
+&lt;/div&gt;</code></pre>
+
+          <h3>
+            Tabla Compacta con Columnas Resaltadas (<code>.table-compact</code>,
+            <code>.col-accent</code>, <code>.col-danger</code>,
+            <code>.text-left</code>, <code>.table-caption</code> y
+            <code>.en-term</code>)
+          </h3>
+          <div class="table-caption">
+            Selección de Tiempo de Arranque
+            <span class="en-term">(Start-up Times)</span>
+          </div>
+          <div class="table-container table-compact">
+            <table>
+              <thead>
+                <tr>
+                  <th class="col-accent">SUT1</th>
+                  <th class="col-accent">SUT0</th>
+                  <th class="col-danger">CKSEL0</th>
+                  <th>Retardo desde Reset</th>
+                  <th>
+                    Uso recomendado
+                    <span class="en-term">(Recommended Usage)</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="col-accent">0</td>
+                  <td class="col-accent">0</td>
+                  <td class="col-danger">0</td>
+                  <td>6 CK + 14 CK</td>
+                  <td class="text-left">
+                    Fuente de subida rápida o BOD habilitado
                   </td>
                 </tr>
                 <tr>
-                  <td>5..4</td>
-                  <td><code>SUT1..0</code></td>
-                  <td>10</td>
-                  <td>Selecciona el tiempo de espera (Start-up Time).</td>
-                </tr>
-                <tr>
-                  <td>3..0</td>
-                  <td><code>CKSEL3..0</code></td>
-                  <td>0010</td>
-                  <td>
-                    Selecciona el Oscilador RC Interno Calibrado de 8 MHz.
+                  <td class="col-accent">1</td>
+                  <td class="col-accent">0</td>
+                  <td class="col-danger">1</td>
+                  <td>6 CK + 14 CK + 65 ms</td>
+                  <td class="text-left">
+                    Cristal cerámico o frecuencia estable en el arranque
                   </td>
                 </tr>
               </tbody>
-              <tfoot>
-                <tr>
-                  <td colspan="4">
-                    <strong>Nota:</strong> En la arquitectura AVR, un bit de
-                    fusible en <code>0</code> significa programado/activo.
-                  </td>
-                </tr>
-              </tfoot>
             </table>
           </div>
+          <pre><code>&lt;div class="table-caption"&gt;
+  Selección de Tiempo de Arranque &lt;span class="en-term"&gt;(Start-up Times)&lt;/span&gt;
+&lt;/div&gt;
+&lt;div class="table-container table-compact"&gt;
+  &lt;table&gt;
+    &lt;thead&gt;
+      &lt;tr&gt;
+        &lt;th class="col-accent"&gt;SUT1&lt;/th&gt;
+        &lt;th class="col-accent"&gt;SUT0&lt;/th&gt;
+        &lt;th class="col-danger"&gt;CKSEL0&lt;/th&gt;
+        &lt;th&gt;Retardo desde Reset&lt;/th&gt;
+        &lt;th&gt;Uso recomendado &lt;span class="en-term"&gt;(Recommended Usage)&lt;/span&gt;&lt;/th&gt;
+      &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+      &lt;tr&gt;
+        &lt;td class="col-accent"&gt;0&lt;/td&gt;
+        &lt;td class="col-accent"&gt;0&lt;/td&gt;
+        &lt;td class="col-danger"&gt;0&lt;/td&gt;
+        &lt;td&gt;6 CK + 14 CK&lt;/td&gt;
+        &lt;td class="text-left"&gt;Fuente de subida rápida o BOD habilitado&lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/tbody&gt;
+  &lt;/table&gt;
+&lt;/div&gt;</code></pre>
         </section>
 
-        <!-- SECCIÓN 5: COLUMNAS -->
-        <section id="columnas">
-          <h2>5. DISTRIBUCIÓN MULTICOLUMNA</h2>
-          <p>
-            Clases utilitarias basadas en CSS Multi-column Layout. Todas
-            colapsan automáticamente a 1 columna en pantallas menores a
-            <code>768px</code>.
-          </p>
+        <!-- ==========================================================
+             SECCIÓN 4: COMPONENTES TÉCNICOS E INFOGRAFÍAS (AVR)
+             ========================================================== -->
+        <section>
+          <h2>
+            4. Componentes Técnicos e Infografías (Fuses, Tarjetas y Barras)
+          </h2>
 
-          <h3>5.1. Dos Columnas (<code>.dos-columnas</code>)</h3>
-          <div class="dos-columnas">
-            <p>
-              <strong>Columna 1 (Arquitectura Harvard):</strong> Separa
-              físicamente los buses y memorias de programa (Flash) y datos
-              (SRAM), permitiendo leer la siguiente instrucción mientras se
-              ejecuta la actual.
-            </p>
-            <p>
-              <strong>Columna 2 (Registros GPR):</strong> El núcleo AVR cuenta
-              con 32 registros de propósito general de 8 bits (<code>R0</code> a
-              <code>R31</code>) conectados directamente a la ALU para ejecución
-              en un solo ciclo.
+          <h3>
+            Encabezado Interno de Infografía (<code
+              >&lt;div class="tech-header"&gt;</code
+            >)
+          </h3>
+          <div class="tech-header">
+            <h2>BYTE BAJO DE FUSIBLES (LFUSE)</h2>
+            <p class="tech-subtitle">
+              (Low Fuse Byte) · Arquitectura AVR
+              ATmega48A/PA/88A/PA/168A/PA/328/P
             </p>
           </div>
+          <pre><code>&lt;div class="tech-header"&gt;
+  &lt;h2&gt;BYTE BAJO DE FUSIBLES (LFUSE)&lt;/h2&gt;
+  &lt;p class="tech-subtitle"&gt;(Low Fuse Byte) · Arquitectura AVR&lt;/p&gt;
+&lt;/div&gt;</code></pre>
 
-          <h3>5.2. Tres Columnas (<code>.tres-columnas</code>)</h3>
-          <div class="tres-columnas">
-            <p>
-              <strong>1. Preprocesamiento:</strong> Resolución de directivas
-              <code>#include</code> y <code>#define</code> mediante
-              <code>avr-gcc -E</code>.
-            </p>
-            <p>
-              <strong>2. Compilación y Ensamblado:</strong> Traducción a código
-              objeto relocalizable (<code>.o</code>) específico para la
-              arquitectura.
-            </p>
-            <p>
-              <strong>3. Enlazado (Linking):</strong> Generación del ejecutable
-              <code>.elf</code> y extracción del archivo <code>.hex</code> con
-              <code>avr-objcopy</code>.
-            </p>
+          <h3>
+            Rejilla de 8 Bits (<code>&lt;div class="bits-grid"&gt;</code> y
+            <code>.bit-box</code>)
+          </h3>
+          <div
+            class="bits-grid"
+            aria-label="Ejemplo de mapa de bits de un registro"
+          >
+            <div class="bit-box bit-warn">
+              <small>Bit 7</small><strong>CKDIV8</strong>
+            </div>
+            <div class="bit-box bit-yellow">
+              <small>Bit 6</small><strong>CKOUT</strong>
+            </div>
+            <div class="bit-box bit-accent">
+              <small>Bit 5</small><strong>SUT1</strong>
+            </div>
+            <div class="bit-box bit-accent">
+              <small>Bit 4</small><strong>SUT0</strong>
+            </div>
+            <div class="bit-box bit-danger">
+              <small>Bit 3</small><strong>CKSEL3</strong>
+            </div>
+            <div class="bit-box bit-danger">
+              <small>Bit 2</small><strong>CKSEL2</strong>
+            </div>
+            <div class="bit-box bit-danger">
+              <small>Bit 1</small><strong>CKSEL1</strong>
+            </div>
+            <div class="bit-box bit-danger">
+              <small>Bit 0</small><strong>CKSEL0</strong>
+            </div>
           </div>
+          <pre><code>&lt;!-- Variantes de color: .bit-warn | .bit-yellow | .bit-accent | .bit-danger --&gt;
+&lt;div class="bits-grid" aria-label="Bits del byte bajo de fusibles"&gt;
+  &lt;div class="bit-box bit-warn"&gt;&lt;small&gt;Bit 7&lt;/small&gt;&lt;strong&gt;CKDIV8&lt;/strong&gt;&lt;/div&gt;
+  &lt;div class="bit-box bit-yellow"&gt;&lt;small&gt;Bit 6&lt;/small&gt;&lt;strong&gt;CKOUT&lt;/strong&gt;&lt;/div&gt;
+  &lt;div class="bit-box bit-accent"&gt;&lt;small&gt;Bit 5&lt;/small&gt;&lt;strong&gt;SUT1&lt;/strong&gt;&lt;/div&gt;
+  &lt;div class="bit-box bit-accent"&gt;&lt;small&gt;Bit 4&lt;/small&gt;&lt;strong&gt;SUT0&lt;/strong&gt;&lt;/div&gt;
+  &lt;div class="bit-box bit-danger"&gt;&lt;small&gt;Bit 3&lt;/small&gt;&lt;strong&gt;CKSEL3&lt;/strong&gt;&lt;/div&gt;
+  &lt;div class="bit-box bit-danger"&gt;&lt;small&gt;Bit 2&lt;/small&gt;&lt;strong&gt;CKSEL2&lt;/strong&gt;&lt;/div&gt;
+  &lt;div class="bit-box bit-danger"&gt;&lt;small&gt;Bit 1&lt;/small&gt;&lt;strong&gt;CKSEL1&lt;/strong&gt;&lt;/div&gt;
+  &lt;div class="bit-box bit-danger"&gt;&lt;small&gt;Bit 0&lt;/small&gt;&lt;strong&gt;CKSEL0&lt;/strong&gt;&lt;/div&gt;
+&lt;/div&gt;</code></pre>
 
-          <h3>5.3. Cuatro Columnas (<code>.cuatro-columnas</code>)</h3>
-          <div class="cuatro-columnas">
-            <p>
-              <strong>Registro DDRx:</strong> Data Direction Register (Configura
-              entrada/salida).
-            </p>
-            <p>
-              <strong>Registro PORTx:</strong> Data Register (Escribe nivel
-              alto/bajo o activa pull-up).
-            </p>
-            <p>
-              <strong>Registro PINx:</strong> Input Pins Address (Lee el estado
-              físico del pin).
-            </p>
-            <p>
-              <strong>Bit PUD:</strong> Pull-up Disable en el registro
-              <code>MCUCR</code>.
-            </p>
+          <h3>
+            Tarjeta Técnica Individual (<code
+              >&lt;div class="tech-card"&gt;</code
+            >)
+          </h3>
+          <div class="tech-card">
+            <span class="tech-card-title">Donde:</span>
+            <ul>
+              <li>
+                <strong>C<sub>e</sub></strong
+                >: capacitancia externa opcional en cada pin TOSC.
+              </li>
+              <li>
+                <strong>C<sub>i</sub></strong
+                >: capacitancia interna del pin indicada en la hoja de datos.
+              </li>
+            </ul>
           </div>
+          <pre><code>&lt;div class="tech-card"&gt;
+  &lt;span class="tech-card-title"&gt;Donde:&lt;/span&gt;
+  &lt;ul&gt;
+    &lt;li&gt;&lt;strong&gt;C&lt;sub&gt;e&lt;/sub&gt;&lt;/strong&gt;: capacitancia externa opcional en cada pin TOSC.&lt;/li&gt;
+    &lt;li&gt;&lt;strong&gt;C&lt;sub&gt;i&lt;/sub&gt;&lt;/strong&gt;: capacitancia interna del pin indicada en la hoja de datos.&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;</code></pre>
 
-          <h3>5.4. Cinco Columnas (<code>.cinco-columnas</code>)</h3>
-          <div class="cinco-columnas">
-            <p><strong>clk<sub>CPU</sub>:</strong> Núcleo y ALU.</p>
-            <p><strong>clk<sub>I/O</sub>:</strong> Timers, UART, SPI.</p>
-            <p><strong>clk<sub>FLASH</sub>:</strong> Bus de memoria Flash.</p>
-            <p><strong>clk<sub>ASY</sub>:</strong> Timer2 asíncrono.</p>
-            <p><strong>clk<sub>ADC</sub>:</strong> Conversor analógico.</p>
+          <h3>
+            Cuadrícula de 3 Tarjetas Técnicas (<code
+              >&lt;div class="tech-grid-3"&gt;</code
+            >)
+          </h3>
+          <div class="tech-grid-3">
+            <div class="tech-card">
+              <span class="tech-card-title">Cercanía</span>
+              Coloca el cristal y los capacitores lo más cerca posible de los
+              pines TOSC1 y TOSC2.
+            </div>
+            <div class="tech-card">
+              <span class="tech-card-title">Pistas cortas</span>
+              Minimiza la longitud de las pistas para evitar capacitancia
+              parásita (C<sub>S</sub>).
+            </div>
+            <div class="tech-card">
+              <span class="tech-card-title">Plano de masa</span>
+              Rodea la zona del oscilador con plano de tierra para reducir ruido
+              EMI.
+            </div>
           </div>
+          <pre><code>&lt;div class="tech-grid-3"&gt;
+  &lt;div class="tech-card"&gt;
+    &lt;span class="tech-card-title"&gt;Cercanía&lt;/span&gt;
+    Coloca el cristal y los capacitores lo más cerca posible de los pines.
+  &lt;/div&gt;
+  &lt;div class="tech-card"&gt;
+    &lt;span class="tech-card-title"&gt;Pistas cortas&lt;/span&gt;
+    Minimiza la longitud de las pistas para evitar capacitancia parásita.
+  &lt;/div&gt;
+  &lt;div class="tech-card"&gt;
+    &lt;span class="tech-card-title"&gt;Plano de masa&lt;/span&gt;
+    Rodea la zona del oscilador con plano de tierra.
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+          <h3>
+            Barras Comparativas Horizontales (<code
+              >&lt;div class="tech-bar-row"&gt;</code
+            >)
+          </h3>
+          <div class="tech-card">
+            <span class="tech-card-title"
+              >Comparativa de ESR máxima recomendada según C<sub>L</sub>:</span
+            >
+            <div class="tech-bar-row">
+              <span>6.5 pF</span
+              ><i class="tech-bar-fill" style="width: 100%">75 kΩ</i>
+            </div>
+            <div class="tech-bar-row">
+              <span>9.0 pF</span
+              ><i class="tech-bar-fill" style="width: 86.7%">65 kΩ</i>
+            </div>
+            <div class="tech-bar-row">
+              <span>12.5 pF</span
+              ><i class="tech-bar-fill" style="width: 40%">30 kΩ</i>
+            </div>
+          </div>
+          <pre><code>&lt;div class="tech-card"&gt;
+  &lt;span class="tech-card-title"&gt;Comparativa de ESR máxima:&lt;/span&gt;
+  &lt;div class="tech-bar-row"&gt;&lt;span&gt;6.5 pF&lt;/span&gt;&lt;i class="tech-bar-fill" style="width: 100%;"&gt;75 kΩ&lt;/i&gt;&lt;/div&gt;
+  &lt;div class="tech-bar-row"&gt;&lt;span&gt;9.0 pF&lt;/span&gt;&lt;i class="tech-bar-fill" style="width: 86.7%;"&gt;65 kΩ&lt;/i&gt;&lt;/div&gt;
+  &lt;div class="tech-bar-row"&gt;&lt;span&gt;12.5 pF&lt;/span&gt;&lt;i class="tech-bar-fill" style="width: 40%;"&gt;30 kΩ&lt;/i&gt;&lt;/div&gt;
+&lt;/div&gt;</code></pre>
         </section>
 
-        <!-- SECCIÓN 6: MULTIMEDIA Y DIAGRAMAS -->
-        <section id="multimedia">
-          <h2>6. IMÁGENES, GALERÍAS Y MARCADORES</h2>
+        <!-- ==========================================================
+             SECCIÓN 5: DIAGRAMAS SVG, IMÁGENES Y GALERÍAS
+             ========================================================== -->
+        <section>
+          <h2>5. Diagramas SVG Técnicos, Imágenes y Galerías</h2>
 
-          <h3>6.1. Marcador de Posición (<code>.image-placeholder</code>)</h3>
-          <p>
-            Útil durante la fase de redacción de un artículo antes de exportar
-            el diagrama definitivo:
-          </p>
+          <h3>
+            Diagrama Vectorial Técnico (<code>&lt;svg class="tech-svg"&gt;</code
+            >)
+          </h3>
+          <svg class="tech-svg" viewBox="0 0 680 140" role="img">
+            <title>Ejemplo de bloques y trazos con .tech-svg</title>
+            <rect
+              class="c-gray"
+              x="30"
+              y="25"
+              width="130"
+              height="70"
+              rx="8"
+              stroke-width="1"
+            ></rect>
+            <text class="th" x="95" y="57" text-anchor="middle">.c-gray</text>
+            <text class="ts" x="95" y="75" text-anchor="middle">
+              Bloque neutro
+            </text>
+
+            <path class="wire" d="M160 60 H195"></path>
+            <circle class="node-dot" cx="177" cy="60" r="3"></circle>
+
+            <rect
+              class="c-teal"
+              x="195"
+              y="25"
+              width="130"
+              height="70"
+              rx="8"
+              stroke-width="1"
+            ></rect>
+            <text class="th" x="260" y="57" text-anchor="middle">.c-teal</text>
+            <text class="ts" x="260" y="75" text-anchor="middle">
+              Oscilador
+            </text>
+
+            <path class="wire" d="M325 60 H360"></path>
+
+            <rect
+              class="c-blue"
+              x="360"
+              y="25"
+              width="130"
+              height="70"
+              rx="8"
+              stroke-width="1"
+            ></rect>
+            <text class="th" x="425" y="57" text-anchor="middle">.c-blue</text>
+            <text class="ts" x="425" y="75" text-anchor="middle">Registro</text>
+
+            <path class="wire" d="M490 60 H525"></path>
+
+            <rect
+              class="c-amber"
+              x="525"
+              y="25"
+              width="130"
+              height="70"
+              rx="8"
+              stroke-width="1"
+            ></rect>
+            <text class="th" x="590" y="57" text-anchor="middle">.c-amber</text>
+            <text class="ts" x="590" y="75" text-anchor="middle">
+              Fuse / Alerta
+            </text>
+          </svg>
+          <pre><code>&lt;svg class="tech-svg" viewBox="0 0 680 140" role="img"&gt;
+  &lt;title&gt;Descripción del diagrama&lt;/title&gt;
+  &lt;!-- Bloques: .c-gray | .c-teal | .c-blue | .c-amber --&gt;
+  &lt;rect class="c-teal" x="195" y="25" width="130" height="70" rx="8" stroke-width="1"&gt;&lt;/rect&gt;
+  &lt;!-- Textos: .th (título) y .ts (subtítulo) --&gt;
+  &lt;text class="th" x="260" y="57" text-anchor="middle"&gt;Título&lt;/text&gt;
+  &lt;text class="ts" x="260" y="75" text-anchor="middle"&gt;Subtítulo&lt;/text&gt;
+  &lt;!-- Pistas (.wire) y nodos (.node-dot) --&gt;
+  &lt;path class="wire" d="M160 60 H195"&gt;&lt;/path&gt;
+  &lt;circle class="node-dot" cx="177" cy="60" r="3"&gt;&lt;/circle&gt;
+&lt;/svg&gt;</code></pre>
+
+          <h3>
+            Marcador de Imagen en Borrador (<code
+              >&lt;div class="image-placeholder"&gt;</code
+            >)
+          </h3>
           <div class="image-placeholder">
-            [Espacio reservado para diagrama esquemático: Conexión ISP de 6
-            pines entre USBasp y ATmega328P]
+            [Espacio reservado para esquema eléctrico o captura de osciloscopio]
           </div>
+          <pre><code>&lt;div class="image-placeholder"&gt;
+  [Espacio reservado para esquema eléctrico o captura de osciloscopio]
+&lt;/div&gt;</code></pre>
 
           <h3>
-            6.2. Imagen Individual Centrada (<code>.imagen-centrada</code>)
+            Imagen Centrada (<code>&lt;img class="imagen-centrada"&gt;</code>) e
+            Imagen Lateral (<code>&lt;div class="imagen-derecha"&gt;</code>)
           </h3>
-          <p>
-            Centra un diagrama técnico horizontalmente respetando el ancho
-            máximo del contenedor:
-          </p>
-          <img
-            src="https://placehold.co/720x240/1f2937/f8fafc?text=Diagrama+de+Bloques+(.imagen-centrada)"
-            alt="Ejemplo de imagen centrada"
-            class="imagen-centrada"
-          />
-
-          <h3>
-            6.3. Texto con Imagen a la Derecha (<code>.imagen-derecha</code>)
-          </h3>
-          <p>
-            Disposición Flexbox horizontal (50% texto / 50% imagen) que se apila
-            verticalmente en móviles:
-          </p>
           <div class="imagen-derecha">
             <div class="texto">
               <p>
-                Los pines <code>XTAL1</code> y <code>XTAL2</code> forman parte
-                de un amplificador inversor interno diseñado para oscilar junto
-                a un cristal de cuarzo externo y dos condensadores cerámicos de
-                carga (<code>C1</code> y <code>C2</code>, típicamente entre 12
-                pF y 22 pF) conectados a masa (<code>GND</code>).
-              </p>
-              <p>
-                Esta disposición permite mantener el diagrama de conexiones
-                justo al lado de su explicación teórica.
+                El contenedor <code>.imagen-derecha</code> coloca un bloque de
+                texto explicativo a la izquierda y una imagen técnica a la
+                derecha (máximo 50% de ancho en escritorio, apilándose en
+                móvil).
               </p>
             </div>
             <img
-              src="https://placehold.co/420x280/eef4ff/1e3a8a?text=Esquema+XTAL+(.imagen-derecha)"
-              alt="Esquema oscilador cristal"
+              src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='160' viewBox='0 0 320 160'><rect width='320' height='160' rx='8' fill='%23eef2ff' stroke='%232563eb' stroke-width='2'/><text x='160' y='85' font-family='Segoe UI, sans-serif' font-size='15' font-weight='600' fill='%231e3a8a' text-anchor='middle'>Imagen .imagen-derecha</text></svg>"
+              alt="Ejemplo de imagen lateral"
             />
           </div>
+          <pre><code>&lt;!-- Imagen individual centrada --&gt;
+&lt;img class="imagen-centrada" src="/ruta/a/imagen.png" alt="Descripción" /&gt;
 
-          <h3>6.4. Galería de Imágenes con Leyenda (<code>.galeria</code>)</h3>
-          <p>
-            Contenedor flexible para comparar múltiples fotografías de hardware,
-            oscilogramas o encapsulados:
-          </p>
+&lt;!-- Imagen a la derecha con texto a la izquierda --&gt;
+&lt;div class="imagen-derecha"&gt;
+  &lt;div class="texto"&gt;
+    &lt;p&gt;Texto explicativo junto a la imagen...&lt;/p&gt;
+  &lt;/div&gt;
+  &lt;img src="/ruta/a/imagen.png" alt="Descripción" /&gt;
+&lt;/div&gt;</code></pre>
+
+          <h3>Galería de Figuras (<code>&lt;div class="galeria"&gt;</code>)</h3>
           <div class="galeria">
             <figure>
               <img
-                src="https://placehold.co/320x200/1f2937/38bdf8?text=Encapsulado+DIP-28"
-                alt="Encapsulado DIP-28"
+                src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'><rect width='280' height='200' rx='8' fill='%23f1f5f9' stroke='%2364748b' stroke-width='2'/><text x='140' y='105' font-family='Segoe UI, sans-serif' font-size='14' fill='%231e293b' text-anchor='middle'>Figura 1 (280x200)</text></svg>"
+                alt="Ejemplo de figura 1 en galería"
               />
-              <figcaption>
-                Figura 1. Encapsulado PDIP de 28 pines ideal para protoboard.
-              </figcaption>
+              <figcaption>Figura 1: Encapsulado PDIP-28.</figcaption>
             </figure>
             <figure>
               <img
-                src="https://placehold.co/320x200/1f2937/34d399?text=Encapsulado+TQFP-32"
-                alt="Encapsulado TQFP-32"
+                src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='280' height='200' viewBox='0 0 280 200'><rect width='280' height='200' rx='8' fill='%23f1f5f9' stroke='%2364748b' stroke-width='2'/><text x='140' y='105' font-family='Segoe UI, sans-serif' font-size='14' fill='%231e293b' text-anchor='middle'>Figura 2 (280x200)</text></svg>"
+                alt="Ejemplo de figura 2 en galería"
               />
-              <figcaption>
-                Figura 2. Encapsulado SMD TQFP de 32 pines con pines ADC6 y ADC7
-                adicionales.
-              </figcaption>
-            </figure>
-            <figure>
-              <img
-                src="https://placehold.co/320x200/1f2937/fbbf24?text=Oscilograma+CLKO"
-                alt="Oscilograma CLKO"
-              />
-              <figcaption>
-                Figura 3. Señal cuadrada medida en el pin PB0 con el fusible
-                CKOUT activo.
-              </figcaption>
+              <figcaption>Figura 2: Encapsulado TQFP-32.</figcaption>
             </figure>
           </div>
-        </section>
-
-        <!-- SECCIÓN 7: NAVEGACIÓN INFERIOR -->
-        <section id="navegacion-pie">
-          <h2>7. NAVEGACIÓN ENTRE ARTÍCULOS Y BOTÓN DE RETORNO</h2>
-          <p>
-            Elementos utilizados al cierre de cada página para facilitar la
-            lectura secuencial del manual:
-          </p>
-
-          <!-- Botón volver arriba (.volver-arriba) -->
-          <a href="#inicio" class="volver-arriba">↑ Volver arriba</a>
-
-          <!-- Navegación anterior / siguiente (.articulo-nav) -->
-          <div class="articulo-nav">
-            <a href="#inicio">← Artículo Anterior: Puertos de E/S (GPIO)</a>
-            <a href="#inicio">Artículo Siguiente: Fuses en la serie →</a>
-          </div>
+          <pre><code>&lt;div class="galeria"&gt;
+  &lt;figure&gt;
+    &lt;img src="/ruta/a/figura1.png" alt="Descripción 1" /&gt;
+    &lt;figcaption&gt;Figura 1: Encapsulado PDIP-28.&lt;/figcaption&gt;
+  &lt;/figure&gt;
+  &lt;figure&gt;
+    &lt;img src="/ruta/a/figura2.png" alt="Descripción 2" /&gt;
+    &lt;figcaption&gt;Figura 2: Encapsulado TQFP-32.&lt;/figcaption&gt;
+  &lt;/figure&gt;
+&lt;/div&gt;</code></pre>
         </section>
       </article>
     </main>
