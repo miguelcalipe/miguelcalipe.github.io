@@ -59,8 +59,15 @@
             <section>
               <h2>1. EJECUCIÓN DE INSTRUCCIONES Y RENDIMIENTO</h2>    
 
-                <p>La CPU AVR se controla mediante el reloj de la CPU (clk<sub>CPU</sub>) , generado directamente a partir de la fuente de reloj seleccionada para el chip. No se utiliza división de reloj interna. </p>
+                <p>La <strong>CPU AVR</strong> se controla mediante el reloj de la CPU (clk<sub>CPU</sub>) , generado directamente a partir de la fuente de reloj seleccionada para el chip.</p>
 
+                <p>Una vez seleccionada la fuente de reloj (oscilador RC interno, cristal/resonador externo, reloj externo, etc.) y aplicado el divisor inicial de arranque si corresponde (con el fusible <code>CKDIV8</code>), la señal de reloj pasa por el <em>preescalador del sistema</em> controlado mediante el registro <code>CLKPR</code> (bits CLKPS3:0, con factores de división de 1 hasta 256). Ese reloj ya escalado conforma el <strong>reloj del sistema</strong> y alimenta las ramas síncronas principales del árbol de reloj (<code>clk<sub>CPU</sub></code>, <code>clk<sub>FLASH</sub></code>, <code>clk<sub>I/O</sub></code> y <code>clk<sub>ADC</sub></code>)</p>
+
+                <p>Desde el prescalador  del sistema (<code>CLKPR</code> ) hacia el núcleo del procesador, no existe un divisor interno adicional: 1 pulso de <code>clk<sub>CPU</sub></code> equivale a 1 ciclo de  CPU (a diferencia de las familias PIC tradicionales de 8 bits, que dividen el reloj de entrada entre 4 para formar el ciclo de instrucción)</p>
+                  
+                <p>En la serie <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong>, gracias al pipeline de dos etapas de la arquitectura Harvard, la mayoría de las instrucciones se ejecutan en 1 ciclo de CPU (1 pulso de clkCPU). </p>
+
+                
                 <p>Los microcontroladores AVR se basan en una arquitectura RISC mejorada que implementa una canalización (<em>pipelining</em>) de dos etapas (<em>Two-Stage Pipelining</em>):
                   <ul>
                     <li><strong>1. Búsqueda (Fetch)</strong>: Se extrae la instrucción de la memoria de programa.</li>
@@ -70,12 +77,22 @@
                 <p>
                   El pipeline del <strong>AVR</strong>  procesa la búsqueda de la siguiente instrucción al mismo tiempo que ejecuta la instrucción actual. Debido a este solapamiento, en cada ciclo de reloj se termina de ejecutar una instrucción. 
                 </p>
-                <p>
-                  Esto significa que la gran mayoría de las instrucciones se ejecutan en un solo ciclo de reloj (CLK<SUB>CPU</SUB>). Por lo tanto, el reloj determina directamente la velocidad de procesamiento del microcontrolador, alcanzando un rendimiento de hasta 20 MIPS (millones de instrucciones por segundo)a 20 MHz.</p>
-                </p>  
 
                 <p>
-                  La siguiente figura muestra la búsqueda y ejecución paralela de instrucciones, posible gracias a la arquitectura Harvard y al concepto de registro de acceso rápido.</p>
+                  Esto significa que la gran mayoría de las instrucciones se ejecutan en un solo ciclo de reloj (<code>clk<sub>CPU</sub></code>). Por lo tanto, el reloj determina directamente la velocidad de procesamiento del microcontrolador, alcanzando un rendimiento de hasta 20 MIPS (millones de instrucciones por segundo) a 20 MHz.</p>
+                </p>
+
+                <div class="tech-card">
+  <span class="tech-card-title">Diferentes periodos de reloj, según su frecuencia:</span>
+  <ul>
+    <li><strong>1 MHz</strong>:  0,000001 s    = 0,001 ms = 1 µs </li>
+    <li><strong>4 MHz</strong>:  0,00000025 s  = 0,250 µs = 250 ns.</li>
+    <li><strong>8 MHz</strong>:  0,000000125 s = 0,125 µs = 125 ns.</li>
+    <li><strong>20 MHz</strong>: 0,00000005 s  = 0,050 µs = 50 ns.</li>
+  </ul>
+</div>
+                <p>
+                  La siguiente figura ilustra la búsqueda y ejecución paralela de instrucciones, posible gracias a la arquitectura Harvard y al concepto de registro de acceso rápido.</p>
                 </p>
                 <img src="img/avr_two_stage_pipelining.png" alt="Pipeline de dos etapas del AVR" class="imagen-centrada">           
             </section>           
@@ -110,7 +127,9 @@
             <section>
                 <h2>3. BITS DE CONFIGURACIÓN DE RELOJ EN REGISTROS DE FUSIBLES</h2>
                 <p >
-                  Los bits de fusibles son celdas de memoria no volátil independientes del espacio de programa Flash. No se pueden modificar mediante instrucciones normales de ejecución de código en C o ensamblador (a menos que se use programación paralela, SPI de alto voltaje o bootloaders dedicados). Aqui los configuraremos por la línea de comandos usando el softaware <strong>AVR-DUDE</strong> y el programador <strong>USBasp</strong>.
+                  Los bits de fusibles son pequeñas celdas de memoria no volátil dedicadas exclusivamente a guardar ajustes de hardware del microcontrolador (qué fuente de reloj usar, si activar el Brown-Out Detector, tamaño del bootloader, etc.). </p>
+                  <p>Cambiar un fusible no borra el programa de la memoria Flash, y el programa en la Flash no puede reescribir los fusibles libremente como si fueran memoria RAM normal.</p>
+                  <p> Los valores de los fusibles no se pueden modificar mediante instrucciones normales de ejecución de código en C o ensamblador (a menos que se use programación paralela, SPI de alto voltaje o bootloaders dedicados). Aqui los configuraremos por la <STRONG>línea de comandos</STRONG> usando el softaware <strong>AVR-DUDE</strong> y el programador <strong>USBasp</strong>.
             </p>
                 <h3>3.1. EL BYTE lfuse (LOW FUSE) </h3>
                 <p>
@@ -120,7 +139,7 @@
                   El <code>lfuse</code> de un <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong> consta de 8 bits, donde un bit en <code>0</code> significa programado/activo y en <code>1</code> significa no programado/inactivo.
                 </p>
 <div class="tech-header">
-  <h4>BYTE FUSIBLE  BAJO: lfuse (LOW FUSE) </h4>
+  <h4>BYTE lfuse (LOW FUSE) </h4>
   <p class="tech-subtitle">lfuse en ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P· </p>
 </div>
 <div class="bits-grid">
@@ -145,11 +164,27 @@
             </div>
             <div class="tech-card-item">
               <span class="tech-card-title">CKOUT. Salida de reloj del sistema por PBO</span> <strong>Bit 6</strong>
-              <p><span class="badge-val badge-yellow">CKOUT</span>: permite que el reloj del sistema se emita a  su frecuencia exacta por el pin <code>PB0/CLKO</code> del dispositivo, pin 14 en el encapsulado DIP28 de la serie, dejando  de funcionar como un pin digital común y corriente y se convierte automáticamente en una <strong>salida de hardware</strong>.  La señal de reloj estará presente en la salida durante el estado de <em>reset</em>. Se puede seleccionar cualquier fuente de reloj, incluido el <strong>oscilador RC interno</strong>, para emitir la señal de reloj a través de <code>CLKO</code>. Si se utiliza el preescalador del reloj del sistema (<em>System Clock Prescaler</em>), la señal obtenida en la salida será el reloj del sistema ya dividido </p>
-              <p><code>0</code> Habilitado (Programado). El pin PB0/CLKO emite la señal de reloj del sistema.</p>
-              <p><code>1</code> Deshabilitado (No programado). El pin PB0/CLKO funciona como un pin digital normal. </p>
+              <p><span class="badge-val badge-yellow">CKOUT</span>: permite que el reloj del sistema se emita a  su frecuencia exacta por el pin <code>PB0/CLKO</code> del dispositivo, pin 14 en el encapsulado DIP28 de la serie, dejando  de funcionar como un pin digital común y corriente y se convierte automáticamente en una <strong>salida de hardware</strong>.  </p>
+              <p><code>0</code> Habilitado (Programado). El pin <code>PB0/CLKO</code> emite la señal de reloj del sistema.</p>
+              <p><code>1</code> Deshabilitado (No programado). El pin <code>PB0/CLKO</code> funciona como un pin digital normal. </p>
             </div>
           </div>
+
+          <div class="note-box note-primary">
+  <i class="note-icon">1</i>
+  <div>
+    <strong>Nota 1:</strong>
+    Si se habilita <code>CKOUT</code>, la señal de reloj estará presente en la salida también durante el estado de <em>reset</em>. 
+  </div>
+  <i class="note-icon">2</i>
+  <div> <strong>Nota 2:</strong>
+  Se puede seleccionar cualquier fuente de reloj, incluido el <strong>oscilador RC interno</strong>, para emitir la señal de reloj a través del pin <code>PB0/CLKO</code>. 
+  </div>
+  <i class="note-icon">3</i>
+    <div> <strong>Nota 3:</strong>
+    Si se utiliza el preescalador del reloj del sistema (<em>System Clock Prescaler</em>), la señal obtenida en la salida será el reloj del sistema ya dividido </p>
+  </div>
+</div>
     
             <p>Los otros fusibles <code>SUT1...0</code> y <code>CKSEL3...0</code> se utilizan para seleccionar la fuente de reloj, el tipo de oscilador  y el tiempo de arranque del oscilador. La combinación de estos bits determina el comportamiento del sistema de reloj del microcontrolador al arrancar y durante su operación normal.</p>
             <img src="img/CKSEL-SUT.png" alt="Bits de lfuse y significado de SUT1...0 y CKSEL3...0" class="imagen-centrada">
@@ -161,13 +196,14 @@
 
 <h4>Paso 1 — Comprobar comunicación</h4>
 <pre><code>
-#Primero nos aseguramos que el <strpoong>USBasp</strpoong> puede comunicarse con el ATmega328P, mostrando información detallada en pantalla sin modificar ninguna memoria:
-avrdude -c usbasp -p m328p -v
+#Primero nos aseguramos que el <strpoong>USBasp</strpoong> puede comunicarse con el ATmega328P, 
+#mostrando información detallada en pantalla sin modificar ninguna memoria:
+avrdude -c usbasp -p m88pa -v
 </code></pre>
 <ul>
   <li><code>avrdude</code>: Es el programa principal (<em>AVR Downloader/UploaDEr</em>) que gestiona la comunicación con el microcontrolador.</li>
   <li><code>-c usbasp</code>: Indica el <strong>programador</strong> (<em>programmer</em>) físico que estás utilizando (USBasp).</li>
-  <li><code>-p m328p</code>: Especifica el modelo del <strong>microcontrolador</strong> (<em>part</em>) que está conectado (ATmega328P) al programador.</li>
+  <li><code>-p m88pa</code>: Especifica el modelo del <strong>microcontrolador</strong> (<em>part</em>) que está conectado (ATmega88PA) al programador.</li>
   <li><code>-v</code>: Activa el <strong>modo detallado</strong> (<em>verbose</em>). Le pide al programa que muestre en pantalla toda la información técnica de la conexión, como la firma del chip (<em>Device signature</em>) y los valores actuales de todos los fusibles, confirmando así que el cableado funciona correctamente.</li>
 </ul>
 
