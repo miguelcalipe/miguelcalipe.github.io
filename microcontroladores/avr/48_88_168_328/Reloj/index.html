@@ -49,15 +49,25 @@
                 El reloj o señal de reloj es una señal de onda cuadrada de alta frecuencia que gobierna y rige cada uno de los eventos secuenciales del circuito lógico síncrono.
               </p>
 
-              <p>El sistema de reloj del AVR es un subsistema complejo que proporciona la señal de reloj para el núcleo (core) y los periféricos. El sistema de reloj del AVR es flexible y puede configurarse para satisfacer las necesidades de la aplicación. </p>
+              <p>En este artículo conoceremos el funcionamiento del reloj de un dispositivo de la serie <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong>, como seleccionar la fuente de oscilación  y como configurarlo desde la línea de comandos usando un programador <strong>USBasp</strong>. Para la pŕactica usaremos un microcontrolador <strong>ATmega88PA</strong></p>
 
-              <p>
-                La CPU de un AVR está construida internamente como una máquina de estados finitos compleja y circuitos secuenciales (basados en flip-flops). Sin una transición de flanco de reloj (de bajo a alto, o flanco de subida), los periféricos, los registros internos, los contadores y la Unidad Lógica Aritmética (ALU) simplemente permanecerían estáticos. Cada ciclo de reloj (CK) le indica a los transistores cuándo dispararse, cuándo propagar los datos a través del bus interno y cuándo almacenar el resultado en los registros de trabajo o en la memoria SRAM.
-              </p>
+              <p>La conexión del programador <strong>USBasp</strong> con el dispositivo la hemos visto en <a href="/microcontroladores/avr/programacion/bare-metal/programador/index.html" target="blank"> CONEXIÓN DEL PROGRAMADOR ISP USBasp POR BUS SERIAL SPI</a>. Las conexiones que se explican en ese artículo son las mismas que usaremos en este.</p>
+
+              <p>El circuito en el dispositivo sólo será un led por lo que La alimentación del circuito y del microcontrolador será proporcionada por VCC procedente del USBasp.</p>
+
+              <figcaption style="text-align: center;">Conexión USBasp con <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong></figcaption>
+              <img src="/microcontroladores/avr/programacion/bare-metal/programador/img/conexion_USBasp_ATmega_v2.png" alt="Conexión del programador USBasp con el microcontrolador AVR" class="imagen-centrada">
             </section>
             
             <section>
               <h2>1. EJECUCIÓN DE INSTRUCCIONES Y RENDIMIENTO</h2>    
+
+                
+                <p>El sistema de reloj del AVR es un subsistema complejo que proporciona la señal de reloj para el núcleo (core) y los periféricos. El sistema de reloj del AVR es flexible y puede configurarse para satisfacer las necesidades de la aplicación. </p>
+
+              <p>
+                Sin una transición de flanco de reloj, los periféricos, los registros internos, los contadores y la Unidad Lógica Aritmética (ALU) simplemente permanecerían estáticos.
+              </p>
 
                 <p>La <strong>CPU AVR</strong> se controla mediante el reloj de la CPU (clk<sub>CPU</sub>) , generado directamente a partir de la fuente de reloj seleccionada para el chip.</p>
 
@@ -190,27 +200,36 @@
             <img src="img/CKSEL-SUT.png" alt="Bits de lfuse y significado de SUT1...0 y CKSEL3...0" class="imagen-centrada">
 
 <h3>3.2 Lectura de la configuración del fusible <code>lfuse</code> </h3>
-            <p>Cada valor del byte <code>lfuse</code>, establece  características importantes del reloj, la frecuencia del reloj y el arranque; su configuración queda grabada en memoria Flash, de forma tal que no se pierda al cortar la alimentación al microcontrolador. Por eso conviene entender qué hace cada bit antes de modificarlo</p>.  
+            <p>Cada valor del byte <code>lfuse</code>, establece  características importantes del reloj, la frecuencia del reloj y el arranque; su configuración queda grabada en memoria Flash, de forma tal que no se pierda al cortar la alimentación al microcontrolador. Por eso conviene entender qué hace cada bit antes de modificarlo.</p>  
                 
                 <p>Antes de programarlo o configurarlo, vamos a leer el fusible <code>lfuse</code> y seguiremos el siguiente proceso:</p>
 
-<h4>Paso 1 — Comprobar comunicación</h4>
-<pre><code>
-#Primero nos aseguramos que el <strpoong>USBasp</strpoong> puede comunicarse con el ATmega328P, 
-#mostrando información detallada en pantalla sin modificar ninguna memoria:
-avrdude -c usbasp -p m88pa -v
+<h4>Paso 1 — Comprobar comunicación con el dispositivo</h4>
+
+<p>Primero nos aseguramos que el <strpoong>USBasp</strpoong> puede comunicarse con el dispositivo (ATmega88pa), mostrando información detallada en pantalla sin modificar ninguna memoria:
+<pre><code class="language-bash">avrdude -c usbasp -p m88pa
 </code></pre>
 <ul>
   <li><code>avrdude</code>: Es el programa principal (<em>AVR Downloader/UploaDEr</em>) que gestiona la comunicación con el microcontrolador.</li>
-  <li><code>-c usbasp</code>: Indica el <strong>programador</strong> (<em>programmer</em>) físico que estás utilizando (USBasp).</li>
+  <li><code>-c usbasp</code>: Indica el <strong>programador</strong> (<em>programmer</em>) físico que estamos utilizando (USBasp).</li>
   <li><code>-p m88pa</code>: Especifica el modelo del <strong>microcontrolador</strong> (<em>part</em>) que está conectado (ATmega88PA) al programador.</li>
   <li><code>-v</code>: Activa el <strong>modo detallado</strong> (<em>verbose</em>). Le pide al programa que muestre en pantalla toda la información técnica de la conexión, como la firma del chip (<em>Device signature</em>) y los valores actuales de todos los fusibles, confirmando así que el cableado funciona correctamente.</li>
 </ul>
 
+<pre><code class="language-bash">#avrdude mostrará un mensaje de error de no ser posible la comunicación
+avrdude error: program enable: target does not answer (0x01)
+avrdude error: initialization failed, rc=-1
+        - double check the connections and try again
+        - use -B to set lower ISP clock frequency, e.g. -B 125kHz
+        - use -F to override this check
+
+avrdude done.  Thank you.
+</code></pre>
+
 <h4>Paso 2 — Leer el byte lfuse actual</h4>
-<pre><code>
-#Comando para leer el valor del fusible bajo (low fuse) de un microcontrolador ATmega328P y lo muestra en la pantalla en formato hexadecimal.
-avrdude -c usbasp -p m328p -U lfuse:r:-:h
+
+<p>Con el siguiente comando leeremos el valor del fusible bajo (low fuse) de un microcontrolador ATmega88PA y lo muestra en la pantalla en formato hexadecimal.</p>
+<pre><code> avrdude -c usbasp -p m88pa -U lfuse:r:-:h
 </code></pre>
 <ul>
   <li><code>avrdude</code>: Es el programa principal (<em>AVR Downloader/UploaDEr</em>) encargado de comunicarse con el microcontrolador para leer o escribir su memoria.</li>
@@ -226,9 +245,14 @@ avrdude -c usbasp -p m328p -U lfuse:r:-:h
   </li>
 </ul>
 
-<p>Así podemos conocer la configuración actual. </p>
+<p>Así podemos conocer la configuración actual del reloj del microcontrolador. </p>
 
-                <h4>Paso 3 — Decidir la configuración</h4>
+<p>Para modificarla, necesitamos seguir dos pasos adicionales</p>                
+
+<h3>3.3. Proceso de configuración de la Fuente de Reloj</h3>
+
+<p>Luego de leer el valor actual del fusible <code>lfuse</code>, podemos decidir si queremos cambiar la configuración de la fuente de reloj y otros parámetros relacionados. El proceso general para configurar la fuente de reloj implica los siguientes pasos:</p>
+<h4>Paso 3 — Decidir la configuración</h4>
 
 <p>Antes de escribir un solo bit en la memoria del microcontrolador, es fundamental detenerse a planificar cómo va a operar nuestro circuito en el mundo real. Los fusibles controlan el comportamiento de bajo nivel del hardware; un ajuste incorrecto aquí puede dejar el chip inaccesible para el programador si, por ejemplo, le indicamos que busque un cristal externo que no hemos conectado.</p>
 
@@ -241,13 +265,74 @@ avrdude -c usbasp -p m328p -U lfuse:r:-:h
 
 <p>Solo cuando tenemos claras estas decisiones de arquitectura y consumo, pasamos a traducirlas a valores hexadecimales utilizando una calculadora de <em>fuse bits</em> o la hoja de datos (<em>datasheet</em>) del fabricante.</p>
 
+<svg class="tech-svg" viewBox="0 0 680 140" role="img">
+  <title>Proceso de configuración de la Fuente de Reloj</title>
+          <!-- Paso 1 -->
+  <!-- Paso 1 (x: 20 a 150) -->
+  <rect class="c-gray" x="20" y="45" width="130" height="74" rx="8" stroke-width="1"></rect>
+  <text class="th" x="85" y="72" text-anchor="middle">
+    <tspan x="85" dy="0">Comprobar</tspan>
+    <tspan x="85" dy="15">comunicación</tspan>
+  </text>
+  <text class="ts" x="85" y="108" text-anchor="middle">Paso 1</text>
+
+  <path class="wire" d="M150 82 H190"></path>
+  <circle class="node-dot" cx="170" cy="82" r="3"></circle>
+
+  <!-- Paso 2 (x: 190 a 320) -->
+  <rect class="c-teal" x="190" y="45" width="130" height="74" rx="8" stroke-width="1"></rect>
+  <text class="th" x="255" y="79" text-anchor="middle">Leer lfuse</text>
+  <text class="ts" x="255" y="108" text-anchor="middle">Paso 2</text>
+
+  <path class="wire" d="M320 82 H360"></path>
+
+  <!-- Paso 3 (x: 360 a 490) -->
+  <rect class="c-blue" x="360" y="45" width="130" height="74" rx="8" stroke-width="1"></rect>
+  <text class="th" x="425" y="72" text-anchor="middle">
+    <tspan x="425" dy="0">Decidir</tspan>
+    <tspan x="425" dy="15">configuración</tspan>
+  </text>
+  <text class="ts" x="425" y="108" text-anchor="middle">Paso 3</text>
+
+  <path class="wire" d="M490 82 H530"></path>
+
+  <!-- Paso 4 (x: 530 a 660 -> margen derecho de 20px) -->
+  <rect class="c-amber" x="530" y="45" width="130" height="74" rx="8" stroke-width="1"></rect>
+  <text class="th" x="595" y="79" text-anchor="middle">Programar lfuse</text>
+  <text class="ts" x="595" y="108" text-anchor="middle">Paso 4</text>
+</svg>
 
 
-<h3>3.3. Fuente de Reloj por Defecto </h3>
-<p>En un dispositivo de la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong>, con la configuración de fábrica, el valor de lectura de <code>lfuse</code> es  <code>0x62</code> (binario <code>0b01100010</code>).</p>
-            <img src="img/0x62.png" alt="Valor de fábrica por defecto del registro lfuse" class="imagen-centrada">  
+<h3>3.4. Fuente de Reloj por Defecto </h3>
+<p>En un dispositivo de la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong>, con la configuración de fábrica, el valor de lectura de <code>lfuse</code> en hexadecimal es  <code>0x62</code> (en binario <code>0b01100010</code>, en decimal <code>98</code>).</p>
+
+<!-- Variantes de color: .bit-warn | .bit-yellow | .bit-accent | .bit-danger -->
+<div class="bits-grid-9" aria-label="Bits del byte bajo de fusibles">
+  <!-- FILA 1 (Bits 8 a 0) -->
+  <div class="bit-box bit-white"><small>Bitx</small><strong>Mnemonico</strong></div>
+  <div class="bit-box bit-warn"><small>Bit 7</small><strong>CKDIV8</strong></div>
+  <div class="bit-box bit-yellow"><small>Bit 6</small><strong>CKOUT</strong></div>
+  <div class="bit-box bit-accent"><small>Bit 5</small><strong>SUT1</strong></div>
+  <div class="bit-box bit-accent"><small>Bit 4</small><strong>SUT0</strong></div>
+  <div class="bit-box bit-danger"><small>Bit 3</small><strong>CKSEL3</strong></div>
+  <div class="bit-box bit-danger"><small>Bit 2</small><strong>CKSEL2</strong></div>
+  <div class="bit-box bit-danger"><small>Bit 1</small><strong>CKSEL1</strong></div>
+  <div class="bit-box bit-danger"><small>Bit 0</small><strong>CKSEL0</strong></div>
+
+<!-- FILA 2 (Mismos índices y mismos formatos debajo) -->
+  <div class="bit-box bit-white bit-value">Valor</div>
+  <div class="bit-box bit-warn bit-value">0</div>
+  <div class="bit-box bit-yellow bit-value">1</div>
+  <div class="bit-box bit-accent bit-value">1</div>
+  <div class="bit-box bit-accent bit-value">0</div>
+  <div class="bit-box bit-danger bit-value">0</div>
+  <div class="bit-box bit-danger bit-value">0</div>
+  <div class="bit-box bit-danger bit-value">1</div>
+  <div class="bit-box bit-danger bit-value">0</div>
+</div>
+            
                
-                    <p>El dispositivo se suministra de fábrica con el oscilador RC interno (<em>internal RC oscillator</em>) a 8.0 MHz y con el fusible <code>CKDIV8</code> programado, lo que resulta en un reloj del sistema (<em>system clock</em>) de 1.0 MHz. El tiempo de arranque (<em>startup time</em>) se configura al máximo y se habilita el período de tiempo de espera (<em>time-out period</em>).  </p>
+                    <p>El dispositivo se suministra de fábrica con el oscilador RC interno (<em>internal RC oscillator</em>) a 8.0 MHz (<code>CKSEL</code>) y con el fusible <code>CKDIV8</code> programado, lo que resulta en un reloj del sistema (<em>system clock</em>) de 1.0 MHz. El tiempo de arranque (<em>startup time</em>) se configura al máximo y se habilita el período de tiempo de espera (<em>time-out period</em>), <code>SUT</code>. </p>
                       
                     <p>Esta configuración por defecto (<code>CKDIV8 = "0"</code>, <code>CKOUT= "1" </code>, <code>CKSEL = "0010"</code>, <code>SUT = "10"</code>, )garantiza que cualquier usuario pueda establecer la configuración de la fuente de reloj deseada utilizando cualquier interfaz de programación disponible.</p>
 
@@ -257,7 +342,7 @@ avrdude -c usbasp -p m328p -U lfuse:r:-:h
   <thead>
     <tr>
       <th>Bit</th>
-      <th>Nombre</th>
+      <th>Mnemónico</th>
       <th>Valor de Fábrica</th>
       <th>Descripción</th>
     </tr>
@@ -265,51 +350,55 @@ avrdude -c usbasp -p m328p -U lfuse:r:-:h
   <tbody>
     <tr>
       <td>7</td>
-      <td>CKDIV8</td>
-      <td>0</td>
-      <td>Activo: Divide la frecuencia del reloj del sistema por 8.</td>
+      <td><div class="bit-box bit-warn bit-value">CKDIV8</div></td>
+      <td style="text-align: center";>0</td>
+      <td>Activo: Divide la frecuencia del reloj del sistema por 8. Por defecto el reloj del sistema es el Oscilador RC Interno de 8 MHz. Al pasar por el fusible <code>CKDIV8</code>, el reloj del sistema resulta en un reloj de 1.0 MHz.</td>
     </tr>
     <tr>
       <td>6</td>
-      <td>CKOUT</td>
-      <td>1</td>
-      <td>Inactivo: El pin PB0 (Pin físico 14 en empaque DIP28/ Digital 8 en Arduino) funciona como E/S. Si se cambia a 0, emite el reloj del sistema por el pin PB0 .</td>
+      <td><div class="bit-box bit-yellow bit-value">CKOUT</div></td>
+      <td style="text-align: center";>1</td>
+      <td>Inactivo: El pin <code>PB0</code> (Pin físico 14 en empaque DIP28/ pin digital 8 en Arduino) funciona como E/S. </td>
     </tr>
     <tr>
       <td>5</td>
-      <td>SUT1</td>
-      <td>1</td>
-      <td>Tiempo de arranque (Start-up Time). Se combina con SUT0 y CKSEL0.</td>
+      <td><div class="bit-box bit-accent bit-value">SUT1</div></td>
+      <td style="text-align: center";>1</td>
+      <td rowspan="2">Tiempo de arranque (Start-up Time). Se combina con <code>SUT0</code>. <br>
+        El valor <code>SUT1...0</code> = <code>10</code>, configura una <strong>potencia de subida lenta</strong> (<em>Slowly rising power</em>): al encender desde cero (<strong>Reset / Slowly rising power</strong>) el voltaje aún está subiendo, por eso necesita un tiempo de espera de 19 CK + 65 ms  para estabilizar la alimentación. <br>
+        Al despertar de los modos de bajo consumo <stronng>Power-down</stronng> o <strong>Power-save</strong>, la alimentación eléctrica ya está estable y el microcontrolador sólo necesita  exactamente <strong>6 CK</strong>	(<em>Clock Cycles</em>,Ciclos de Reloj) antes de ejecutar la primera instrucción. </td>
     </tr>
     <tr>
       <td>4</td>
-      <td>SUT0</td>
-      <td>0</td>
-      <td>Tiempo de arranque (Start-up Time). Se combina con SUT1 y CKSEL0.</td>
+      <td><div class="bit-box bit-accent bit-value">SUT0</div></td>
+      <td style="text-align: center";>0</td>
+      
+
     </tr>
     <tr>
       <td>3</td>
-      <td>CKSEL3</td>
-      <td>0</td>
-      <td>Selección del tipo de reloj.</td>
+      <td><div class="bit-box bit-danger bit-value">CKSEL3</div></td>
+      <td style="text-align: center";>0</td>
+      <td rowspan="4">Selección del tipo de reloj. Se usa en combinación con <code>CKSEL2</code>, <code>CKSEL1</code> y <code>CKSEL0</code>. 
+      <p>El Valor <code>CKSEL3...0</code> = <code>0010</code> selecciona el <strong>Oscilador RC Calibrado Interno</strong> como reloj del sistema.  </td>
     </tr>
     <tr>
       <td>2</td>
-      <td>CKSEL2</td>
-      <td>0</td>
-      <td>Selección del tipo de reloj.</td>
+      <td><div class="bit-box bit-danger bit-value">CKSEL2</div></td>
+      <td style="text-align: center";>0</td>
+      
     </tr>
     <tr>
       <td>1</td>
-      <td>CKSEL1</td>
-      <td>1</td>
-      <td>Selección del tipo de reloj.</td>
+      <td><div class="bit-box bit-danger bit-value">CKSEL1</div></td>
+      <td style="text-align: center";>1</td>
+      
     </tr>
     <tr>
       <td>0</td>
-      <td>CKSEL0</td>
-      <td>0</td>
-      <td>Selección de reloj. Se combina con SUT1 y SUT0 para los tiempos de arranque.</td>
+      <td><div class="bit-box bit-danger bit-value">CKSEL0</div></td>
+      <td style="text-align: center";>0</td>
+      
     </tr>
   </tbody>
   

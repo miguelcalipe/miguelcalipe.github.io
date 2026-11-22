@@ -450,6 +450,85 @@ pre code {
   }
 }
 
+/* Rejilla de 9 bits y 2 filas */
+.bits-grid-9 {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  grid-template-rows: repeat(2, auto);
+  gap: 6px;
+  margin: 1rem 0;
+}
+
+.bit-box {
+  border-radius: 8px;
+  padding: 8px 4px;
+  text-align: center;
+  border: 1px solid var(--border-color, #cbd5e1);
+  line-height: 1.3;
+}
+
+.bit-box small {
+  display: block;
+  font-size: 0.72rem;
+  opacity: 0.85;
+}
+
+.bit-box strong {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Nuevo estilo para el bit 8 (fondo blanco) */
+.bit-white {
+  background-color: #ffffff;
+  border-color: var(--border-color, #cbd5e1);
+  color: #1e293b;
+}
+
+.bit-warn {
+  background-color: #fef3c7;
+  border-color: #f59e0b;
+  color: #92400e;
+}
+
+.bit-yellow {
+  background-color: #fef08a;
+  border-color: #eab308;
+  color: #713f12;
+}
+
+.bit-accent {
+  background-color: #dbeafe;
+  border-color: #3b82f6;
+  color: #1e40af;
+}
+
+.bit-danger {
+  background-color: #fee2e2;
+  border-color: #ef4444;
+  color: #991b1b;
+}
+
+/* En móvil: permitir scroll horizontal para no romper la alineación vertical de los bits */
+@media (max-width: 640px) {
+  .bits-grid-9 {
+    overflow-x: auto;
+    grid-template-columns: repeat(9, minmax(56px, 1fr));
+  }
+}
+
+/* Segunda fila: número único y grande centrado */
+.bit-box.bit-value {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 1.45rem;
+  font-weight: 700;
+  padding: 10px 4px;
+}
+
 /* Tarjetas técnicas y cuadrícula de 3 columnas */
 .tech-card {
   background-color: var(--bg-color, #f8fafc);

@@ -96,14 +96,86 @@ Bus 004 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
                     Podemos comprobar que el <strong>USBasp</strong> está correctamente conectado y reconocido por el sistema operativo con el siguiente comando, ponemos también a continuación la salida del comando:
                 </p>
 <pre><code class="languaje-c">
-~ $ avrdude -c usbasp -p m88pa
+avrdude -c usbasp -p m88pa
 
 avrdude: AVR device initialized and ready to accept instructions
 avrdude: device signature = 0x1e940b (probably m168pa)
 
 avrdude done.  Thank you.
 </code></pre>
-            </section>
+
+<p>Cuando la comunicación entre USBasp y el microcontrolador no es posible, saldrá un mensaje como este:</p>
+<pre><code class="languaje-c">avrdude error: program enable: target does not answer (0x01)
+avrdude error: initialization failed, rc=-1
+        - double check the connections and try again
+        - use -B to set lower ISP clock frequency, e.g. -B 125kHz
+        - use -F to override this check
+
+avrdude done.  Thank you.
+</code></pre>
+
+<p>Este error significa que <strong>el programador ISP no logra comunicarse con el microcontrolador AVR</strong>. El software (<code>avrdude</code>) intenta poner el chip en modo de programación, pero el microcontrolador no responde.</p>
+
+<h4>Causas principales y cómo solucionarlas</h4>
+
+<div class="note-box note-warning">
+  <i class="note-icon">1</i>
+  <div>
+    <strong>Conexiones físicas incorrectas o sueltas.</strong>
+      <div class="note-sublist">
+      <ul>
+        <li>Revisa que los cables <strong>MOSI, MISO, SCK y RESET</strong> estén conectados a los pines exactos del microcontrolador (no los cruces como en UART).</li>
+        <li>Verifica la continuidad de los cables dupont y que haya una <strong>tierra (GND) común</strong> entre el programador y la placa.</li>
+    </ul>
+    </div>
+  </div>
+  <i class="note-icon">2</i>
+  <div>
+    <strong>Falta de alimentación en el microcontrolador.</strong>
+    <div class="note-sublist">
+        <ul>
+            <li>Muchos programadores (como el USBasp) tienen un jumper para elegir entre 3.3V y 5V, o para decidir si el programador alimenta al chip. Asegúrate de que el microcontrolador esté recibiendo voltaje adecuado.</li>
+        </ul>
+  </div>
+  </div>
+  <i class="note-icon">3</i>
+  <div>
+    <strong>Frecuencia de reloj ISP demasiado alta.</strong>
+    <div class="note-sublist">
+    <ul>
+      <li>Un chip AVR nuevo de fábrica funciona con su oscilador interno a <strong>1 MHz</strong>. Si el programador intenta comunicarse muy rápido, el chip no puede seguirle el ritmo.</li>
+      <li><strong>Solución:</strong> Agrega el parámetro <code>-B 125kHz</code> (o <code>-B 10</code> según la versión de avrdude) en tu comando para bajar la velocidad. Si usas un programador USBasp, algunos tienen un jumper llamado <em>"Slow SCK"</em> que hace lo mismo por hardware.</li>
+    </ul>
+  </div>
+  </div>
+
+  <i class="note-icon">4</i>
+  <div>
+    <strong>Fuses mal configurados o falta de reloj externo.</strong>
+    <div class="note-sublist">
+    <ul>
+      <li>Si el chip fue configurado previamente para usar un cristal externo y este no está conectado (o está dañado), el microcontrolador no tendrá señal de reloj y no responderá.</li>
+      <li><strong>Solución:</strong> Conecta un cristal (por ejemplo, de 8 MHz o 16 MHz) con sus capacitores correspondientes, o inyecta una señal de reloj cuadrada en el pin <strong>XTAL1</strong>.</li>
+    </ul>
+  </div>
+  </div>
+
+  <i class="note-icon">5</i>
+  <div>
+    <strong>Pin RESET deshabilitado o bloqueado.</strong>
+    <div class="note-sublist">
+    <ul>
+      <li>Si algún componente externo (como un capacitor grande) mantiene el pin RESET en estado alto o bajo fijo, el programador no podrá reiniciarlo para iniciar la carga.</li>
+    </ul>
+  </div>
+  </div>
+
+</div>
+
+<div class="alert-box">
+<em><strong>Nota</strong>: Evita usar la bandera <code>-F</code> como sugiere el mensaje; esta solo ignora el error de firma, pero no solucionará la falta de comunicación.</em>
+</div>
+</section>
             <section> 
                 <h2>2. PROGRAMACIÓN ISP, COMUNICACIÓN SPI E INTERFAZ ICSP. </h2>
                     <h3>2.1. Interfaz ICSP</h3>
