@@ -54,8 +54,9 @@
                 En esta guía veremos cómo funciona el sistema de reloj de la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong>, cómo elegir su fuente de oscilación y cómo configurarlo desde la <strong>línea de comandos</strong> usando un programador <strong>USBasp</strong>. Para la parte práctica trabajaremos con un <strong>ATmega88PA</strong>.
               </p>
 
-
-              <p>La conexión del programador <strong>USBasp</strong> con el dispositivo la hemos visto en <a href="/microcontroladores/avr/programacion/bare-metal/programador/index.html" target="blank"> CONEXIÓN DEL PROGRAMADOR ISP USBasp POR BUS SERIAL SPI</a>. Las conexiones que se explican en ese artículo son las mismas que usaremos en este.</p>
+              <p>La conexión del programador <strong>USBasp</strong> con el dispositivo la hemos visto en <a href="/microcontroladores/avr/programacion/bare-metal/programador/index.html" target="blank"> CONEXIÓN DEL PROGRAMADOR ISP USBasp POR BUS SERIAL SPI</a>. Las conexiones para la programación en el circuito (ICSP) que se explican en ese artículo son las mismas que usaremos en este.</p>
+                
+              <p>  Conectaremos el <strong>ATmega88PA</strong> a un circuito mínimo con oscilador interno, descrito en <a href="https://miguelcalipe.github.io/microcontroladores/avr/48_88_168_328/standalone/#seccion-8">CIRCUITO MÍNIMO. μMC STANDALONE</a> </p>
 
               <p>El circuito en el dispositivo sólo será un led por lo que La alimentación del circuito y del microcontrolador será proporcionada por VCC procedente del USBasp.</p>
 
@@ -67,15 +68,15 @@
               <h2>1. EJECUCIÓN DE INSTRUCCIONES Y RENDIMIENTO</h2>    
 
                 
-                <p>El sistema de reloj del AVR es un subsistema complejo que proporciona la señal de reloj para el núcleo (core) y los periféricos. El sistema de reloj del AVR es flexible y puede configurarse para satisfacer las necesidades de la aplicación. </p>
+              <p>El sistema de reloj del AVR es un subsistema complejo que proporciona la señal de reloj para el núcleo (core) y los periféricos. El sistema de reloj del AVR es flexible y puede configurarse para satisfacer las necesidades de la aplicación. </p>
 
               <p>
                 Sin una transición de flanco de reloj, los periféricos, los registros internos, los contadores y la Unidad Lógica Aritmética (ALU) simplemente permanecerían estáticos.
               </p>
 
-                <p>La <strong>CPU AVR</strong> se controla mediante el reloj de la CPU (clk<sub>CPU</sub>) , generado directamente a partir de la fuente de reloj seleccionada para el chip.</p>
+              <p>La <strong>CPU AVR</strong> se controla mediante el reloj de la CPU (clk<sub>CPU</sub>) , generado directamente a partir de la fuente de reloj seleccionada para el chip.</p>
 
-                <p>Una vez seleccionada la fuente de reloj (oscilador RC interno, cristal/resonador externo, reloj externo, etc.) y aplicado el divisor inicial de arranque si corresponde (con el fusible <code>CKDIV8</code>), la señal de reloj pasa por el <em>preescalador del sistema</em> controlado mediante el registro <code>CLKPR</code> (bits CLKPS3:0, con factores de división de 1 hasta 256). Ese reloj ya escalado conforma el <strong>reloj del sistema</strong> y alimenta las ramas síncronas principales del árbol de reloj (<code>clk<sub>CPU</sub></code>, <code>clk<sub>FLASH</sub></code>, <code>clk<sub>I/O</sub></code> y <code>clk<sub>ADC</sub></code>)</p>
+              <p>Una vez seleccionada la fuente de reloj (oscilador RC interno, cristal/resonador externo, reloj externo, etc.) y aplicado el divisor inicial de arranque si corresponde (con el fusible <code>CKDIV8</code>), la señal de reloj pasa por el <em>preescalador del sistema</em> controlado mediante el registro <code>CLKPR</code> (bits CLKPS3:0, con factores de división de 1 hasta 256). Ese reloj ya escalado conforma el <strong>reloj del sistema</strong> y alimenta las ramas síncronas principales del árbol de reloj (<code>clk<sub>CPU</sub></code>, <code>clk<sub>FLASH</sub></code>, <code>clk<sub>I/O</sub></code> y <code>clk<sub>ADC</sub></code>)</p>
 
                 <p>Desde el prescalador  del sistema (<code>CLKPR</code> ) hacia el núcleo del procesador, no existe un divisor interno adicional: 1 pulso de <code>clk<sub>CPU</sub></code> equivale a 1 ciclo de  CPU (a diferencia de las familias PIC tradicionales de 8 bits, que dividen el reloj de entrada entre 4 para formar el ciclo de instrucción)</p>
                   
