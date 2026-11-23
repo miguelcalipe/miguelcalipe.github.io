@@ -35,7 +35,7 @@
         <article>
             <!-- 1. CABECERA DEL ARTÍCULO (.article-header) -->            
             <header class="article-header">
-            <h1>SISTEMAS DE RELOJ Y OPCIONES</h1>
+            <h1>SISTEMAS DE RELOJ Y SU CONFIGURACIÓN</h1>
             
             </header>
             
@@ -54,19 +54,19 @@
                 En esta guía veremos cómo funciona el sistema de reloj de la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong>, cómo elegir su fuente de oscilación y cómo configurarlo desde la <strong>línea de comandos</strong> usando un programador <strong>USBasp</strong>. Para la parte práctica trabajaremos con un <strong>ATmega88PA</strong>.
               </p>
 
-              <p>La conexión del programador <strong>USBasp</strong> con el dispositivo la hemos visto en <a href="/microcontroladores/avr/programacion/bare-metal/programador/index.html" target="blank"> CONEXIÓN DEL PROGRAMADOR ISP USBasp POR BUS SERIAL SPI</a>. Las conexiones para la programación en el circuito (ICSP) que se explican en ese artículo son las mismas que usaremos en este.</p>
-                
               <p>  Conectaremos el <strong>ATmega88PA</strong> a un circuito mínimo con oscilador interno, descrito en <a href="https://miguelcalipe.github.io/microcontroladores/avr/48_88_168_328/standalone/#seccion-8">CIRCUITO MÍNIMO. μMC STANDALONE</a> </p>
 
               <p>El circuito en el dispositivo sólo será un led por lo que La alimentación del circuito y del microcontrolador será proporcionada por VCC procedente del USBasp.</p>
 
-              <figcaption style="text-align: center;">Conexión USBasp con <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong></figcaption>
+              <p>La conexión del programador <strong>USBasp</strong> con el dispositivo la hemos visto en <a href="/microcontroladores/avr/programacion/bare-metal/programador/index.html" target="blank"> CONEXIÓN DEL PROGRAMADOR ISP USBasp POR BUS SERIAL SPI</a>. Las conexiones para la programación en el circuito (ICSP) que se explican en ese artículo son las mismas que usaremos aquí.</p>
+                
+              
+              <figcaption style="text-align: center;">Conexión <strong>USBasp</strong> con <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong></figcaption>
               <img src="/microcontroladores/avr/programacion/bare-metal/programador/img/conexion_USBasp_ATmega_v2.png" alt="Conexión del programador USBasp con el microcontrolador AVR" class="imagen-centrada">
             </section>
             
             <section>
-              <h2>1. EJECUCIÓN DE INSTRUCCIONES Y RENDIMIENTO</h2>    
-
+              <h2>1. EJECUCIÓN DE INSTRUCCIONES Y RENDIMIENTO</h2> 
                 
               <p>El sistema de reloj del AVR es un subsistema complejo que proporciona la señal de reloj para el núcleo (core) y los periféricos. El sistema de reloj del AVR es flexible y puede configurarse para satisfacer las necesidades de la aplicación. </p>
 
