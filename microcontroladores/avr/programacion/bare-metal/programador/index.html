@@ -143,8 +143,13 @@ avrdude done.  Thank you.
     <strong>Frecuencia de reloj ISP demasiado alta.</strong>
     <div class="note-sublist">
     <ul>
-      <li>Un chip AVR nuevo de fábrica funciona con su oscilador interno a <strong>1 MHz</strong>. Si el programador intenta comunicarse muy rápido, el chip no puede seguirle el ritmo.</li>
-      <li><strong>Solución:</strong> Agrega el parámetro <code>-B 125kHz</code> (o <code>-B 10</code> según la versión de avrdude) en tu comando para bajar la velocidad. Si usas un programador USBasp, algunos tienen un jumper llamado <em>"Slow SCK"</em> que hace lo mismo por hardware.</li>
+      <li>Un dispositivo de la serie <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong>, nuevo de fábrica viene configurado con su oscilador interno de 8 MHz y el divisor por 8 activado (CKDIV8), por lo que corre a 1 MHz. Si el USBasp intenta comunicarse demasiado rápido, el chip no alcanza a responder y arroja <em>target does not answer</em>.</li>
+        <ul>
+            <li><strong>Solución:</strong> Agrega el parámetro <code>-B 125kHz</code> (o <code>-B 10</code> según la versión de avrdude) en tu comando para bajar la velocidad. Este aregumento ajusta <strong>la velocidad del reloj de comunicación (SCK)</strong> con la que el programador USBasp le habla al microcontrolador durante la transferencia de datos.El número que acompaña al argumento puede ser ajustado según la respuesta del chip; valores más altos significan comunicación más lenta. </li> 
+                <pre><code>avrdude -c usbasp -p atmega328p -B 10</code></pre></li>
+            <li>Algunos programadores USBasp tienen un jumper JP3 llamado <em>"Slow SCK"</em> que hace lo mismo por hardware. </li>
+            </ul>
+    </ul>
     </ul>
   </div>
   </div>

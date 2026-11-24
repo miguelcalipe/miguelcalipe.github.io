@@ -1,17 +1,16 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistemas de Reloj y Opciones del Reloj | MC Mundo Tech</title>
-    <meta name="description" content="El reloj o señal de reloj es una señal de onda cuadrada de alta frecuencia que gobierna y rige cada uno de los eventos secuenciales del circuito lógico síncrono. El sistema de reloj del AVR es un subsistema complejo que proporciona la señal de reloj para el núcleo (core) y los periféricos. El sistema de reloj del AVR es flexible y puede configurarse para satisfacer las necesidades de la aplicación. ">
-
-    <!-- Hojas de estilo globales y de artículo -->
-    <link rel="stylesheet" href="/assets/css/principal.css">
-    <link rel="stylesheet" href="/assets/css/articulo.css">
-    
-    <!-- Configuración de MathJax para fórmulas -->
-    <script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sistemas de reloj y opciones de configuración | MC Mundo Tech</title>
+<meta content="El reloj o señal de reloj es una señal de onda cuadrada de alta frecuencia que gobierna y rige cada uno de los eventos secuenciales del circuito lógico síncrono. El sistema de reloj del AVR es un subsistema complejo que proporciona la señal de reloj para el núcleo (core) y los periféricos. El sistema de reloj del AVR es flexible y puede configurarse para satisfacer las necesidades de la aplicación. " name="description"/>
+<!-- Hojas de estilo globales y de artículo -->
+<link href="/assets/css/principal.css" rel="stylesheet"/>
+<link href="/assets/css/articulo.css" rel="stylesheet"/>
+<!-- Configuración de MathJax para fórmulas -->
+<script>
         MathJax = {
             tex: {
                 inlineMath: [['$', '$']],
@@ -19,492 +18,168 @@
             }
         };
     </script>
-
-    <script async
-        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
-    </script>
+<script async="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
 </head>
-
-<body id="inicio" class="articulo">
-    <!-- Componentes dinámicos cargados por componentes.js -->
-    <header id="site-header"> </header>
-    <nav id="menu"></nav>
-    <div id="migas-pan"></div>
-
-    <main>        
-        <article>
-            <!-- 1. CABECERA DEL ARTÍCULO (.article-header) -->            
-            <header class="article-header">
-            <h1>SISTEMAS DE RELOJ Y SU CONFIGURACIÓN</h1>
-            
-            </header>
-            
-            <!-- 2. ÍNDICE DINÁMICO (#indice) -->            
-            <aside id="indice"></aside>    
-            
-            <!-- CONTENIDO DEL ARTÍCULO   -->
-            <section>
-              <h2>INTRODUCCIÓN</h2>
-              
-              <p>
+<body class="articulo" id="inicio">
+<!-- Componentes dinámicos cargados por componentes.js -->
+<header id="site-header"> </header>
+<nav id="menu"></nav>
+<div id="migas-pan"></div>
+<main>
+<article>
+<!-- 1. CABECERA DEL ARTÍCULO (.article-header) -->
+<header class="article-header">
+<h1>SISTEMAS DE RELOJ Y OPCIONES DE CONFIGURACIÓN EN LOS ATmega48A/PA, ATmega88A/PA, ATmega168A/PA Y ATmega328/P</h1>
+</header>
+<!-- 2. ÍNDICE DINÁMICO (#indice) -->
+<aside id="indice"></aside>
+<!-- CONTENIDO DEL ARTÍCULO   -->
+<section>
+<h2>INTRODUCCIÓN</h2>
+<p>
                 La señal de reloj es una onda cuadrada que marca el ritmo de operación del microcontrolador y sincroniza la ejecución de sus instrucciones y periféricos.
               </p>
-
-              <p>
+<p>
                 En esta guía veremos cómo funciona el sistema de reloj de la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong>, cómo elegir su fuente de oscilación y cómo configurarlo desde la <strong>línea de comandos</strong> usando un programador <strong>USBasp</strong>. Para la parte práctica trabajaremos con un <strong>ATmega88PA</strong>.
               </p>
-
-              <p>  Conectaremos el <strong>ATmega88PA</strong> a un circuito mínimo con oscilador interno, descrito en <a href="https://miguelcalipe.github.io/microcontroladores/avr/48_88_168_328/standalone/#seccion-8">CIRCUITO MÍNIMO. μMC STANDALONE</a> </p>
-
-              <p>El circuito en el dispositivo sólo será un led por lo que La alimentación del circuito y del microcontrolador será proporcionada por VCC procedente del USBasp.</p>
-
-              <p>La conexión del programador <strong>USBasp</strong> con el dispositivo la hemos visto en <a href="/microcontroladores/avr/programacion/bare-metal/programador/index.html" target="blank"> CONEXIÓN DEL PROGRAMADOR ISP USBasp POR BUS SERIAL SPI</a>. Las conexiones para la programación en el circuito (ICSP) que se explican en ese artículo son las mismas que usaremos aquí.</p>
-                
-              
-              <figcaption style="text-align: center;">Conexión <strong>USBasp</strong> con <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong></figcaption>
-              <img src="/microcontroladores/avr/programacion/bare-metal/programador/img/conexion_USBasp_ATmega_v2.png" alt="Conexión del programador USBasp con el microcontrolador AVR" class="imagen-centrada">
-            </section>
-            
-            <section>
-              <h2>1. EJECUCIÓN DE INSTRUCCIONES Y RENDIMIENTO</h2> 
-                
-              <p>El sistema de reloj del AVR es un subsistema complejo que proporciona la señal de reloj para el núcleo (core) y los periféricos. El sistema de reloj del AVR es flexible y puede configurarse para satisfacer las necesidades de la aplicación. </p>
-
-              <p>
+<p>  Conectaremos el <strong>ATmega88PA</strong> a un circuito mínimo con oscilador interno, descrito en <a href="https://miguelcalipe.github.io/microcontroladores/avr/48_88_168_328/standalone/#seccion-8">CIRCUITO MÍNIMO. μMC STANDALONE</a> </p>
+<p>El circuito en el dispositivo sólo será un led por lo que La alimentación del circuito y del microcontrolador será proporcionada por <strong>VCC</strong> procedente del <strong>USBasp</strong>.</p>
+<p>La conexión del programador <strong>USBasp</strong> con el dispositivo la hemos visto en <a href="/microcontroladores/avr/programacion/bare-metal/programador/index.html" target="blank"> CONEXIÓN DEL PROGRAMADOR ISP USBasp POR BUS SERIAL SPI</a>. Las conexiones para la programación en el circuito (ICSP) que se explican en ese artículo son las mismas que usaremos aquí.</p>
+<figcaption style="text-align: center;">Conexión <strong>USBasp</strong> con <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong></figcaption>
+<img alt="Conexión del programador USBasp con el microcontrolador AVR" class="imagen-centrada" src="/microcontroladores/avr/programacion/bare-metal/programador/img/conexion_USBasp_ATmega_v2.png"/>
+</section><section>
+<h2>1. RELOJ DEL SISTEMA, EJECUCIÓN DE INSTRUCCIONES Y RENDIMIENTO</h2>
+<p>El sistema de reloj del AVR es un subsistema complejo que proporciona la señal de reloj para el núcleo (core) y los periféricos. El sistema de reloj del AVR es flexible y puede configurarse para satisfacer las necesidades de la aplicación. </p>
+<p>
                 Sin una transición de flanco de reloj, los periféricos, los registros internos, los contadores y la Unidad Lógica Aritmética (ALU) simplemente permanecerían estáticos.
               </p>
-
-              <p>La <strong>CPU AVR</strong> se controla mediante el reloj de la CPU (clk<sub>CPU</sub>) , generado directamente a partir de la fuente de reloj seleccionada para el chip.</p>
-
-              <p>Una vez seleccionada la fuente de reloj (oscilador RC interno, cristal/resonador externo, reloj externo, etc.) y aplicado el divisor inicial de arranque si corresponde (con el fusible <code>CKDIV8</code>), la señal de reloj pasa por el <em>preescalador del sistema</em> controlado mediante el registro <code>CLKPR</code> (bits CLKPS3:0, con factores de división de 1 hasta 256). Ese reloj ya escalado conforma el <strong>reloj del sistema</strong> y alimenta las ramas síncronas principales del árbol de reloj (<code>clk<sub>CPU</sub></code>, <code>clk<sub>FLASH</sub></code>, <code>clk<sub>I/O</sub></code> y <code>clk<sub>ADC</sub></code>)</p>
-
-                <p>Desde el prescalador  del sistema (<code>CLKPR</code> ) hacia el núcleo del procesador, no existe un divisor interno adicional: 1 pulso de <code>clk<sub>CPU</sub></code> equivale a 1 ciclo de  CPU (a diferencia de las familias PIC tradicionales de 8 bits, que dividen el reloj de entrada entre 4 para formar el ciclo de instrucción)</p>
-                  
-                <p>En la serie <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong>, gracias al pipeline de dos etapas de la arquitectura Harvard, la mayoría de las instrucciones se ejecutan en 1 ciclo de CPU (1 pulso de clkCPU). </p>
-
-                
-                <p>Los microcontroladores AVR se basan en una arquitectura RISC mejorada que implementa una canalización (<em>pipelining</em>) de dos etapas (<em>Two-Stage Pipelining</em>):
-                  <ul>
-                    <li><strong>1. Búsqueda (Fetch)</strong>: Se extrae la instrucción de la memoria de programa.</li>
-                    <li><strong>2. Ejecución (Execute)</strong>: Se decodifica y se ejecuta li instrucción.</li>
-                  </ul>
-                  
-                <p>
+<p>La <strong>CPU AVR</strong> se controla mediante el reloj de la CPU (clk<sub>CPU</sub>) , generado directamente a partir de la fuente de reloj seleccionada para el chip.</p>
+<p>Una vez seleccionada la fuente de reloj (oscilador RC interno, cristal/resonador externo, reloj externo, etc.) y aplicado el divisor inicial de arranque si corresponde (con el fusible <code>CKDIV8</code>), la señal de reloj pasa por el <em>preescalador del sistema</em> controlado mediante el registro <code>CLKPR</code> (bits CLKPS3:0, con factores de división de 1 hasta 256). Ese reloj ya escalado conforma el <strong>reloj del sistema</strong> y alimenta las ramas síncronas principales del árbol de reloj (<code>clk<sub>CPU</sub></code>, <code>clk<sub>FLASH</sub></code>, <code>clk<sub>I/O</sub></code> y <code>clk<sub>ADC</sub></code>)</p>
+<p>Desde el prescalador  del sistema (<code>CLKPR</code> ) hacia el núcleo del procesador, no existe un divisor interno adicional: 1 pulso de <code>clk<sub>CPU</sub></code> equivale a 1 ciclo de  CPU (a diferencia de las familias PIC tradicionales de 8 bits, que dividen el reloj de entrada entre 4 para formar el ciclo de instrucción)</p>
+<p>En la serie <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong>, gracias al pipeline de dos etapas de la arquitectura Harvard, la mayoría de las instrucciones se ejecutan en 1 ciclo de CPU (1 pulso de clkCPU). </p>
+<p>Los microcontroladores AVR se basan en una arquitectura RISC mejorada que implementa una canalización (<em>pipelining</em>) de dos etapas (<em>Two-Stage Pipelining</em>):
+                  <ol>
+<li><strong>Búsqueda (Fetch)</strong>: Se extrae la instrucción de la memoria de programa.</li>
+<li><strong>Ejecución (Execute)</strong>: Se decodifica y se ejecuta li instrucción.</li>
+</ol>
+<p>
                   El pipeline del <strong>AVR</strong>  procesa la búsqueda de la siguiente instrucción al mismo tiempo que ejecuta la instrucción actual. Debido a este solapamiento, en cada ciclo de reloj se termina de ejecutar una instrucción. 
                 </p>
-
-                <p>
+<p>
                   Esto significa que la gran mayoría de las instrucciones se ejecutan en un solo ciclo de reloj (<code>clk<sub>CPU</sub></code>). Por lo tanto, el reloj determina directamente la velocidad de procesamiento del microcontrolador, alcanzando un rendimiento de hasta 20 MIPS (millones de instrucciones por segundo) a 20 MHz.</p>
-                </p>
-
-                <div class="tech-card">
-  <span class="tech-card-title">Diferentes periodos de reloj, según su frecuencia:</span>
-  <ul>
-    <li><strong>1 MHz</strong>:  0,000001 s    = 0,001 ms = 1 µs </li>
-    <li><strong>4 MHz</strong>:  0,00000025 s  = 0,250 µs = 250 ns.</li>
-    <li><strong>8 MHz</strong>:  0,000000125 s = 0,125 µs = 125 ns.</li>
-    <li><strong>20 MHz</strong>: 0,00000005 s  = 0,050 µs = 50 ns.</li>
-  </ul>
+</p>
+<div class="tech-card">
+<span class="tech-card-title">Diferentes periodos de reloj, según su frecuencia:</span>
+<ul>
+<li><strong>1 MHz</strong>:  0,000001 s    = 0,001 ms = 1 µs </li>
+<li><strong>4 MHz</strong>:  0,00000025 s  = 0,250 µs = 250 ns.</li>
+<li><strong>8 MHz</strong>:  0,000000125 s = 0,125 µs = 125 ns.</li>
+<li><strong>20 MHz</strong>: 0,00000005 s  = 0,050 µs = 50 ns.</li>
+</ul>
 </div>
-                <p>
+<p>
                   La siguiente figura ilustra la búsqueda y ejecución paralela de instrucciones, posible gracias a la arquitectura Harvard y al concepto de registro de acceso rápido.</p>
-                </p>
-                <img src="img/avr_two_stage_pipelining.png" alt="Pipeline de dos etapas del AVR" class="imagen-centrada">           
-            </section>           
-
-            <section>
-                <h2>2. SISTEMAS DE RELOJ Y SU DISTRIBUCIÓN </h2>
-                
-                <p>
+<img alt="Pipeline de dos etapas del AVR" class="imagen-centrada" src="img/avr_two_stage_pipelining.png"/>
+</section><section>
+<h2>2. SISTEMA DE RELOJ Y DISTRIBUCIÓN DE LAS SEÑALES DE RELOJ</h2>
+<p>
                   Dentro del <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong> , la señal del reloj principal no alimenta a todo de la misma manera; se distribuye a través de un árbol de distribución de reloj  hacia subsistemas especializados e independientes para optimizar el consumo de energía
                 </p>
-                <p>La Figura siguiente detalla los subsistemas de reloj en el <strong>AVR</strong> y cómo se distribuyen entre ellos. No es necesario que todas las fuentes de reloj estén activas en un momento dado. La flexibilidad de la arquitectura del reloj ayuda a reducir el consumo de energía  al conectar únicamente los subsistemas de reloj periféricos necesarios para la aplicación en ejecución, tal como se describe en ”Power Management and Sleep Modes”.</p>
-                <img src="img/clock_distribution_avr_por_zonas.png" alt="Subsistemas de reloj del AVR y su distribución entre ellos" class="imagen-centrada"> 
-
-                
-                <h3>2.1. Reloj de la CPU (CPU Clock) – clk<sub>CPU</sub></h3>
-                <p>El reloj de la CPU se encarga de dirigir los circuitos principales del núcleo (core), los cuales operan en los registros de trabajo de propósito general (general purpose working registers), la <strong>unidad lógica aritmética (ALU)</strong> y la <strong>memoria de datos (SRAM)</strong>. El acceso a la memoria <strong>Flash</strong> y a la <strong>EEPROM</strong> también depende del reloj de la CPU.</p>
-
-                <h3>2.2. Reloj de E/S (I/O Clock) – clk<sub>I/O</sub></h3>
-                <p>El <strong>reloj de E/S</strong> se utiliza para la mayoría de los periféricos, tales como los temporizadores/contadores (Timer/Counters), la interfaz serial universal (USART), la interfaz periférica serial (SPI) y el convertidor analógico-digital (ADC). El <strong>reloj de E/S</strong> también es utilizado por el subsistema de interrupciones externas (external interrupts).</p>
-                <p><em>Nota: Para minimizar el consumo de energía en los modos de suspensión (sleep modes), el reloj de E/S puede detenerse para determinados periféricos.</em></p>
-
-                <h3>2.3. Reloj de Flash (Flash Clock) – clk<sub>FLASH</sub></h3>
-                <p>El reloj de Flash controla la interfaz del bus de la memoria Flash (Flash memory bus interface). El reloj de Flash opera normalmente al mismo ritmo que el reloj de la CPU (clk<sub>CPU</sub>).</p>
-
-                <h3>2.4. Reloj Asíncrono (Asynchronous Clock) – clk<sub>ASY</sub>></h3>
-                <p>El reloj asíncrono permite que determinados periféricos (como el Temporizador/Contador2) operen de forma independiente del reloj principal de la CPU (clk<sub>CPU</sub>). Esto es especialmente útil cuando se utiliza un oscilador externo de baja frecuencia (como un cristal de reloj de 32.768 kHz) para el conteo en tiempo real (RTC).</p>
-
-                <h3>2.5. Reloj del ADC (ADC Clock) – clk<sub>ADC</sub> </h3>
-                <p>El convertidor analógico-digital (ADC) cuenta con su propio reloj dedicado para permitir la conversión de señales analógicas mientras el reloj de E/S se encuentra detenido o ralentizado (por ejemplo, en el modo de reducción de ruido del ADC - ADC Noise Reduction Mode).</p>
-            </section>
-
-            <section>
-                <h2>3. BITS DE CONFIGURACIÓN DE RELOJ EN REGISTROS DE FUSIBLES</h2>
-                <p >
-                  Los bits de fusibles son pequeñas celdas de memoria no volátil dedicadas exclusivamente a guardar ajustes de hardware del microcontrolador (qué fuente de reloj usar, si activar el Brown-Out Detector, tamaño del bootloader, etc.). </p>
-                  <p>Cambiar un fusible no borra el programa de la memoria Flash, y el programa en la Flash no puede reescribir los fusibles libremente como si fueran memoria RAM normal.</p>
-                  <p> Los valores de los fusibles no se pueden modificar mediante instrucciones normales de ejecución de código en C o ensamblador (a menos que se use programación paralela, SPI de alto voltaje o bootloaders dedicados). Aqui los configuraremos por la <STRONG>línea de comandos</STRONG> usando el softaware <strong>AVR-DUDE</strong> y el programador <strong>USBasp</strong>.
-            </p>
-                <h3>3.1. EL BYTE lfuse (LOW FUSE) </h3>
-                <p>
-                  Los bits de configuración de reloj se encuentran en los registros de fusibles <code>lfuse</code> (LOW FUSE) del microcontrolador. Estos bits determinan la fuente de reloj principal, el divisor de frecuencia y otros parámetros relacionados con el reloj. La configuración adecuada de estos bits es esencial para garantizar un funcionamiento estable y eficiente del microcontrolador en diversas aplicaciones. 
-                </p>
-                <p>
-                  El <code>lfuse</code> de un <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong> consta de 8 bits, donde un bit en <code>0</code> significa programado/activo y en <code>1</code> significa no programado/inactivo.
-                </p>
-<div class="tech-header">
-  <h4>BYTE lfuse (LOW FUSE) </h4>
-  <p class="tech-subtitle">lfuse en ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P· </p>
-</div>
-<div class="bits-grid">
-            <div class="bit-box bit-warn"><small>Bit 7</small><strong>CKDIV8</strong></div>
-            <div class="bit-box bit-yellow"><small>Bit 6</small><strong>CKOUT</strong></div>
-            <div class="bit-box bit-accent"><small>Bit 5</small><strong>SUT1</strong></div>
-            <div class="bit-box bit-accent"><small>Bit 4</small><strong>SUT0</strong></div>
-            <div class="bit-box bit-danger"><small>Bit 3</small><strong>CKSEL3</strong></div>
-            <div class="bit-box bit-danger"><small>Bit 2</small><strong>CKSEL2</strong></div>
-            <div class="bit-box bit-danger"><small>Bit 1</small><strong>CKSEL1</strong></div>
-            <div class="bit-box bit-danger"><small>Bit 0</small><strong>CKSEL0</strong></div>
-          </div>
-
-          <div class="grid-2">
-            <div class="tech-card-item">
-              <span class="tech-card-title">CKDIV8. Divisor de reloj por 8</span><strong>Bit 7</strong>
-              <p><span class="badge-val badge-warn">CKDIV8</span>: permite dividir la frecuencia del reloj del sistema entre 8, al arrancar. Esto es útil para reducir el consumo de energía en aplicaciones que no requieren un alto rendimiento.</p>
-              <p>Si está en <code>0</code> (programado), por defecto divide el reloj del sistema entre 8 al arrancar</p>
-              <p>Si está en <code>1</code> (no programado), el reloj del sistema permanece en su frecuencia original.</p>
-              <p><code>0</code> Dividir por 8. Habilitado (Programado). $F_{cpu} = F_{osc}/8$</p>
-              <p><code>1</code> Sin división. Deshabilitado (No programado). $F_{cpu} = F_{osc}$</p>
-            </div>
-            <div class="tech-card-item">
-              <span class="tech-card-title">CKOUT. Salida de reloj del sistema por PBO</span> <strong>Bit 6</strong>
-              <p><span class="badge-val badge-yellow">CKOUT</span>: permite que el reloj del sistema se emita a  su frecuencia exacta por el pin <code>PB0/CLKO</code> del dispositivo, pin 14 en el encapsulado DIP28 de la serie, dejando  de funcionar como un pin digital común y corriente y se convierte automáticamente en una <strong>salida de hardware</strong>.  </p>
-              <p><code>0</code> Habilitado (Programado). El pin <code>PB0/CLKO</code> emite la señal de reloj del sistema.</p>
-              <p><code>1</code> Deshabilitado (No programado). El pin <code>PB0/CLKO</code> funciona como un pin digital normal. </p>
-            </div>
-          </div>
-
-          <div class="note-box note-primary">
-  <i class="note-icon">1</i>
-  <div>
-    <strong>Nota 1:</strong>
-    Si se habilita <code>CKOUT</code>, la señal de reloj estará presente en la salida también durante el estado de <em>reset</em>. 
-  </div>
-  <i class="note-icon">2</i>
-  <div> <strong>Nota 2:</strong>
-  Se puede seleccionar cualquier fuente de reloj, incluido el <strong>oscilador RC interno</strong>, para emitir la señal de reloj a través del pin <code>PB0/CLKO</code>. 
-  </div>
-  <i class="note-icon">3</i>
-    <div> <strong>Nota 3:</strong>
-    Si se utiliza el preescalador del reloj del sistema (<em>System Clock Prescaler</em>), la señal obtenida en la salida será el reloj del sistema ya dividido </p>
-  </div>
-</div>
-    
-            <p>Los otros fusibles <code>SUT1...0</code> y <code>CKSEL3...0</code> se utilizan para seleccionar la fuente de reloj, el tipo de oscilador  y el tiempo de arranque del oscilador. La combinación de estos bits determina el comportamiento del sistema de reloj del microcontrolador al arrancar y durante su operación normal.</p>
-            <img src="img/CKSEL-SUT.png" alt="Bits de lfuse y significado de SUT1...0 y CKSEL3...0" class="imagen-centrada">
-
-<h3>3.2 Lectura de la configuración del fusible <code>lfuse</code> </h3>
-            <p>Cada valor del byte <code>lfuse</code>, establece  características importantes del reloj, la frecuencia del reloj y el arranque; su configuración queda grabada en memoria Flash, de forma tal que no se pierda al cortar la alimentación al microcontrolador. Por eso conviene entender qué hace cada bit antes de modificarlo.</p>  
-                
-                <p>Antes de programarlo o configurarlo, vamos a leer el fusible <code>lfuse</code> y seguiremos el siguiente proceso:</p>
-
-<h4>Paso 1 — Comprobar comunicación con el dispositivo</h4>
-
-<p>Primero nos aseguramos que el <strpoong>USBasp</strpoong> puede comunicarse con el dispositivo (ATmega88pa), mostrando información detallada en pantalla sin modificar ninguna memoria:
-<pre><code class="language-bash">avrdude -c usbasp -p m88pa
-</code></pre>
-<ul>
-  <li><code>avrdude</code>: Es el programa principal (<em>AVR Downloader/UploaDEr</em>) que gestiona la comunicación con el microcontrolador.</li>
-  <li><code>-c usbasp</code>: Indica el <strong>programador</strong> (<em>programmer</em>) físico que estamos utilizando (USBasp).</li>
-  <li><code>-p m88pa</code>: Especifica el modelo del <strong>microcontrolador</strong> (<em>part</em>) que está conectado (ATmega88PA) al programador.</li>
-  <li><code>-v</code>: Activa el <strong>modo detallado</strong> (<em>verbose</em>). Le pide al programa que muestre en pantalla toda la información técnica de la conexión, como la firma del chip (<em>Device signature</em>) y los valores actuales de todos los fusibles, confirmando así que el cableado funciona correctamente.</li>
-</ul>
-
-<pre><code class="language-bash">#avrdude mostrará un mensaje de error de no ser posible la comunicación
-avrdude error: program enable: target does not answer (0x01)
-avrdude error: initialization failed, rc=-1
-        - double check the connections and try again
-        - use -B to set lower ISP clock frequency, e.g. -B 125kHz
-        - use -F to override this check
-
-avrdude done.  Thank you.
-</code></pre>
-
-<h4>Paso 2 — Leer el byte lfuse actual</h4>
-
-<p>Con el siguiente comando leeremos el valor del fusible bajo (low fuse) de un microcontrolador ATmega88PA y lo muestra en la pantalla en formato hexadecimal.</p>
-<pre><code> avrdude -c usbasp -p m88pa -U lfuse:r:-:h
-</code></pre>
-<ul>
-  <li><code>avrdude</code>: Es el programa principal (<em>AVR Downloader/UploaDEr</em>) encargado de comunicarse con el microcontrolador para leer o escribir su memoria.</li>
-  <li><code>-c usbasp</code>: Especifica el <strong>programador</strong> (<em>programmer</em>) físico que usamos para conectar la computadora al chip (en este caso, un programador USBasp).</li>
-  <li><code>-p m328p</code>: Indica el modelo exacto del <strong>microcontrolador</strong> (<em>part</em>) objetivo. <code>m328p</code> es la abreviatura del ATmega328P (el chip clásico de Arduino Uno y Nano).</li>
-  <li><code>-U</code>: Es la instrucción principal para operar sobre la <strong>memoria</strong> (<em>memory operation</em>). Todo lo que sigue separado por dos puntos define qué hacer:
-    <ul>
-      <li><code>lfuse</code>: Indica el área de memoria a consultar, en este caso el <strong>fusible bajo</strong> (<em>Low Fuse</em>), que controla principalmente la fuente de reloj y el divisor de frecuencia.</li>
-      <li><code>r</code>: Define la operación a realizar: <strong>leer</strong> (<em>read</em>).</li>
-      <li><code>-</code>: Es el nombre del archivo de destino. Al poner un guion, le dices al programa que no lo guarde en ningún archivo, sino que imprima el resultado directamente en la terminal (<strong>salida estándar</strong> o <em>stdout</em>).</li>
-      <li><code>h</code>: Especifica el <strong>formato</strong> en el que quieres ver el dato leído, que aquí es <strong>hexadecimal</strong> (<em>hex</em>, por ejemplo, <code>0xFF</code>).</li>
-    </ul>
-  </li>
-</ul>
-
-<p>Así podemos conocer la configuración actual del reloj del microcontrolador. </p>
-
-<p>Para modificarla, necesitamos seguir dos pasos adicionales</p>                
-
-<h3>3.3. Proceso de configuración de la Fuente de Reloj</h3>
-
-<p>Luego de leer el valor actual del fusible <code>lfuse</code>, podemos decidir si queremos cambiar la configuración de la fuente de reloj y otros parámetros relacionados. El proceso general para configurar la fuente de reloj implica los siguientes pasos:</p>
-<h4>Paso 3 — Decidir la configuración</h4>
-
-<p>Antes de escribir un solo bit en la memoria del microcontrolador, es fundamental detenerse a planificar cómo va a operar nuestro circuito en el mundo real. Los fusibles controlan el comportamiento de bajo nivel del hardware; un ajuste incorrecto aquí puede dejar el chip inaccesible para el programador si, por ejemplo, le indicamos que busque un cristal externo que no hemos conectado.</p>
-
-<p>En esta etapa debemos responder a las siguientes preguntas clave sobre el diseño de nuestro proyecto:</p>
-
-<ul>
-  <li><strong>Fuente de reloj (Clock Source):</strong> ¿De dónde obtendrá el pulso el microcontrolador? Podemos optar por un <strong>oscilador interno RC</strong> (ahorra componentes externos, pero es menos preciso con cambios de temperatura), un <strong>cristal de cuarzo externo</strong> (máxima precisión, ideal para comunicación serial UART o USB) o un <strong>resonador cerámico</strong> (un punto medio más económico y compacto).</li>
-  <li><strong>Frecuencia de operación:</strong> ¿A qué velocidad trabajará el chip? Lo más habitual en el ATmega328P es trabajar a <strong>16 MHz</strong> (con cristal externo a 5V), <strong>8 MHz</strong> (con cristal o reloj interno, ideal para sistemas a 3.3V) o <strong>1 MHz</strong> (el valor de fábrica cuando el divisor interno <code>CKDIV8</code> está activo para bajo consumo).</li>
-  </ul>
-
-<p>Solo cuando tenemos claras estas decisiones de arquitectura y consumo, pasamos a traducirlas a valores hexadecimales utilizando una calculadora de <em>fuse bits</em> o la hoja de datos (<em>datasheet</em>) del fabricante.</p>
-
-<svg class="tech-svg" viewBox="0 0 680 140" role="img">
-  <title>Proceso de configuración de la Fuente de Reloj</title>
-          <!-- Paso 1 -->
-  <!-- Paso 1 (x: 20 a 150) -->
-  <rect class="c-gray" x="20" y="45" width="130" height="74" rx="8" stroke-width="1"></rect>
-  <text class="th" x="85" y="72" text-anchor="middle">
-    <tspan x="85" dy="0">Comprobar</tspan>
-    <tspan x="85" dy="15">comunicación</tspan>
-  </text>
-  <text class="ts" x="85" y="108" text-anchor="middle">Paso 1</text>
-
-  <path class="wire" d="M150 82 H190"></path>
-  <circle class="node-dot" cx="170" cy="82" r="3"></circle>
-
-  <!-- Paso 2 (x: 190 a 320) -->
-  <rect class="c-teal" x="190" y="45" width="130" height="74" rx="8" stroke-width="1"></rect>
-  <text class="th" x="255" y="79" text-anchor="middle">Leer lfuse</text>
-  <text class="ts" x="255" y="108" text-anchor="middle">Paso 2</text>
-
-  <path class="wire" d="M320 82 H360"></path>
-
-  <!-- Paso 3 (x: 360 a 490) -->
-  <rect class="c-blue" x="360" y="45" width="130" height="74" rx="8" stroke-width="1"></rect>
-  <text class="th" x="425" y="72" text-anchor="middle">
-    <tspan x="425" dy="0">Decidir</tspan>
-    <tspan x="425" dy="15">configuración</tspan>
-  </text>
-  <text class="ts" x="425" y="108" text-anchor="middle">Paso 3</text>
-
-  <path class="wire" d="M490 82 H530"></path>
-
-  <!-- Paso 4 (x: 530 a 660 -> margen derecho de 20px) -->
-  <rect class="c-amber" x="530" y="45" width="130" height="74" rx="8" stroke-width="1"></rect>
-  <text class="th" x="595" y="79" text-anchor="middle">Programar lfuse</text>
-  <text class="ts" x="595" y="108" text-anchor="middle">Paso 4</text>
-</svg>
-
-
-<h3>3.4. Fuente de Reloj por Defecto </h3>
-<p>En un dispositivo de la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong>, con la configuración de fábrica, el valor de lectura de <code>lfuse</code> en hexadecimal es  <code>0x62</code> (en binario <code>0b01100010</code>, en decimal <code>98</code>).</p>
-
-<!-- Variantes de color: .bit-warn | .bit-yellow | .bit-accent | .bit-danger -->
-<div class="bits-grid-9" aria-label="Bits del byte bajo de fusibles">
-  <!-- FILA 1 (Bits 8 a 0) -->
-  <div class="bit-box bit-white"><small>Bitx</small><strong>Mnemonico</strong></div>
-  <div class="bit-box bit-warn"><small>Bit 7</small><strong>CKDIV8</strong></div>
-  <div class="bit-box bit-yellow"><small>Bit 6</small><strong>CKOUT</strong></div>
-  <div class="bit-box bit-accent"><small>Bit 5</small><strong>SUT1</strong></div>
-  <div class="bit-box bit-accent"><small>Bit 4</small><strong>SUT0</strong></div>
-  <div class="bit-box bit-danger"><small>Bit 3</small><strong>CKSEL3</strong></div>
-  <div class="bit-box bit-danger"><small>Bit 2</small><strong>CKSEL2</strong></div>
-  <div class="bit-box bit-danger"><small>Bit 1</small><strong>CKSEL1</strong></div>
-  <div class="bit-box bit-danger"><small>Bit 0</small><strong>CKSEL0</strong></div>
-
-<!-- FILA 2 (Mismos índices y mismos formatos debajo) -->
-  <div class="bit-box bit-white bit-value">Valor</div>
-  <div class="bit-box bit-warn bit-value">0</div>
-  <div class="bit-box bit-yellow bit-value">1</div>
-  <div class="bit-box bit-accent bit-value">1</div>
-  <div class="bit-box bit-accent bit-value">0</div>
-  <div class="bit-box bit-danger bit-value">0</div>
-  <div class="bit-box bit-danger bit-value">0</div>
-  <div class="bit-box bit-danger bit-value">1</div>
-  <div class="bit-box bit-danger bit-value">0</div>
-</div>
-            
-               
-                    <p>El dispositivo se suministra de fábrica con el oscilador RC interno (<em>internal RC oscillator</em>) a 8.0 MHz (<code>CKSEL</code>) y con el fusible <code>CKDIV8</code> programado, lo que resulta en un reloj del sistema (<em>system clock</em>) de 1.0 MHz. El tiempo de arranque (<em>startup time</em>) se configura al máximo y se habilita el período de tiempo de espera (<em>time-out period</em>), <code>SUT</code>. </p>
-                      
-                    <p>Esta configuración por defecto (<code>CKDIV8 = "0"</code>, <code>CKOUT= "1" </code>, <code>CKSEL = "0010"</code>, <code>SUT = "10"</code>, )garantiza que cualquier usuario pueda establecer la configuración de la fuente de reloj deseada utilizando cualquier interfaz de programación disponible.</p>
-
-                    
-                <div class="table-container">
-                  <table>
-  <thead>
-    <tr>
-      <th>Bit</th>
-      <th>Mnemónico</th>
-      <th>Valor de Fábrica</th>
-      <th>Descripción</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>7</td>
-      <td><div class="bit-box bit-warn bit-value">CKDIV8</div></td>
-      <td style="text-align: center";>0</td>
-      <td>Activo: Divide la frecuencia del reloj del sistema por 8. Por defecto el reloj del sistema es el Oscilador RC Interno de 8 MHz. Al pasar por el fusible <code>CKDIV8</code>, el reloj del sistema resulta en un reloj de 1.0 MHz.</td>
-    </tr>
-    <tr>
-      <td>6</td>
-      <td><div class="bit-box bit-yellow bit-value">CKOUT</div></td>
-      <td style="text-align: center";>1</td>
-      <td>Inactivo: El pin <code>PB0</code> (Pin físico 14 en empaque DIP28/ pin digital 8 en Arduino) funciona como E/S. </td>
-    </tr>
-    <tr>
-      <td>5</td>
-      <td><div class="bit-box bit-accent bit-value">SUT1</div></td>
-      <td style="text-align: center";>1</td>
-      <td rowspan="2">Tiempo de arranque (Start-up Time). Se combina con <code>SUT0</code>. <br>
-        El valor <code>SUT1...0</code> = <code>10</code>, configura una <strong>potencia de subida lenta</strong> (<em>Slowly rising power</em>): al encender desde cero (<strong>Reset / Slowly rising power</strong>) el voltaje aún está subiendo, por eso necesita un tiempo de espera de 19 CK + 65 ms  para estabilizar la alimentación. <br>
-        Al despertar de los modos de bajo consumo <stronng>Power-down</stronng> o <strong>Power-save</strong>, la alimentación eléctrica ya está estable y el microcontrolador sólo necesita  exactamente <strong>6 CK</strong>	(<em>Clock Cycles</em>,Ciclos de Reloj) antes de ejecutar la primera instrucción. </td>
-    </tr>
-    <tr>
-      <td>4</td>
-      <td><div class="bit-box bit-accent bit-value">SUT0</div></td>
-      <td style="text-align: center";>0</td>
-      
-
-    </tr>
-    <tr>
-      <td>3</td>
-      <td><div class="bit-box bit-danger bit-value">CKSEL3</div></td>
-      <td style="text-align: center";>0</td>
-      <td rowspan="4">Selección del tipo de reloj. Se usa en combinación con <code>CKSEL2</code>, <code>CKSEL1</code> y <code>CKSEL0</code>. 
-      <p>El Valor <code>CKSEL3...0</code> = <code>0010</code> selecciona el <strong>Oscilador RC Calibrado Interno</strong> como reloj del sistema.  </td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td><div class="bit-box bit-danger bit-value">CKSEL2</div></td>
-      <td style="text-align: center";>0</td>
-      
-    </tr>
-    <tr>
-      <td>1</td>
-      <td><div class="bit-box bit-danger bit-value">CKSEL1</div></td>
-      <td style="text-align: center";>1</td>
-      
-    </tr>
-    <tr>
-      <td>0</td>
-      <td><div class="bit-box bit-danger bit-value">CKSEL0</div></td>
-      <td style="text-align: center";>0</td>
-      
-    </tr>
-  </tbody>
-  
-</table>
-
-                </div>
-
-                
-
-            </section>
-
-            <section>
-                <h2>4. FUENTES DE RELOJ (CLOCK SOURCES) FISICAS CONFIGURABLES POR FUSIBLES</h2>
-                <p>
+<p>La Figura siguiente detalla los subsistemas de reloj en el <strong>AVR</strong> y cómo se distribuyen entre ellos. No es necesario que todas las fuentes de reloj estén activas en un momento dado. La flexibilidad de la arquitectura del reloj ayuda a reducir el consumo de energía  al conectar únicamente los subsistemas de reloj periféricos necesarios para la aplicación en ejecución, tal como se describe en ”Power Management and Sleep Modes”.</p>
+<img alt="Subsistemas de reloj del AVR y su distribución entre ellos" class="imagen-centrada" src="img/clock_distribution_avr_por_zonas.png"/>
+<h3>2.1. Reloj de la CPU (CPU Clock) – clk<sub>CPU</sub></h3>
+<p>El reloj de la CPU se encarga de dirigir los circuitos principales del núcleo (core), los cuales operan en los registros de trabajo de propósito general (general purpose working registers), la <strong>unidad lógica aritmética (ALU)</strong> y la <strong>memoria de datos (SRAM)</strong>. El acceso a la memoria <strong>Flash</strong> y a la <strong>EEPROM</strong> también depende del reloj de la CPU.</p>
+<h3>2.2. Reloj de entrada/salida (I/O Clock) – clk<sub>I/O</sub></h3>
+<p>El <strong>reloj de E/S</strong> se utiliza para la mayoría de los periféricos, tales como los temporizadores/contadores (Timer/Counters), la interfaz serial universal (USART), la interfaz periférica serial (SPI) y el convertidor analógico-digital (ADC). El <strong>reloj de E/S</strong> también es utilizado por el subsistema de interrupciones externas (external interrupts).</p>
+<p><em>Nota: Para minimizar el consumo de energía en los modos de suspensión (sleep modes), el reloj de E/S puede detenerse para determinados periféricos.</em></p>
+<h3>2.3. Reloj de la memoria Flash (Flash Clock) – clk<sub>FLASH</sub></h3>
+<p>El reloj de Flash controla la interfaz del bus de la memoria Flash (Flash memory bus interface). El reloj de Flash opera normalmente al mismo ritmo que el reloj de la CPU (clk<sub>CPU</sub>).</p>
+<h3>2.4. Reloj del temporizador asíncrono (Asynchronous Timer Clock) – clkASY</h3>
+<p>El reloj asíncrono permite que determinados periféricos (como el Temporizador/Contador2) operen de forma independiente del reloj principal de la CPU (clk<sub>CPU</sub>). Esto es especialmente útil cuando se utiliza un oscilador externo de baja frecuencia (como un cristal de reloj de 32.768 kHz) para el conteo en tiempo real (RTC).</p>
+<h3>2.5. Reloj del ADC (ADC Clock) – clk<sub>ADC</sub> </h3>
+<p>El convertidor analógico-digital (ADC) cuenta con su propio reloj dedicado para permitir la conversión de señales analógicas mientras el reloj de E/S se encuentra detenido o ralentizado (por ejemplo, en el modo de reducción de ruido del ADC - ADC Noise Reduction Mode).</p>
+</section><section>
+<h2>3. FUENTES DE RELOJ DEL SISTEMA (CLOCK SOURCES)</h2>
+<p>
                   El dispositivo cuenta con varias opciones de fuentes de reloj para el oscilador principal (main oscillator), las cuales se seleccionan mediante bits de configuración de hardware llamados fusibles (fuses, específicamente los bits <strong>CKSEL3...0</strong>). 
                 </p>
-                  
-                <p> 
+<p> 
                   Estos bits de fusible permiten seleccionar entre diferentes tipos de osciladores, como osciladores de cristal, osciladores RC internos y relojes externos. La selección adecuada de la fuente de reloj es crucial para garantizar un funcionamiento estable y eficiente del microcontrolador en diversas aplicaciones.
                 </p>
-                                
-                <p> 
+<p> 
                   Cuando el microcontrolador se libera del estado de reset, la lógica de control del hardware lee el estado físico de los fusibles <strong>CKSEL3...0</strong> (junto con el fusible <strong>SUT</strong> para el tiempo de arranque) y multiplexa físicamente la circuitería interna para engancharse a una de las siguientes cuatro familias de osciladores disponibles en el silicio.
                 </p>
-                  
-                <p>
+<p>
                   Aquí se encuentra la tabla de configuración de los bits de fusible para las opciones de fuente de reloj (Clock Options) 
                 </p>
-                
-                <div class="table-container">
-                    <table>
-                    <caption><strong>Selección de Opciones de Reloj del dispositivo(1)</strong></caption>
-                    <thead>
-                        <tr>
-                        <th>Opción de Reloj del Dispositivo (Device Clocking Option)</th>
-                        <th>CKSEL3...0</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                        <td>Oscilador de Cristal de Baja Potencia (Low Power Crystal Oscillator)<br>
-                            Optimizado para cristales de cuarzo estándar,con frecuencias que pueden ir de 400 kHz a 16 MHz (o hasta 20 MHz dependiendo del voltaje y modelo)</td>
-                        <td>1111 - 1000</td>
-                        </tr>
-                        <tr>
-                        <td>Oscilador de Cristal de Oscilación Completa (Full Swing Crystal Oscillator)</td>
-                        <td>0111 - 0110</td>
-                        </tr>
-                        <tr>
-                        <td>Oscilador de Cristal de Baja Frecuencia (Low Frequency Crystal Oscillator)</td>
-                        <td>0101 - 0100</td>
-                        </tr>
-                        <tr>
-                        <td>Oscilador RC Interno de 128kHz (Internal 128kHz RC Oscillator)<br>
+<div class="table-container">
+<table>
+<caption><strong>Selección de Opciones de Reloj del dispositivo(1)</strong></caption>
+<thead>
+<tr>
+<th>Opción de Reloj del Dispositivo (Device Clocking Option)</th>
+<th>CKSEL3...0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Oscilador de Cristal de Baja Potencia (Low Power Crystal Oscillator)<br/>
+                            Optimizado para cristales de cuarzo estándar,con frecuencias que pueden ir de 400 kHz a 16 MHz </td>
+<td>1111 - 1000</td>
+</tr>
+<tr>
+<td>Oscilador de Cristal de Oscilación Completa (Full Swing Crystal Oscillator)</td>
+<td>0111 - 0110</td>
+</tr>
+<tr>
+<td>Oscilador de Cristal de Baja Frecuencia (Low Frequency Crystal Oscillator)</td>
+<td>0101 - 0100</td>
+</tr>
+<tr>
+<td>Oscilador RC Interno de 128kHz (Internal 128kHz RC Oscillator)<br/>
                             Un oscilador interno de baja potencia y baja frecuencia utilizado principalmente por el temporizador perro guardián (Watchdog Timer - WDT) y durante el arranque (start-up)
                         </td>
-                        <td>0011</td>
-                        </tr>
-                        <tr>
-                        <td>Oscilador RC Interno Calibrado (Calibrated Internal RC Oscillator)<br>
+<td>0011</td>
+</tr>
+<tr>
+<td>Oscilador RC Interno Calibrado (Calibrated Internal RC Oscillator)<br/>
                             Proporciona una frecuencia de 8 MHz (con calibración de fábrica configurable a otras frecuencias mediante el registro <code>OSCCAL</code>)</td>
-                        <td>0010</td>
-                        </tr>
-                        <tr>
-                        <td>Reloj Externo (External Clock)<br>
+<td>0010</td>
+</tr>
+<tr>
+<td>Reloj Externo (External Clock)<br/>
                             Entrada de señal de reloj digital externa aplicada directamente en los pines <code>XTAL1</code> y <code>XTAL2</code>.
                         </td>
-                        <td>0000</td>
-                        </tr>
-                        <tr>
-                        <td>Reservado (Reserved)</td>
-                        <td>0001</td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                        <td colspan="2">
-                            Nota:<br>
-                            Device Clocking Options Select(1)<br>
+<td>0000</td>
+</tr>
+<tr>
+<td>Reservado (Reserved)</td>
+<td>0001</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td colspan="2">
+                            Nota:<br/>
+                            Device Clocking Options Select(1)<br/>
                             1. Para todos los fusibles, "1" significa no programado (unprogrammed) mientras que "0" significa programado (programmed).
                         </td>
-                        </tr>
-                    </tfoot>
-                    </table>
-                </div>
-
-                
-
-                <h3>4.2. Secuencia de Arranque del Reloj (<em>Clock Startup Sequence</em>)</h3>
-                      <p>
+</tr>
+</tfoot>
+</table>
+</div>
+<h3>3.1. Secuencia de arranque de la fuente de reloj (Clock Startup Sequence)</h3>
+<p>
                         Cualquier fuente de reloj necesita un voltaje de alimentación
                         <strong>V<sub>CC</sub></strong> suficiente para iniciar la oscilación y alcanzar
                         un número mínimo de ciclos antes de que la señal de reloj pueda
                         considerarse estable.
                     </p>
-                      
-                    <p>
+<p>
                       Al conectar la alimentación, un detector interno de <strong>Reset por Encendido (Power-on Reset, <code>POR</code>)</strong> mantiene al microcontrolador en estado de <em>reset</em> mientras el voltaje (<strong>V<sub>CC</sub></strong>) sea inferior al <strong>umbral de detección de reset por encendido (Power-on Reset Threshold, V<sub>POT</sub></strong>). Una vez superado este umbral y liberadas las demás fuentes de reset, el dispositivo genera un <em>reset interno</em>  y mantiene el microcontrolador en ese estado durante un tiempo de espera (<strong>t<sub>TOUT</sub></strong>) para garantizar que <strong>V<sub>CC</sub></strong> alcance un nivel suficiente antes de estabilizar el reloj
-                    </p>                      
-              
-                    <p>
+                    </p>
+<p>
                         La sección <em>System Control and Reset</em> describe las condiciones
                         que determinan la activación del <em>reset</em> interno. El tiempo de
                         espera (time-out delay): <strong>t<sub>TOUT</sub></strong>, se temporiza mediante el oscilador
@@ -512,45 +187,42 @@ avrdude done.  Thank you.
                         que comprende este intervalo se configura mediante los bits de fusible
                         <code>SUTx</code> y <code>CKSELx</code>.
                     </p>
-
-                    <p>
+<p>
                         Los tiempos de espera que pueden seleccionarse se muestran en la
                         siguiente tabla. La frecuencia del oscilador del Perro Guardián
                         depende del voltaje de alimentación, tal como se indica en la sección
                         <em>Typical Characteristics – (TA = -40 °C a 85 °C)</em>.
                     </p>
-
-                <div class="table-container">
-                    <table>
-                    <caption>Number of Watchdog Oscillator Cycles</caption>
-                    <thead>
-                        <tr>
-                        <th>Tiempo de espera típico<br>(Typ Time-out V<sub>CC</sub> = 5.0V)</th>
-                        <th>Tiempo de espera típico<br>(Typ Time-out V<sub>CC</sub> = 3.0V)</th>
-                        <th>Número de ciclos<br>(Number of Cycles)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                        <td>0 ms</td>
-                        <td>0 ms</td>
-                        <td>0</td>
-                        </tr>
-                        <tr>
-                        <td>4.1 ms</td>
-                        <td>4.3 ms</td>
-                        <td>512</td>
-                        </tr>
-                        <tr>
-                        <td>65 ms</td>
-                        <td>69 ms</td>
-                        <td>8K (8,192)</td>
-                        </tr>
-                    </tbody>
-                    </table>
-                </div>
-                                
-                <p>
+<div class="table-container">
+<table>
+<caption>Number of Watchdog Oscillator Cycles</caption>
+<thead>
+<tr>
+<th>Tiempo de espera típico<br/>(Typ Time-out V<sub>CC</sub> = 5.0V)</th>
+<th>Tiempo de espera típico<br/>(Typ Time-out V<sub>CC</sub> = 3.0V)</th>
+<th>Número de ciclos<br/>(Number of Cycles)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0 ms</td>
+<td>0 ms</td>
+<td>0</td>
+</tr>
+<tr>
+<td>4.1 ms</td>
+<td>4.3 ms</td>
+<td>512</td>
+</tr>
+<tr>
+<td>65 ms</td>
+<td>69 ms</td>
+<td>8K (8,192)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>
                     El propósito principal del retardo (<strong>t<sub>TOUT</sub></strong>) es mantener al
                     microcontrolador AVR en estado de <em>reset</em> hasta que la tensión
                     de alimentación <strong>V<sub>CC</sub></strong> alcance un nivel mínimo
@@ -562,16 +234,16 @@ avrdude done.  Thank you.
                     circuito de <strong>Detección de Bajo Voltaje </strong>(<em>Brown-Out Detection</em>,
                     <strong>BOD</strong>), interno o externo.
                 </p>
-<img src="img/ArranqueReloj.png" alt="Secuencia de arranque del reloj" class="imagen-centrada">
-                <p>
+<img alt="Secuencia de arranque del reloj" class="imagen-centrada" src="img/ArranqueReloj.png"/>
+<p>
                     El circuito <strong>BOD</strong> garantiza que <strong>V<sub>CC</sub></strong> alcance un nivel
                     suficiente antes de liberar el <em>reset</em>, por lo que permite
                     deshabilitar el retardo de tiempo de espera (<em>time-out delay</em>, <strong>t<sub>TOUT</sub></strong>).
                     No se recomienda deshabilitar este retardo si no se dispone de un
                     <strong>circuito de Detección de Bajo Voltaje</strong>.
                 </p>
-<img src="img/BOD.png" alt="Circuito de Detección de Bajo Voltaje (BOD)" class="imagen-centrada">
-                <p>
+<img alt="Circuito de Detección de Bajo Voltaje (BOD)" class="imagen-centrada" src="img/BOD.png"/>
+<p>
                     Por otra parte, el oscilador debe completar un número mínimo de
                     ciclos antes de que la señal de reloj pueda considerarse estable.
                     Para ello, un <strong>contador de rizo interno</strong> (<em>internal ripple counter</em>)
@@ -581,8 +253,8 @@ avrdude done.  Thank you.
                     y el dispositivo comienza a ejecutar instrucciones. El <strong>tiempo de arranque</strong> (<em>start-up time</em>) recomendado depende del tipo de fuente de reloj y puede variar desde 6 ciclos, para una
                     señal de reloj aplicada externamente, hasta 32K ciclos, para un  cristal de baja frecuencia.
                 </p>
-<img src="img/counter.png" alt="Contador de Rizo Interno" class="imagen-centrada">
-                <p>
+<img alt="Contador de Rizo Interno" class="imagen-centrada" src="img/counter.png"/>
+<p>
                     La secuencia de arranque del reloj comprende tanto el retardo de
                     tiempo de espera (<em>time-out delay</em>, <strong>t<sub>TOUT</sub></strong>) como el tiempo de arranque
                     (<em>start-up time</em>) cuando el dispositivo sale del estado de
@@ -592,832 +264,1017 @@ avrdude done.  Thank you.
                     encuentra en un nivel suficiente. Por tanto, en estos casos,
                     únicamente se incluye el tiempo de arranque del oscilador.
                 </p>
-<img src="img/SupSecuencia.png" alt="Secuencia de Arranque" class="imagen-centrada">  
-
-            </section>
-            <section>
-                <h2>5. OSCILADOR DE CRISTAL DE BAJA POTENCIA (<em>Low Power Crystal Oscillator</em>)</h2>
-                <div class="imagen-derecha">
-                    <div class="texto">
-                <p>
+<img alt="Secuencia de Arranque" class="imagen-centrada" src="img/SupSecuencia.png"/>
+</section><section>
+<h2>3.2. OSCILADOR DE CRISTAL DE BAJA POTENCIA (LOW POWER CRYSTAL OSCILLATOR)</h2>
+<div class="imagen-derecha">
+<div class="texto">
+<p>
                     Los pines <code>XTAL1</code> y <code>XTAL2</code> son la entrada y la salida, respectivamente, de un amplificador inversor (<em>inverting amplifier</em>) que puede configurarse para su uso como un oscilador en el chip (<em>On-chip Oscillator</em>), tal como se muestra en la figura adjunta. Se puede utilizar tanto un cristal de cuarzo (<em>quartz crystal</em>) como un resonador cerámico (<em>ceramic resonator</em>).
                 </p>
-                <p>Este oscilador de cristal es un oscilador de baja potencia (<em>low power oscillator</em>), con una oscilación de voltaje reducida (<em>reduced voltage swing</em>) en la salida <code>XTAL2</code>. Proporciona el menor consumo de energía (<em>power consumption</em>), pero no es capaz de controlar otras entradas de reloj (<em>clock inputs</em>) y puede ser más susceptible al ruido en entornos ruidosos (<em>noisy environments</em>). En estos casos, consulte la sección <a href="#seccion-11">Oscilador de Cristal de Oscilación Completa</a> (<em>Full Swing Crystal Oscillator</em>).</p>
-                    </div>
-                <img src="img/crystal_oscillator_low_power_v3.png" alt="Conexión de un oscilador de baja potencia" class="imagen-derecha">
-                </div>
-                
-                <h3>5.1. Condensadores y Rangos de Frecuencia del Oscilador</h3>
-                <p><code>C1</code> y <code>C2</code> deben ser siempre iguales tanto para los cristales como para los resonadores. El valor óptimo de los condensadores depende del cristal o resonador en uso, de la cantidad de capacitancia parásita (<em>stray capacitance</em>) y del ruido electromagnético del entorno. En la Tabla siguiente se ofrecen algunas directrices iniciales para elegir los condensadores que se utilizarán con los cristales. Para los resonadores cerámicos, se deben utilizar los valores de los condensadores indicados por el fabricante.</p>
-
-                <p>El oscilador de baja potencia (<em>Low Power Oscillator</em>) puede operar en tres modos diferentes, cada uno optimizado para un rango de frecuencia específico.</p>
-                <p>El modo de operación se selecciona mediante los fusibles <code>CKSEL3...1</code>, tal como se muestra en la Tabla siguiente.</p>
-<div class="table-container">                
+<p>Este oscilador de cristal es un oscilador de baja potencia (<em>low power oscillator</em>), con una oscilación de voltaje reducida (<em>reduced voltage swing</em>) en la salida <code>XTAL2</code>. Proporciona el menor consumo de energía (<em>power consumption</em>), pero no es capaz de controlar otras entradas de reloj (<em>clock inputs</em>) y puede ser más susceptible al ruido en entornos ruidosos (<em>noisy environments</em>). En estos casos, consulte la sección <a href="#seccion-11">Oscilador de Cristal de Oscilación Completa</a> (<em>Full Swing Crystal Oscillator</em>).</p>
+</div>
+<img alt="Conexión de un oscilador de baja potencia" class="imagen-derecha" src="img/crystal_oscillator_low_power_v3.png"/>
+</div>
+<h3>3.2.1. Rangos de frecuencia y selección de los condensadores de carga</h3>
+<p><code>C1</code> y <code>C2</code> deben ser siempre iguales tanto para los cristales como para los resonadores. El valor óptimo de los condensadores depende del cristal o resonador en uso, de la cantidad de capacitancia parásita (<em>stray capacitance</em>) y del ruido electromagnético del entorno. En la Tabla siguiente se ofrecen algunas directrices iniciales para elegir los condensadores que se utilizarán con los cristales. Para los resonadores cerámicos, se deben utilizar los valores de los condensadores indicados por el fabricante.</p>
+<p>El oscilador de baja potencia (<em>Low Power Oscillator</em>) puede operar en tres modos diferentes, cada uno optimizado para un rango de frecuencia específico.</p>
+<p>El modo de operación se selecciona mediante los fusibles <code>CKSEL3...1</code>, tal como se muestra en la Tabla siguiente.</p>
+<div class="table-container">
 <table>
-  <caption><strong>Modos de Operación del Oscilador de Cristal de Baja Potencia</strong></caption>
-  <thead>
-    <tr>
-      <th>Rango de frecuencia<br>(Frequency Range) [MHz]</th>
-      <th>Rango recomendado para<br>los condensadores C1 y C2 [pF]</th>
-      <th><code>CKSEL3...1</code> <sup>(1)</sup></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0.4 - 0.9</td>
-      <td>– </td>
-      <td>100<sup>(2)</sup></td>
-    </tr>
-    <tr>
-      <td>0.9 - 3.0</td>
-      <td>12 - 22</td>
-      <td>101</td>
-    </tr>
-    <tr>
-      <td>3.0 - 8.0</td>
-      <td>12 - 22</td>
-      <td>110</td>
-    </tr>
-    <tr>
-      <td>8.0 - 16.0</td>
-      <td>12 - 22</td>
-      <td>111</td>
-    </tr>
-  </tbody>
-  <tfoot>
-    <tr>
-      <td colspan="3">
-        <strong>Notas:</strong><br>
-        1. Estos son los ajustes de <code>CKSEL</code> recomendados para los diferentes rangos de frecuencia.<br>
-        2. Esta opción no debe usarse con cristales, únicamente con resonadores cerámicos (<em>ceramic resonators</em>).<br>
+<caption><strong>Modos de Operación del Oscilador de Cristal de Baja Potencia</strong></caption>
+<thead>
+<tr>
+<th>Rango de frecuencia<br/>(Frequency Range) [MHz]</th>
+<th>Rango recomendado para<br/>los condensadores C1 y C2 [pF]</th>
+<th><code>CKSEL3...1</code> <sup>(1)</sup></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.4 - 0.9</td>
+<td>– </td>
+<td>100<sup>(2)</sup></td>
+</tr>
+<tr>
+<td>0.9 - 3.0</td>
+<td>12 - 22</td>
+<td>101</td>
+</tr>
+<tr>
+<td>3.0 - 8.0</td>
+<td>12 - 22</td>
+<td>110</td>
+</tr>
+<tr>
+<td>8.0 - 16.0</td>
+<td>12 - 22</td>
+<td>111</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td colspan="3">
+<strong>Notas:</strong><br/>
+        1. Estos son los ajustes de <code>CKSEL</code> recomendados para los diferentes rangos de frecuencia.<br/>
+        2. Esta opción no debe usarse con cristales, únicamente con resonadores cerámicos (<em>ceramic resonators</em>).<br/>
         3. Si la frecuencia del cristal excede la especificación del dispositivo (depende de V<sub>CC</sub>), se puede programar el fusible <code>CKDIV8</code> para dividir la frecuencia interna por 8. Debe garantizarse que el reloj dividido resultante cumpla con la especificación de frecuencia del dispositivo.
       </td>
-    </tr>
-  </tfoot>
+</tr>
+</tfoot>
 </table>
 </div>
-<img src="img/CKSEL3_1.png" alt="Ajustes de CKSEL3...1 según rangos de frecuencia" class="imagen-centrada">
-
-<h3>5.2. Selección de los Tiempos de Arranque</h3>
+<img alt="Ajustes de CKSEL3...1 según rangos de frecuencia" class="imagen-centrada" src="img/CKSEL3_1.png"/>
+<h3>3.2.2. Selección de los tiempos de arranque (Startup Times)</h3>
 <p>El fusible <code>CKSEL0</code> junto con los fusibles <code>SUT1...0</code> seleccionan los tiempos de arranque (<em>start-up times</em>) como se muestra a continuación.</p>
-
-    <div class="table-container">
+<div class="table-container">
 <table>
-  <caption><strong>Tiempos de Arranque para la Selección del Reloj del Oscilador de Cristal de Baja Potencia</strong> <br>(<em>Start-up Times for the Low Power Crystal Oscillator Clock Selection</em>)</caption>
-  <thead>
-    <tr>
-      <th>Fuente del oscilador /<br>Condiciones de potencia (<em>Oscillator Source / Power Conditions</em>)</th>
-      <th>Tiempo de arranque desde<br><em>Power-down</em> y <em>Power-save</em></th>
-      <th>Retardo adicional desde <em>reset</em><br>(V<sub>CC</sub> = 5.0V) <sup>(a)</sup></th>
-      <th><code>CKSEL0</code></th>
-      <th><code>SUT1...0</code></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Resonador cerámico, subida rápida de potencia (<em>Ceramic resonator, fast rising power</em>)</td>
-      <td>258 CK</td>
-      <td>19 CK + 4 ms <sup>(1)</sup></td>
-      <td>0</td>
-      <td>00</td>
-    </tr>
-    <tr>
-      <td>Resonador cerámico, subida lenta de potencia (<em>Ceramic resonator, slowly rising power</em>)</td>
-      <td>258 CK</td>
-      <td>19 CK + 65ms <sup>(1)</sup></td>
-      <td>0</td>
-      <td>01</td>
-    </tr>
-    <tr>
-      <td>Resonador cerámico, BOD habilitado (<em>Ceramic resonator, BOD enabled</em>)</td>
-      <td>1K CK</td>
-      <td>19 CK <sup>(2)</sup></td>
-      <td>0</td>
-      <td>10</td>
-    </tr>
-    <tr>
-      <td>Resonador cerámico, subida rápida de potencia (<em>Ceramic resonator, fast rising power</em>)</td>
-      <td>1K CK</td>
-      <td>19 CK + 4 ms <sup>(2)</sup></td>
-      <td>0</td>
-      <td>11</td>
-    </tr>
-    <tr>
-      <td>Resonador cerámico, subida lenta de potencia (<em>Ceramic resonator, slowly rising power</em>)</td>
-      <td>1K CK</td>
-      <td>19 CK + 65ms <sup>(2)</sup></td>
-      <td>1</td>
-      <td>00</td>
-    </tr>
-    <tr>
-      <td>Oscilador de cristal, BOD habilitado (<em>Crystal Oscillator, BOD enabled</em>)</td>
-      <td>16K CK</td>
-      <td>19 CK</td>
-      <td>1</td>
-      <td>01</td>
-    </tr>
-    <tr>
-      <td>Oscilador de cristal, subida rápida de potencia (<em>Crystal Oscillator, fast rising power</em>)</td>
-      <td>16K CK</td>
-      <td>19 CK + 4 ms</td>
-      <td>1</td>
-      <td>10</td>
-    </tr>
-    <tr>
-      <td>Oscilador de cristal, subida lenta de potencia (<em>Crystal Oscillator, slowly rising power</em>)</td>
-      <td>16K CK</td>
-      <td>19 CK + 65ms</td>
-      <td>1</td>
-      <td>11</td>
-    </tr>
-  </tbody>
-  <tfoot>
-    <tr>
-      <td colspan="5">
-        <strong>Notas:</strong><br>
-        <sup>(a)</sup> Datos de columna actualizados según <strong>DS80000855C</strong>. <em>Silicon Errata and Data Sheet Clarifications ATmega48A/PA/88A/PA/168A/PA/328/P</em>, pag. 5<br>
-        <sup>(1)</sup> Estas opciones solo deben usarse cuando no se opera cerca de la frecuencia máxima del dispositivo, y únicamente si la estabilidad de frecuencia en el arranque no es importante para la aplicación. Estas opciones no son adecuadas para cristales.<br>
-        <sup>(2)</sup> Estas opciones están destinadas al uso con resonadores cerámicos y garantizarán la estabilidad de frecuencia en el arranque. También se pueden utilizar con cristales cuando no se opera cerca de la frecuencia máxima del dispositivo, y si la estabilidad de frecuencia en el arranque no es importante para la aplicación.
+<caption><strong>Tiempos de Arranque para la Selección del Reloj del Oscilador de Cristal de Baja Potencia</strong> <br/>(<em>Start-up Times for the Low Power Crystal Oscillator Clock Selection</em>)</caption>
+<thead>
+<tr>
+<th>Fuente del oscilador /<br/>Condiciones de potencia (<em>Oscillator Source / Power Conditions</em>)</th>
+<th>Tiempo de arranque desde<br/><em>Power-down</em> y <em>Power-save</em></th>
+<th>Retardo adicional desde <em>reset</em><br/>(V<sub>CC</sub> = 5.0V) <sup>(a)</sup></th>
+<th><code>CKSEL0</code></th>
+<th><code>SUT1...0</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Resonador cerámico, subida rápida de potencia (<em>Ceramic resonator, fast rising power</em>)</td>
+<td>258 CK</td>
+<td>19 CK + 4 ms <sup>(1)</sup></td>
+<td>0</td>
+<td>00</td>
+</tr>
+<tr>
+<td>Resonador cerámico, subida lenta de potencia (<em>Ceramic resonator, slowly rising power</em>)</td>
+<td>258 CK</td>
+<td>19 CK + 65ms <sup>(1)</sup></td>
+<td>0</td>
+<td>01</td>
+</tr>
+<tr>
+<td>Resonador cerámico, BOD habilitado (<em>Ceramic resonator, BOD enabled</em>)</td>
+<td>1K CK</td>
+<td>19 CK <sup>(2)</sup></td>
+<td>0</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Resonador cerámico, subida rápida de potencia (<em>Ceramic resonator, fast rising power</em>)</td>
+<td>1K CK</td>
+<td>19 CK + 4 ms <sup>(2)</sup></td>
+<td>0</td>
+<td>11</td>
+</tr>
+<tr>
+<td>Resonador cerámico, subida lenta de potencia (<em>Ceramic resonator, slowly rising power</em>)</td>
+<td>1K CK</td>
+<td>19 CK + 65ms <sup>(2)</sup></td>
+<td>1</td>
+<td>00</td>
+</tr>
+<tr>
+<td>Oscilador de cristal, BOD habilitado (<em>Crystal Oscillator, BOD enabled</em>)</td>
+<td>16K CK</td>
+<td>19 CK</td>
+<td>1</td>
+<td>01</td>
+</tr>
+<tr>
+<td>Oscilador de cristal, subida rápida de potencia (<em>Crystal Oscillator, fast rising power</em>)</td>
+<td>16K CK</td>
+<td>19 CK + 4 ms</td>
+<td>1</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Oscilador de cristal, subida lenta de potencia (<em>Crystal Oscillator, slowly rising power</em>)</td>
+<td>16K CK</td>
+<td>19 CK + 65ms</td>
+<td>1</td>
+<td>11</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td colspan="5">
+<strong>Notas:</strong><br/>
+<sup>(a)</sup> Datos de columna actualizados según <strong>DS80000855C</strong>. <em>Silicon Errata and Data Sheet Clarifications ATmega48A/PA/88A/PA/168A/PA/328/P</em>, pag. 5<br/>
+<sup>(1)</sup> Estas opciones solo deben usarse cuando no se opera cerca de la frecuencia máxima del dispositivo, y únicamente si la estabilidad de frecuencia en el arranque no es importante para la aplicación. Estas opciones no son adecuadas para cristales.<br/>
+<sup>(2)</sup> Estas opciones están destinadas al uso con resonadores cerámicos y garantizarán la estabilidad de frecuencia en el arranque. También se pueden utilizar con cristales cuando no se opera cerca de la frecuencia máxima del dispositivo, y si la estabilidad de frecuencia en el arranque no es importante para la aplicación.
       </td>
-    </tr>
-  </tfoot>
+</tr>
+</tfoot>
 </table>
 </div>
-<img src="img/SUT-CKSEL.png" alt="Ajustes de CKSEL0 y SUT1...0 según condiciones de potencia" class="imagen-centrada">
-</section>
-<section>
-<h2>6. OSCILADOR DE CRISTAL DE OSCILACIÓN COMPLETA (<em>FULL SWING CRYSTAL OSCILLATOR</em>)</h2>
-
+<img alt="Ajustes de CKSEL0 y SUT1...0 según condiciones de potencia" class="imagen-centrada" src="img/SUT-CKSEL.png"/>
+</section><section>
+<h2>3.3. OSCILADOR DE CRISTAL DE OSCILACIÓN COMPLETA (FULL SWING CRYSTAL OSCILLATOR)</h2>
 <div class="imagen-derecha">
-    <div class="texto">
-        <p>Los pines <code>XTAL1</code> y <code>XTAL2</code> son la entrada y la salida, respectivamente, de un amplificador inversor (<em>inverting amplifier</em>) que puede configurarse para su uso como un <strong>oscilador en el chip (<em>On-chip Oscillator</em>)</strong>, tal como se muestra en la Figura de abajo. Se puede utilizar tanto un cristal de cuarzo (<em>quartz crystal</em>) como un resonador cerámico (<em>ceramic resonator</em>).</p>
-
-        <p>
+<div class="texto">
+<p>Los pines <code>XTAL1</code> y <code>XTAL2</code> son la entrada y la salida, respectivamente, de un amplificador inversor (<em>inverting amplifier</em>) que puede configurarse para su uso como un <strong>oscilador en el chip (<em>On-chip Oscillator</em>)</strong>, tal como se muestra en la Figura de abajo. Se puede utilizar tanto un cristal de cuarzo (<em>quartz crystal</em>) como un resonador cerámico (<em>ceramic resonator</em>).</p>
+<p>
           Este oscilador de cristal es un oscilador de oscilación completa (<em>full swing oscillator</em>), con una oscilación de riel a riel (<em>rail-to-rail swing</em>) en la salida <code>XTAL2</code>. Se le llama oscilador  de oscilación completa  porque la señal de reloj que genera en el pin de salida <strong>XTAL2</strong> alcanza los límites máximos y mínimos del voltaje de alimentación del microcontrolador, es decir, oscila de 0V (GND) hasta el voltaje máximo (V<sub>CC</sub>). A esta característica se le conoce como oscilación de riel a riel (rail-to-rail swing), donde los "rieles" representan las líneas de alimentación positiva y negativa (tierra).        
         </p>
-        <p>Esto es útil para controlar otras entradas de reloj (<em>clock inputs</em>) y en entornos ruidosos (<em>noisy environments</em>). El consumo de corriente es mayor que el del <strong>Oscilador de Cristal de Baja Potencia (<em>Low Power Crystal Oscillator</em>)</strong>. Tenga en cuenta que el Oscilador de Cristal de Oscilación Completa solo operará para <strong>V<sub>CC</sub> = 2.7 - 5.5 voltios</strong>.</p>
-    </div>
-    
-<img src="img/crystal_oscillator_full_swing.png" alt="Conexión de un oscilador de cristal de oscilación completa" class="imagen-derecha">  
+<p>Esto es útil para controlar otras entradas de reloj (<em>clock inputs</em>) y en entornos ruidosos (<em>noisy environments</em>). El consumo de corriente es mayor que el del <strong>Oscilador de Cristal de Baja Potencia (<em>Low Power Crystal Oscillator</em>)</strong>. Tenga en cuenta que el Oscilador de Cristal de Oscilación Completa solo operará para <strong>V<sub>CC</sub> = 2.7 - 5.5 voltios</strong>.</p>
 </div>
-
-
-<h3>6.1 Elección de los condensadores del oscilador</h3>
+<img alt="Conexión de un oscilador de cristal de oscilación completa" class="imagen-derecha" src="img/crystal_oscillator_full_swing.png"/>
+</div>
+<h3>3.3.1. Selección de los condensadores de carga</h3>
 <p><strong>C1</strong> y <strong>C2</strong> deben ser siempre iguales tanto para los cristales como para los resonadores. El valor óptimo de los condensadores depende del cristal o resonador en uso, de la cantidad de capacitancia parásita (<em>stray capacitance</em>) y del ruido electromagnético del entorno. En la <strong>Tabla: Modos de operación del Oscilador de Cristal de Oscilación Completa</strong>  se ofrecen algunas directrices iniciales para elegir los condensadores que se utilizarán con los cristales. Para los resonadores cerámicos, se deben utilizar los valores de los condensadores indicados por el fabricante.</p>
-
 <p>El modo de operación se selecciona mediante los fusibles <code>CKSEL3...1</code>, tal como se muestra en la siguiente tabla </p>
-
 <div class="table-container">
 <table>
-  <caption><strong>Modos de operación del Oscilador de Cristal de Oscilación Completa</strong></caption>
-  <thead>
-    <tr>
-      <th>Rango de frecuencia <sup>(1)</sup><br>(Frequency Range) [MHz]</th>
-      <th>Rango recomendado para<br>los condensadores C1 y C2 [pF]</th>
-      <th><code>CKSEL3...1</code></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0.4 - 20</td>
-      <td>12 - 22</td>
-      <td>011</td>
-    </tr>
-  </tbody>
-  <tfoot>
-    <tr>
-      <td colspan="3">
-        <strong>Notas:</strong><br>
+<caption><strong>Modos de operación del Oscilador de Cristal de Oscilación Completa</strong></caption>
+<thead>
+<tr>
+<th>Rango de frecuencia <sup>(1)</sup><br/>(Frequency Range) [MHz]</th>
+<th>Rango recomendado para<br/>los condensadores C1 y C2 [pF]</th>
+<th><code>CKSEL3...1</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.4 - 20</td>
+<td>12 - 22</td>
+<td>011</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td colspan="3">
+<strong>Notas:</strong><br/>
         1. Si la frecuencia del cristal excede la especificación del dispositivo (depende de V<sub>CC</sub>), se puede programar el fusible <code>CKDIV8</code> para dividir la frecuencia interna por 8. Debe garantizarse que el reloj dividido resultante cumpla con la especificación de frecuencia del dispositivo.
       </td>
-    </tr>
-  </tfoot>
+</tr>
+</tfoot>
 </table>
-<img src="img/CKSEL3_1XtalOscCompleta.png" alt="Ajustes de CKSEL3...1 según rangos de frecuencia para oscilador de oscilación completa" class="imagen-centrada">
-
-
-<h3>6.2 Tiempos de Arranque y Retardo adicional</h3>
-
+<img alt="Ajustes de CKSEL3...1 según rangos de frecuencia para oscilador de oscilación completa" class="imagen-centrada" src="img/CKSEL3_1XtalOscCompleta.png"/>
+<h3>3.3.2. Tiempos de arranque y retardo adicional desde Reset</h3>
 <p>Los fusibles <code>SUT1...0</code> y <code>CKSEL0</code> se utilizan para seleccionar los tiempos de arranque y retardo adicional desde el reset.</p>
-<p>El retardo adicional desde <em>reset</em> se aplica únicamente cuando el microcontrolador sale del estado de <em>reset</em>. Cuando se reanuda la ejecución desde los modos de Ahorro de Energía (<em>Power-save</em>) o Apagado (<em>Power-down</em>), se asume que <strong>V<sub>CC</sub></strong> ya se encuentra en un nivel suficiente. Por tanto, en estos casos, únicamente se incluye el tiempo de arranque del oscilador.<br></p>
-
+<p>El retardo adicional desde <em>reset</em> se aplica únicamente cuando el microcontrolador sale del estado de <em>reset</em>. Cuando se reanuda la ejecución desde los modos de Ahorro de Energía (<em>Power-save</em>) o Apagado (<em>Power-down</em>), se asume que <strong>V<sub>CC</sub></strong> ya se encuentra en un nivel suficiente. Por tanto, en estos casos, únicamente se incluye el tiempo de arranque del oscilador.<br/></p>
 <div class="table-container">
 <table>
-  <caption><strong>Tiempos de Arranque para la Selección del Reloj del Oscilador de Cristal de Oscilación Completa</strong> <br>(<em>Start-up Times for the Full Swing Crystal Oscillator Clock Selection</em>)</strong></caption>
-  <thead>
-    <tr>
-      <th>Fuente del oscilador /<br>Condiciones de potencia </th>
-      <th>Tiempo de arranque desde<br><em>Power-down</em> y <em>Power-save</em></th>
-      <th>Retardo adicional desde <em>reset</em><br>(V<sub>CC</sub> = 5.0V) <sup>(a)</sup></th>
-      <th><code>CKSEL0</code></th>
-      <th><code>SUT1...0</code></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Resonador cerámico, subida rápida de potencia (<em>Ceramic resonator, fast rising power</em>)</td>
-      <td>258 CK</td>
-      <td>19 CK + 4.1 ms<sup>(1)</sup></td>
-      <td>0</td>
-      <td>00</td>
-    </tr>
-    <tr>
-      <td>Resonador cerámico, subida lenta de potencia (<em>Ceramic resonator, slowly rising power</em>)</td>
-      <td>258 CK</td>
-      <td>19 CK + 65 ms<sup>(1)</sup></td>
-      <td>0</td>
-      <td>01</td>
-    </tr>
-    <tr>
-      <td>Resonador cerámico, BOD habilitado (<em>Ceramic resonator, BOD enabled</em>)</td>
-      <td>1K CK</td>
-      <td>19 CK <sup>(2)</sup></td>
-      <td>0</td>
-      <td>10</td>
-    </tr>
-    <tr>
-      <td>Resonador cerámico, subida rápida de potencia (<em>Ceramic resonator, fast rising power</em>)</td>
-      <td>1K CK</td>
-      <td>19 CK + 4.1 ms <sup>(2)</sup></td>
-      <td>0</td>
-      <td>11</td>
-    </tr>
-    <tr>
-      <td>Resonador cerámico, subida lenta de potencia (<em>Ceramic resonator, slowly rising power</em>)</td>
-      <td>1K CK</td>
-      <td>19 CK + 65ms <sup>(2)</sup></td>
-      <td>1</td>
-      <td>00</td>
-    </tr>
-    <tr>
-      <td>Oscilador de cristal, BOD habilitado (<em>Crystal Oscillator, BOD enabled</em>)</td>
-      <td>16K CK</td>
-      <td>19 CK</td>
-      <td>1</td>
-      <td>01</td>
-    </tr>
-    <tr>
-      <td>Oscilador de cristal, subida rápida de potencia (<em>Crystal Oscillator, fast rising power</em>)</td>
-      <td>16K CK</td>
-      <td>19 CK + 4.1 ms</td>
-      <td>1</td>
-      <td>10</td>
-    </tr>
-    <tr>
-      <td>Oscilador de cristal, subida lenta de potencia (<em>Crystal Oscillator, slowly rising power</em>)</td>
-      <td>16K CK</td>
-      <td>19 CK + 65 ms</td>
-      <td>1</td>
-      <td>11</td>
-    </tr>
-  </tbody>
-  <tfoot>
-    <tr>
-      <td colspan="5">
-        <strong>Notas:</strong><br>
-        <sup>(a)</sup> Datos de columna actualizados según <strong>DS80000855C</strong>. <em>Silicon Errata and Data Sheet Clarifications ATmega48A/PA/88A/PA/168A/PA/328/P</em>, pp. 5-6<br>
-        <sup>(1)</sup> Estas opciones solo deben usarse cuando no se opera cerca de la frecuencia máxima del dispositivo, y únicamente si la estabilidad de frecuencia en el arranque no es importante para la aplicación. Estas opciones no son adecuadas para cristales.<br>
-        <sup>(2)</sup> Estas opciones están destinadas al uso con resonadores cerámicos (<em>ceramic resonators</em>) y garantizarán la estabilidad de frecuencia en el arranque. También se pueden utilizar con cristales cuando no se opera cerca de la frecuencia máxima del dispositivo, y si la estabilidad de frecuencia en el arranque no es importante para la aplicación.
+<caption><strong>Tiempos de Arranque para la Selección del Reloj del Oscilador de Cristal de Oscilación Completa</strong> <br/>(<em>Start-up Times for the Full Swing Crystal Oscillator Clock Selection</em>)</caption>
+<thead>
+<tr>
+<th>Fuente del oscilador /<br/>Condiciones de potencia </th>
+<th>Tiempo de arranque desde<br/><em>Power-down</em> y <em>Power-save</em></th>
+<th>Retardo adicional desde <em>reset</em><br/>(V<sub>CC</sub> = 5.0V) <sup>(a)</sup></th>
+<th><code>CKSEL0</code></th>
+<th><code>SUT1...0</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Resonador cerámico, subida rápida de potencia (<em>Ceramic resonator, fast rising power</em>)</td>
+<td>258 CK</td>
+<td>19 CK + 4.1 ms<sup>(1)</sup></td>
+<td>0</td>
+<td>00</td>
+</tr>
+<tr>
+<td>Resonador cerámico, subida lenta de potencia (<em>Ceramic resonator, slowly rising power</em>)</td>
+<td>258 CK</td>
+<td>19 CK + 65 ms<sup>(1)</sup></td>
+<td>0</td>
+<td>01</td>
+</tr>
+<tr>
+<td>Resonador cerámico, BOD habilitado (<em>Ceramic resonator, BOD enabled</em>)</td>
+<td>1K CK</td>
+<td>19 CK <sup>(2)</sup></td>
+<td>0</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Resonador cerámico, subida rápida de potencia (<em>Ceramic resonator, fast rising power</em>)</td>
+<td>1K CK</td>
+<td>19 CK + 4.1 ms <sup>(2)</sup></td>
+<td>0</td>
+<td>11</td>
+</tr>
+<tr>
+<td>Resonador cerámico, subida lenta de potencia (<em>Ceramic resonator, slowly rising power</em>)</td>
+<td>1K CK</td>
+<td>19 CK + 65ms <sup>(2)</sup></td>
+<td>1</td>
+<td>00</td>
+</tr>
+<tr>
+<td>Oscilador de cristal, BOD habilitado (<em>Crystal Oscillator, BOD enabled</em>)</td>
+<td>16K CK</td>
+<td>19 CK</td>
+<td>1</td>
+<td>01</td>
+</tr>
+<tr>
+<td>Oscilador de cristal, subida rápida de potencia (<em>Crystal Oscillator, fast rising power</em>)</td>
+<td>16K CK</td>
+<td>19 CK + 4.1 ms</td>
+<td>1</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Oscilador de cristal, subida lenta de potencia (<em>Crystal Oscillator, slowly rising power</em>)</td>
+<td>16K CK</td>
+<td>19 CK + 65 ms</td>
+<td>1</td>
+<td>11</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td colspan="5">
+<strong>Notas:</strong><br/>
+<sup>(a)</sup> Datos de columna actualizados según <strong>DS80000855C</strong>. <em>Silicon Errata and Data Sheet Clarifications ATmega48A/PA/88A/PA/168A/PA/328/P</em>, pp. 5-6<br/>
+<sup>(1)</sup> Estas opciones solo deben usarse cuando no se opera cerca de la frecuencia máxima del dispositivo, y únicamente si la estabilidad de frecuencia en el arranque no es importante para la aplicación. Estas opciones no son adecuadas para cristales.<br/>
+<sup>(2)</sup> Estas opciones están destinadas al uso con resonadores cerámicos (<em>ceramic resonators</em>) y garantizarán la estabilidad de frecuencia en el arranque. También se pueden utilizar con cristales cuando no se opera cerca de la frecuencia máxima del dispositivo, y si la estabilidad de frecuencia en el arranque no es importante para la aplicación.
       </td>
-    </tr>
-  </tfoot>
+</tr>
+</tfoot>
 </table>
 </div>
-<img src="img/lfuse_cristal_oscilacion_completa_arranque.png" alt="Ajustes de CKSEL0 y SUT1...0 según condiciones de potencia para oscilador de oscilación completa" class="imagen-centrada">
-
-
-</section>
-
-          <section>
-          <h2>7. OSCILADOR DE CRISTAL DE BAJA FRECUENCIA (<em>Low Frequency Crystal Oscillator</em>)</h2>
-          <p>El oscilador de cristal de baja frecuencia está optimizado para su uso con un cristal de reloj de <strong>32.768 kHz</strong>. Al seleccionar los cristales, se deben tomar en consideración la capacitancia de carga (<em>load capacitance</em>) y la resistencia serie equivalente (<em>Equivalent Series Resistance, ESR</em>) del cristal. 
+<img alt="Ajustes de CKSEL0 y SUT1...0 según condiciones de potencia para oscilador de oscilación completa" class="imagen-centrada" src="img/lfuse_cristal_oscilacion_completa_arranque.png"/>
+</div></section><section>
+<h2>3.4. OSCILADOR DE CRISTAL DE BAJA FRECUENCIA (LOW FREQUENCY CRYSTAL OSCILLATOR)</h2>
+<p>El oscilador de cristal de baja frecuencia está optimizado para su uso con un cristal de reloj de <strong>32.768 kHz</strong>. Al seleccionar los cristales, se deben tomar en consideración la capacitancia de carga (<em>load capacitance</em>) y la resistencia serie equivalente (<em>Equivalent Series Resistance, ESR</em>) del cristal. 
             
-            <h3>7.1. Capacitancia de Carga y Resistencia Serie Equivalente del Oscilador</h3>
-            <p>Ambos valores son especificados por el fabricante del cristal. El oscilador del <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> está optimizado para un consumo de energía muy bajo (<em>very low power consumption</em>), por lo que al seleccionar los cristales, consulte la tabla para ver las recomendaciones de ESR máximo en cristales de 6.5 pF, 9.0 pF y 12.5 pF.</p>
-          <div class="table-container">
-          <table>
-          <caption><strong>Recomendación de ESR Máxima para Cristal de 32.768 kHz</strong> </caption>
-            <thead>
-              <tr>
-                <th style="text-align: center;">Capacitancia de Carga del Cristal <br> C<sub>L</sub> (pF) </th>
-                <th style="text-align: center;">Resistencia Serie Equivalente Máxima para el Cristal <br> ESR Máx. [k&#937;] <sup>(1)</sup> </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>6.5</td>
-                <td>75</td>
-              </tr>
-              <tr>
-                <td>9.0</td>
-                <td>65</td>
-              </tr>
-              <tr>
-                <td>12.5</td>
-                <td>30</td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr>
-                <td colspan="2">
-                  <strong>Nota:</strong><br>
-                  <sup>(1)</sup> La ESR máxima es un valor típico basado en la caracterización (<em>characterization</em>).
+            <h3>3.4.1. Capacitancia de carga y resistencia serie equivalente (ESR) del cristal</h3>
+<p>Ambos valores son especificados por el fabricante del cristal. El oscilador del <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> está optimizado para un consumo de energía muy bajo (<em>very low power consumption</em>), por lo que al seleccionar los cristales, consulte la tabla para ver las recomendaciones de ESR máximo en cristales de 6.5 pF, 9.0 pF y 12.5 pF.</p>
+<div class="table-container">
+<table>
+<caption><strong>Recomendación de ESR Máxima para Cristal de 32.768 kHz</strong> </caption>
+<thead>
+<tr>
+<th style="text-align: center;">Capacitancia de Carga del Cristal <br/> C<sub>L</sub> (pF) </th>
+<th style="text-align: center;">Resistencia Serie Equivalente Máxima para el Cristal <br/> ESR Máx. [kΩ] <sup>(1)</sup> </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6.5</td>
+<td>75</td>
+</tr>
+<tr>
+<td>9.0</td>
+<td>65</td>
+</tr>
+<tr>
+<td>12.5</td>
+<td>30</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td colspan="2">
+<strong>Nota:</strong><br/>
+<sup>(1)</sup> La ESR máxima es un valor típico basado en la caracterización (<em>characterization</em>).
                 </td>
-              </tr>
-            </tfoot>
-          </table>
-          </div>
-
-        <p><strong>Cómo interpretar esta tabla</strong>:</p>
-
-        <ul>
-          <li>La capacitancia de carga <strong>C<sub>L</sub></strong> y la <strong>ESR máxima</strong> son datos del cristal: los especifica su fabricante, en la hoja de datos del cristal.</li>
-          <li>La tabla no dice qué <strong>ESR</strong> debe tener el cristal, sino la ESR máxima <strong>recomendada</strong> según su <strong>C<sub>L</sub></strong>.</li>
-          <li>La <strong>ESR</strong> del cristal a elegir debe ser igual o menor que el valor de la fila que corresponde a su <strong>C<sub>L</sub></strong>: hasta 75 kΩ con 6.5 pF, hasta 65 kΩ con 9.0 pF y hasta 30 kΩ con 12.5 pF.</li>
-          <li>A mayor <strong>C<sub>L</sub></strong>, menor es la <strong>ESR máxima recomendada</strong>.</li>
-          <li>Es un valor típico basado en la caracterización, según la nota (1).</li>
-          <li>Ejemplo con valores supuestos: un cristal de 12.5 pF con ESR de 25 kΩ cumple la recomendación (25 es menor que 30); con ESR de 40 kΩ no la cumple (40 es mayor que 30).</li>
-        </ul>
-        
-      <h3>7.2. Capacitancia de Carga Interna en los pines TOSC</h3>  
-        <p>El oscilador de cristal de baja frecuencia proporciona una capacitancia de carga interna  en cada pin <strong>TOSC</strong> (<code>PB6</code> y <code>PB7</code>). Consulte la Tabla siguiente</p>
-
-        <div class="table-container">
-          <table>
-            <caption><strong> Capacitancia de Carga Interna para el Oscilador de Cristal de Baja Frecuencia</strong></caption>
-            <thead>
-              <tr>
-                <th>Dispositivo (<em>Device</em>)</th>
-                <th>Tipo de Oscilador de 32 kHz (<em>32kHz Osc. Type</em>)</th>
-                <th>Cap(Xtal1/TOSC1/PB6)</th>
-                <th>Cap(Xtal2/TOSC2/PB7)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td rowspan="2">ATmega48A/PA/88A/PA/168A/PA/328/P</td>
-                <td>Oscilador del Sistema (<em>System Osc.</em>)</td>
-                <td>18 pF</td>
-                <td>8 pF</td>
-              </tr>
-              <tr>
-                <td>Oscilador del Temporizador (<em>Timer Osc.</em>)</td>
-                <td>18 pF</td>
-                <td>8 pF</td>
-              </tr>
-            </tbody>
-          </table>
-          </div>
-      
-          <h3>7.3. Cálculo de la Capacitancia Necesaria</h3>
-          <p>La capacitancia (C<sub>e</sub> + C<sub>i</sub>) necesaria en cada pin <code>TOSC</code> se puede calcular utilizando:</p>
-          <p>$$C = 2 \cdot C_L - C_S$$</p>
-          <p>donde:</p>
-          <ul>
-            <li>C<sub>e</sub> - son los condensadores externos opcionales como se describe en <a href="#seccion-13"> 5. OSCILADOR DE CRISTAL DE BAJA POTENCIA.</a></li>
-            <li>C<sub>i</sub> - es la capacitancia del pin en la Tabla <strong>Capacitancia de Carga Interna para el Oscilador de Cristal de Baja Frecuencia</strong>>.</li>
-            <li>C<sub>L</sub> - es la capacitancia de carga para un cristal de 32.768 kHz especificada por el fabricante del cristal.</li>
-            <li>C<sub>S</sub> - es la capacitancia parásita total para un pin<code>TOSC</code>. Debemos averiguar este valor</li>
-          </ul>
-
-          <p>Los cristales que especifican una capacitancia de carga (C<sub>L</sub>) superior a 6 pF requieren condensadores externos aplicados como se describe en la <a href="#seccion-10"> Crystal Oscillator Connections</a></li>.</p>
-
-          
-    <h3>7.4.Consejos de diseño en el PCB</h3>
-    <ul>
-        <li><strong>Cercanía:</strong> Coloca el cristal y los capacitores lo más cerca posible de los pines TOSC1 y TOSC2 del chip.</li>
-        <li><strong>Pistas cortas:</strong> Minimiza la longitud de las pistas para evitar que aumente la capacitancia parásita (C<sub>S</sub>) y altere la precisión del reloj.</li>
-        <li><strong>Plano de masa:</strong> Rodea la zona del oscilador con un plano de tierra para proteger la señal de ruidos electromagnéticos externos.</li>
-    </ul>
-
-    <h3>7.5. Selección de los Tiempos de Retardo Adicional desde Reset</h3>
-
-      <p>Los tiempos de retardo adicional son determinados por los fusibles <code>SUT</code> como se muestra en la Tabla siguiente.</p>
-          
-          <div class="table-container">
-          <table>
-            <caption><strong>Tiempos de Arranque para la Selección del Reloj del Oscilador de Cristal de Baja Frecuencia</strong> </caption>
-            <thead>
-              <tr>
-                <th><code>SUT1...0</code></th>
-                <th>Retardo adicional desde <em>reset</em> (V<sub>CC</sub> = 5.0V) <sup>(a)</sup> <br> 
+</tr>
+</tfoot>
+</table>
+</div>
+<p><strong>Cómo interpretar esta tabla</strong>:</p>
+<ul>
+<li>La capacitancia de carga <strong>C<sub>L</sub></strong> y la <strong>ESR máxima</strong> son datos del cristal: los especifica su fabricante, en la hoja de datos del cristal.</li>
+<li>La tabla no dice qué <strong>ESR</strong> debe tener el cristal, sino la ESR máxima <strong>recomendada</strong> según su <strong>C<sub>L</sub></strong>.</li>
+<li>La <strong>ESR</strong> del cristal a elegir debe ser igual o menor que el valor de la fila que corresponde a su <strong>C<sub>L</sub></strong>: hasta 75 kΩ con 6.5 pF, hasta 65 kΩ con 9.0 pF y hasta 30 kΩ con 12.5 pF.</li>
+<li>A mayor <strong>C<sub>L</sub></strong>, menor es la <strong>ESR máxima recomendada</strong>.</li>
+<li>Es un valor típico basado en la caracterización, según la nota (1).</li>
+<li>Ejemplo con valores supuestos: un cristal de 12.5 pF con ESR de 25 kΩ cumple la recomendación (25 es menor que 30); con ESR de 40 kΩ no la cumple (40 es mayor que 30).</li>
+</ul>
+<h3>3.4.2. Capacitancia interna de los pines TOSC1 y TOSC2</h3>
+<p>El oscilador de cristal de baja frecuencia proporciona una capacitancia de carga interna  en cada pin <strong>TOSC</strong> (<code>PB6</code> y <code>PB7</code>). Consulte la Tabla siguiente</p>
+<div class="table-container">
+<table>
+<caption><strong> Capacitancia de Carga Interna para el Oscilador de Cristal de Baja Frecuencia</strong></caption>
+<thead>
+<tr>
+<th>Dispositivo (<em>Device</em>)</th>
+<th>Tipo de Oscilador de 32 kHz (<em>32kHz Osc. Type</em>)</th>
+<th>Cap(Xtal1/TOSC1/PB6)</th>
+<th>Cap(Xtal2/TOSC2/PB7)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td rowspan="2">ATmega48A/PA/88A/PA/168A/PA/328/P</td>
+<td>Oscilador del Sistema (<em>System Osc.</em>)</td>
+<td>18 pF</td>
+<td>8 pF</td>
+</tr>
+<tr>
+<td>Oscilador del Temporizador (<em>Timer Osc.</em>)</td>
+<td>18 pF</td>
+<td>8 pF</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3>3.4.3. Cálculo de la capacitancia de carga requerida</h3>
+<p>La capacitancia (C<sub>e</sub> + C<sub>i</sub>) necesaria en cada pin <code>TOSC</code> se puede calcular utilizando:</p>
+<p>$$C = 2 \cdot C_L - C_S$$</p>
+<p>donde:</p>
+<ul>
+<li>C<sub>e</sub> - son los condensadores externos opcionales como se describe en <a href="#seccion-13"> 5. OSCILADOR DE CRISTAL DE BAJA POTENCIA.</a></li>
+<li>C<sub>i</sub> - es la capacitancia del pin en la Tabla <strong>Capacitancia de Carga Interna para el Oscilador de Cristal de Baja Frecuencia</strong>&gt;.</li>
+<li>C<sub>L</sub> - es la capacitancia de carga para un cristal de 32.768 kHz especificada por el fabricante del cristal.</li>
+<li>C<sub>S</sub> - es la capacitancia parásita total para un pin<code>TOSC</code>. Debemos averiguar este valor</li>
+</ul>
+<p>Los cristales que especifican una capacitancia de carga (C<sub>L</sub>) superior a 6 pF requieren condensadores externos aplicados como se describe en la <a href="#seccion-10"> Crystal Oscillator Connections</a>.</p>
+<h3>3.4.4. Recomendaciones de diseño de PCB para el oscilador</h3>
+<ul>
+<li><strong>Cercanía:</strong> Coloca el cristal y los capacitores lo más cerca posible de los pines TOSC1 y TOSC2 del chip.</li>
+<li><strong>Pistas cortas:</strong> Minimiza la longitud de las pistas para evitar que aumente la capacitancia parásita (C<sub>S</sub>) y altere la precisión del reloj.</li>
+<li><strong>Plano de masa:</strong> Rodea la zona del oscilador con un plano de tierra para proteger la señal de ruidos electromagnéticos externos.</li>
+</ul>
+<h3>3.4.5. Selección del retardo adicional desde Reset</h3>
+<p>Los tiempos de retardo adicional son determinados por los fusibles <code>SUT</code> como se muestra en la Tabla siguiente.</p>
+<div class="table-container">
+<table>
+<caption><strong>Tiempos de Arranque para la Selección del Reloj del Oscilador de Cristal de Baja Frecuencia</strong> </caption>
+<thead>
+<tr>
+<th><code>SUT1...0</code></th>
+<th>Retardo adicional desde <em>reset</em> (V<sub>CC</sub> = 5.0V) <sup>(a)</sup> <br/> 
                     (<em>Additional Delay from Reset (VCC = 5.0V)</em>) </th>
-                <th>Uso recomendado (<em>Recommended Usage</em>)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>00</td>
-                <td>19 CK</td>
-                <td>Potencia de subida rápida (<em>Fast rising power</em>) o BOD habilitado</td>
-              </tr>
-              <tr>
-                <td>01</td>
-                <td>19 CK + 4.1 ms</td>
-                <td>Potencia de subida lenta (<em>Slowly rising power</em>)</td>
-              </tr>
-              <tr>
-                <td>10</td>
-                <td>19 CK + 65 ms</td>
-                <td>Frecuencia estable en el arranque (<em>Stable frequency at start-up</em>)</td>
-              </tr>
-              <tr>
-                <td>11</td>
-                <td colspan="2">Reservado (<em>Reserved</em>)</td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr>
-                <td colspan="3">
-                  <strong>Nota:</strong><br>
-                  <sup>(a)</sup> Datos de columna actualizados según <strong>DS80000855C</strong>. <em>Silicon Errata and Data Sheet Clarifications ATmega48A/PA/88A/PA/168A/PA/328/P</em>, pag. 6.
+<th>Uso recomendado (<em>Recommended Usage</em>)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>00</td>
+<td>19 CK</td>
+<td>Potencia de subida rápida (<em>Fast rising power</em>) o BOD habilitado</td>
+</tr>
+<tr>
+<td>01</td>
+<td>19 CK + 4.1 ms</td>
+<td>Potencia de subida lenta (<em>Slowly rising power</em>)</td>
+</tr>
+<tr>
+<td>10</td>
+<td>19 CK + 65 ms</td>
+<td>Frecuencia estable en el arranque (<em>Stable frequency at start-up</em>)</td>
+</tr>
+<tr>
+<td>11</td>
+<td colspan="2">Reservado (<em>Reserved</em>)</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td colspan="3">
+<strong>Nota:</strong><br/>
+<sup>(a)</sup> Datos de columna actualizados según <strong>DS80000855C</strong>. <em>Silicon Errata and Data Sheet Clarifications ATmega48A/PA/88A/PA/168A/PA/328/P</em>, pag. 6.
                 </td>
-              </tr>
-            </tfoot>
-          </table>
-          </div>
-
-
-    <h3>7.6. Selección de los Tiempos de Arranque desde Power-down y Power-save</h3>
-
-          <p>El oscilador de cristal de baja frecuencia debe seleccionarse configurando los fusibles <code>CKSEL</code> en &laquo;0110&raquo; o &laquo;0111&raquo; para establecer el tiempo de arranque desde los estados de <strong>Apagado (<em>Power-down</em>)</strong> y <strong>Ahorro de Energía (<em>Power-save</em>)</strong> como se muestra en la tabla siguiente. 
-          </p>  
-
-           <div class="table-container">
-          <table>
-            <caption><strong>Tiempos de Arranque para la Selección del Reloj del Oscilador de Cristal de Baja Frecuencia</strong></caption>
-            <thead>
-              <tr>
-                <th><code>CKSEL3...0</code></th>
-                <th>Tiempo de arranque desde <em>Power-down</em> y <em>Power-save</em>  </th>
-                <th>Uso recomendado </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>0100<sup>(1)</sup></td>
-                <td>1K CK</td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>0101</td>
-                <td>32K CK</td>
-                <td>Frecuencia estable en el arranque (<em>Stable frequency at start-up</em>)</td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr>
-                <td colspan="3">
-                  <strong>Nota:</strong><br>
+</tr>
+</tfoot>
+</table>
+</div>
+<h3>3.4.6. Selección de los tiempos de arranque desde Power-down y Power-save</h3>
+<p>El oscilador de cristal de baja frecuencia debe seleccionarse configurando los fusibles <code>CKSEL</code> en «0110» o «0111» para establecer el tiempo de arranque desde los estados de <strong>Apagado (<em>Power-down</em>)</strong> y <strong>Ahorro de Energía (<em>Power-save</em>)</strong> como se muestra en la tabla siguiente. 
+          </p>
+<div class="table-container">
+<table>
+<caption><strong>Tiempos de Arranque para la Selección del Reloj del Oscilador de Cristal de Baja Frecuencia</strong></caption>
+<thead>
+<tr>
+<th><code>CKSEL3...0</code></th>
+<th>Tiempo de arranque desde <em>Power-down</em> y <em>Power-save</em> </th>
+<th>Uso recomendado </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0100<sup>(1)</sup></td>
+<td>1K CK</td>
+<td></td>
+</tr>
+<tr>
+<td>0101</td>
+<td>32K CK</td>
+<td>Frecuencia estable en el arranque (<em>Stable frequency at start-up</em>)</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td colspan="3">
+<strong>Nota:</strong><br/>
                   1. Esta opción solo debe usarse si la estabilidad de frecuencia en el arranque no es importante para la aplicación .
                 </td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
-
-      </section>
-
-      <section>
-        <h2>8. OSCILADOR RC CALIBRADO INTERNO (<em>Calibrated Internal RC Oscillator</em>)</h2>
-<p>Por defecto, el <strong>oscilador RC interno (<em>Internal RC Oscillator</em>)</strong> proporciona un reloj de aproximadamente 8.0 MHz. Aunque depende del voltaje y de la temperatura, este reloj puede ser calibrado con mucha precisión por el usuario.</p>
-
- <p>El <strong>oscilador RC interno</strong> se puede utilizar como el reloj del sistema sin componentes externos. La frecuencia de este oscilador depende del voltaje y de la temperatura, pero puede ser calibrada con mucha precisión por el usuario. La calibración de fábrica es de ±10% a 8 MHz, 3 V y 25 °C. La calibración del usuario es de ±1% a 7.3 - 8.1 MHz, 1.8 V - 5.5 V y -40 °C - 85 °C</p>
- 
-
-<div class="table-container">
-<table>
-  <caption><strong>Precisión de Calibración del Oscilador RC Interno</strong></caption>
-  <thead>
-    <tr>
-      <th>Tipo de calibración</th>
-      <th>Frecuencia</th>
-      <th>VCC</th>
-      <th>Temperatura</th>
-      <th>Precisión de calibración</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Calibración de fábrica</td>
-      <td>8.0 MHz</td>
-      <td>3 V</td>
-      <td>25 °C</td>
-      <td>±10%</td>
-    </tr>
-    <tr>
-      <td>Calibración de usuario</td>
-      <td>7.3 - 8.1 MHz</td>
-      <td>1.8 V - 5.5 V</td>
-      <td>-40 °C - 85 °C</td>
-      <td>±1%</td>
-    </tr>
-  </tbody>
+</tr>
+</tfoot>
 </table>
 </div>
-
- <p> El dispositivo se suministra con el fusible <code>CKDIV8</code> programado (<em>programmed</em>). Cuando el microcontrolador sale de la línea de fabricación, viene configurado por defecto para utilizar su Oscilador RC Interno a 8.0 MHz. Para garantizar que el dispositivo arranque de manera 100% estable en cualquier condición de voltaje (V<sub>CC</sub>) o entorno sin importar la fuente de alimentación del cliente, Microchip programa de fábrica dos cosas en el byte lfuse:</p>
-<ul>
-  <li>Selecciona el oscilador RC interno como fuente de reloj.</li>
-  <li>Activa (programa con 0) el fusible CKDIV8.</li>
-</ul>
-
-<p>Por eso, el chip iniciará operando a 1 MHz a menos que cambies el fusible <code>CKDIV8</code> en <code>lfuse</code> o uses el registro <code>CLKPR</code>, Consulte la sección &laquo;Preescalador del Reloj del Sistema&raquo; (<em>System Clock Prescaler</em>), para más detalles.</p>
-<p>Este reloj se puede seleccionar como el reloj del sistema programando los fusibles <code>CKSEL</code> en <code>0010</code> como se muestra en la Tabla <strong>Modos de Operación del Oscilador RC Calibrado Interno</strong>. Si se selecciona, operará sin componentes externos. </p>
-
+</p></section><section>
+<h2>3.5. OSCILADOR RC INTERNO CALIBRADO (CALIBRATED INTERNAL RC OSCILLATOR)</h2>
+<p>Por defecto, el <strong>oscilador RC interno (<em>Internal RC Oscillator</em>)</strong> proporciona un reloj de aproximadamente 8.0 MHz. Aunque depende del voltaje y de la temperatura, este reloj puede ser calibrado con mucha precisión por el usuario.</p>
+<p>El <strong>oscilador RC interno</strong> se puede utilizar como el reloj del sistema sin componentes externos. La frecuencia de este oscilador depende del voltaje y de la temperatura, pero puede ser calibrada con mucha precisión por el usuario. La calibración de fábrica es de ±10% a 8 MHz, 3 V y 25 °C. La calibración del usuario es de ±1% a 7.3 - 8.1 MHz, 1.8 V - 5.5 V y -40 °C - 85 °C</p>
 <div class="table-container">
 <table>
-  <caption><strong>Modos de Operación del Oscilador RC Calibrado Interno</strong> </caption>
-  <thead>
-    <tr>
-      <th>Rango de Frecuencia <sup>(2)</sup> [MHz] (<em>Frequency Range</em>)</th>
-      <th><code>CKSEL3...0</code></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>7.3 - 8.1</td>
-      <td>0010 <sup>(1)</sup></td>
-    </tr>
-  </thead>
-  <tfoot>
-    <tr>
-      <td colspan="2">
-        <strong>Notas:</strong><br>
-        1. El dispositivo se suministra de fábrica con esta opción seleccionada (<em>The device is shipped with this option selected</em>).<br>
+<caption><strong>Precisión de Calibración del Oscilador RC Interno</strong></caption>
+<thead>
+<tr>
+<th>Tipo de calibración</th>
+<th>Frecuencia</th>
+<th>VCC</th>
+<th>Temperatura</th>
+<th>Precisión de calibración</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Calibración de fábrica</td>
+<td>8.0 MHz</td>
+<td>3 V</td>
+<td>25 °C</td>
+<td>±10%</td>
+</tr>
+<tr>
+<td>Calibración de usuario</td>
+<td>7.3 - 8.1 MHz</td>
+<td>1.8 V - 5.5 V</td>
+<td>-40 °C - 85 °C</td>
+<td>±1%</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p> El dispositivo se suministra con el fusible <code>CKDIV8</code> programado (<em>programmed</em>). Cuando el microcontrolador sale de la línea de fabricación, viene configurado por defecto para utilizar su Oscilador RC Interno a 8.0 MHz. Para garantizar que el dispositivo arranque de manera 100% estable en cualquier condición de voltaje (V<sub>CC</sub>) o entorno sin importar la fuente de alimentación del cliente, Microchip programa de fábrica dos cosas en el byte lfuse:</p>
+<ul>
+<li>Selecciona el oscilador RC interno como fuente de reloj.</li>
+<li>Activa (programa con 0) el fusible CKDIV8.</li>
+</ul>
+<p>Por eso, el chip iniciará operando a 1 MHz a menos que cambies el fusible <code>CKDIV8</code> en <code>lfuse</code> o uses el registro <code>CLKPR</code>, Consulte la sección «Preescalador del Reloj del Sistema» (<em>System Clock Prescaler</em>), para más detalles.</p>
+<p>Este reloj se puede seleccionar como el reloj del sistema programando los fusibles <code>CKSEL</code> en <code>0010</code> como se muestra en la Tabla <strong>Modos de Operación del Oscilador RC Calibrado Interno</strong>. Si se selecciona, operará sin componentes externos. </p>
+<div class="table-container">
+<table>
+<caption><strong>Modos de Operación del Oscilador RC Calibrado Interno</strong> </caption>
+<thead>
+<tr>
+<th>Rango de Frecuencia <sup>(2)</sup> [MHz] (<em>Frequency Range</em>)</th>
+<th><code>CKSEL3...0</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>7.3 - 8.1</td>
+<td>0010 <sup>(1)</sup></td>
+</tr>
+<tfoot>
+<tr>
+<td colspan="2">
+<strong>Notas:</strong><br/>
+        1. El dispositivo se suministra de fábrica con esta opción seleccionada (<em>The device is shipped with this option selected</em>).<br/>
         2. Si la frecuencia de 8 MHz excede la especificación del dispositivo (depende de V<sub>CC</sub>), se puede programar el fusible <code>CKDIV8</code> para dividir la frecuencia interna por 8.
       </td>
-    </tr>
-  </tfoot>
-</table>
+</tr>
+</tfoot>
+</tbody></table>
 </div>
-  
-  
 <p>Durante el <em>reset</em>, el <em>hardware</em> carga el valor de calibración preprogramado en el registro <code>OSCCAL</code> y, por lo tanto, calibra automáticamente el oscilador RC. La precisión de esta calibración se muestra como Calibración de fábrica (<em>Factory calibration</em>) en la Tabla 29-9 de la página 313.</p>
-<p>Al cambiar el registro <code>OSCCAL</code> desde el <em>software</em> (consulte la sección &laquo;<code>OSCCAL</code> – Registro de Calibración del Oscilador&raquo; [<em>OSCCAL – Oscillator Calibration Register</em>] en la página 46), es posible obtener una mayor precisión de calibración que utilizando la calibración de fábrica. La precisión de esta calibración se muestra como Calibración del usuario (<em>User calibration</em>) en la Tabla 29-9 de la página 313.</p>
-<p>Cuando este oscilador se utiliza como el reloj del chip, el oscilador del Perro Guardián (<em>Watchdog Oscillator</em>) se seguirá utilizando para el temporizador Perro Guardián (<em>Watchdog Timer</em>) y para el tiempo de espera del <em>reset</em> (<em>Reset Time-out</em>). Para obtener más información sobre el valor de calibración preprogramado, consulte la sección &laquo;Byte de Calibración&raquo; (<em>Calibration Byte</em>) en la página 293.</p>
-
-
-
+<p>Al cambiar el registro <code>OSCCAL</code> desde el <em>software</em> (consulte la sección «<code>OSCCAL</code> – Registro de Calibración del Oscilador» [<em>OSCCAL – Oscillator Calibration Register</em>] en la página 46), es posible obtener una mayor precisión de calibración que utilizando la calibración de fábrica. La precisión de esta calibración se muestra como Calibración del usuario (<em>User calibration</em>) en la Tabla 29-9 de la página 313.</p>
+<p>Cuando este oscilador se utiliza como el reloj del chip, el oscilador del Perro Guardián (<em>Watchdog Oscillator</em>) se seguirá utilizando para el temporizador Perro Guardián (<em>Watchdog Timer</em>) y para el tiempo de espera del <em>reset</em> (<em>Reset Time-out</em>). Para obtener más información sobre el valor de calibración preprogramado, consulte la sección «Byte de Calibración» (<em>Calibration Byte</em>) en la página 293.</p>
 <p>Cuando se selecciona este oscilador, los tiempos de arranque (<em>start-up times</em>) son determinados por los fusibles <code>SUT</code> como se muestra en la Tabla siguiente.</p>
-
 <div class="table-container">
 <table>
-  <caption><strong>Tiempos de Arranque para la Selección del Reloj del Oscilador RC Calibrado Interno</strong> </caption>
-  <thead>
-    <tr>
-      <th>Condiciones de potencia (<em>Power Conditions</em>)</th>
-      <th>Tiempo de arranque desde <em>Power-down</em> y <em>Power-save</em></th>
-      <th>Retardo adicional desde <em>reset</em> (V<sub>CC</sub> = 5.0V) <sup>(a)</sup> <br> (<em>Additional Delay from Reset</em>)</th>
-      <th><code>SUT1...0</code></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>BOD habilitado (<em>BOD enabled</em>)</td>
-      <td>6 CK</td>
-      <td>19 CK <sup>(1)</sup></td>
-      <td>00</td>
-    </tr>
-    <tr>
-      <td>Potencia de subida rápida (<em>Fast rising power</em>)</td>
-      <td>6 CK</td>
-      <td>19 CK + 4 ms</td>
-      <td>01</td>
-    </tr>
-    <tr>
-      <td>Potencia de subida lenta (<em>Slowly rising power</em>)</td>
-      <td>6 CK</td>
-      <td>19 CK + 65 ms <sup>(2)</sup></td>
-      <td>10</td>
-    </tr>
-    <tr>
-      <td colspan="3">Reservado (<em>Reserved</em>)</td>
-      <td>11</td>
-    </tr>
-  </tbody>
-  <tfoot>
-    <tr>
-      <td colspan="4">
-        <strong>Notas:</strong><br>
-        <sup>(a)</sup> Datos de columna actualizados según <strong>DS80000855C</strong>. <em>Silicon Errata and Data Sheet Clarifications ATmega48A/PA/88A/PA/168A/PA/328/P</em>, pag. 6.<br>
-        1. Si el fusible <code>RSTDISBL</code> está programado, este tiempo de arranque se incrementará a 19CK + 4 ms para asegurar que se pueda ingresar al modo de programación .<br>
+<caption><strong>Tiempos de Arranque para la Selección del Reloj del Oscilador RC Calibrado Interno</strong> </caption>
+<thead>
+<tr>
+<th>Condiciones de potencia (<em>Power Conditions</em>)</th>
+<th>Tiempo de arranque desde <em>Power-down</em> y <em>Power-save</em></th>
+<th>Retardo adicional desde <em>reset</em> (V<sub>CC</sub> = 5.0V) <sup>(a)</sup> <br/> (<em>Additional Delay from Reset</em>)</th>
+<th><code>SUT1...0</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BOD habilitado (<em>BOD enabled</em>)</td>
+<td>6 CK</td>
+<td>19 CK <sup>(1)</sup></td>
+<td>00</td>
+</tr>
+<tr>
+<td>Potencia de subida rápida (<em>Fast rising power</em>)</td>
+<td>6 CK</td>
+<td>19 CK + 4 ms</td>
+<td>01</td>
+</tr>
+<tr>
+<td>Potencia de subida lenta (<em>Slowly rising power</em>)</td>
+<td>6 CK</td>
+<td>19 CK + 65 ms <sup>(2)</sup></td>
+<td>10</td>
+</tr>
+<tr>
+<td colspan="3">Reservado (<em>Reserved</em>)</td>
+<td>11</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td colspan="4">
+<strong>Notas:</strong><br/>
+<sup>(a)</sup> Datos de columna actualizados según <strong>DS80000855C</strong>. <em>Silicon Errata and Data Sheet Clarifications ATmega48A/PA/88A/PA/168A/PA/328/P</em>, pag. 6.<br/>
+        1. Si el fusible <code>RSTDISBL</code> está programado, este tiempo de arranque se incrementará a 19CK + 4 ms para asegurar que se pueda ingresar al modo de programación .<br/>
         2. El dispositivo se suministra con esta opción seleccionada (<em>The device is shipped with this option selected</em>).
       </td>
-    </tr>
-  </tfoot>
+</tr>
+</tfoot>
 </table>
 </div>
-</section>
-
-<section>
-<h2>9. OSCILADOR INTERNO DE 128kHz</h2>
-<p>El oscilador interno de 128 kHz es un oscilador de baja potencia (<em>low power Oscillator</em>) que proporciona un reloj de 128 kHz. La frecuencia es nominal a 3V y 25&nbsp;&deg;C. Este reloj se puede seleccionar como el reloj del sistema programando los fusibles <code>CKSEL</code> en <code>0011</code>, como se muestra en la siguiente Tabla.</p>
-
+</section><section>
+<h2>3.6. OSCILADOR RC INTERNO DE 128 kHz (128 kHz INTERNAL OSCILLATOR)</h2>
+<p>El oscilador interno de 128 kHz es un oscilador de baja potencia (<em>low power Oscillator</em>) que proporciona un reloj de 128 kHz. La frecuencia es nominal a 3V y 25 °C. Este reloj se puede seleccionar como el reloj del sistema programando los fusibles <code>CKSEL</code> en <code>0011</code>, como se muestra en la siguiente Tabla.</p>
 <div class="table-container">
 <table>
-  <caption><strong>Modos de Operación del Oscilador Interno de 128kHz</strong></caption>
-  <thead>
-    <tr>
-      <th>Frecuencia Nominal <sup>(1)</sup> (<em>Nominal Frequency</em>)</th>
-      <th><code>CKSEL3...0</code></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>128 kHz</td>
-      <td>0011</td>
-    </tr>
-  </tbody>
-  <tfoot>
-    <tr>
-      <td colspan="2">
-        <strong>Nota:</strong><br>
+<caption><strong>Modos de Operación del Oscilador Interno de 128kHz</strong></caption>
+<thead>
+<tr>
+<th>Frecuencia Nominal <sup>(1)</sup> (<em>Nominal Frequency</em>)</th>
+<th><code>CKSEL3...0</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>128 kHz</td>
+<td>0011</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td colspan="2">
+<strong>Nota:</strong><br/>
         1. Tenga en cuenta que el oscilador de 128 kHz es una fuente de reloj de muy baja potencia y no está diseñada para alta precisión.
       </td>
-    </tr>
-  </tfoot>
+</tr>
+</tfoot>
 </table>
 </div>
-
 <p>Cuando se selecciona esta fuente de reloj, los tiempos de arranque son determinados por los fusibles <code>SUT</code> como se muestra a continuación</p>
-
 <div class="table-container">
 <table>
-  <caption><strong>Tiempos de Arranque para el Oscilador Interno de 128kHz</strong></caption>
-  <thead>
-    <tr>
-      <th>Condiciones de potencia (<em>Power Conditions</em>)</th>
-      <th>Tiempo de arranque desde <em>Power-down</em> y <em>Power-save</em></th>
-      <th>Retardo adicional desde <em>reset</em> (VCC = 5.0V) <sup>(a)</sup> <sup>(1)</sup> </th>
-      <th><code>SUT1...0</code></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>BOD habilitado (<em>BOD enabled</em>)</td>
-      <td>6 CK</td>
-      <td>14 CK</td>
-      <td>00</td>
-    </tr>
-    <tr>
-      <td>Potencia de subida rápida (<em>Fast rising power</em>)</td>
-      <td>6 CK</td>
-      <td>14 CK + 4 ms</td>
-      <td>01</td>
-    </tr>
-    <tr>
-      <td>Potencia de subida lenta (<em>Slowly rising power</em>)</td>
-      <td>6 CK</td>
-      <td>14 CK + 64 ms</td>
-      <td>10</td>
-    </tr>
-    <tr>
-      <td colspan="3">Reservado (<em>Reserved</em>)</td>
-      <td>11</td>
-    </tr>
-  </tbody>
-  <tfoot>
-    <tr>
-      <td colspan="4">
-        <strong>Nota:</strong><br>
-        <sup>(a)</sup> Datos de columna actualizados según <strong>DS80000855C</strong>. <em>Silicon Errata and Data Sheet Clarifications ATmega48A/PA/88A/PA/168A/PA/328/P</em>, pag. 7.<br>
-        <sup>(1)</sup>. Si el fusible <code>RSTDISBL</code> está programado, este tiempo de arranque se incrementará a 14CK + 4.1ms para asegurar que se pueda ingresar al modo de programación (<em>If the RSTDISBL fuse is programmed, this start-up time will be increased to 19CK + 4 ms to ensure programming mode can be entered</em>).
+<caption><strong>Tiempos de Arranque para el Oscilador Interno de 128kHz</strong></caption>
+<thead>
+<tr>
+<th>Condiciones de potencia (<em>Power Conditions</em>)</th>
+<th>Tiempo de arranque desde <em>Power-down</em> y <em>Power-save</em></th>
+<th>Retardo adicional desde <em>reset</em> (VCC = 5.0V) <sup>(a)</sup> <sup>(1)</sup> </th>
+<th><code>SUT1...0</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BOD habilitado (<em>BOD enabled</em>)</td>
+<td>6 CK</td>
+<td>14 CK</td>
+<td>00</td>
+</tr>
+<tr>
+<td>Potencia de subida rápida (<em>Fast rising power</em>)</td>
+<td>6 CK</td>
+<td>14 CK + 4 ms</td>
+<td>01</td>
+</tr>
+<tr>
+<td>Potencia de subida lenta (<em>Slowly rising power</em>)</td>
+<td>6 CK</td>
+<td>14 CK + 64 ms</td>
+<td>10</td>
+</tr>
+<tr>
+<td colspan="3">Reservado (<em>Reserved</em>)</td>
+<td>11</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td colspan="4">
+<strong>Nota:</strong><br/>
+<sup>(a)</sup> Datos de columna actualizados según <strong>DS80000855C</strong>. <em>Silicon Errata and Data Sheet Clarifications ATmega48A/PA/88A/PA/168A/PA/328/P</em>, pag. 7.<br/>
+<sup>(1)</sup>. Si el fusible <code>RSTDISBL</code> está programado, este tiempo de arranque se incrementará a 14CK + 4.1ms para asegurar que se pueda ingresar al modo de programación (<em>If the RSTDISBL fuse is programmed, this start-up time will be increased to 19CK + 4 ms to ensure programming mode can be entered</em>).
       </td>
-    </tr>
-  </tfoot>
+</tr>
+</tfoot>
 </table>
 </div>
-</section>  
-
-<section>
-<h2>10. RELOJ EXTERNO</h2>
+</section><section>
+<h2>3.7. RELOJ EXTERNO (EXTERNAL CLOCK)</h2>
 <div class="imagen-derecha">
-    <div class="texto">
-        <p>El <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> puede ser controlado por un reloj externo (<em>external clock</em>).</p>
+<div class="texto">
+<p>El <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> puede ser controlado por un reloj externo (<em>external clock</em>).</p>
 <p>Para controlar el dispositivo desde una fuente de reloj externa (<em>external clock source</em>), esta debe conectarse directamente al pin <code>XTAL1</code> como se muestra en la Figura. mientras que el pin <code>XTAL2</code> debe dejarse sin conectar </p>
 </div>
-<img src="img/external_clock_drive_configuration.png" alt="Configuración de Control de Reloj Externo" class="imagen-derecha">
+<img alt="Configuración de Control de Reloj Externo" class="imagen-derecha" src="img/external_clock_drive_configuration.png"/>
 </div>
-
 <p>Para ejecutar el dispositivo con un reloj externo, los fusibles <code>CKSEL</code> deben programarse en <code>0000</code></p>
 <div class="table-container">
 <table>
-  <caption><strong>Fuses CKSEL para la selección del Reloj Externo</strong></caption>
-  <thead>
-    <tr>
-      <th>Frecuencia (<em>Frequency</em>)</th>
-      <th><code>CKSEL3...0</code></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0 - 20 MHz</td>
-      <td>0000</td>
-    </tr>
-  </tbody>
-  
+<caption><strong>Fuses CKSEL para la selección del Reloj Externo</strong></caption>
+<thead>
+<tr>
+<th>Frecuencia (<em>Frequency</em>)</th>
+<th><code>CKSEL3...0</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0 - 20 MHz</td>
+<td>0000</td>
+</tr>
+</tbody>
 </table>
 </div>
-
 <p>Cuando se selecciona esta fuente de reloj, los tiempos de arranque son determinados por los fusibles <code>SUT</code>, tal como se muestra en la Tabla siguiente:</p>
 <div class="table-container">
 <table>
-  <caption><strong>Fuses para la Selección de Tiempos de Arranque del Reloj Externo</strong></caption>
-  <thead>
-    <tr>
-      <th>Tiempo de arranque desde <em>Power-down</em> y <em>Power-save</em></th>
-      <th>Retraso adicional desde el <em>Reset</em> (V<sub>CC</sub>> = 5.0 V) <sup>(a)</sup></th>
-      <th>SUT1...0</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>6 CK</td>
-      <td>19 CK <sup>(1)</sup></td>
-      <td>00</td>
-    </tr>
-    <tr>
-      <td>6 CK</td>
-      <td>19 CK + 4.1 ms</td>
-      <td>01</td>
-    </tr>
-    <tr>
-      <td>6 CK</td>
-      <td>19 CK + 65 ms<sup>(2)</sup></td>
-      <td>10</td>
-    </tr>
-    <tr>
-      <td><em>Reservado</em></td>
-      <td><em>Reservado</em></td>
-      <td>11</td>
-    </tr>
-  </tbody>
-  <tfoot>
-    <tr>
-      <td colspan="3">
-        <strong>Nota:</strong><br>
-        <sup>(a)</sup> Datos de columna actualizados según <strong>DS80000855C</strong>. <em>Silicon Errata and Data Sheet Clarifications ATmega48A/PA/88A/PA/168A/PA/328/P</em>, pag. 7.<br>
-        <sup>(1)</sup>. Si el fusible RSTDISBL está programado, este tiempo de arranque se incrementará a 19 CK + 4 ms para asegurar que se pueda ingresar al modo de programación.<br>
-        <sup>(2)</sup>. El dispositivo se envía de fábrica con esta opción seleccionada. 
+<caption><strong>Fuses para la Selección de Tiempos de Arranque del Reloj Externo</strong></caption>
+<thead>
+<tr>
+<th>Tiempo de arranque desde <em>Power-down</em> y <em>Power-save</em></th>
+<th>Retraso adicional desde el <em>Reset</em> (V<sub>CC</sub>&gt; = 5.0 V) <sup>(a)</sup></th>
+<th>SUT1...0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6 CK</td>
+<td>19 CK <sup>(1)</sup></td>
+<td>00</td>
+</tr>
+<tr>
+<td>6 CK</td>
+<td>19 CK + 4.1 ms</td>
+<td>01</td>
+</tr>
+<tr>
+<td>6 CK</td>
+<td>19 CK + 65 ms<sup>(2)</sup></td>
+<td>10</td>
+</tr>
+<tr>
+<td><em>Reservado</em></td>
+<td><em>Reservado</em></td>
+<td>11</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td colspan="3">
+<strong>Nota:</strong><br/>
+<sup>(a)</sup> Datos de columna actualizados según <strong>DS80000855C</strong>. <em>Silicon Errata and Data Sheet Clarifications ATmega48A/PA/88A/PA/168A/PA/328/P</em>, pag. 7.<br/>
+<sup>(1)</sup>. Si el fusible RSTDISBL está programado, este tiempo de arranque se incrementará a 19 CK + 4 ms para asegurar que se pueda ingresar al modo de programación.<br/>
+<sup>(2)</sup>. El dispositivo se envía de fábrica con esta opción seleccionada. 
       </td>
-    </tr>
-  </tfoot>
+</tr>
+</tfoot>
 </table>
-
 <p>Al aplicar un reloj externo, es necesario evitar cambios repentinos en la frecuencia de la señal aplicada para garantizar un funcionamiento estable del microcontrolador (MCU). Una variación en la frecuencia superior al 2% de un ciclo de reloj al siguiente puede provocar un comportamiento errático o impredecible. Si se requieren modificaciones mayores al 2%, asegúrese de mantener el MCU en estado de <em>Reset</em> mientras se realizan dichos cambios.</p>
-
 <p>
   Nótese que el <strong>preescalador del reloj del sistema (<em>System Clock Prescaler</em>)</strong> se puede utilizar para implementar cambios en tiempo de ejecución de la frecuencia del reloj interno garantizando al mismo tiempo un funcionamiento estable. Consulte la sección «Preescalador del reloj del sistema» (System Clock Prescaler) .
 </p>
-                
-</section>
+</div></section><section>
+<h2>4. PRESCALER DEL RELOJ DEL SISTEMA (SYSTEM CLOCK PRESCALER)</h2>
+<p>El ATmega48A/PA/88A/PA/168A/PA/328/P cuenta con un preescalador del reloj del sistema, y el reloj del sistema se puede dividir configurando el registro <code>CLKPR</code> (<emp>CLKPR – Clock Prescale Register</emp>) descrito en la sección más abajo. Esta característica se puede utilizar para disminuir la frecuencia del reloj del sistema y el consumo de energía cuando los requerimientos de potencia de procesamiento son bajos. Esto se puede emplear con todas las opciones de fuentes de reloj, afectando la frecuencia de reloj de la CPU y de todos los periféricos síncronos. Los relojes <code>clkI/O</code>, <code>clkADC</code>, <code>clkCPU</code> y <code>clkFLASH</code> se dividen por un factor tal como se muestra en la Tabla 29-11 de la página 314.</p>
+<p>Al cambiar entre las configuraciones del preescalador, el preescalador del reloj del sistema garantiza que no se produzcan picos transitorios ni fallos (<emp>glitches</emp>) en el sistema de reloj. Asimismo, asegura que ninguna frecuencia intermedia sea superior a la frecuencia de reloj correspondiente a la configuración anterior, ni superior a la frecuencia de reloj correspondiente a la nueva configuración. El contador de ondulación (<emp>ripple counter</emp>) que implementa el preescalador opera a la frecuencia del reloj sin dividir, la cual puede ser más rápida que la frecuencia de reloj de la CPU. Por lo tanto, no es posible determinar el estado del preescalador —incluso si fuera legible— y el tiempo exacto que toma cambiar de una división de reloj a otra no se puede predecir con exactitud.</p>
+<p>Desde el momento en que se escriben los valores en <code>CLKPS</code>, transcurre un lapso de entre $T_1 + T_2$ y $T_1 + 2 \times T_2$ antes de que la nueva frecuencia de reloj se encuentre activa. Durante este intervalo, se producen $2$ flancos de reloj activos. Aquí, $T_1$ es el período de reloj anterior y $T_2$ es el período correspondiente a la nueva configuración del preescalador.</p>
+<p>Para evitar cambios involuntarios en la frecuencia del reloj, se debe seguir un procedimiento de escritura especial para modificar los bits <code>CLKPS</code>:</p>
+<ol>
+<li>Escribir un uno en el bit de habilitación de cambio del preescalador de reloj (<code>CLKPCE</code> – <emp>Clock Prescaler Change Enable</emp>) y un cero en todos los demás bits de <code>CLKPR</code>.</li>
+<li>Dentro de los cuatro ciclos siguientes, escribir el valor deseado en <code>CLKPS</code> mientras se escribe un cero en <code>CLKPCE</code>.</li>
+</ol>
+<p>Las interrupciones deben deshabilitarse al cambiar la configuración del preescalador para garantizar que el procedimiento de escritura no sea interrumpido.</p>
+</section><section>
+<h2>5. CONFIGURACIÓN DE LA FUENTE Y LOS PARÁMETROS DEL RELOJ MEDIANTE LOS FUSIBLES (LOW FUSE BYTE)</h2>
+<p>
+                  Los bits de fusibles son pequeñas celdas de memoria no volátil dedicadas exclusivamente a guardar ajustes de hardware del microcontrolador (qué fuente de reloj usar, si activar el Brown-Out Detector, tamaño del bootloader, etc.). </p>
+<p>Cambiar un fusible no borra el programa de la memoria Flash, y el programa en la Flash no puede reescribir los fusibles libremente como si fueran memoria RAM normal.</p>
+<p> Los valores de los fusibles no se pueden modificar mediante instrucciones normales de ejecución de código en C o ensamblador (a menos que se use programación paralela, SPI de alto voltaje o bootloaders dedicados). Aqui los configuraremos por la <strong>línea de comandos</strong> usando el softaware <strong>AVRDUDE</strong> y el programador <strong>USBasp</strong>.
+            </p>
+<h3>5.1. Byte de fusibles Low Fuse (LFUSE)</h3>
+<p>
+                  Los bits de configuración de reloj se encuentran en los registros de fusibles <code>lfuse</code> (LOW FUSE) del microcontrolador. Estos bits determinan la fuente de reloj principal, el divisor de frecuencia y otros parámetros relacionados con el reloj. La configuración adecuada de estos bits es esencial para garantizar un funcionamiento estable y eficiente del microcontrolador en diversas aplicaciones. 
+                </p>
+<p>
+                  El <code>lfuse</code> de un <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong> consta de 8 bits, donde un bit en <code>0</code> significa programado/activo y en <code>1</code> significa no programado/inactivo.
+                </p>
+<div class="tech-header">
+<h4>BYTE lfuse (LOW FUSE) </h4>
+<p class="tech-subtitle">lfuse en ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P· </p>
+</div>
+<div class="bits-grid">
+<div class="bit-box bit-warn"><small>Bit 7</small><strong>CKDIV8</strong></div>
+<div class="bit-box bit-yellow"><small>Bit 6</small><strong>CKOUT</strong></div>
+<div class="bit-box bit-accent"><small>Bit 5</small><strong>SUT1</strong></div>
+<div class="bit-box bit-accent"><small>Bit 4</small><strong>SUT0</strong></div>
+<div class="bit-box bit-danger"><small>Bit 3</small><strong>CKSEL3</strong></div>
+<div class="bit-box bit-danger"><small>Bit 2</small><strong>CKSEL2</strong></div>
+<div class="bit-box bit-danger"><small>Bit 1</small><strong>CKSEL1</strong></div>
+<div class="bit-box bit-danger"><small>Bit 0</small><strong>CKSEL0</strong></div>
+</div>
+<div class="grid-2">
+<div class="tech-card-item">
+<span class="tech-card-title">CKDIV8. Divisor de reloj por 8</span><strong>Bit 7</strong>
+<p><span class="badge-val badge-warn">CKDIV8</span>: permite dividir la frecuencia del reloj del sistema entre 8, al arrancar. Esto es útil para reducir el consumo de energía en aplicaciones que no requieren un alto rendimiento.</p>
+<p>Si está en <code>0</code> (programado), por defecto divide el reloj del sistema entre 8 al arrancar</p>
+<p>Si está en <code>1</code> (no programado), el reloj del sistema permanece en su frecuencia original.</p>
+<p><code>0</code> Dividir por 8. Habilitado (Programado). $F_{cpu} = F_{osc}/8$</p>
+<p><code>1</code> Sin división. Deshabilitado (No programado). $F_{cpu} = F_{osc}$</p>
+</div>
+<div class="tech-card-item">
+<span class="tech-card-title">CKOUT. Salida de reloj del sistema por PBO</span> <strong>Bit 6</strong>
+<p><span class="badge-val badge-yellow">CKOUT</span>: permite que el reloj del sistema se emita a  su frecuencia exacta por el pin <code>PB0/CLKO</code> del dispositivo, pin 14 en el encapsulado DIP28 de la serie, dejando  de funcionar como un pin digital común y corriente y se convierte automáticamente en una <strong>salida de hardware</strong>.  </p>
+<p><code>0</code> Habilitado (Programado). El pin <code>PB0/CLKO</code> emite la señal de reloj del sistema.</p>
+<p><code>1</code> Deshabilitado (No programado). El pin <code>PB0/CLKO</code> funciona como un pin digital normal. </p>
+</div>
+</div>
+<div class="note-box note-primary">
+<i class="note-icon">1</i>
+<div>
+<strong>Nota 1:</strong>
+    Si se habilita <code>CKOUT</code>, la señal de reloj estará presente en la salida también durante el estado de <em>reset</em>. 
+  </div>
+<i class="note-icon">2</i>
+<div> <strong>Nota 2:</strong>
+  Se puede seleccionar cualquier fuente de reloj, incluido el <strong>oscilador RC interno</strong>, para emitir la señal de reloj a través del pin <code>PB0/CLKO</code>. 
+  </div>
+<i class="note-icon">3</i>
+<div> <strong>Nota 3:</strong>
+    Si se utiliza el preescalador del reloj del sistema (<em>System Clock Prescaler</em>), la señal obtenida en la salida será el reloj del sistema ya dividido 
+</div>
+</div>
+<p>Los fusibles <code>SUT1...0</code> se utilizan para seleccionar el tiempo de arranque del oscilador y darle un tiempo prudecial para alcanzar estabilidad. </p>
+<p>Los bits <code>CKSEL3...0</code> del fusible bajo determinan la fuente de reloj principal y el tipo de oscilador que se utilizará. La combinación de estos bits permite seleccionar entre diferentes opciones, como el oscilador interno RC, un cristal externo o un resonador cerámico, así como la frecuencia de operación deseada.</p>
+<img alt="Bits de lfuse y significado de SUT1...0 y CKSEL3...0" class="imagen-centrada" src="img/CKSEL-SUT.png"/>
+<h3>5.2. Lectura y decodificación del byte LFUSE</h3>
+<p>Cada valor del byte <code>lfuse</code>, establece  características importantes del reloj, la frecuencia del reloj y el arranque; su configuración queda grabada en memoria Flash, de forma tal que no se pierda al cortar la alimentación al microcontrolador. Por eso conviene entender qué hace cada bit antes de modificarlo.</p>
+<p>Antes de programarlo o configurarlo, vamos a leer el fusible <code>lfuse</code> y seguiremos el siguiente proceso:</p>
+<h4>Paso 1 — Comprobar comunicación con el dispositivo</h4>
+<p>Primero nos aseguramos que el <strpoong>USBasp</strpoong> puede comunicarse con el dispositivo (ATmega88pa), mostrando información detallada en pantalla sin modificar ninguna memoria:
+<pre><code> class="language-bash">avrdude -c usbasp -p m88pa
+</code></pre>
+<ul>
+<li><code>avrdude</code>: Es el programa principal (<em>AVR Downloader/UploaDEr</em>) que gestiona la comunicación con el microcontrolador.</li>
+<li><code>-c usbasp</code>: Indica el <strong>programador</strong> (<em>programmer</em>) físico que estamos utilizando (USBasp).</li>
+<li><code>-p m88pa</code>: Especifica el modelo del <strong>microcontrolador</strong> (<em>part</em>) que está conectado (ATmega88PA) al programador.</li>
+<li><code>-v</code>: Activa el <strong>modo detallado</strong> (<em>verbose</em>). Le pide al programa que muestre en pantalla toda la información técnica de la conexión, como la firma del chip (<em>Device signature</em>) y los valores actuales de todos los fusibles, confirmando así que el cableado funciona correctamente.</li>
+</ul>
+<pre><code class="language-bash">#avrdude mostrará un mensaje de error cuando no sea posibnle la comunicación.
+avrdude error: program enable: target does not answer (0x01)
+avrdude error: initialization failed, rc=-1
+        - double check the connections and try again
+        - use -B to set lower ISP clock frequency, e.g. -B 125kHz
+        - use -F to override this check
 
-<section>
-<h2>11. OSCILADOR DEL TEMPORIZADOR/CONTADOR (<em>Timer/Counter Oscillator</em>)</h2>
+avrdude done.  Thank you.
+</code></pre>
+
+<p>Cuando eso sucede debemos seguir las indicaciones establecidas en <a href="/microcontroladores/avr/programacion/bare-metal/programador/index.html#seccion-2" target="_blank">CONEXIÓN DEL PROGRAMADOR ISP USBasp POR BUS SERIAL SPI</a> 
+
+<p>De no haber problemas enn las conexiones usamos el argumento -B, de la siguiente manera:</p>
+
+<pre><code class="language-bash">avrdude -c usbasp -p m88pa -B 10
+</code></pre>
+
+<p>En  nustro caso la salida fue:</p><pre><code>avrdude: set SCK frequency to 93750 Hz
+avrdude: AVR device initialized and ready to accept instructions
+avrdude: device signature = 0x1e930f (probably m88pa)
+
+avrdude done.  Thank you.
+</code></pre>
+
+<h4>Paso 2 — Leer el byte lfuse actual</h4>
+<p>Con el siguiente comando leeremos el valor del fusible bajo (low fuse) de un microcontrolador ATmega88PA y lo muestra en la pantalla en formato hexadecimal.</p>
+<pre><code> avrdude -c usbasp -p m88pa -B 10-U lfuse:r:-:h
+</code></pre>
+<div class="alert-box">
+  <strong>¡Atención al comando!</strong> Si tuvimos problemas al comprobar la comunicación con el dispositivo <strong>ATmega48A/PA/ 88A/PA/ 168A/PA/ 328/P</strong> y lo resolvimos con el argumento <code>-B 10</code>, debemos seguir usandolo en la lectura y escritura de <code>lfuse</code>
+   
+</div>
+
+<div class="tech-card"> 
+  <ul> 
+  <li><strong>avrdude</strong>: Es el programa principal (<em>AVR Downloader/UploaDEr</em>) encargado de comunicarse con el microcontrolador para leer o escribir su memoria.</li> 
+  <li><strong>-c usbasp</strong>: Especifica el <strong>programador</strong> (<em>programmer</em>) físico que usamos para conectar la computadora al chip (en este caso, un programador USBasp).</li> 
+  <li><strong>-p m88pa</strong>: Indica el modelo exacto del <strong>microcontrolador</strong> (<em>part</em>) objetivo. <code>m88pa</code> es la abreviatura del ATmega88PA.</li> 
+  <li><strong>-U</strong>: Es la instrucción principal para operar sobre la <strong>memoria</strong> (<em>memory operation</em>). Todo lo que sigue separado por dos puntos define qué hacer: 
+    <ul> 
+      <li><strong>lfuse</strong>: Indica el área de memoria a consultar, en este caso el <strong>fusible bajo</strong> (<em>Low Fuse</em>), que controla principalmente la fuente de reloj y el divisor de frecuencia.</li> 
+      <li><strong>r</strong>: Define la operación a realizar: <strong>leer</strong> (<em>read</em>).</li> 
+      <li><strong>-</strong>: Es el nombre del archivo de destino. Al poner un guion, le dices al programa que no lo guarde en ningún archivo, sino que imprima el resultado directamente en la terminal (<strong>salida estándar</strong> o <em>stdout</em>).</li> 
+      <li><strong>h</strong>: Especifica el <strong>formato</strong> en el que quieres ver el dato leído, que aquí es <strong>hexadecimal</strong> (<em>hex</em>, por ejemplo, <code>0xFF</code>).</li> 
+    </ul> 
+  </li> 
+  </ul> 
+</div>
+
+<p>Así podemos conocer la configuración actual del reloj del microcontrolador. </p>
+<p>Para modificarla, necesitamos seguir dos pasos adicionales</p>
+<h3>5.3. Configuración de la fuente de reloj mediante los fuses del byte Low Fuse</h3>
+<p>Luego de leer el valor actual del fusible <code>lfuse</code>, podemos decidir si queremos cambiar la configuración de la fuente de reloj y otros parámetros relacionados. </p>
+<h4>Paso 3 — Decidir la configuración</h4>
+<p>Antes de escribir un solo bit en la memoria del microcontrolador, es fundamental detenerse a planificar cómo va a operar nuestro circuito en el mundo real. Los fusibles controlan el comportamiento de bajo nivel del hardware; un ajuste incorrecto aquí puede dejar el chip inaccesible para el programador si, por ejemplo, le indicamos que busque un cristal externo que no hemos conectado.</p>
+<p>En esta etapa debemos responder a las siguientes preguntas clave sobre el diseño de nuestro proyecto:</p>
+<ul>
+<li><strong>Divisor de reloj:</strong> ¿Se requiere un divisor de reloj para ajustar la frecuencia de operación del microcontrolador? Este parámetro se configura mediante el bit <code>CKDIV8</code> del fusible <code>hfuse</code>.</li>
+<li><strong>Pin de salida del reloj</strong>¿Necesitamos contar con un salida de la señal del reloj mientras está operando el microcontrolador? Este parámetro se configura mediante el bit <code>CKOUT</code> del fusible <code>lfuse</code>.</li>
+<li><strong>Pin Reset</strong>: ¿Seguiremos usando el pin reset o lo usaremos como un pin de E/S?.</li>
+<li><strong>Tiempo de arranque:</strong> ¿Cuánto tiempo necesita el oscilador para estabilizarse antes de que el microcontrolador comience a operar? Este parámetro se configura mediante los bits <code>SUT1...0</code> del fusible <code>lfuse</code>.</li>
+<li><strong>Fuente de reloj (Clock Source):</strong> ¿De dónde obtendrá el pulso el microcontrolador? Podemos optar por un <strong>oscilador interno RC</strong> (ahorra componentes externos, pero es menos preciso con cambios de temperatura), un <strong>cristal de cuarzo externo</strong> (máxima precisión, ideal para comunicación serial UART o USB) o un <strong>resonador cerámico</strong> (un punto medio más económico y compacto).</li>
+<li><strong>Frecuencia de operación:</strong> ¿A qué velocidad trabajará el chip? Lo más habitual en el ATmega328P es trabajar a <strong>16 MHz</strong> (con cristal externo a 5V), <strong>8 MHz</strong> (con cristal o reloj interno, ideal para sistemas a 3.3V) o <strong>1 MHz</strong> (el valor de fábrica cuando el divisor interno <code>CKDIV8</code> está activo para bajo consumo).</li>
+</ul>
+<p>Solo cuando tenemos claras estas decisiones de arquitectura y consumo, pasamos a traducirlas a valores hexadecimales utilizando una calculadora de <em>fuse bits</em> o la hoja de datos (<em>datasheet</em>) del fabricante.</p>
+<svg class="tech-svg" role="img" viewbox="0 0 680 140">
+<title>Proceso de configuración de la Fuente de Reloj</title>
+<!-- Paso 1 -->
+<!-- Paso 1 (x: 20 a 150) -->
+<rect class="c-gray" height="74" rx="8" stroke-width="1" width="130" x="20" y="45"></rect>
+<text class="th" text-anchor="middle" x="85" y="72">
+<tspan dy="0" x="85">Comprobar</tspan>
+<tspan dy="15" x="85">comunicación</tspan>
+</text>
+<text class="ts" text-anchor="middle" x="85" y="108">Paso 1</text>
+<path class="wire" d="M150 82 H190"></path>
+<circle class="node-dot" cx="170" cy="82" r="3"></circle>
+<!-- Paso 2 (x: 190 a 320) -->
+<rect class="c-teal" height="74" rx="8" stroke-width="1" width="130" x="190" y="45"></rect>
+<text class="th" text-anchor="middle" x="255" y="79">Leer lfuse</text>
+<text class="ts" text-anchor="middle" x="255" y="108">Paso 2</text>
+<path class="wire" d="M320 82 H360"></path>
+<!-- Paso 3 (x: 360 a 490) -->
+<rect class="c-blue" height="74" rx="8" stroke-width="1" width="130" x="360" y="45"></rect>
+<text class="th" text-anchor="middle" x="425" y="72">
+<tspan dy="0" x="425">Decidir</tspan>
+<tspan dy="15" x="425">configuración</tspan>
+</text>
+<text class="ts" text-anchor="middle" x="425" y="108">Paso 3</text>
+<path class="wire" d="M490 82 H530"></path>
+<!-- Paso 4 (x: 530 a 660 -> margen derecho de 20px) -->
+<rect class="c-amber" height="74" rx="8" stroke-width="1" width="130" x="530" y="45"></rect>
+<text class="th" text-anchor="middle" x="595" y="79">Programar lfuse</text>
+<text class="ts" text-anchor="middle" x="595" y="108">Paso 4</text>
+</svg>
+
+<p>Una vez tengamos listo el binario podemos modificar el <code>lfuse</code> con el siguienmte comando, hemos seleccioando una fuente de reloj externa</p>
+
+<pre><code>avrdude -c usbasp -p m88pa -B 10 -U lfuse:w:0x20:m</code></pre>
+<div class="tech-card">
+  <span class="tech-card-title">La directiva principal se concentra en el argumento <code>-U lfuse:w:0x20:m</code>, el cual se divide internamente de la siguiente manera: :</span>
+  <ul>
+    <li><strong>lfuse:</strong>. Especifica que el objetivo de la operación es el byte del Fusible Bajo (Low Fuse)</li>
+    <li><strong>w:</strong>. Indica que se va a ejecutar una acción de escritura (write) en dicha memoria.</li>
+    <li><strong>0x20:</strong>. Determina el valor hexadecimal exacto que se va a grabar en el registro.</li>
+    <li><strong>m:</strong>. Establece el modo "inmediato" (immediate mode), indicando al software que el valor proporcionado es un dato numérico directo y no un archivo de texto en el disco.</li>  
+  </ul>
+</div>
+<h3>5.4. Configuración de reloj de fábrica (Default Clock Configuration)</h3>
+<p>En un dispositivo de la serie <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong>, con la configuración de fábrica, el valor de lectura de <code>lfuse</code> en hexadecimal es  <code>0x62</code> (en binario <code>0b01100010</code>, en decimal <code>98</code>).</p>
+<!-- Variantes de color: .bit-warn | .bit-yellow | .bit-accent | .bit-danger -->
+<div aria-label="Bits del byte bajo de fusibles" class="bits-grid-9">
+<!-- FILA 1 (Bits 8 a 0) -->
+<div class="bit-box bit-white"><small>Bitx</small><strong>Mnemonico</strong></div>
+<div class="bit-box bit-warn"><small>Bit 7</small><strong>CKDIV8</strong></div>
+<div class="bit-box bit-yellow"><small>Bit 6</small><strong>CKOUT</strong></div>
+<div class="bit-box bit-accent"><small>Bit 5</small><strong>SUT1</strong></div>
+<div class="bit-box bit-accent"><small>Bit 4</small><strong>SUT0</strong></div>
+<div class="bit-box bit-danger"><small>Bit 3</small><strong>CKSEL3</strong></div>
+<div class="bit-box bit-danger"><small>Bit 2</small><strong>CKSEL2</strong></div>
+<div class="bit-box bit-danger"><small>Bit 1</small><strong>CKSEL1</strong></div>
+<div class="bit-box bit-danger"><small>Bit 0</small><strong>CKSEL0</strong></div>
+<!-- FILA 2 (Mismos índices y mismos formatos debajo) -->
+<div class="bit-box bit-white bit-value">Valor</div>
+<div class="bit-box bit-warn bit-value">0</div>
+<div class="bit-box bit-yellow bit-value">1</div>
+<div class="bit-box bit-accent bit-value">1</div>
+<div class="bit-box bit-accent bit-value">0</div>
+<div class="bit-box bit-danger bit-value">0</div>
+<div class="bit-box bit-danger bit-value">0</div>
+<div class="bit-box bit-danger bit-value">1</div>
+<div class="bit-box bit-danger bit-value">0</div>
+</div>
+<p>El dispositivo se suministra de fábrica con el oscilador RC interno (<em>internal RC oscillator</em>) a 8.0 MHz (<code>CKSEL</code>) y con el fusible <code>CKDIV8</code> programado, lo que resulta en un reloj del sistema (<em>system clock</em>) de 1.0 MHz. El tiempo de arranque (<em>startup time</em>) se configura al máximo y se habilita el período de tiempo de espera (<em>time-out period</em>), <code>SUT</code>. </p>
+<p>Esta configuración por defecto (<code>CKDIV8 = "0"</code>, <code>CKOUT= "1" </code>, <code>CKSEL = "0010"</code>, <code>SUT = "10"</code>, )garantiza que cualquier usuario pueda establecer la configuración de la fuente de reloj deseada utilizando cualquier interfaz de programación disponible.</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>Bit</th>
+<th>Mnemónico</th>
+<th>Valor de Fábrica</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>7</td>
+<td><div class="bit-box bit-warn bit-value">CKDIV8</div></td>
+<td ;="" style="text-align: center">0</td>
+<td>Activo: Divide la frecuencia del reloj del sistema por 8. Por defecto el reloj del sistema es el Oscilador RC Interno de 8 MHz. Al pasar por el fusible <code>CKDIV8</code>, el reloj del sistema resulta en un reloj de 1.0 MHz.</td>
+</tr>
+<tr>
+<td>6</td>
+<td><div class="bit-box bit-yellow bit-value">CKOUT</div></td>
+<td ;="" style="text-align: center">1</td>
+<td>Inactivo: El pin <code>PB0</code> (Pin físico 14 en empaque DIP28/ pin digital 8 en Arduino) funciona como E/S. </td>
+</tr>
+<tr>
+<td>5</td>
+<td><div class="bit-box bit-accent bit-value">SUT1</div></td>
+<td ;="" style="text-align: center">1</td>
+<td rowspan="2">Tiempo de arranque (Start-up Time). Se combina con <code>SUT0</code>. <br/>
+        El valor <code>SUT1...0</code> = <code>10</code>, configura una <strong>potencia de subida lenta</strong> (<em>Slowly rising power</em>): al encender desde cero (<strong>Reset / Slowly rising power</strong>) el voltaje aún está subiendo, por eso necesita un tiempo de espera de 19 CK + 65 ms  para estabilizar la alimentación. <br/>
+        Al despertar de los modos de bajo consumo <stronng>Power-down</stronng> o <strong>Power-save</strong>, la alimentación eléctrica ya está estable y el microcontrolador sólo necesita  exactamente <strong>6 CK</strong>	(<em>Clock Cycles</em>,Ciclos de Reloj) antes de ejecutar la primera instrucción. </td>
+</tr>
+<tr>
+<td>4</td>
+<td><div class="bit-box bit-accent bit-value">SUT0</div></td>
+<td ;="" style="text-align: center">0</td>
+</tr>
+<tr>
+<td>3</td>
+<td><div class="bit-box bit-danger bit-value">CKSEL3</div></td>
+<td ;="" style="text-align: center">0</td>
+<td rowspan="4">Selección del tipo de reloj. Se usa en combinación con <code>CKSEL2</code>, <code>CKSEL1</code> y <code>CKSEL0</code>. 
+      <p>El Valor <code>CKSEL3...0</code> = <code>0010</code> selecciona el <strong>Oscilador RC Calibrado Interno</strong> como reloj del sistema.  </p></td>
+</tr>
+<tr>
+<td>2</td>
+<td><div class="bit-box bit-danger bit-value">CKSEL2</div></td>
+<td ;="" style="text-align: center">0</td>
+</tr>
+<tr>
+<td>1</td>
+<td><div class="bit-box bit-danger bit-value">CKSEL1</div></td>
+<td ;="" style="text-align: center">1</td>
+</tr>
+<tr>
+<td>0</td>
+<td><div class="bit-box bit-danger bit-value">CKSEL0</div></td>
+<td ;="" style="text-align: center">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</p></section><section>
+<h2>6. OSCILADOR DE TIMER/COUNTER2 (TIMER/COUNTER OSCILLATOR)</h2>
 <p>
 Los <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> utilizan el mismo oscilador de cristal para el Oscilador de Baja Frecuencia y el Oscilador del Temporizador/Contador (Timer/Counter Oscillator).
 </p>
-
 <p>
 Los <strong>ATmega48A/PA/88A/PA/168A/PA/328/P</strong> comparten los pines del Oscilador del Temporizador/Contador (<code>TOSC1</code> y <code>TOSC2</code>) con <code>XTAL1</code> y <code>XTAL2</code>. Al utilizar el Oscilador del Temporizador/Contador, el reloj del sistema debe ser cuatro veces la frecuencia del oscilador. Debido a esto y a la compartición de pines, el Oscilador del Temporizador/Contador solo se puede utilizar cuando el Oscilador RC Interno Calibrado (Calibrated Internal RC Oscillator) está seleccionado como la fuente de reloj del sistema.
 </p>
-
 <p>Se puede aplicar una fuente de reloj externa a <code>TOSC1</code> si el bit <code>EXTCLK</code> en el registro <code>ASSR</code> se configura a uno lógico (<code>1</code>). Consulte la sección "Operación Asíncrona del Temporizador/Contador2" en la página 160 para obtener una descripción más detallada sobre cómo seleccionar el reloj externo como entrada en lugar de un cristal de reloj de 32.768 kHz. </p>
-</section>
-
-
-<section>
-
-<h2>12. PREESCALADOR DEL RELOJ DEL SISTEMA (<emp>System Clock Prescaler</emp>)</h2>
-
-<p>El ATmega48A/PA/88A/PA/168A/PA/328/P cuenta con un preescalador del reloj del sistema, y el reloj del sistema se puede dividir configurando el registro <code>CLKPR</code> (<emp>CLKPR – Clock Prescale Register</emp>) descrito en la sección más abajo. Esta característica se puede utilizar para disminuir la frecuencia del reloj del sistema y el consumo de energía cuando los requerimientos de potencia de procesamiento son bajos. Esto se puede emplear con todas las opciones de fuentes de reloj, afectando la frecuencia de reloj de la CPU y de todos los periféricos síncronos. Los relojes <code>clkI/O</code>, <code>clkADC</code>, <code>clkCPU</code> y <code>clkFLASH</code> se dividen por un factor tal como se muestra en la Tabla 29-11 de la página 314.</p>
-
-<p>Al cambiar entre las configuraciones del preescalador, el preescalador del reloj del sistema garantiza que no se produzcan picos transitorios ni fallos (<emp>glitches</emp>) en el sistema de reloj. Asimismo, asegura que ninguna frecuencia intermedia sea superior a la frecuencia de reloj correspondiente a la configuración anterior, ni superior a la frecuencia de reloj correspondiente a la nueva configuración. El contador de ondulación (<emp>ripple counter</emp>) que implementa el preescalador opera a la frecuencia del reloj sin dividir, la cual puede ser más rápida que la frecuencia de reloj de la CPU. Por lo tanto, no es posible determinar el estado del preescalador —incluso si fuera legible— y el tiempo exacto que toma cambiar de una división de reloj a otra no se puede predecir con exactitud.</p>
-
-<p>Desde el momento en que se escriben los valores en <code>CLKPS</code>, transcurre un lapso de entre $T_1 + T_2$ y $T_1 + 2 \times T_2$ antes de que la nueva frecuencia de reloj se encuentre activa. Durante este intervalo, se producen $2$ flancos de reloj activos. Aquí, $T_1$ es el período de reloj anterior y $T_2$ es el período correspondiente a la nueva configuración del preescalador.</p>
-
-<p>Para evitar cambios involuntarios en la frecuencia del reloj, se debe seguir un procedimiento de escritura especial para modificar los bits <code>CLKPS</code>:</p>
-
-<ol>
-  <li>Escribir un uno en el bit de habilitación de cambio del preescalador de reloj (<code>CLKPCE</code> – <emp>Clock Prescaler Change Enable</emp>) y un cero en todos los demás bits de <code>CLKPR</code>.</li>
-  <li>Dentro de los cuatro ciclos siguientes, escribir el valor deseado en <code>CLKPS</code> mientras se escribe un cero en <code>CLKPCE</code>.</li>
-</ol>
-
-<p>Las interrupciones deben deshabilitarse al cambiar la configuración del preescalador para garantizar que el procedimiento de escritura no sea interrumpido.</p>
-</section>
-
-        </article>
-        
-    </main>
-
+</section></article>
+</main>
 <div id="articulo-nav"> </div>
-
 <div id="footer"></div>
 <script src="/assets/js/componentes.js"></script>
 <script src="/assets/js/menu-direction.js"></script>
 <script src="/assets/js/indice.js"></script>
-
 <!-- 
 CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
 <script>
@@ -1432,7 +1289,5 @@ document.addEventListener("articulo-nav-cargado", () => {
 });
 </script>
 -->
-
 </body>
-
 </html>
