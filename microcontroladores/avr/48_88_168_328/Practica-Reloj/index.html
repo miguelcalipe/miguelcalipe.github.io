@@ -1,0 +1,1387 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Configuración del Reloj en ATmega88/48/88/168/328 - Practica de
+      Laboratorio | MC Mundo Tech
+    </title>
+    <meta
+      name="description"
+      content="Con el paso del tiempo han aparecido distintos niveles de abstracción cuyo objetivo es simplificar el desarrollo de software. Mientras mayor es la abstracción, menor es la cantidad de detalles del hardware que el programador necesita conocer, a costa de perder algo de control y eficiencia "
+    />
+
+    <!-- Hojas de estilo globales y de artículo -->
+    <link rel="stylesheet" href="/assets/css/principal.css" />
+    <link rel="stylesheet" href="/assets/css/articulo.css" />
+
+    <!-- Configuración de MathJax para fórmulas -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [["$", "$"]],
+          displayMath: [["$$", "$$"]],
+        },
+      };
+    </script>
+
+    <script
+      async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+    ></script>
+  </head>
+
+  <body id="inicio" class="articulo">
+    <!-- Componentes dinámicos cargados por componentes.js -->
+    <header id="site-header"></header>
+    <nav id="menu"></nav>
+    <div id="migas-pan"></div>
+
+    <main>
+      <article>
+        <!-- 1. CABECERA DEL ARTÍCULO (.article-header) -->
+        <header class="article-header">
+          <h1>
+            CONFIGURACIÓN DEL RELOJ EN DISPOSITIVOS ATmega48A/PA/ 88A/PA/
+            168A/PA/ 328/P MEDIANTE LFUSE
+          </h1>
+          <p>Práctica de Laboratorio</p>
+        </header>
+
+        <!-- 2. ÍNDICE DINÁMICO (#indice) -->
+        <aside id="indice"></aside>
+        <!-- CONTENIDO DEL ARTÍCULO   -->
+
+        <h1></h1>
+
+        <section>
+          <h2>1. OBJETIVO DE LA PRÁCTICA</h2>
+
+          <p>
+            En esta práctica se configurarán los fusibles de
+            <code>lfuse</code>(<em>Low Fuse Byte</em>), de un microcontrolador
+            <strong>ATmega88PA</strong> para seleccionar una señal de reloj
+            externa de 8 MHz. La señal será generada por un Arduino Uno mediante
+            el Timer1 y se aplicará a la entrada XTAL1 del microcontrolador.
+          </p>
+
+          <p>
+            La configuración de <code>lfuse</code> permitirá activar la división
+            del reloj entre 8 mediante CKDIV8 y habilitar la salida de reloj
+            de||||l sistema mediante CKOUT. De esta manera, aunque el ATmega88PA
+            reciba una señal externa de 8 MHz, su reloj de sistema será de 1
+            MHz.
+          </p>
+
+          <p>
+            La frecuencia de reloj del sistema se observará en el pin PB0
+            (CLKO), pin 14 del encapsulado DIP-28, y se medirá con un multímetro
+            que disponga de función de medición de frecuencia.
+          </p>
+
+          <p>
+            Al finalizar la práctica, se restaurará el fusible LFUSE a su
+            configuración de fábrica, utilizando el valor 0x62, para que el
+            microcontrolador vuelva a utilizar su oscilador RC interno calibrado
+            de 8 MHz con división entre 8.
+          </p>
+
+          <h3>1.1. Objetivos específicos</h3>
+
+          <ul>
+            <li>
+              Comprender la función de los bits CKSEL, CKDIV8 y CKOUT del
+              fusible LFUSE.
+            </li>
+            <li>
+              Identificar los pines XTAL1 y PB0/CLKO del ATmega88PA en el
+              encapsulado DIP-28.
+            </li>
+            <li>
+              Generar una señal cuadrada de 8 MHz mediante el Timer1 del Arduino
+              Uno.
+            </li>
+            <li>
+              Seleccionar la entrada de reloj externo del ATmega88PA mediante
+              CKSEL3:0.
+            </li>
+            <li>Activar la división del reloj entre 8 mediante CKDIV8.</li>
+            <li>
+              Habilitar la salida CLKO para observar el reloj de sistema en PB0.
+            </li>
+            <li>
+              Medir la frecuencia de la señal generada por el Arduino Uno y la
+              salida de reloj del ATmega88PA.
+            </li>
+            <li>Restaurar la configuración de fábrica del fusible LFUSE.</li>
+          </ul>
+
+          <h3>1.2. Resultados esperados</h3>
+
+          <p>
+            Al programar LFUSE = 0x20 y aplicar una señal externa de 8 MHz a
+            XTAL1, el ATmega88PA utilizará dicha señal como fuente de reloj.
+            Debido a que CKDIV8 está habilitado, el reloj de sistema se dividirá
+            entre 8 y tendrá una frecuencia de 1 MHz.
+          </p>
+
+          <p>
+            Como CKOUT también está habilitado, la frecuencia de reloj de
+            sistema será observable en PB0/CLKO, pin 14 del ATmega88PA en
+            encapsulado DIP-28.
+          </p>
+
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Punto de medición</th>
+                  <th>Frecuencia esperada</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Arduino Uno, pin D9 / OC1A</td>
+                  <td>8 MHz</td>
+                </tr>
+                <tr>
+                  <td>ATmega88PA, PB0 / CLKO (pin 14)</td>
+                  <td>1 MHz</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h2>2. FUNDAMENTO TEÓRICO</h2>
+
+          <h3>2.1. El reloj de sistema del microcontrolador</h3>
+
+          <p>
+            El reloj de sistema proporciona la referencia temporal que utiliza
+            el microcontrolador para sincronizar la ejecución de instrucciones y
+            el funcionamiento de sus periféricos. La frecuencia de este reloj
+            determina, entre otros aspectos, la velocidad a la que trabaja el
+            procesador.
+          </p>
+
+          <p>
+            Los microcontroladores AVR de la familia ATmega48A/PA, ATmega88A/PA,
+            ATmega168A/PA y ATmega328/P disponen de diferentes opciones de
+            fuente de reloj, que se seleccionan mediante los bits CKSEL del
+            fusible LFUSE.
+          </p>
+
+          <p>
+            Una fuente de reloj puede ser un oscilador interno, un circuito
+            oscilador con cristal o una señal de reloj externa generada por otro
+            dispositivo. En esta práctica se utilizará una señal digital de
+            reloj producida por el Arduino Uno.
+          </p>
+
+          <h3>2.2. Diferencia entre cristal externo y reloj externo</h3>
+
+          <h4>2.2.1. Cristal externo</h4>
+
+          <p>
+            Un cristal de cuarzo es un componente resonante que se utiliza junto
+            con el circuito oscilador del microcontrolador para generar una
+            señal de reloj. Normalmente, el cristal se conecta entre XTAL1 y
+            XTAL2, junto con los componentes requeridos por el circuito.
+          </p>
+
+          <h4>2.2.2. Reloj externo</h4>
+
+          <p>
+            En la configuración de reloj externo, el microcontrolador recibe una
+            señal digital generada por otro circuito. La señal se aplica a
+            XTAL1, que actúa como entrada de reloj, mientras que XTAL2 no se
+            utiliza para esta configuración.
+          </p>
+
+          <p>
+            En esta práctica, el Arduino Uno generará la señal de reloj y la
+            aplicará al pin XTAL1 del ATmega88PA. El microcontrolador no
+            utilizará su circuito oscilador para generar la señal a partir de un
+            cristal.
+          </p>
+
+          <h3>2.3. Entrada XTAL1</h3>
+
+          <p>
+            Cuando se selecciona la fuente de reloj externo mediante CKSEL3:0 =
+            0000, el pin XTAL1 recibe la señal digital de reloj. El reloj
+            recibido se utiliza como fuente para el circuito de distribución de
+            reloj del microcontrolador.
+          </p>
+
+          <p>
+            Para el ATmega88PA en encapsulado DIP-28, XTAL1 corresponde al pin
+            físico 9, asociado también al terminal PB6.
+          </p>
+
+          <h3>2.4. El fusible LFUSE</h3>
+
+          <p>
+            Los fuses son bits de configuración del hardware del
+            microcontrolador. Permiten establecer determinadas características
+            de funcionamiento, como la fuente de reloj, la división de
+            frecuencia, la salida de reloj y los tiempos de arranque.
+          </p>
+
+          <p>
+            El fusible LFUSE contiene los bits relacionados con la selección de
+            la fuente de reloj y otras opciones. Estos bits no forman parte del
+            programa almacenado en la memoria Flash: son configuraciones del
+            dispositivo que permanecen incluso después de apagarlo.
+          </p>
+
+          <p>
+            En los fuses AVR, un bit con valor lógico 0 se encuentra programado,
+            mientras que un bit con valor lógico 1 se encuentra sin programar.
+            Esta convención debe tenerse en cuenta al interpretar los valores
+            hexadecimales que se escriben en los fuses.
+          </p>
+
+          <h3>2.5. Bits del fusible LFUSE</h3>
+
+          <p>
+            En el ATmega88PA, el byte LFUSE se organiza de la siguiente manera:
+          </p>
+
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Bit</th>
+                  <th>Nombre</th>
+                  <th>Función</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>7</td>
+                  <td>CKDIV8</td>
+                  <td>
+                    Habilita la división del reloj de sistema entre 8 cuando
+                    está programado.
+                  </td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td>CKOUT</td>
+                  <td>
+                    Habilita la salida del reloj de sistema en el pin CLKO
+                    cuando está programado.
+                  </td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>SUT1</td>
+                  <td>Bit de selección del tiempo de arranque.</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>SUT0</td>
+                  <td>Bit de selección del tiempo de arranque.</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>CKSEL3</td>
+                  <td>Bit de selección de fuente de reloj.</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>CKSEL2</td>
+                  <td>Bit de selección de fuente de reloj.</td>
+                </tr>
+                <tr>
+                  <td>1</td>
+                  <td>CKSEL1</td>
+                  <td>Bit de selección de fuente de reloj.</td>
+                </tr>
+                <tr>
+                  <td>0</td>
+                  <td>CKSEL0</td>
+                  <td>Bit de selección de fuente de reloj.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>2.6. Selección del reloj externo mediante CKSEL</h3>
+
+          <p>
+            Los bits CKSEL3:0 permiten seleccionar la fuente de reloj del
+            microcontrolador. Para utilizar una señal externa aplicada a XTAL1,
+            se debe establecer la siguiente combinación:
+          </p>
+
+          <div class="formula-box">
+            <p><strong>CKSEL3:0 = 0000</strong></p>
+          </div>
+
+          <p>
+            Esta combinación selecciona la entrada de reloj externo. La señal
+            aplicada a XTAL1 debe respetar los niveles eléctricos y las
+            condiciones de funcionamiento indicadas por el fabricante.
+          </p>
+
+          <h3>2.7. División de frecuencia mediante CKDIV8</h3>
+
+          <p>
+            El bit CKDIV8 permite habilitar la división del reloj de sistema
+            entre 8. Cuando este fusible está programado, el reloj seleccionado
+            como fuente se divide antes de ser utilizado como reloj de sistema.
+          </p>
+
+          <p>
+            En los fuses AVR, CKDIV8 se encuentra en el bit 7 de LFUSE. Para
+            habilitar el divisor, el bit debe programarse con valor lógico 0.
+          </p>
+
+          <p>
+            En esta práctica se aplicará una señal de 8 MHz y se habilitará
+            CKDIV8. Por tanto, la frecuencia del reloj de sistema será:
+          </p>
+
+          <div class="formula-box">
+            <p><strong>fCPU = fCLK / 8</strong></p>
+            <p>fCPU = 8 MHz / 8</p>
+            <p><strong>fCPU = 1 MHz</strong></p>
+          </div>
+
+          <h3>2.8. Salida de reloj CLKO mediante CKOUT</h3>
+
+          <p>
+            El fusible CKOUT permite habilitar la salida del reloj de sistema a
+            través del pin PB0, que dispone de la función alternativa CLKO.
+          </p>
+
+          <p>
+            Cuando CKOUT está programado, el reloj de sistema se presenta en
+            PB0, independientemente de la configuración habitual del puerto
+            GPIO. Esta función permite observar externamente la frecuencia de
+            reloj del microcontrolador.
+          </p>
+
+          <p>
+            En el ATmega88PA con encapsulado DIP-28, PB0/CLKO corresponde al pin
+            físico 14.
+          </p>
+
+          <p>
+            En esta práctica, como CKDIV8 está habilitado, la señal que se
+            observará en CLKO será la frecuencia del reloj de sistema después de
+            la división, es decir, 1 MHz.
+          </p>
+        </section>
+
+        <section>
+          <h2>3. CONFIGURACIÓN DEL FUSE LFUSE = 0x20</h2>
+
+          <h3>3.1. Determinación del valor de configuración</h3>
+
+          <p>
+            El objetivo de la práctica es seleccionar el reloj externo,
+            habilitar la división entre 8 y habilitar la salida CLKO. Para ello,
+            se configurarán los bits de LFUSE de la siguiente manera:
+          </p>
+
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Bit</th>
+                  <th>Nombre</th>
+                  <th>Valor</th>
+                  <th>Interpretación</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>7</td>
+                  <td>CKDIV8</td>
+                  <td>0</td>
+                  <td>Programado: división del reloj entre 8 habilitada.</td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td>CKOUT</td>
+                  <td>0</td>
+                  <td>Programado: salida de reloj CLKO habilitada.</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>SUT1</td>
+                  <td>1</td>
+                  <td>Sin programar.</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>SUT0</td>
+                  <td>0</td>
+                  <td>Programado.</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>CKSEL3</td>
+                  <td>0</td>
+                  <td>Selección de reloj externo.</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>CKSEL2</td>
+                  <td>0</td>
+                  <td>Selección de reloj externo.</td>
+                </tr>
+                <tr>
+                  <td>1</td>
+                  <td>CKSEL1</td>
+                  <td>0</td>
+                  <td>Selección de reloj externo.</td>
+                </tr>
+                <tr>
+                  <td>0</td>
+                  <td>CKSEL0</td>
+                  <td>0</td>
+                  <td>Selección de reloj externo.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>3.2. Construcción del byte LFUSE</h3>
+
+          <p>
+            Organizando los valores de los bits en su posición correspondiente:
+          </p>
+
+          <pre><code>Bit:       7  6  5  4  3  2  1  0
+Nombre:   CKDIV8 CKOUT SUT1 SUT0 CKSEL3 CKSEL2 CKSEL1 CKSEL0
+Valor:      0   0   1   0   0   0   0   0
+</code></pre>
+
+          <p>El byte resultante es:</p>
+
+          <pre><code>0010 0000</code></pre>
+
+          <p>En hexadecimal:</p>
+
+          <pre><code>LFUSE = 0x20</code></pre>
+
+          <h3>3.3. Interpretación de LFUSE = 0x20</h3>
+
+          <p>
+            El valor 0x20 configura el microcontrolador de la siguiente manera:
+          </p>
+
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Configuración</th>
+                  <th>Valor</th>
+                  <th>Resultado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>CKDIV8</td>
+                  <td>0</td>
+                  <td>División de reloj entre 8 habilitada.</td>
+                </tr>
+                <tr>
+                  <td>CKOUT</td>
+                  <td>0</td>
+                  <td>Salida de reloj CLKO habilitada.</td>
+                </tr>
+                <tr>
+                  <td>SUT1:0</td>
+                  <td>10</td>
+                  <td>Selección del tiempo de arranque.</td>
+                </tr>
+                <tr>
+                  <td>CKSEL3:0</td>
+                  <td>0000</td>
+                  <td>Fuente de reloj externa.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            La señal externa de 8 MHz se divide entre 8 para obtener el reloj de
+            sistema de 1 MHz. La salida CLKO permite observar externamente esta
+            frecuencia en PB0.
+          </p>
+        </section>
+
+        <section>
+          <h2>4. GENERACIÓN DE LA SEÑAL DE 8 MHz MEDIANTE ARDUINO UNO</h2>
+
+          <h3>4.1. Timer1 del Arduino Uno</h3>
+
+          <p>
+            El Arduino Uno utiliza un ATmega328P con un reloj de sistema de 16
+            MHz. El Timer1 es un temporizador/contador de 16 bits que dispone de
+            salidas de comparación, entre ellas OC1A, disponible en el pin
+            digital 9.
+          </p>
+
+          <p>
+            Mediante la configuración del Timer1 en modo CTC, con el reloj sin
+            prescaler y la salida OC1A configurada para conmutar en cada
+            coincidencia de comparación, se puede generar una señal cuadrada de
+            8 MHz.
+          </p>
+
+          <p>
+            La generación de la señal se realiza por hardware, sin necesidad de
+            que el procesador ejecute instrucciones para cambiar continuamente
+            el estado del pin.
+          </p>
+
+          <h3>4.2. Pin 9 del Arduino Uno</h3>
+
+          <p>
+            En el ATmega328P utilizado por el Arduino Uno, el pin digital 9
+            corresponde al terminal PB1, que dispone de la función alternativa
+            OC1A.
+          </p>
+
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Arduino Uno</th>
+                  <th>ATmega328P</th>
+                  <th>Función</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>D9</td>
+                  <td>PB1</td>
+                  <td>OC1A: salida de comparación A del Timer1.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>4.3. Código para generar la señal cuadrada de 8 MHz</h3>
+
+          <p>
+            El siguiente programa configura el Timer1 del Arduino Uno para
+            generar una señal cuadrada de 8 MHz en el pin digital 9.
+          </p>
+
+          <pre><code>// Genera una onda cuadrada de 8 MHz en el Pin 9 (OC1A)
+// Arduino Uno con ATmega328P a 16 MHz
+
+void setup() {
+  // Configurar Pin 9 (PB1 / OC1A) como salida
+  pinMode(9, OUTPUT);
+
+  // Reiniciar registros de control del Timer1
+  TCCR1A = 0;
+  TCCR1B = 0;
+  TCNT1  = 0;
+
+  // Establecer valor de comparación
+  OCR1A = 0;
+
+  // Configurar OC1A para conmutar en cada Compare Match
+  TCCR1A = (1 &lt;&lt; COM1A0);
+
+  // Configurar modo CTC y comenzar sin prescaler
+  TCCR1B = (1 &lt;&lt; WGM12) | (1 &lt;&lt; CS10);
+}
+
+void loop() {
+  // La señal es generada por hardware
+}
+</code></pre>
+
+          <h3>4.4. Funcionamiento del Timer1</h3>
+
+          <p>
+            El Timer1 recibe el reloj de sistema de 16 MHz del Arduino Uno. Al
+            utilizar el prescaler con factor de división 1, el contador recibe
+            los pulsos directamente a esa frecuencia.
+          </p>
+
+          <p>
+            El modo CTC se establece mediante el bit WGM12. El valor de
+            comparación se establece en OCR1A = 0, por lo que el contador
+            realiza su ciclo de conteo en un solo valor.
+          </p>
+
+          <p>
+            La salida OC1A se configura para conmutar en cada coincidencia de
+            comparación mediante el bit COM1A0. Como el temporizador recibe un
+            pulso cada 62,5 ns, la salida cambia de estado en ese intervalo.
+          </p>
+
+          <p>
+            Para completar un período de la señal cuadrada se necesitan dos
+            cambios de estado, por lo que el período de salida es de 125 ns y su
+            frecuencia es de 8 MHz.
+          </p>
+
+          <h3>4.5. Cálculo de la frecuencia de salida</h3>
+
+          <p>
+            La frecuencia de salida en OC1A, utilizando el modo CTC con
+            conmutación de la salida en cada coincidencia, se determina
+            mediante:
+          </p>
+
+          <div class="formula-box">
+            <p><strong>fOC1A = fclk / [2 × N × (1 + OCR1A)]</strong></p>
+          </div>
+
+          <p>Donde:</p>
+
+          <ul>
+            <li>fOC1A: frecuencia de la señal de salida.</li>
+            <li>fclk: frecuencia del reloj que alimenta al Timer1.</li>
+            <li>N: factor de división del prescaler.</li>
+            <li>OCR1A: valor del registro de comparación.</li>
+          </ul>
+
+          <p>En este caso:</p>
+
+          <pre><code>fclk  = 16 MHz
+N     = 1
+OCR1A = 0</code></pre>
+
+          <p>Sustituyendo:</p>
+
+          <pre><code>fOC1A = 16 MHz / [2 × 1 × (0 + 1)]
+
+fOC1A = 16 MHz / 2
+
+fOC1A = 8 MHz</code></pre>
+
+          <p>
+            La señal de salida tendrá un período de 125 ns y un ciclo de trabajo
+            del 50 %.
+          </p>
+        </section>
+
+        <section>
+          <h2>5. MATERIALES Y EQUIPOS</h2>
+
+          <h3>5.1. Materiales</h3>
+
+          <ul>
+            <li>Arduino Uno con ATmega328P y reloj de 16 MHz.</li>
+            <li>Microcontrolador ATmega88PA en encapsulado DIP-28.</li>
+            <li>Programador ISP, por ejemplo USBasp.</li>
+            <li>Protoboard.</li>
+            <li>Cables de conexión.</li>
+            <li>
+              Fuente de alimentación regulada de 5 V, compatible con ambos
+              dispositivos.
+            </li>
+            <li>Multímetro con función de medición de frecuencia.</li>
+          </ul>
+
+          <h3>5.2. Herramientas de software</h3>
+
+          <ul>
+            <li>
+              Arduino IDE para cargar el programa generador de reloj en el
+              Arduino Uno.
+            </li>
+            <li>
+              AVRDUDE para leer y escribir los fuses del ATmega88PA mediante el
+              programador ISP.
+            </li>
+            <li>
+              Terminal de Linux para ejecutar los comandos de programación.
+            </li>
+          </ul>
+
+          <h3>5.3. Identificación de los pines del ATmega88PA</h3>
+
+          <p>
+            Para esta práctica se utilizará el ATmega88PA en encapsulado DIP-28.
+            Los pines relevantes son:
+          </p>
+
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Pin físico</th>
+                  <th>Nombre</th>
+                  <th>Función en la práctica</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>9</td>
+                  <td>PB6 / XTAL1</td>
+                  <td>Entrada de la señal de reloj externa.</td>
+                </tr>
+                <tr>
+                  <td>14</td>
+                  <td>PB0 / CLKO / ICP1</td>
+                  <td>Salida del reloj de sistema.</td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td>VCC</td>
+                  <td>Alimentación del microcontrolador.</td>
+                </tr>
+                <tr>
+                  <td>8</td>
+                  <td>GND</td>
+                  <td>Tierra.</td>
+                </tr>
+                <tr>
+                  <td>20</td>
+                  <td>AVCC</td>
+                  <td>
+                    Alimentación de la sección analógica; debe conectarse según
+                    las recomendaciones del fabricante.
+                  </td>
+                </tr>
+                <tr>
+                  <td>22</td>
+                  <td>GND</td>
+                  <td>Tierra.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Antes de realizar las conexiones, comprobar el pinout del
+            encapsulado y la orientación del microcontrolador. No debe
+            confundirse el número de pin físico con el nombre del puerto.
+          </p>
+        </section>
+
+        <section>
+          <h2>6. PROCEDIMIENTO EXPERIMENTAL</h2>
+
+          <h3>6.1. Cargar el programa generador de reloj en el Arduino Uno</h3>
+
+          <ol>
+            <li>Conectar el Arduino Uno al computador mediante USB.</li>
+            <li>Abrir Arduino IDE.</li>
+            <li>
+              Seleccionar la placa Arduino Uno y el puerto correspondiente.
+            </li>
+            <li>Copiar el programa generador de señal de 8 MHz.</li>
+            <li>Compilar el programa y cargarlo en el Arduino Uno.</li>
+            <li>Comprobar que la carga se haya realizado correctamente.</li>
+          </ol>
+
+          <h3>6.2. Medir la frecuencia de salida del Arduino Uno</h3>
+
+          <p>
+            Con el programa cargado, medir la frecuencia de la señal disponible
+            en el pin digital 9 del Arduino Uno.
+          </p>
+
+          <p>
+            Utilizar la función de medición de frecuencia del multímetro y
+            comprobar que el instrumento admita la medición de 8 MHz. La
+            frecuencia esperada es:
+          </p>
+
+          <div class="formula-box">
+            <p><strong>fD9 = 8 MHz</strong></p>
+          </div>
+
+          <p>
+            Registrar el valor obtenido antes de conectar la señal al
+            ATmega88PA.
+          </p>
+
+          <div class="alert-box">
+            <p>
+              <strong>Precaución:</strong> no todos los multímetros permiten
+              medir frecuencias de 8 MHz. Si el rango de frecuencia del
+              instrumento no alcanza este valor, la medición puede ser
+              incorrecta o no mostrar ningún resultado. En ese caso, se debe
+              utilizar un instrumento con un rango de frecuencia adecuado, como
+              un frecuencímetro o un osciloscopio.
+            </p>
+          </div>
+
+          <h3>6.3. Conectar el Arduino Uno al ATmega88PA</h3>
+
+          <p>
+            Con la señal de 8 MHz verificada, realizar las conexiones entre el
+            Arduino Uno y el microcontrolador objetivo.
+          </p>
+
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Arduino Uno</th>
+                  <th>ATmega88PA DIP-28</th>
+                  <th>Descripción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Pin 9 (OC1A)</td>
+                  <td>Pin 9 (PB6 / XTAL1)</td>
+                  <td>Señal de reloj externa de 8 MHz.</td>
+                </tr>
+                <tr>
+                  <td>GND</td>
+                  <td>GND (pin 8 y pin 22)</td>
+                  <td>Referencia común de tierra.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            El ATmega88PA debe contar con una alimentación de 5 V regulada,
+            siempre que el dispositivo utilizado y las condiciones de
+            funcionamiento lo permitan. AVCC debe conectarse de acuerdo con las
+            recomendaciones del fabricante.
+          </p>
+
+          <p>
+            XTAL2 (PB7, pin 10 del encapsulado DIP-28) permanecerá sin conexión
+            para esta configuración de reloj externo.
+          </p>
+
+          <h3>6.4. Conectar el programador ISP</h3>
+
+          <p>
+            Conectar el programador ISP al ATmega88PA. Comprobar que las
+            conexiones de programación, alimentación y tierra estén
+            correctamente realizadas.
+          </p>
+
+          <p>
+            Antes de modificar los fuses, se recomienda verificar que el
+            programador pueda comunicarse con el microcontrolador.
+          </p>
+
+          <h3>6.5. Leer el valor inicial de LFUSE</h3>
+
+          <p>
+            Con USBasp conectado, ejecutar el siguiente comando en la terminal:
+          </p>
+
+          <pre><code>avrdude -c usbasp -p m88p -U lfuse:r:-:h</code></pre>
+
+          <p>
+            El parámetro <code>-p m88p</code> identifica al ATmega88PA en
+            AVRDUDE. El comando solicita la lectura de LFUSE y muestra el valor
+            hexadecimal en la terminal.
+          </p>
+
+          <p>Registrar el valor inicial antes de modificarlo.</p>
+
+          <h3>6.6. Programar LFUSE = 0x20</h3>
+
+          <p>
+            Con la señal externa de 8 MHz funcionando y conectada a XTAL1,
+            ejecutar el siguiente comando:
+          </p>
+
+          <pre><code>avrdude -c usbasp -p m88p -U lfuse:w:0x20:m</code></pre>
+
+          <p>
+            El comando establece el valor 0x20 en el fusible LFUSE del
+            ATmega88PA.
+          </p>
+
+          <ul>
+            <li>
+              <strong>-c usbasp:</strong> selecciona el programador USBasp.
+            </li>
+            <li>
+              <strong>-p m88p:</strong> identifica el microcontrolador
+              ATmega88PA.
+            </li>
+            <li>
+              <strong>-U lfuse:w:0x20:m:</strong> indica que se escribirá el
+              valor 0x20 en LFUSE.
+            </li>
+          </ul>
+
+          <p>
+            La opción <code>w</code> indica una operación de escritura y
+            <code>m</code> indica que el valor se proporciona en formato
+            inmediato.
+          </p>
+
+          <p>
+            La escritura modifica los bits de configuración de LFUSE. No
+            modifica el programa almacenado en la memoria Flash.
+          </p>
+
+          <div class="alert-box">
+            <p>
+              <strong>Precaución:</strong> antes de programar CKSEL para
+              utilizar reloj externo, asegúrese de que la señal de reloj de 8
+              MHz esté funcionando y aplicada a XTAL1. Si el microcontrolador
+              queda configurado para utilizar reloj externo y la señal
+              desaparece, puede dejar de responder al programador ISP.
+            </p>
+          </div>
+
+          <h3>6.7. Verificar el valor de LFUSE</h3>
+
+          <p>Después de programar el fusible, leer nuevamente su contenido:</p>
+
+          <pre><code>avrdude -c usbasp -p m88p -U lfuse:r:-:h</code></pre>
+
+          <p>El valor esperado es:</p>
+
+          <pre><code>0x20</code></pre>
+
+          <p>
+            La lectura confirma que se ha programado el valor de configuración
+            solicitado.
+          </p>
+
+          <h3>6.8. Medir la salida CLKO del ATmega88PA</h3>
+
+          <p>
+            Con LFUSE = 0x20, el microcontrolador recibe una señal externa de 8
+            MHz por XTAL1. Debido a que CKDIV8 está habilitado, el reloj de
+            sistema será de 1 MHz.
+          </p>
+
+          <p>
+            CKOUT también está habilitado, por lo que la salida del reloj de
+            sistema estará disponible en PB0/CLKO, pin 14 del encapsulado
+            DIP-28.
+          </p>
+
+          <p>
+            Conectar el multímetro en modo de medición de frecuencia entre
+            PB0/CLKO y GND, respetando las indicaciones del instrumento.
+          </p>
+
+          <p>El valor esperado es:</p>
+
+          <div class="formula-box">
+            <p><strong>fCLKO = 1 MHz</strong></p>
+          </div>
+
+          <p>
+            Registrar el valor medido y compararlo con la frecuencia de 8 MHz
+            obtenida en el Arduino Uno.
+          </p>
+
+          <h3>6.9. Comparación de las frecuencias medidas</h3>
+
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Punto de medición</th>
+                  <th>Frecuencia teórica</th>
+                  <th>Frecuencia medida</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Arduino Uno, D9 / OC1A</td>
+                  <td>8 MHz</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>ATmega88PA, PB0 / CLKO</td>
+                  <td>1 MHz</td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            La diferencia entre ambas frecuencias se debe a que CKDIV8 divide
+            entre 8 la señal de reloj que utiliza el microcontrolador como reloj
+            de sistema.
+          </p>
+
+          <div class="formula-box">
+            <p><strong>8 MHz / 8 = 1 MHz</strong></p>
+          </div>
+
+          <h3>6.10. Restaurar LFUSE a su configuración de fábrica</h3>
+
+          <p>
+            Una vez realizadas las mediciones, se debe restaurar la
+            configuración original del fusible LFUSE del ATmega88PA.
+          </p>
+
+          <p>
+            La configuración de fábrica selecciona el oscilador RC interno
+            calibrado de 8 MHz, habilita la división entre 8 y establece el
+            tiempo de arranque correspondiente. El valor predeterminado de LFUSE
+            es:
+          </p>
+
+          <pre><code>LFUSE = 0x62</code></pre>
+
+          <p>
+            Antes de restaurar el fusible, mantener la señal externa de 8 MHz
+            conectada a XTAL1 mientras se realiza la programación mediante ISP.
+            Esto permite que el microcontrolador continúe disponiendo de reloj
+            durante la operación de escritura.
+          </p>
+
+          <p>Ejecutar el siguiente comando:</p>
+
+          <pre><code>avrdude -c usbasp -p m88p -U lfuse:w:0x62:m</code></pre>
+
+          <p>Después de realizar la escritura, leer LFUSE nuevamente:</p>
+
+          <pre><code>avrdude -c usbasp -p m88p -U lfuse:r:-:h</code></pre>
+
+          <p>El valor esperado es:</p>
+
+          <pre><code>0x62</code></pre>
+
+          <p>
+            Una vez confirmada la restauración, se puede desconectar la señal
+            externa de reloj de XTAL1. El microcontrolador volverá a utilizar el
+            oscilador RC interno calibrado, con el divisor entre 8 habilitado,
+            por lo que su reloj de sistema será de 1 MHz.
+          </p>
+
+          <div class="alert-box">
+            <p>
+              <strong>Importante:</strong> no desconectar la señal de reloj
+              externa antes de haber programado y verificado la restauración de
+              LFUSE = 0x62. Mientras el microcontrolador esté configurado para
+              utilizar reloj externo, necesita esa señal para funcionar y
+              permitir la comunicación ISP.
+            </p>
+          </div>
+        </section>
+
+        <section>
+          <h2>7. ANÁLISIS DE LOS RESULTADOS</h2>
+
+          <h3>7.1. Frecuencia aplicada al ATmega88PA</h3>
+
+          <p>
+            El Arduino Uno genera una señal cuadrada de 8 MHz en su pin 9, que
+            corresponde a OC1A del ATmega328P. Esta señal se aplica a XTAL1 del
+            ATmega88PA.
+          </p>
+
+          <p>
+            La frecuencia aplicada al microcontrolador es de 8 MHz. Esta
+            frecuencia corresponde a la señal externa antes de aplicar la
+            división de reloj configurada mediante CKDIV8.
+          </p>
+
+          <h3>7.2. Frecuencia del reloj de sistema</h3>
+
+          <p>Con CKDIV8 programado, el reloj externo se divide entre 8:</p>
+
+          <div class="formula-box">
+            <p><strong>fCPU = 8 MHz / 8 = 1 MHz</strong></p>
+          </div>
+
+          <p>
+            Por tanto, el procesador del ATmega88PA trabaja con un reloj de
+            sistema de 1 MHz, aunque la señal externa aplicada a XTAL1 tenga una
+            frecuencia de 8 MHz.
+          </p>
+
+          <h3>7.3. Frecuencia en PB0/CLKO</h3>
+
+          <p>
+            Al habilitar CKOUT, la salida CLKO presenta la frecuencia del reloj
+            de sistema. Como CKDIV8 está habilitado, la frecuencia observada en
+            PB0 será de 1 MHz.
+          </p>
+
+          <p>
+            La medición de CLKO permite comprobar de manera directa el efecto de
+            la división de frecuencia configurada en LFUSE.
+          </p>
+
+          <h3>7.4. Registro de resultados experimentales</h3>
+
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Parámetro</th>
+                  <th>Valor esperado</th>
+                  <th>Valor registrado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Frecuencia de reloj del Arduino Uno</td>
+                  <td>16 MHz</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>Frecuencia de salida del Arduino Uno, D9</td>
+                  <td>8 MHz</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>Frecuencia aplicada a XTAL1</td>
+                  <td>8 MHz</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>LFUSE programado durante la práctica</td>
+                  <td>0x20</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>CKSEL3:0</td>
+                  <td>0000</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>CKDIV8</td>
+                  <td>Habilitado</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>CKOUT</td>
+                  <td>Habilitado</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>Frecuencia del reloj de sistema</td>
+                  <td>1 MHz</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>Frecuencia de salida PB0/CLKO</td>
+                  <td>1 MHz</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>LFUSE restaurado</td>
+                  <td>0x62</td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <h2>8. PRECAUCIONES Y POSIBLES PROBLEMAS</h2>
+
+          <h3>8.1. Mantener la señal externa de reloj</h3>
+
+          <p>
+            Cuando se selecciona la entrada de reloj externo mediante CKSEL, el
+            microcontrolador necesita recibir una señal en XTAL1 para funcionar.
+          </p>
+
+          <p>
+            Si se programa el fusible y posteriormente se desconecta la señal de
+            reloj, el microcontrolador puede dejar de responder al programador
+            ISP. Por este motivo, la señal externa debe mantenerse conectada
+            durante la programación, verificación y restauración del fusible.
+          </p>
+
+          <h3>8.2. Compatibilidad de niveles lógicos</h3>
+
+          <p>
+            La señal de reloj generada por el Arduino Uno debe ser compatible
+            con los niveles de tensión del ATmega88PA. Para esta práctica se
+            recomienda utilizar ambos dispositivos con alimentación de 5 V,
+            siempre que las condiciones de funcionamiento del microcontrolador
+            lo permitan.
+          </p>
+
+          <p>
+            Debe existir una referencia común de tierra entre el Arduino Uno, el
+            ATmega88PA y el programador ISP.
+          </p>
+
+          <h3>8.3. Medición de frecuencia con multímetro</h3>
+
+          <p>
+            La función de medición de frecuencia del multímetro tiene un rango
+            máximo que depende del modelo del instrumento.
+          </p>
+
+          <p>
+            Antes de medir los 8 MHz del Arduino Uno, comprobar que el
+            multímetro admite esa frecuencia. Si el instrumento no alcanza ese
+            rango, no se debe considerar válida una lectura incorrecta o
+            inestable.
+          </p>
+
+          <p>
+            La medición de 1 MHz en PB0/CLKO también debe realizarse dentro del
+            rango especificado para el instrumento.
+          </p>
+
+          <h3>8.4. No confundir la señal externa con el reloj de sistema</h3>
+
+          <p>
+            La señal de 8 MHz aplicada a XTAL1 es la fuente externa de reloj.
+            Sin embargo, el reloj de sistema es de 1 MHz porque CKDIV8 está
+            habilitado.
+          </p>
+
+          <p>
+            La salida CLKO permite observar el reloj de sistema después de la
+            división. Por eso, la frecuencia medida en PB0 no será igual a la
+            frecuencia aplicada en XTAL1.
+          </p>
+
+          <h3>8.5. Restauración de los fuses</h3>
+
+          <p>
+            La restauración del valor LFUSE = 0x62 debe realizarse antes de
+            retirar la señal externa de reloj. Después de verificar el valor
+            restaurado, el microcontrolador volverá a utilizar su oscilador RC
+            interno calibrado.
+          </p>
+
+          <p>
+            La restauración de LFUSE no borra la memoria Flash del programa ni
+            modifica los otros bytes de fuses.
+          </p>
+        </section>
+
+        <section>
+          <h2>9. CONCLUSIONES</h2>
+
+          <p>
+            La práctica permite comprender cómo se selecciona una fuente de
+            reloj externa mediante los bits CKSEL del fusible LFUSE y cómo la
+            frecuencia de esa fuente puede modificarse mediante el divisor de
+            reloj CKDIV8.
+          </p>
+
+          <p>
+            Al programar LFUSE = 0x20, el ATmega88PA selecciona la entrada de
+            reloj externo, habilita la división entre 8 y habilita la salida
+            CLKO.
+          </p>
+
+          <p>
+            La señal de 8 MHz generada por el Arduino Uno se aplica a XTAL1.
+            Debido a CKDIV8, el reloj de sistema del ATmega88PA será de 1 MHz,
+            que puede observarse en PB0/CLKO, pin 14 del encapsulado DIP-28.
+          </p>
+
+          <p>
+            La medición de ambas señales permite comprobar experimentalmente la
+            diferencia entre la frecuencia de la fuente de reloj externa y la
+            frecuencia de reloj de sistema utilizada por el microcontrolador.
+          </p>
+
+          <p>
+            Finalmente, la restauración de LFUSE = 0x62 devuelve al ATmega88PA
+            su configuración de reloj de fábrica: oscilador RC interno calibrado
+            de 8 MHz con división entre 8, resultando en un reloj de sistema de
+            1 MHz.
+          </p>
+        </section>
+
+        <section>
+          <h2>10. CUESTIONARIO DE EVALUACIÓN</h2>
+
+          <h3>10.1. Preguntas de comprensión</h3>
+
+          <ol>
+            <li>¿Qué función cumplen los bits CKSEL3:0 del fusible LFUSE?</li>
+            <li>
+              ¿Qué diferencia existe entre aplicar una señal de reloj externa y
+              utilizar un cristal de cuarzo?
+            </li>
+            <li>¿Qué función cumple CKDIV8?</li>
+            <li>
+              ¿Qué sucede con una señal de 8 MHz cuando CKDIV8 está habilitado?
+            </li>
+            <li>¿Qué función cumple CKOUT?</li>
+            <li>
+              ¿En qué pin del ATmega88PA se observa la salida CLKO en el
+              encapsulado DIP-28?
+            </li>
+            <li>
+              ¿Por qué la frecuencia medida en PB0/CLKO es de 1 MHz y no de 8
+              MHz?
+            </li>
+            <li>
+              ¿Qué diferencia existe entre la frecuencia aplicada a XTAL1 y la
+              frecuencia del reloj de sistema?
+            </li>
+            <li>
+              ¿Por qué es necesario mantener la señal externa de reloj durante
+              la programación ISP después de seleccionar CKSEL = 0000?
+            </li>
+            <li>
+              ¿Qué valor de LFUSE corresponde a la configuración de fábrica del
+              ATmega88PA?
+            </li>
+          </ol>
+
+          <h3>10.2. Ejercicio de cálculo</h3>
+
+          <p>
+            Un microcontrolador recibe una señal externa de 12 MHz y tiene
+            CKDIV8 habilitado.
+          </p>
+
+          <p>Calcular la frecuencia del reloj de sistema:</p>
+
+          <div class="formula-box">
+            <p><strong>fCPU = 12 MHz / 8 = 1.5 MHz</strong></p>
+          </div>
+
+          <p>
+            Si CKDIV8 estuviera deshabilitado, la frecuencia del reloj de
+            sistema sería de 12 MHz.
+          </p>
+
+          <p>
+            Explicar por qué la frecuencia de la señal aplicada a XTAL1 no
+            necesariamente coincide con la frecuencia del reloj de sistema.
+          </p>
+        </section>
+      </article>
+    </main>
+
+    <div id="articulo-nav"></div>
+
+    <div id="footer"></div>
+    <script src="/assets/js/componentes.js"></script>
+    <script src="/assets/js/menu-direction.js"></script>
+    <script src="/assets/js/indice.js"></script>
+
+    <!-- 
+CAMBIAR EN CADA ARTICULO. Siempre que se agregue un nuevo artículo, se debe modificar el script para indicar el artículo anterior y el siguiente.
+<script>
+document.addEventListener("articulo-nav-cargado", () => {
+
+    document.getElementById("articulo-anterior").href = "ley-ohm.html";
+    document.getElementById("articulo-anterior").textContent = "← Ley de Ohm";
+
+    document.getElementById("articulo-siguiente").href = "efecto-carga.html";
+    document.getElementById("articulo-siguiente").textContent = "Efecto de carga →";
+
+});
+</script>
+-->
+  </body>
+</html>
